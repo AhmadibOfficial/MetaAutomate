@@ -1,12 +1,16 @@
 import os
 from fastapi import FastAPI
 import psycopg
+from app.registry import router as capability_router
 
-app = FastAPI(title="MetaAutomate MVP API", version="0.1.0")
+app = FastAPI(title="MetaAutomate MVP API", version="0.2.0")
+app.include_router(capability_router)
+
 
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "metaautomate-api"}
+
 
 @app.get("/ready")
 def ready():

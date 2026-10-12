@@ -23,6 +23,7 @@ services:
     environment:
       DATABASE_URL: postgresql://metaautomate:${POSTGRES_PASSWORD:-localdev_only_change_me}@postgres:5432/${POSTGRES_DB:-metaautomate}
       REDIS_URL: redis://redis:6379/0
+      REGISTRY_READ_API_KEY: ${REGISTRY_READ_API_KEY:-}
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
