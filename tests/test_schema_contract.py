@@ -18,6 +18,7 @@ def test_required_migration_order_exists():
         "005_business_outcomes_audit.sql",
         "006_security_triggers_rls.sql",
         "007_utility_functions.sql",
+        "008_capability_registry.sql",
     ]
 
 
@@ -92,6 +93,27 @@ def test_rls_is_forced_on_core_tenant_tables():
         "appointments",
         "audit_events",
     ):
+        assert f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;" in sql
+        assert f"ALTER TABLE {table} FORCE ROW LEVEL SECURITY;" in sql
+        assert f"CREATE POLICY tenant_{table}" in sql
+
+
+def test_registry_has_all_six_tables():
+    sql = (MIGRATIONS / "008_capability_registry.sql").read_text(encoding="utf-8")
+    for table in (
+        "capability_definitions",
+        "capability_versions",
+        "capability_dependencies",
+        "capability_permissions",
+        "organization_capabilities",
+        "capability_executions",
+    ):
+        assert f"CREATE TABLE {table} (" in sql
+
+
+def test_registry_tenant_rls_is_forced():
+    sql = (MIGRATIONS / "008_capability_registry.sql").read_text(encoding="utf-8")
+    for table in ("organization_capabilities", "capability_executions"):
         assert f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;" in sql
         assert f"ALTER TABLE {table} FORCE ROW LEVEL SECURITY;" in sql
         assert f"CREATE POLICY tenant_{table}" in sql
