@@ -21,6 +21,7 @@ def test_required_migration_order_exists():
         "008_capability_registry.sql",
         "009_objective_operations.sql",
         "010_workspace_sessions.sql",
+        "011_oidc_identities.sql",
     ]
 
 
@@ -137,3 +138,12 @@ def test_workspace_browser_sessions_are_revocable_and_tenant_scoped():
     assert "CREATE FUNCTION app.authenticate_workspace_session(" in sql
     assert "CREATE FUNCTION app.revoke_workspace_session(" in sql
     assert "REVOKE ALL ON workspace_sessions FROM metaautomate_runtime;" in sql
+
+
+def test_production_oidc_identity_contract():
+    sql=(MIGRATIONS/"011_oidc_identities.sql").read_text(encoding="utf-8")
+    assert "CREATE TABLE oidc_identities" in sql
+    assert "ALTER TABLE oidc_identities FORCE ROW LEVEL SECURITY;" in sql
+    assert "REVOKE ALL ON oidc_identities FROM metaautomate_runtime;" in sql
+    assert "CREATE FUNCTION app.create_oidc_workspace_session(" in sql
+    assert "CREATE OR REPLACE FUNCTION app.authenticate_workspace_session(" in sql

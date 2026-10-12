@@ -131,3 +131,11 @@ jobs:
           python scripts/bootstrap_workspace.py
           python scripts/verify_workspace_bootstrap.py
           rm -f .env .workspace-access-key
+
+      - name: Verify private cloud Compose and security boundaries
+        run: python scripts/verify_private_deploy.py
+
+      - name: Verify pre-provisioned OIDC identities and fail-closed production configuration
+        env:
+          APP_DATABASE_URL: postgresql://metaautomate_runtime:ci_runtime_password@localhost:5432/metaautomate
+        run: python scripts/verify_oidc_identity.py
