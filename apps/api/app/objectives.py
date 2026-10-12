@@ -68,12 +68,6 @@ def build_preview(payload: PreviewRequest, caps: list[dict], dependencies: list[
             detail={"reason": "Unknown registered capabilities", "capability_ids": unknown},
         )
 
-    dependencies = registry._query(
-        "SELECT capability_id, depends_on_capability_id "
-        "FROM capability_dependencies WHERE capability_id = ANY(%s::text[]) "
-        "ORDER BY capability_id, depends_on_capability_id",
-        (ids,),
-    )
     deps_by_id: dict[str, list[str]] = {cap_id: [] for cap_id in ids}
     for dep in dependencies:
         deps_by_id[dep["capability_id"]].append(dep["depends_on_capability_id"])
