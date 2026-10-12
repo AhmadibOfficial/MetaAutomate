@@ -52,7 +52,7 @@ if [[ "$(stat -c %a "$ENV")" != "600" || "$(stat -c %a "$KEY")" != "600" ]]; the
   exit 1
 fi
 COMPOSE=(docker compose --project-name metaautomate-oss-demo --env-file "$ENV" -f "$DEMO_DIR/compose.yaml")
-"${COMPOSE[@]}" up -d postgres
+"${COMPOSE[@]}" up -d --wait postgres
 existing="$("${COMPOSE[@]}" exec -T postgres psql -X -A -t -U metaautomate -d metaautomate -c "SELECT to_regclass('public.organizations') IS NOT NULL;")"
 if [[ "$existing" != "t" && "$existing" != "f" ]]; then
   echo "ERROR: unexpected database response; refusing migrations." >&2
