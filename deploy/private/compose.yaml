@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_DB: metaautomate
       POSTGRES_USER: metaautomate_admin
-      POSTGRES_PASSWORD: \${POSTGRES_ADMIN_PASSWORD:?Set a strong PostgreSQL administrator password}
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:?Set a strong PostgreSQL administrator password}
     volumes:
       - metaautomate_private_postgres:/var/lib/postgresql/data
     networks: [internal]
@@ -28,15 +28,15 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      APP_DATABASE_URL: postgresql://metaautomate_runtime:\${APP_DB_PASSWORD:?Required}@postgres:5432/metaautomate
+      APP_DATABASE_URL: postgresql://metaautomate_runtime:${APP_DB_PASSWORD:?Required}@postgres:5432/metaautomate
       WORKSPACE_AUTH_MODE: oidc
-      WORKSPACE_ORIGIN: \${WORKSPACE_ORIGIN:?Must be the private HTTPS Tailscale address}
+      WORKSPACE_ORIGIN: ${WORKSPACE_ORIGIN:?Must be the private HTTPS Tailscale address}
       WORKSPACE_COOKIE_SECURE: "1"
-      OIDC_ISSUER: \${OIDC_ISSUER:?Required}
-      OIDC_CLIENT_ID: \${OIDC_CLIENT_ID:?Required}
-      OIDC_CLIENT_SECRET: \${OIDC_CLIENT_SECRET:?Required}
-      OIDC_REDIRECT_URI: \${OIDC_REDIRECT_URI:?Required}
-      OIDC_STATE_SECRET: \${OIDC_STATE_SECRET:?Required}
+      OIDC_ISSUER: ${OIDC_ISSUER:?Required}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:?Required}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:?Required}
+      OIDC_REDIRECT_URI: ${OIDC_REDIRECT_URI:?Required}
+      OIDC_STATE_SECRET: ${OIDC_STATE_SECRET:?Required}
       WORKSPACE_WEB_ROOT: /srv/metaautomate/web
     ports: ["127.0.0.1:8080:8000"]
     networks: [internal]
@@ -63,8 +63,8 @@ services:
       PGHOST: postgres
       PGUSER: metaautomate_admin
       PGDATABASE: metaautomate
-      PGPASSWORD: \${POSTGRES_ADMIN_PASSWORD:?Required}
-      APP_DB_PASSWORD: \${APP_DB_PASSWORD:?Required}
+      PGPASSWORD: ${POSTGRES_ADMIN_PASSWORD:?Required}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?Required}
     volumes:
       - ../../database/migrations:/migrations:ro
       - ./scripts/migrate_fresh.sh:/opt/migrate_fresh.sh:ro
@@ -82,8 +82,8 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://metaautomate_admin:\${POSTGRES_ADMIN_PASSWORD:?Required}@postgres:5432/metaautomate
-      OIDC_ISSUER: \${OIDC_ISSUER:?Required}
+      DATABASE_URL: postgresql://metaautomate_admin:${POSTGRES_ADMIN_PASSWORD:?Required}@postgres:5432/metaautomate
+      OIDC_ISSUER: ${OIDC_ISSUER:?Required}
     volumes:
       - ../../scripts:/opt/meta-scripts:ro
     entrypoint: ["python"]
