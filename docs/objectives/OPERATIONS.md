@@ -24,15 +24,23 @@ GitHub Actions applies migrations 001-009 to ephemeral PostgreSQL, seeds 33 disa
 
 Local make ci-local creates a disposable database. Objective operations integration there requires a separately provisioned APP_DATABASE_URL. Credentials are not embedded in the GitHub repository.
 
-## Local rollout (opt-in privileged operation)
+## Browser workspace and local setup
 
-1. Work in the established repository ~/metaautomate-github and review migration 009.
-2. Run make db-upgrade once. It verifies migrations 001-008, takes a backup into ~/metaautomate-db-backups, and transactionally installs only 009. It never replays previous migrations or removes Docker volumes.
-3. A trusted administrator must provision PostgreSQL role metaautomate_runtime as LOGIN with a strong private password and configure APP_DATABASE_URL in the ignored .env. The API Compose service already exposes this environment variable.
-4. The administrator provisions a development organization, user and ACTIVE membership, then stores a SHA-256 digest of a high-entropy mat_dev_ bearer token in api_access_tokens. The tenant context must be set for membership inserts, even by a privileged database user, because of the existing write trigger.
-5. Restart the API to load the new environment; then run make smoke, make validate and make ci-local. Do not share raw bearer tokens or database passwords in Git, screenshots or logs.
+This PR includes a usable, responsive browser workspace under apps/web. The Objective Workspace supports local access-key sign-in, revocable HttpOnly sessions, CSRF protection, objective creation, persistent DAG visualization, approval/rejection, an overview dashboard, and sign-out.
 
-Local credential issuance is deliberately not an unauthenticated API or insecure default. It must be securely provisioned before enabling the local objective-write API; GitHub's ephemeral end-to-end CI does not require local credentials. Opening this PR does not migrate or modify the user's main database.
+See docs/workspace/README.md for the complete local rollout, security boundaries and browser acceptance tests.
+
+On the established Kali checkout, the one-time setup is a single command:
+
+    make workspace-init
+
+The command asks for explicit INIT approval, creates a pre-migration database backup, installs only missing migrations 009-010, provisions restricted runtime credentials and a seven-day development access key, then restarts the API. The ignored access key is saved in .workspace-access-key with permissions 0600. The database connection credentials remain in the ignored .env file with permissions 0600. Neither value is printed or committed. The workspace opens at http://127.0.0.1:8000/.
+
+**Do not run this setup before reviewing the PR and deciding to modify the local development database.** Opening, testing or merging this PR does not automatically change the Kali database or credentials. The Docker port remains bound to 127.0.0.1; this is not a public cloud deployment.
+
+## Security review boundary
+
+The browser now uses revocable server-side sessions with separate CSRF verification; sessions and API access keys are stored as hashes. Original development API bearer authentication remains available for automated tests. The API process still carries the migration administrator DATABASE_URL for legacy health/registry endpoints, and PostgreSQL GUC-based tenant context is not hardened against compromised SQL; production requires role segregation, identity-provider integration, stronger tenant enforcement, rate limiting and deployment review. The local access-key flow is NOT general customer sign-in.
 
 ## Execution exclusions
 
