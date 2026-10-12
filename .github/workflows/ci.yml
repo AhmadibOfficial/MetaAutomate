@@ -121,7 +121,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: objective-workspace-browser
-          path: artifacts/objective-workspace.png
+          path: artifacts/*.png
           if-no-files-found: ignore
 
       - name: Verify pre-provisioned OIDC identities and fail-closed production configuration
