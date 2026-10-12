@@ -20,7 +20,7 @@ printf 'Creating isolated CI database: %s\n' "$DB"
 docker compose exec -T postgres createdb -U metaautomate "$DB"
 CREATED=1
 
-for migration in database/migrations/00[1-9]_*.sql; do
+for migration in database/migrations/*.sql; do
   echo "Applying: $migration"
   docker compose exec -T postgres \
     psql -X -q -v ON_ERROR_STOP=1 -U metaautomate -d "$DB" < "$migration"
