@@ -34,7 +34,8 @@ def get_tenant_session(
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Bearer token required")
     token = authorization[7:]
-    if len(token) < 35 or len(token) > 160 or not token.startswith("mat_dev_"):
+    if (len(token) < 35 or len(token) > 160 or not token.startswith("mat_dev_")
+            or not token.isascii()):
         raise HTTPException(status_code=401, detail="Invalid API token")
 
     db_url = os.environ.get("APP_DATABASE_URL")

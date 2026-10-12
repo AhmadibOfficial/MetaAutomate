@@ -78,9 +78,10 @@ def create_objective(
             "INSERT INTO idempotency_keys "
             "(organization_id, scope, idempotency_key, request_hash, status, expires_at) "
             "VALUES (%s, 'OBJECTIVE_CREATE', %s, %s, 'IN_PROGRESS', now()+interval '24 hours') "
-            "ON CONFLICT (organization_id, scope, idempotency_key) DO NOTHING",
+            "ON CONFLICT (organization_id, scope, idempotency_key) DO NOTHING RETURNING id",
             (org, idempotency_key, request_hash),
         )
+        inserted = cur.fetchone() is not None
         cur.execute(
             "SELECT request_hash, status, response_body FROM idempotency_keys "
             "WHERE organization_id=%s AND scope='OBJECTIVE_CREATE' AND idempotency_key=%s "
@@ -93,7 +94,7 @@ def create_objective(
             return existing["response_body"]
         # An in-progress key can only be seen after conflicting transactions
         # finish; it cannot be reused to create a duplicate objective.
-        if cur.rowcount != 1:
+        if not inserted:
             raise HTTPException(status_code=409, detail="Concurrent objective creation")
         plan = _plan_for_session(cur, payload)
 

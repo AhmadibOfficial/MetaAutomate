@@ -34,8 +34,7 @@ END;
 $$;
 
 GRANT USAGE ON SCHEMA public, app TO metaautomate_runtime;
-GRANT SELECT ON organizations, organization_memberships,
-    capability_definitions, capability_dependencies TO metaautomate_runtime;
+GRANT SELECT ON capability_definitions, capability_dependencies TO metaautomate_runtime;
 GRANT SELECT, INSERT ON objectives, workflows, tasks, task_dependencies,
     audit_events TO metaautomate_runtime;
 GRANT SELECT, INSERT, UPDATE ON idempotency_keys, approvals TO metaautomate_runtime;
