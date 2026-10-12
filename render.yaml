@@ -1,0 +1,23 @@
+# MetaAutomate BUSINESS WEBSITE ONLY.
+# Static pages/assets: no FastAPI, PostgreSQL, API keys, payment details or
+# private operational data. Deployment requires explicit owner action in Render.
+services:
+  - type: web
+    name: metaautomate-business-website
+    runtime: static
+    buildCommand: echo "MetaAutomate static website ready"
+    staticPublishPath: ./apps/site
+    autoDeployTrigger: 'off'
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Referrer-Policy
+        value: no-referrer
+      - path: /*
+        name: Content-Security-Policy
+        value: "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; form-action 'none'"
