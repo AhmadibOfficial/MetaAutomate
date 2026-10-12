@@ -1,0 +1,37 @@
+name: Open Source Contributor Journey
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  contributor-demo:
+    name: Fresh Isolated Demo and Repository Hygiene
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check license, release docs and tracked-file safety
+        run: python3 scripts/audit_oss_release.py
+      - name: Validate demo shell script syntax
+        run: |
+          bash -n scripts/oss_demo_up.sh
+          bash -n scripts/oss_demo_down.sh
+      - name: Start a fresh, completely isolated contributor workspace
+        run: make demo-up
+      - name: Verify save, graph, human review, authentication and sign-out
+        run: make demo-check
+      - name: Ensure the regular developer environment was not changed
+        run: |
+          test ! -e .env
+          test ! -e .workspace-access-key
+          git diff --exit-code
+          echo "PASS: original repository secrets and developer workspace left untouched"
+      - name: Stop sandbox without deleting the test database volume
+        if: always()
+        run: make demo-down
