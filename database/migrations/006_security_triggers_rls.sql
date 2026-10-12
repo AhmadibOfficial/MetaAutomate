@@ -29,6 +29,16 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION set_updated_at_only()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$;
+
 CREATE OR REPLACE FUNCTION prevent_audit_mutation()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -79,7 +89,7 @@ $$;
 CREATE TRIGGER trg_business_profiles_updated
 BEFORE UPDATE ON business_profiles FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER trg_integrations_updated
-BEFORE UPDATE ON integrations FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+BEFORE UPDATE ON integrations FOR EACH ROW EXECUTE FUNCTION set_updated_at_only();
 CREATE TRIGGER trg_leads_updated
 BEFORE UPDATE ON leads FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER trg_objectives_updated
@@ -89,19 +99,19 @@ BEFORE UPDATE ON workflows FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER trg_tasks_updated
 BEFORE UPDATE ON tasks FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER trg_agents_updated
-BEFORE UPDATE ON agents FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+BEFORE UPDATE ON agents FOR EACH ROW EXECUTE FUNCTION set_updated_at_only();
 CREATE TRIGGER trg_tools_updated
-BEFORE UPDATE ON tools FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+BEFORE UPDATE ON tools FOR EACH ROW EXECUTE FUNCTION set_updated_at_only();
 CREATE TRIGGER trg_agent_permissions_updated
-BEFORE UPDATE ON agent_permissions FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+BEFORE UPDATE ON agent_permissions FOR EACH ROW EXECUTE FUNCTION set_updated_at_only();
 CREATE TRIGGER trg_approvals_updated
-BEFORE UPDATE ON approvals FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+BEFORE UPDATE ON approvals FOR EACH ROW EXECUTE FUNCTION set_updated_at_only();
 CREATE TRIGGER trg_communications_updated
-BEFORE UPDATE ON communications FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+BEFORE UPDATE ON communications FOR EACH ROW EXECUTE FUNCTION set_updated_at_only();
 CREATE TRIGGER trg_appointments_updated
-BEFORE UPDATE ON appointments FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+BEFORE UPDATE ON appointments FOR EACH ROW EXECUTE FUNCTION set_updated_at_only();
 CREATE TRIGGER trg_workflow_outcomes_updated
-BEFORE UPDATE ON workflow_outcomes FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+BEFORE UPDATE ON workflow_outcomes FOR EACH ROW EXECUTE FUNCTION set_updated_at_only();
 
 -- organization_id must never be changed after insert.
 CREATE TRIGGER trg_business_profiles_tenant_immutable
