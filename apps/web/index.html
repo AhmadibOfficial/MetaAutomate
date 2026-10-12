@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#10254A">
+  <meta name="description" content="MetaAutomate Objective Workspace — Plan with clarity. Review with control.">
+  <title>MetaAutomate — Objective Workspace</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script defer src="/assets/app.js"></script>
+</head>
+<body>
+  <div id="loading-view" class="loading-screen"><div class="brand-mark">M<span>·</span></div><p>Preparing your workspace…</p></div>
+
+  <section id="login-view" class="auth-layout" hidden>
+    <div class="auth-story">
+      <div class="brand"><div class="brand-mark">M<span>·</span></div><span>MetaAutomate</span></div>
+      <div class="auth-message">
+        <span class="eyebrow light">THE OBJECTIVE WORKSPACE</span>
+        <h1>From intention<br>to <em>clear direction.</em></h1>
+        <p>Define what matters. Map the work. Keep the final decision in your hands.</p>
+      </div>
+      <div class="auth-story-footer"><span class="tiny-pulse"></span> Planning only · Nothing executes without authorization</div>
+      <div class="auth-orbit a"></div><div class="auth-orbit b"></div>
+    </div>
+    <div class="auth-form-wrap">
+      <form id="login-form" class="login-card">
+        <div class="mobile-brand"><div class="brand-mark">M<span>·</span></div> MetaAutomate</div>
+        <div class="pill">PRIVATE DEVELOPMENT WORKSPACE</div>
+        <h2>Welcome back.</h2>
+        <p>Sign in with the access key provisioned for your organization.</p>
+        <label for="login-key">Workspace access key</label>
+        <input id="login-key" name="access_key" type="password" autocomplete="off" spellcheck="false"
+          placeholder="mat_dev_…" minlength="35" required>
+        <p class="field-hint">Your key is exchanged for a secure, revocable browser session. It is never saved in browser storage.</p>
+        <div id="login-error" class="alert error" role="alert" hidden></div>
+        <button id="login-submit" class="button primary full" type="submit">Enter workspace <span aria-hidden="true">↗</span></button>
+        <div class="login-footnote">MetaAutomate Objective Operations v1.0 <span>·</span> Local access</div>
+      </form>
+    </div>
+  </section>
+
+  <div id="workspace-shell" class="workspace" hidden>
+    <aside class="sidebar">
+      <div class="brand sidebar-brand"><div class="brand-mark">M<span>·</span></div><span>MetaAutomate</span></div>
+      <div class="sidebar-section-label">WORKSPACE</div>
+      <nav aria-label="Main navigation" class="sidebar-nav">
+        <button class="nav-item active" id="nav-overview" type="button" data-view="overview"><span aria-hidden="true">▦</span> Overview</button>
+        <button class="nav-item" id="nav-create" type="button" data-view="create"><span aria-hidden="true">＋</span> New objective</button>
+      </nav>
+      <div class="sidebar-grow"></div>
+      <div class="guard-card">
+        <span class="guard-icon">◈</span>
+        <strong>Planning mode</strong>
+        <p>All proposed work remains blocked. Review is not execution permission.</p>
+        <span class="guard-status"><span class="tiny-pulse"></span> Execution disabled</span>
+      </div>
+      <div class="sidebar-user">
+        <div class="avatar">M</div>
+        <div class="identity"><strong id="side-role">Member</strong><small id="side-org">Organization</small></div>
+        <button id="logout-button" class="icon-button" title="Sign out" aria-label="Sign out" type="button">⇥</button>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div><span class="topbar-label">META / OBJECTIVES</span><span id="topbar-crumb" class="topbar-current">Overview</span></div>
+        <div class="topbar-right"><span class="environment-tag"><span class="tiny-pulse"></span> LOCAL DEVELOPMENT</span><div class="avatar small">M</div></div>
+      </header>
+      <div class="content-inner">
+
+        <section id="overview-view" class="app-screen">
+          <div class="section-heading">
+            <div><div class="eyebrow">OBJECTIVE OPERATIONS</div><h1>Your work, <em>in focus.</em></h1><p>Every meaningful outcome starts with a clear objective.</p></div>
+            <button class="button primary create-trigger" type="button">+ New objective</button>
+          </div>
+          <div class="metric-grid">
+            <div class="metric-card"><span class="metric-icon">◫</span><small>TOTAL OBJECTIVES</small><strong id="metric-total">0</strong><span>Saved in your workspace</span></div>
+            <div class="metric-card"><span class="metric-icon amber">◷</span><small>AWAITING REVIEW</small><strong id="metric-pending">0</strong><span>Plans requiring a decision</span></div>
+            <div class="metric-card"><span class="metric-icon teal">✓</span><small>PLANS APPROVED</small><strong id="metric-approved">0</strong><span>Reviewed, not executing</span></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><h2>All objectives</h2><p>A record of the outcomes you're planning.</p></div><button class="button subtle" id="refresh-overview" type="button">↻ Refresh</button></div>
+            <div id="objectives-list" class="objective-list"></div>
+            <div id="empty-overview" class="empty-state" hidden><div class="empty-glyph">◎</div><h3>Make your first move.</h3><p>Define a valuable outcome and MetaAutomate will structure its work for your review.</p><button class="button primary create-trigger" type="button">Create an objective →</button></div>
+          </div>
+          <div class="note-strip"><span>✧</span><p>MetaAutomate currently generates deterministic plans from capabilities you select. Autonomous discovery and execution aren't enabled.</p></div>
+        </section>
+
+        <section id="create-view" class="app-screen" hidden>
+          <div class="section-heading compact"><div><div class="eyebrow">NEW OBJECTIVE</div><h1>Give the work <em>purpose.</em></h1><p>Tell MetaAutomate what success should look like.</p></div><button id="cancel-create" class="button subtle" type="button">← Overview</button></div>
+          <form id="objective-form">
+            <div class="form-layout">
+              <div class="form-main">
+                <div class="panel form-panel">
+                  <div class="panel-step"><span>01</span><div><h2>Define your outcome</h2><p>Start with the problem you're trying to solve.</p></div></div>
+                  <label for="objective-title">Objective title <span class="required">*</span></label>
+                  <input id="objective-title" maxlength="200" minlength="8" required placeholder="e.g. Increase qualified customer appointments">
+                  <label for="objective-description">Context and description</label>
+                  <textarea id="objective-description" maxlength="2000" rows="4" placeholder="What is happening today, and what needs to change?"></textarea>
+                </div>
+                <div class="panel form-panel">
+                  <div class="panel-step"><span>02</span><div><h2>Measure success</h2><p>Set one clear, verifiable target.</p></div></div>
+                  <div class="field-grid">
+                    <div><label for="criterion-metric">Success metric <span class="required">*</span></label><input id="criterion-metric" required minlength="3" maxlength="120" placeholder="Qualified appointments"></div>
+                    <div><label for="criterion-target">Target <span class="required">*</span></label><input id="criterion-target" required maxlength="120" placeholder="20"></div>
+                  </div>
+                  <label for="criterion-days">Timeframe</label>
+                  <div class="time-field"><input id="criterion-days" type="number" min="1" max="3650" value="30" required><span>days</span></div>
+                  <label for="objective-constraints">Boundaries and constraints</label>
+                  <textarea id="objective-constraints" maxlength="6000" rows="3" placeholder="One constraint per line&#10;Only contact customers who opted in"></textarea>
+                  <p class="field-hint">Use up to 20 constraints, one per line.</p>
+                </div>
+              </div>
+              <div class="form-side">
+                <div class="panel form-panel">
+                  <div class="panel-step"><span>03</span><div><h2>Choose capabilities</h2><p>Start with the work your plan may need.</p></div></div>
+                  <div class="catalog-hint">Draft capabilities are for planning only.</div>
+                  <div id="capability-picker" class="cap-picker"></div>
+                </div>
+                <div class="form-safety"><span>♧</span><div><strong>You stay in control.</strong><p>Saving creates a draft plan. No email, payment, workflow or tool will run.</p></div></div>
+                <div id="create-error" class="alert error" role="alert" hidden></div>
+                <button class="button primary full" id="create-submit" type="submit">Create and save plan <span aria-hidden="true">→</span></button>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <section id="detail-view" class="app-screen" hidden>
+          <div class="detail-top"><button id="back-to-overview" class="back-link" type="button">← All objectives</button><span id="detail-badge" class="status-badge">Draft</span></div>
+          <div class="detail-heading"><div><div class="eyebrow">SAVED OBJECTIVE</div><h1 id="detail-title">Your objective</h1><p id="detail-description"></p></div><div class="reference-box"><small>OBJECTIVE REFERENCE</small><span id="detail-reference"></span></div></div>
+          <div class="detail-stats">
+            <div><small>WORKFLOW STATUS</small><strong>Draft planning</strong></div>
+            <div><small>CAPABILITY ACTIONS</small><strong>Blocked</strong></div>
+            <div><small>REVIEW STATUS</small><strong id="detail-review-state">Pending</strong></div>
+          </div>
+          <div class="panel graph-panel">
+            <div class="panel-head"><div><h2>Proposed work graph</h2><p>Follow how each step depends on the one before it.</p></div><span class="graph-legend">● Proposed · not executable</span></div>
+            <div class="graph-scroll"><div id="graph-stage" class="graph-stage"><svg id="graph-lines" class="graph-lines" aria-hidden="true"></svg><div id="graph-nodes" class="graph-nodes"></div></div></div>
+          </div>
+          <div class="review-layout">
+            <div class="panel outcome-panel">
+              <div class="panel-head"><div><h2>Success criteria</h2><p>What this objective is designed to achieve.</p></div></div>
+              <div id="detail-outcomes" class="outcome-list"></div>
+              <div class="constraints-title">BOUNDARIES</div>
+              <ul id="detail-constraints" class="constraints-list"></ul>
+            </div>
+            <div class="panel review-panel">
+              <div class="panel-head"><div><h2>Plan review</h2><p id="review-explanation">Human approval is required before moving forward.</p></div></div>
+              <div id="review-readonly" class="review-readonly" hidden></div>
+              <form id="review-form">
+                <label for="review-reason">Decision notes <span class="required">*</span></label>
+                <textarea id="review-reason" rows="3" minlength="5" maxlength="500" placeholder="Explain your decision and any conditions…" required></textarea>
+                <div id="review-error" class="alert error" role="alert" hidden></div>
+                <div class="review-actions">
+                  <button id="approve-plan" class="button primary" type="submit" value="APPROVED">✓ Approve plan</button>
+                  <button id="reject-plan" class="button danger" type="submit" value="REJECTED">Reject plan</button>
+                </div>
+                <p class="field-hint">Approval confirms review only. It never enables execution.</p>
+              </form>
+            </div>
+          </div>
+        </section>
+        <div class="footer-line">META AUTOMATE <span>·</span> SOLUTIONS, CONVENIENCE & EXPERIENCES <span>·</span> DEVELOPMENT WORKSPACE</div>
+      </div>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

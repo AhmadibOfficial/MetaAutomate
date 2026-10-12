@@ -57,16 +57,9 @@ class PreviewRequest(StrictInput):
         return values
 
 
-@router.post("/preview", dependencies=[Depends(registry.require_registry_key)])
-def preview_objective(payload: PreviewRequest):
-    """Construct an unactionable plan from explicit, verified catalog selections."""
+def build_preview(payload: PreviewRequest, caps: list[dict], dependencies: list[dict]) -> dict:
+    """Pure deterministic proposal reused by previews and persistence."""
     ids = payload.requested_capability_ids
-    caps = registry._query(
-        "SELECT capability_id, name, domain, release, lifecycle_status, is_enabled "
-        "FROM capability_definitions WHERE capability_id = ANY(%s::text[]) "
-        "ORDER BY capability_id",
-        (ids,),
-    )
     by_id = {row["capability_id"]: row for row in caps}
     unknown = [cap_id for cap_id in ids if cap_id not in by_id]
     if unknown:
@@ -75,12 +68,6 @@ def preview_objective(payload: PreviewRequest):
             detail={"reason": "Unknown registered capabilities", "capability_ids": unknown},
         )
 
-    dependencies = registry._query(
-        "SELECT capability_id, depends_on_capability_id "
-        "FROM capability_dependencies WHERE capability_id = ANY(%s::text[]) "
-        "ORDER BY capability_id, depends_on_capability_id",
-        (ids,),
-    )
     deps_by_id: dict[str, list[str]] = {cap_id: [] for cap_id in ids}
     for dep in dependencies:
         deps_by_id[dep["capability_id"]].append(dep["depends_on_capability_id"])
@@ -159,3 +146,19 @@ def preview_objective(payload: PreviewRequest):
             "No tenant identity, permissions, approvals, or persistence are established by this preview.",
         ],
     }
+
+
+@router.post("/preview", dependencies=[Depends(registry.require_registry_key)])
+def preview_objective(payload: PreviewRequest):
+    ids = payload.requested_capability_ids
+    caps = registry._query(
+        "SELECT capability_id, name, domain, release, lifecycle_status, is_enabled "
+        "FROM capability_definitions WHERE capability_id = ANY(%s::text[]) "
+        "ORDER BY capability_id", (ids,),
+    )
+    dependencies = registry._query(
+        "SELECT capability_id, depends_on_capability_id "
+        "FROM capability_dependencies WHERE capability_id = ANY(%s::text[]) "
+        "ORDER BY capability_id, depends_on_capability_id", (ids,),
+    )
+    return build_preview(payload, caps, dependencies)

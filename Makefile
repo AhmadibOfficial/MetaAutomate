@@ -22,3 +22,11 @@ ci-local:
 
 pr:
 	bash scripts/pr.sh
+
+.PHONY: db-upgrade
+db-upgrade:
+	bash scripts/db_upgrade_local.sh
+
+.PHONY: workspace-init
+workspace-init:
+	bash scripts/workspace_init.sh

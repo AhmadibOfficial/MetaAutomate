@@ -20,7 +20,7 @@ printf 'Creating isolated CI database: %s\n' "$DB"
 docker compose exec -T postgres createdb -U metaautomate "$DB"
 CREATED=1
 
-for migration in database/migrations/00[1-8]_*.sql; do
+for migration in database/migrations/*.sql; do
   echo "Applying: $migration"
   docker compose exec -T postgres \
     psql -X -q -v ON_ERROR_STOP=1 -U metaautomate -d "$DB" < "$migration"
@@ -34,4 +34,12 @@ docker compose exec -T postgres \
   psql -X -v ON_ERROR_STOP=1 -U metaautomate -d "$DB" \
   < tests/sql/registry_integration.sql
 
+if grep -q '^APP_DATABASE_URL=.' .env 2>/dev/null; then
+  echo "Verifying authenticated objective operations on isolated test database..."
+  docker compose run --rm -T -v "$PWD:/workspace:ro" -w /workspace \
+    -e PYTHONPATH=/workspace/apps/api \
+    api python scripts/verify_objective_ops.py --database "$DB"
+else
+  echo 'NOTE: Restricted APP_DATABASE_URL not configured. Objective Operations integration runs in GitHub CI.'
+fi
 echo 'PASS: local CI-equivalent validation completed'

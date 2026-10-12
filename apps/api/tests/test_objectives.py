@@ -108,3 +108,40 @@ def test_cyclic_dependencies_are_rejected(monkeypatch):
 
     monkeypatch.setattr(objectives.registry, "_query", with_cycle)
     assert client.post("/v1/objectives/preview", json=BASE, headers=HEADERS).status_code == 422
+
+def test_shared_builder_uses_supplied_dependencies_without_privileged_queries(monkeypatch):
+    """Persistent planner must reuse the authenticated transaction's SQL rows."""
+    from app.objectives import PreviewRequest, build_preview
+
+    def forbidden_query(*args, **kwargs):
+        raise AssertionError("Planner escaped the caller's transaction")
+
+    monkeypatch.setattr(objectives.registry, "_query", forbidden_query)
+    payload = PreviewRequest.model_validate(BASE)
+    caps = [
+        {"capability_id": "BIZ-003", "name": "Lead Qualification", "domain": "BIZ",
+         "release": "R1", "lifecycle_status": "DRAFT", "is_enabled": False},
+        {"capability_id": "BIZ-005", "name": "Appointment Booking", "domain": "BIZ",
+         "release": "R1", "lifecycle_status": "DRAFT", "is_enabled": False},
+    ]
+    deps = [{"capability_id": "BIZ-005", "depends_on_capability_id": "BIZ-003"}]
+    preview = build_preview(payload, caps, deps)
+    assert preview["work_graph"][3]["depends_on"] == ["S2", "C1"]
+    assert preview["matched_capabilities"][1]["declared_dependencies"] == ["BIZ-003"]
+    assert preview["execution_allowed"] is False
+
+
+def test_workspace_app_shell_is_served():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert 'id="login-view"' in response.text
+    assert 'id="objective-form"' in response.text
+    assert 'id="graph-nodes"' in response.text
+    assert 'id="review-form"' in response.text
+
+
+def test_workspace_assets_served():
+    response = client.get("/assets/app.js")
+    assert response.status_code == 200
+    assert "create-submit" in response.text
+    assert "mat_csrf" in response.text

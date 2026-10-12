@@ -145,3 +145,5 @@ credentials/
 *.backup
 *.sql.dump
 *.zip
+
+.workspace-access-key
