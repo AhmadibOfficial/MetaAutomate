@@ -124,6 +124,11 @@ jobs:
           path: artifacts/objective-workspace.png
           if-no-files-found: ignore
 
+      - name: Verify pre-provisioned OIDC identities and fail-closed production configuration
+        env:
+          APP_DATABASE_URL: postgresql://metaautomate_runtime:ci_runtime_password@localhost:5432/metaautomate
+        run: python scripts/verify_oidc_identity.py
+
       - name: Verify automated local workspace bootstrap and CSRF boundary
         env:
           WORKSPACE_ORIGIN: http://127.0.0.1:8000
@@ -135,7 +140,3 @@ jobs:
       - name: Verify private cloud Compose and security boundaries
         run: python scripts/verify_private_deploy.py
 
-      - name: Verify pre-provisioned OIDC identities and fail-closed production configuration
-        env:
-          APP_DATABASE_URL: postgresql://metaautomate_runtime:ci_runtime_password@localhost:5432/metaautomate
-        run: python scripts/verify_oidc_identity.py
