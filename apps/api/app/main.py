@@ -15,6 +15,23 @@ app.include_router(objective_router)
 app.include_router(objective_ops_router)
 app.include_router(workspace_auth_router)
 
+
+@app.middleware("http")
+async def workspace_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; script-src 'self'; style-src 'self'; "
+        "img-src 'self' data:; connect-src 'self'; "
+        "object-src 'none'; base-uri 'none'; "
+        "form-action 'self'; frame-ancestors 'none'"
+    )
+    if request.url.path.startswith(("/v1/workspace", "/v1/objective-operations")):
+        response.headers["Cache-Control"] = "no-store"
+    return response
+
 WEB_ROOT = Path(os.environ.get("WORKSPACE_WEB_ROOT", str(Path(__file__).resolve().parents[2] / "web")))
 
 if WEB_ROOT.is_dir():
