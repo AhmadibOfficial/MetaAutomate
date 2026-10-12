@@ -1,0 +1,23 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start services",
+      "type": "shell",
+      "command": "docker compose up -d --build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Apply draft SQL migrations",
+      "type": "shell",
+      "command": "bash scripts/migrate.sh",
+      "problemMatcher": []
+    },
+    {
+      "label": "Check API",
+      "type": "shell",
+      "command": "curl -fsS http://localhost:8000/health",
+      "problemMatcher": []
+    }
+  ]
+}

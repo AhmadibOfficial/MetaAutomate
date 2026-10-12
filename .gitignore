@@ -117,3 +117,31 @@ app.*.symbols
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+# MetaAutomate Python and Node.js
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+node_modules/
+.next/
+dist/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+.envrc
+*.pem
+*.key
+*.p12
+*.pfx
+.npmrc
+.pypirc
+secrets/
+credentials/
+
+# Local backups and generated data
+*.bak
+*.backup
+*.sql.dump
+*.zip

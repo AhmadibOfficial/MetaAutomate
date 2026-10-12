@@ -1,0 +1,97 @@
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+MIGRATIONS = ROOT / "migrations"
+
+
+def load_all_sql() -> str:
+    return "\n".join(p.read_text(encoding="utf-8") for p in sorted(MIGRATIONS.glob("*.sql")))
+
+
+def test_required_migration_order_exists():
+    names = [p.name for p in sorted(MIGRATIONS.glob("*.sql"))]
+    assert names == [
+        "001_extensions_and_enums.sql",
+        "002_identity_business.sql",
+        "003_leads_workflows.sql",
+        "004_execution.sql",
+        "005_business_outcomes_audit.sql",
+        "006_security_triggers_rls.sql",
+        "007_utility_functions.sql",
+    ]
+
+
+def test_core_tenant_tables_have_organization_id():
+    sql = load_all_sql()
+    tables = [
+        "organization_memberships",
+        "business_profiles",
+        "integrations",
+        "leads",
+        "objectives",
+        "workflows",
+        "tasks",
+        "agents",
+        "tools",
+        "agent_permissions",
+        "agent_runs",
+        "tool_calls",
+        "approvals",
+        "verifications",
+        "verification_evidence",
+        "recovery_attempts",
+        "communications",
+        "appointments",
+        "workflow_outcomes",
+        "idempotency_keys",
+        "audit_events",
+    ]
+    for table in tables:
+        marker = f"CREATE TABLE {table} ("
+        start = sql.index(marker)
+        end = sql.index(");", start)
+        body = sql[start:end]
+        assert "organization_id uuid" in body, table
+
+
+def test_composite_cross_tenant_foreign_keys_are_present():
+    sql = load_all_sql()
+    required_fragments = [
+        "FOREIGN KEY (organization_id, workflow_id)\n        REFERENCES workflows(organization_id, id)",
+        "FOREIGN KEY (organization_id, task_id)\n        REFERENCES tasks(organization_id, id)",
+        "FOREIGN KEY (organization_id, agent_id)\n        REFERENCES agents(organization_id, id)",
+        "FOREIGN KEY (organization_id, tool_id)\n        REFERENCES tools(organization_id, id)",
+        "FOREIGN KEY (organization_id, lead_id)\n        REFERENCES leads(organization_id, id)",
+    ]
+    for fragment in required_fragments:
+        assert fragment in sql
+
+
+def test_idempotency_contract_is_present():
+    sql = load_all_sql()
+    assert "idempotency_key text NOT NULL" in sql
+    assert "request_hash text NOT NULL" in sql
+    assert "ON tool_calls(organization_id, tool_id, idempotency_key);" in sql
+    assert "UNIQUE (organization_id, scope, idempotency_key)" in sql
+
+
+def test_audit_is_append_only():
+    sql = load_all_sql()
+    assert "CREATE TRIGGER trg_audit_events_no_update" in sql
+    assert "CREATE TRIGGER trg_audit_events_no_delete" in sql
+    assert "RAISE EXCEPTION 'audit_events is append-only'" in sql
+
+
+def test_rls_is_forced_on_core_tenant_tables():
+    sql = load_all_sql()
+    for table in (
+        "leads",
+        "workflows",
+        "tasks",
+        "tool_calls",
+        "appointments",
+        "audit_events",
+    ):
+        assert f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;" in sql
+        assert f"ALTER TABLE {table} FORCE ROW LEVEL SECURITY;" in sql
+        assert f"CREATE POLICY tenant_{table}" in sql
