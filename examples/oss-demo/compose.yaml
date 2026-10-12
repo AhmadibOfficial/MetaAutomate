@@ -28,12 +28,12 @@ services:
       REGISTRY_READ_API_KEY: ${DEMO_REGISTRY_KEY:?Run make demo-up}
       WORKSPACE_ORIGIN: http://127.0.0.1:18000
       WORKSPACE_COOKIE_SECURE: "0"
-      WORKSPACE_WEB_ROOT: /app/workspace-web
+      WORKSPACE_WEB_ROOT: /workspace-web
     ports:
       - "127.0.0.1:18000:8000"
     volumes:
       - ../../apps/api:/app:ro
-      - ../../apps/web:/app/workspace-web:ro
+      - ../../apps/web:/workspace-web:ro
 
 
   init:
