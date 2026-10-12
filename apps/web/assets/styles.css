@@ -7,3 +7,48 @@ input,textarea{border:1px solid #dce4f0;border-radius:11px;background:white;padd
 .detail-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:23px}.back-link{border:0;background:transparent;color:#6c86a6;font-size:12px;font-weight:710;padding:0}.detail-heading{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;margin-bottom:28px}.detail-heading h1{font-size:clamp(27px,3.1vw,43px);margin:0 0 12px;line-height:1.2;letter-spacing:-.055em}.detail-heading p{font-size:12px;color:#8292a9;line-height:1.65;margin:0;max-width:670px}.reference-box{text-align:right;border-left:1px solid #d7e1ec;padding-left:25px}.reference-box small{display:block;font-size:9px;font-weight:800;letter-spacing:.1em;color:#96a6bb;margin-bottom:8px}.reference-box span{color:#637994;font-size:12px;font-family:ui-monospace,monospace}.detail-stats{display:flex;gap:0;background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:24px}.detail-stats>div{padding:20px 26px;flex:1;border-right:1px solid var(--line)}.detail-stats>div:last-child{border:0}.detail-stats small{display:block;font-size:9px;font-weight:790;color:#90a0b4;letter-spacing:.09em;margin-bottom:9px}.detail-stats strong{font-size:13px}.graph-panel{margin-bottom:23px}.graph-legend{font-size:10px;color:#8599b3}.graph-scroll{overflow-x:auto}.graph-stage{position:relative;min-width:790px}.graph-lines{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:visible}.graph-nodes{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:65px 34px;padding:41px 38px;position:relative;z-index:1}.graph-node{background:#fff;border:1px solid #d8e5f7;border-left:3px solid #5c96e9;box-shadow:0 6px 20px #173b7520;border-radius:12px;padding:18px;min-height:116px;position:relative}.graph-node>small{display:flex;align-items:center;justify-content:space-between;color:#6b92c9;font-size:9px;letter-spacing:.07em;font-weight:800;margin-bottom:12px}.graph-node strong{display:block;color:#2a4161;font-size:12px;line-height:1.45;margin-bottom:10px}.graph-node .node-foot{font-size:10px;color:#99a9be}.review-layout{display:grid;grid-template-columns:1fr 1fr;gap:23px}.outcome-panel,.review-panel{min-height:270px}.outcome-list{padding:20px 25px}.outcome-item{display:flex;align-items:center;gap:13px;padding:10px 0}.outcome-icon{height:34px;width:34px;border-radius:10px;background:#eaf5f1;color:#158b68;display:grid;place-items:center;font-size:17px}.outcome-item strong{font-size:13px}.outcome-item small{display:block;font-size:11px;color:#8f9eaf;margin-top:6px}.constraints-title{font-size:9px;letter-spacing:.1em;font-weight:800;color:#99aabd;margin:0 25px 10px}.constraints-list{padding:0 25px 18px 42px;color:#71839c;font-size:11px;line-height:1.8}.review-panel form{padding:4px 24px 20px}.review-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:13px}.review-readonly{margin:25px;padding:18px;border:1px solid #dce9e0;background:#f1f8f4;border-radius:12px;color:#34745d;line-height:1.7;font-size:12px}.toast{position:fixed;bottom:24px;right:24px;border-radius:12px;background:#142c52;color:white;box-shadow:0 14px 40px #10234733;padding:14px 20px;font-size:12px;z-index:20}
 @media(max-width:1150px){.sidebar{width:215px}.content-inner{padding:38px 28px}.form-layout{grid-template-columns:1fr 320px;gap:15px}.form-panel{padding:20px}.metric-grid{gap:12px}}@media(max-width:930px){.form-layout,.review-layout{grid-template-columns:1fr}.form-side{grid-template-columns:1fr}.sidebar{width:78px;padding-left:10px;padding-right:10px}.sidebar-brand span,.sidebar-section-label,.sidebar-nav .nav-item:not(.active){color:transparent}.sidebar .brand{font-size:0;justify-content:center}.sidebar-nav .nav-item{font-size:0;justify-content:center;padding:12px 8px}.sidebar-nav .nav-item span{font-size:22px}.guard-card,.sidebar-user .identity,.sidebar-user .icon-button{display:none}.sidebar-user{justify-content:center}.auth-layout{grid-template-columns:1fr 1fr}.auth-story{padding:35px}.auth-message h1{font-size:45px}}@media(max-width:690px){.auth-layout{grid-template-columns:1fr}.auth-story{display:none}.mobile-brand{display:flex;align-items:center;gap:9px;margin-bottom:45px;font-weight:800;font-size:18px}.auth-form-wrap{min-height:100vh}.login-card .pill{margin-bottom:25px}.workspace{display:block}.sidebar{height:58px;min-height:0;width:100%;position:sticky;top:0;z-index:10;padding:8px 17px;flex-direction:row;align-items:center;gap:16px}.sidebar-brand{padding:0;flex:1;justify-content:flex-start!important;font-size:0}.sidebar-brand .brand-mark{width:35px;height:35px}.sidebar-nav{display:flex;gap:4px}.sidebar-nav .nav-item{width:40px}.sidebar-grow,.sidebar-user{display:none}.topbar{height:57px;padding:0 19px}.topbar-right .avatar{display:none}.environment-tag{font-size:9px}.content-inner{padding:27px 18px}.section-heading{align-items:flex-start;flex-direction:column}.metric-grid{grid-template-columns:1fr;gap:11px}.metric-card{min-height:115px;padding:17px}.metric-card .metric-icon{display:none}.metric-card strong{font-size:26px}.detail-heading{display:block}.reference-box{text-align:left;border-left:0;border-top:1px solid var(--line);padding:18px 0 0;margin-top:18px}.detail-stats>div{padding:15px 12px}.detail-stats strong{font-size:11px}.panel-head{padding:19px;align-items:flex-start}.field-grid{grid-template-columns:1fr}.graph-legend{display:none}.footer-line{line-height:2}.review-actions .button{flex:1}.objective-row{gap:9px}.objective-symbol{height:35px;width:35px}.objective-description h3{max-width:170px}.status-badge{font-size:9px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+
+/* Official MetaAutomate brand system: deep navy, electric blue, silver and gold.
+   Cropped mark is from the user-approved MetaAutomate vision-to-impact board. */
+:root {
+ --navy:#031436;--navy2:#072858;--navy3:#124078;
+ --accent:#009df4;--accent2:#eaf6ff;--gold:#efbc51;
+ --ink:#122846;--bg:#f4f7fc;--line:#dce7f3;
+ --brand-silver:#d9e2ef;--brand-gold:#f2bb47;
+}
+body {background:var(--bg)}
+.brand-logo{object-fit:cover;object-position:center;padding:0;display:block;
+ background:#041438;border:1px solid #20baff70;border-radius:11px;
+ box-shadow:0 5px 17px #00a5ff20}
+.brand-mark.brand-logo span{display:none}
+.sidebar {background:linear-gradient(170deg,#031436,#092c61 65%,#113d78)}
+.auth-story{background:radial-gradient(circle at 70% 53%,#0a55a870,transparent 49%),linear-gradient(155deg,#020c25,#082650 65%,#071e43)}
+.auth-message h1 em,.section-heading h1 em{color:#4ac1ff}
+.auth-story .auth-message h1 em{background:linear-gradient(105deg,#23aefe,#d9e2f1 60%,#f2bf50);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sidebar-brand span,.auth-story .brand span{letter-spacing:-.055em}
+.sidebar-brand span::first-letter,.auth-story .brand span::first-letter{color:#e1ebf8}
+.button.primary{background:linear-gradient(108deg,#007be4,#08adfb);box-shadow:0 9px 23px #007bdb24}
+.button.primary:hover{background:linear-gradient(108deg,#046ad0,#0797e8)}
+.metric-card{border-top:2px solid #179be72e}
+.metric-card .metric-icon{background:linear-gradient(135deg,#e2f5ff,#edf2ff);color:#007bd9}
+.graph-node{border-left-color:#009cee}
+.pill,.environment-tag,.eyebrow{color:#0587d3}
+.auth-story .eyebrow{color:#83ceff}
+.mobile-brand .brand-logo{width:44px;height:44px}
+.brand-purpose{margin-top:24px;padding:30px 31px;border-radius:18px;background:linear-gradient(140deg,#04183c,#0a2c59);color:#f5faff;border:1px solid #1760a7;box-shadow:0 13px 38px #051b4013}
+.brand-purpose-intro{display:flex;gap:20px;align-items:baseline;justify-content:space-between;flex-wrap:wrap}
+.brand-purpose h2{margin:0;font-size:23px;letter-spacing:-.04em}
+.brand-purpose h2 em{font-style:normal;color:var(--brand-gold)}
+.brand-tagline{color:#78cfff;font-weight:750;letter-spacing:.02em}
+.brand-purpose-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:21px}
+.brand-purpose-grid article{border:1px solid #2477bd75;border-radius:13px;padding:19px 20px;background:#ffffff07}
+.brand-purpose-grid h3{margin:3px 0 9px;font-size:14px}
+.brand-purpose-grid p{color:#b9d3ef;line-height:1.7;font-size:12px;margin:0}
+.purpose-icon{font-size:23px;color:#6fd0fe}
+.brand-principles{display:flex;gap:11px;align-items:center;flex-wrap:wrap;margin-top:22px;font-size:11px}
+.brand-principles strong{color:#7dbdeb;font-size:9px;letter-spacing:.13em;margin-right:7px}
+.brand-principles span{padding:8px 11px;border:1px solid #276eb080;background:#ffffff07;border-radius:20px}
+.brand-principles .gold-value{color:#ffe2a0;border-color:#d8aa4d88}
+.brand-focus{font-size:11px;line-height:1.7;color:#9fc6e5;margin:20px 0 0}
+@media(max-width:690px){.brand-purpose{padding:23px 20px}.brand-purpose-grid{grid-template-columns:1fr}}
