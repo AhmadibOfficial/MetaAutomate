@@ -129,3 +129,19 @@ def test_shared_builder_uses_supplied_dependencies_without_privileged_queries(mo
     assert preview["work_graph"][3]["depends_on"] == ["S2", "C1"]
     assert preview["matched_capabilities"][1]["declared_dependencies"] == ["BIZ-003"]
     assert preview["execution_allowed"] is False
+
+
+def test_workspace_app_shell_is_served():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert 'id="login-view"' in response.text
+    assert 'id="objective-form"' in response.text
+    assert 'id="graph-nodes"' in response.text
+    assert 'id="review-form"' in response.text
+
+
+def test_workspace_assets_served():
+    response = client.get("/assets/app.js")
+    assert response.status_code == 200
+    assert "create-submit" in response.text
+    assert "mat_csrf" in response.text
