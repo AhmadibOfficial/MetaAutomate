@@ -7,7 +7,7 @@ services:
     runtime: static
     buildCommand: echo "MetaAutomate static website ready"
     staticPublishPath: ./apps/site
-    autoDeployTrigger: off
+    autoDeployTrigger: 'off'
     headers:
       - path: /*
         name: X-Content-Type-Options
