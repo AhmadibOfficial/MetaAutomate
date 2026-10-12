@@ -171,8 +171,16 @@ def list_objectives(session: Session, limit: Annotated[int, Query(ge=1, le=100)]
     require_role(session, READ_ROLES)
     with session.conn.cursor() as cur:
         cur.execute(
-            "SELECT id, title, status, created_at, lock_version "
-            "FROM objectives WHERE organization_id=%s ORDER BY created_at DESC, id LIMIT %s",
+            "SELECT o.id, o.title, o.status, o.created_at, o.lock_version, "
+            "review.status AS review_status "
+            "FROM objectives o LEFT JOIN LATERAL ("
+            " SELECT a.status FROM workflows w JOIN approvals a "
+            " ON a.organization_id=w.organization_id AND a.workflow_id=w.id "
+            " WHERE w.organization_id=o.organization_id AND w.objective_id=o.id "
+            " AND w.workflow_type='OBJECTIVE_PLAN_PREVIEW' AND a.action_type='PLAN_REVIEW' "
+            " ORDER BY a.requested_at DESC LIMIT 1"
+            ") review ON true "
+            "WHERE o.organization_id=%s ORDER BY o.created_at DESC, o.id LIMIT %s",
             (session.principal.organization_id, limit),
         )
         return {"items": cur.fetchall()}
