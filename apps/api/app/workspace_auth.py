@@ -7,14 +7,12 @@ HttpOnly cookie, separate CSRF token, and are revoked server-side on logout.
 import hashlib
 import os
 import secrets
-from typing import Annotated
 
 import psycopg
 from psycopg.rows import dict_row
 from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.authn import get_tenant_session
 
 router = APIRouter(prefix="/v1/workspace", tags=["workspace"])
 SESSION_COOKIE = "mat_workspace"
@@ -83,8 +81,6 @@ def login(payload: LoginRequest, request: Request, response: Response):
 
 @router.get("/session")
 def session(request: Request):
-    # Reuse the same authenticated transaction path as Objective Operations.
-    import inspect  # keep import local; not used to bypass FastAPI dependencies
     return _session_for_request(request)
 
 

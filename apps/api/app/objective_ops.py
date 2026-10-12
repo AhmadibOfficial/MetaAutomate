@@ -178,6 +178,31 @@ def list_objectives(session: Session, limit: Annotated[int, Query(ge=1, le=100)]
         return {"items": cur.fetchall()}
 
 
+@router.get("/capabilities")
+def workspace_capabilities(session: Session):
+    """Read-only catalog for the browser; no activation or execution rights."""
+    require_role(session, READ_ROLES)
+    with session.conn.cursor() as cur:
+        cur.execute(
+            "SELECT capability_id, name, domain, release, lifecycle_status, is_enabled "
+            "FROM capability_definitions ORDER BY domain, capability_id LIMIT 100"
+        )
+        items = cur.fetchall()
+        cur.execute(
+            "SELECT capability_id, depends_on_capability_id "
+            "FROM capability_dependencies ORDER BY capability_id, depends_on_capability_id"
+        )
+        links = cur.fetchall()
+    deps: dict[str, list[str]] = {}
+    for row in links:
+        deps.setdefault(row["capability_id"], []).append(row["depends_on_capability_id"])
+    return {"items": [
+        {**item, "dependencies": deps.get(item["capability_id"], []),
+         "execution_ready": False}
+        for item in items
+    ]}
+
+
 @router.get("/{objective_id}")
 def get_objective(objective_id: UUID, session: Session):
     require_role(session, READ_ROLES)
