@@ -37,3 +37,21 @@ services:
 
 volumes:
   oss_demo_postgres:
+
+
+  init:
+    profiles: ["bootstrap"]
+    build:
+      context: ../../apps/api
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://metaautomate:${DEMO_DB_PASSWORD:?Run make demo-up}@postgres:5432/metaautomate
+      DEMO_RUNTIME_PASSWORD: ${DEMO_RUNTIME_PASSWORD:?Run make demo-up}
+      DEMO_ACCESS_KEY: ${DEMO_ACCESS_KEY:?Run make demo-up}
+    volumes:
+      - ../../scripts:/workspace/scripts:ro
+    working_dir: /workspace
+    entrypoint: ["python", "/workspace/scripts/bootstrap_oss_demo.py"]
