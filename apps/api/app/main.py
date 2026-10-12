@@ -65,6 +65,7 @@ if WEB_ROOT.is_dir():
     app.mount("/assets", StaticFiles(directory=str(WEB_ROOT / "assets")), name="web-assets")
 
     @app.get("/", include_in_schema=False)
+    @app.get("/about", include_in_schema=False)
     @app.get("/objectives/{objective_id}", include_in_schema=False)
     def workspace_app(objective_id: str | None = None):
         return FileResponse(WEB_ROOT / "index.html")

@@ -3,7 +3,7 @@
 /* MetaAutomate Objective Workspace: client code never persists access keys. */
 const state = {session:null, authMode:"unknown", capabilities:[], objectives:[], objective:null, inFlightKey:null, graph:null};
 const $ = id => document.getElementById(id);
-const screens = ["overview","create","detail"];
+const screens = ["overview","create","detail","brand"];
 const sleep = ms => new Promise(resolve => setTimeout(resolve,ms));
 
 function visible(id, show) { $(id).hidden = !show; }
@@ -83,9 +83,9 @@ function updateShell() {
 function changeView(view, {history=true, path=null}={}) {
   if (!screens.includes(view)) view = "overview";
   for (const screen of screens) visible(screen+"-view", screen === view);
-  $("topbar-crumb").textContent = {overview:"Overview",create:"New objective",detail:"Objective detail"}[view];
+  $("topbar-crumb").textContent = {overview:"Overview",create:"New objective",detail:"Objective detail",brand:"Mission & Vision"}[view];
   for (const nav of document.querySelectorAll(".nav-item")) nav.classList.toggle("active",nav.dataset.view === view);
-  if (history) window.history.pushState({view}, "", path || (view==="overview"?"/":view==="create"?"/?new=1":location.pathname));
+  if (history) window.history.pushState({view}, "", path || (view==="overview"?"/":view==="create"?"/?new=1":view==="brand"?"/about":location.pathname));
   window.scrollTo({top:0,behavior:"instant"});
   if(view==="detail") requestAnimationFrame(()=>drawGraph());
 }
@@ -333,6 +333,7 @@ async function login(event){
   finally{button.disabled=false;button.textContent="Enter workspace ↗";}
 }
 async function enterWorkspace(){
+  if(window.location.pathname==="/about") return changeView("brand",{history:false});
   const match=window.location.pathname.match(/^\/objectives\/([0-9a-f-]{36})$/i);
   if(match)return openObjective(match[1],{history:false});
   if(new URLSearchParams(location.search).get("new")==="1")return createView();
@@ -347,6 +348,7 @@ async function logout(){
 async function initialize(){
   document.querySelectorAll(".create-trigger, #nav-create").forEach(x=>x.addEventListener("click",createView));
   $("nav-overview").addEventListener("click",overview);
+  $("nav-brand").addEventListener("click",()=>changeView("brand"));
   $("cancel-create").addEventListener("click",overview);
   $("back-to-overview").addEventListener("click",overview);
   $("refresh-overview").addEventListener("click",overview);
