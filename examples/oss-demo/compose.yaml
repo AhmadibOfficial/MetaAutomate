@@ -1,0 +1,39 @@
+# Dedicated contributor sandbox. Does not use the existing MetaAutomate
+# development database, Docker project name, secret file or port 8000.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: metaautomate
+      POSTGRES_DB: metaautomate
+      POSTGRES_PASSWORD: ${DEMO_DB_PASSWORD:?Run make demo-up}
+    volumes:
+      - oss_demo_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U metaautomate -d metaautomate"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: ../../apps/api
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://metaautomate:${DEMO_DB_PASSWORD:?Run make demo-up}@postgres:5432/metaautomate
+      APP_DATABASE_URL: postgresql://metaautomate_runtime:${DEMO_RUNTIME_PASSWORD:?Run make demo-up}@postgres:5432/metaautomate
+      REGISTRY_READ_API_KEY: ${DEMO_REGISTRY_KEY:?Run make demo-up}
+      WORKSPACE_ORIGIN: http://127.0.0.1:18000
+      WORKSPACE_COOKIE_SECURE: "0"
+      WORKSPACE_WEB_ROOT: /app/workspace-web
+    ports:
+      - "127.0.0.1:18000:8000"
+    volumes:
+      - ../../apps/api:/app:ro
+      - ../../apps/web:/app/workspace-web:ro
+
+volumes:
+  oss_demo_postgres:
