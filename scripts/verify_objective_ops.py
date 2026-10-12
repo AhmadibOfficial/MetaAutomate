@@ -56,6 +56,7 @@ def main():
                         (uuid4().hex + "@example.invalid", name),
                     )
                     user_id = c.fetchone()[0]
+                    c.execute("SELECT app.set_context(%s,%s)", (org_id, user_id))
                     c.execute(
                         "INSERT INTO organization_memberships(organization_id,user_id,role) VALUES(%s,%s,%s)",
                         (org_id, user_id, "VIEWER" if name == "viewer" else "OWNER"),
