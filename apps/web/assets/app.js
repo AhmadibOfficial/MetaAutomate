@@ -1,7 +1,7 @@
 "use strict";
 
 /* MetaAutomate Objective Workspace: client code never persists access keys. */
-const state = {session:null, capabilities:[], objectives:[], objective:null, inFlightKey:null, graph:null};
+const state = {session:null, authMode:"unknown", capabilities:[], objectives:[], objective:null, inFlightKey:null, graph:null};
 const $ = id => document.getElementById(id);
 const screens = ["overview","create","detail"];
 const sleep = ms => new Promise(resolve => setTimeout(resolve,ms));
@@ -50,6 +50,22 @@ function showToast(message) {
   clearTimeout(showToast.timer);
   showToast.timer = setTimeout(()=>visible("toast",false),4300);
 }
+function applyIdentityMode() {
+  const oidc = state.authMode === "oidc";
+  for (const item of document.querySelectorAll(
+    '#login-form label[for="login-key"], #login-key, #login-form .field-hint, #login-submit'
+  )) item.hidden = oidc;
+  const sso = $("oidc-login-button");
+  sso.hidden = !oidc;
+  sso.disabled = !oidc;
+  $("login-environment-label").textContent = oidc ? "PRIVATE ORGANIZATION SSO" : "LOCAL DEVELOPMENT WORKSPACE";
+  $("environment-label").textContent = oidc ? "PRIVATE CLOUD · SSO" : "LOCAL DEVELOPMENT";
+  $("login-form").querySelector("p").textContent = oidc
+    ? "Authenticate with your organization's trusted identity provider. Access is restricted to approved members."
+    : "Sign in with the access key provisioned for your organization.";
+  $("login-key").required = !oidc;
+}
+
 function isEditor() { return ["OWNER","ADMIN","OPERATOR"].includes(state.session?.role); }
 function isReviewer() { return ["OWNER","ADMIN"].includes(state.session?.role); }
 function updateShell() {
@@ -306,7 +322,8 @@ function lostSession(){
   history.replaceState({view:"login"},"","/");
 }
 async function login(event){
-  event.preventDefault();clearError("login-error");
+  event.preventDefault();
+  if(state.authMode !== "dev_key") return failInto("login-error", "Local access-key sign-in is disabled. Use your organization's SSO.");clearError("login-error");
   const button=$("login-submit"),accessKey=$("login-key").value.trim();
   button.disabled=true;button.textContent="Checking access…";
   try{
@@ -334,11 +351,21 @@ async function initialize(){
   $("back-to-overview").addEventListener("click",overview);
   $("refresh-overview").addEventListener("click",overview);
   $("login-form").addEventListener("submit",login);
+  $("oidc-login-button").addEventListener("click",()=>window.location.assign("/v1/workspace/oidc/login"));
   $("objective-form").addEventListener("submit",saveObjective);
   $("review-form").addEventListener("submit",reviewObjective);
   $("logout-button").addEventListener("click",logout);
   window.addEventListener("resize",()=>requestAnimationFrame(drawGraph));
   window.addEventListener("popstate",()=>{if(state.session)enterWorkspace();});
+  try{
+    const config = await api("/v1/workspace/config");
+    state.authMode = config.mode;
+    applyIdentityMode();
+  }catch{
+    state.authMode = "unknown";
+    applyIdentityMode();
+    failInto("login-error", "Workspace identity settings are unavailable. Try again later.");
+  }
   try{
     state.session=await api("/v1/workspace/session");
     updateShell();await enterWorkspace();
