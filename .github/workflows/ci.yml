@@ -64,7 +64,7 @@ jobs:
 
       - name: Apply PostgreSQL migrations
         run: |
-          for migration in database/migrations/00[1-8]_*.sql; do
+          for migration in database/migrations/00[1-9]_*.sql; do
             echo "Applying $migration"
             psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 \
               -f "$migration"
@@ -77,3 +77,13 @@ jobs:
         run: |
           psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 \
             -f tests/sql/registry_integration.sql
+
+      - name: Configure restricted objective runtime role
+        run: |
+          psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -c "ALTER ROLE metaautomate_runtime LOGIN PASSWORD 'ci_runtime_password'"
+
+      - name: Exercise authenticated Objective Operations lifecycle
+        env:
+          APP_DATABASE_URL: postgresql://metaautomate_runtime:ci_runtime_password@localhost:5432/metaautomate
+        run: |
+          python scripts/verify_objective_ops.py --database metaautomate

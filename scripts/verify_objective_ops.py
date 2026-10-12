@@ -33,7 +33,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--database", required=True, help="Name of the disposable database to test")
     args = parser.parse_args()
-    assert args.database.startswith(("metaautomate_ci_", "metaautomate_test_"))
+    assert args.database.startswith(("metaautomate_ci_", "metaautomate_test_")) or (
+        args.database == "metaautomate" and os.getenv("GITHUB_ACTIONS") == "true"
+    ), "Tests must run only against an isolated database or ephemeral GitHub CI service"
     admin_url = with_database(os.environ["DATABASE_URL"], args.database)
     runtime_url = with_database(os.environ["APP_DATABASE_URL"], args.database)
     os.environ["APP_DATABASE_URL"] = runtime_url

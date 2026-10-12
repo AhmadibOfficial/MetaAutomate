@@ -19,6 +19,7 @@ def test_required_migration_order_exists():
         "006_security_triggers_rls.sql",
         "007_utility_functions.sql",
         "008_capability_registry.sql",
+        "009_objective_operations.sql",
     ]
 
 
@@ -117,3 +118,12 @@ def test_registry_tenant_rls_is_forced():
         assert f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;" in sql
         assert f"ALTER TABLE {table} FORCE ROW LEVEL SECURITY;" in sql
         assert f"CREATE POLICY tenant_{table}" in sql
+
+
+def test_objective_operations_has_restricted_auth_contract():
+    sql = (MIGRATIONS / "009_objective_operations.sql").read_text(encoding="utf-8")
+    assert "CREATE TABLE api_access_tokens" in sql
+    assert "ALTER TABLE api_access_tokens FORCE ROW LEVEL SECURITY;" in sql
+    assert "SECURITY DEFINER" in sql
+    assert "GRANT EXECUTE ON FUNCTION app.authenticate_api_token(text) TO metaautomate_runtime;" in sql
+    assert "REVOKE ALL ON FUNCTION app.authenticate_api_token(text) FROM PUBLIC;" in sql
