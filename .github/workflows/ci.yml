@@ -123,3 +123,11 @@ jobs:
           name: objective-workspace-browser
           path: artifacts/objective-workspace.png
           if-no-files-found: ignore
+
+      - name: Verify automated local workspace bootstrap and CSRF boundary
+        env:
+          WORKSPACE_ORIGIN: http://127.0.0.1:8000
+        run: |
+          python scripts/bootstrap_workspace.py
+          python scripts/verify_workspace_bootstrap.py
+          rm -f .env .workspace-access-key
