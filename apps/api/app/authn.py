@@ -94,6 +94,8 @@ def get_tenant_session(
     authorization: Annotated[str | None, Header(alias="Authorization")] = None,
 ) -> Iterator[TenantSession]:
     if authorization is not None:
+        if os.environ.get("WORKSPACE_AUTH_MODE", "dev_key") == "oidc":
+            raise HTTPException(status_code=401, detail="Bearer API login disabled in production")
         if not authorization.startswith("Bearer "):
             raise HTTPException(status_code=401, detail="Invalid authorization scheme")
         token = authorization[7:]
