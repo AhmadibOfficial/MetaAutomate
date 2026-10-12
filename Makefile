@@ -30,3 +30,13 @@ db-upgrade:
 .PHONY: workspace-init
 workspace-init:
 	bash scripts/workspace_init.sh
+
+.PHONY: demo-up demo-check demo-down
+demo-up:
+	bash scripts/oss_demo_up.sh
+
+demo-check:
+	python3 scripts/verify_oss_demo.py
+
+demo-down:
+	bash scripts/oss_demo_down.sh
