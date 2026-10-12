@@ -1,0 +1,34 @@
+capability_id,name,domain,release,priority,lifecycle_status
+CORE-001,Objective Interpretation,CORE,R1,P0,DRAFT
+CORE-002,Capability Discovery,CORE,R1,P0,DRAFT
+CORE-003,Work Graph Planning,CORE,R1,P0,DRAFT
+CORE-004,Agent & Tool Orchestration,CORE,R1,P0,DRAFT
+CORE-005,Authorization & Approvals,CORE,R1,P0,DRAFT
+CORE-006,Verification & Recovery,CORE,R1,P0,DRAFT
+CORE-007,Audit & Outcome Measurement,CORE,R1,P0,DRAFT
+BIZ-001,Digital Transformation Assessment,BIZ,R1,P0,DRAFT
+BIZ-002,Lead Intake & Deduplication,BIZ,R1,P0,DRAFT
+BIZ-003,Lead Qualification,BIZ,R1,P0,DRAFT
+BIZ-004,Sales Outreach & Follow-up,BIZ,R1,P0,DRAFT
+BIZ-005,Appointment Booking,BIZ,R1,P0,DRAFT
+BIZ-006,CRM Synchronization,BIZ,R1,P0,DRAFT
+BIZ-007,Revenue Analytics,BIZ,R2,P1,DRAFT
+BIZ-008,Marketing Campaign Automation,BIZ,R2,P1,DRAFT
+BIZ-009,Customer Retention,BIZ,R2,P1,DRAFT
+BIZ-010,Customer Support Automation,BIZ,R2,P1,DRAFT
+BIZ-011,Inventory & Operations,BIZ,R3,P2,DRAFT
+BIZ-012,Financial Operations,BIZ,R3,P2,DRAFT
+PER-001,Daily Planning & Tasks,PER,R3,P1,DRAFT
+PER-002,Email & Message Assistance,PER,R3,P1,DRAFT
+PER-003,Learning & Career Assistant,PER,R3,P1,DRAFT
+PER-004,Personal Budget Assistant,PER,R4,P2,DRAFT
+PER-005,Shopping & Errand Assistant,PER,R4,P2,DRAFT
+PER-006,Wellbeing Routine Assistant,PER,R4,P2,DRAFT
+CRE-001,AI Image Generation & Editing,CRE,R3,P1,DRAFT
+CRE-002,AI Video Production,CRE,R3,P1,DRAFT
+CRE-003,Audio & Voice Production,CRE,R3,P1,DRAFT
+CRE-004,Social Publishing & Analytics,CRE,R3,P1,DRAFT
+CRE-005,Creator Monetization,CRE,R4,P2,DRAFT
+SPEC-001,Agriculture Intelligence,SPEC,R4,P2,DRAFT
+SPEC-002,Healthcare Operations,SPEC,R4,P2,DRAFT
+SPEC-003,Geospatial Intelligence,SPEC,R4,P2,DRAFT
