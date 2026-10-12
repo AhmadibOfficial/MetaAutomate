@@ -3,10 +3,12 @@ from fastapi import FastAPI
 import psycopg
 from app.registry import router as capability_router
 from app.objectives import router as objective_router
+from app.objective_ops import router as objective_ops_router
 
-app = FastAPI(title="MetaAutomate MVP API", version="0.3.0")
+app = FastAPI(title="MetaAutomate MVP API", version="0.4.0")
 app.include_router(capability_router)
 app.include_router(objective_router)
+app.include_router(objective_ops_router)
 
 
 @app.get("/health")
