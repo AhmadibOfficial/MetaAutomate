@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a reproducible non-security defect in the local workspace.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not post credentials, private customer data or security exploit details. For vulnerabilities see SECURITY.md."
+  - type: input
+    id: version
+    attributes:
+      label: MetaAutomate branch / commit
+      placeholder: "main @ commit SHA"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce using fake data
+      description: "Include only sanitized test data."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Security confirmation
+      options:
+        - label: "No credentials or private records are included."
+          required: true

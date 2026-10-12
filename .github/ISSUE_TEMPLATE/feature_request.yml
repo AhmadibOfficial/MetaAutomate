@@ -1,0 +1,26 @@
+name: Feature proposal
+description: Suggest a safe, testable addition to MetaAutomate.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and user value
+      description: "Describe the user problem rather than only the technology."
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior and acceptance criteria
+      description: "Explain the desired behavior, validation and limits."
+    validations:
+      required: true
+  - type: textarea
+    id: security
+    attributes:
+      label: Safety and permission considerations
+      description: "Does this touch users, organizations, external integrations, money or execution?"
+    validations:
+      required: true
