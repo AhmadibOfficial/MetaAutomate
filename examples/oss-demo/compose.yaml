@@ -35,9 +35,6 @@ services:
       - ../../apps/api:/app:ro
       - ../../apps/web:/app/workspace-web:ro
 
-volumes:
-  oss_demo_postgres:
-
 
   init:
     profiles: ["bootstrap"]
@@ -55,3 +52,7 @@ volumes:
       - ../../scripts:/workspace/scripts:ro
     working_dir: /workspace
     entrypoint: ["python", "/workspace/scripts/bootstrap_oss_demo.py"]
+
+
+volumes:
+  oss_demo_postgres:
