@@ -199,6 +199,15 @@ def get_objective(objective_id: UUID, session: Session):
             (org, objective_id),
         )
         workflow = cur.fetchone()
+        if workflow is None:
+            return {
+                "objective": obj,
+                "workflow": None,
+                "tasks": [],
+                "task_dependencies": [],
+                "review": None,
+                "execution_allowed": False,
+            }
         cur.execute(
             "SELECT id, task_type, name, sequence_no, capability_key, state "
             "FROM tasks WHERE organization_id=%s AND workflow_id=%s ORDER BY sequence_no",

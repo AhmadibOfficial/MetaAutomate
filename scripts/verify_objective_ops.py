@@ -104,6 +104,27 @@ def main():
             assert c.fetchone()[0] == 2
             c.execute("SELECT count(*) FROM capability_executions")
             assert c.fetchone()[0] == 0
+    # Construct a legacy objective in a separate transaction after the count checks.
+    # Legacy objectives may exist without an Objective Plan Preview workflow.
+    # Reading them must not crash the objective management endpoint.
+    with psycopg.connect(admin_url) as conn:
+        with conn.cursor() as c:
+            c.execute("SELECT app.set_context(%s,%s)", (
+                actors["owner"]["organization_id"], actors["owner"]["user_id"]
+            ))
+            c.execute(
+                "INSERT INTO objectives(organization_id,title,initiated_by_user_id) "
+                "VALUES(%s,'Legacy objective with no planning workflow',%s) RETURNING id",
+                (actors["owner"]["organization_id"], actors["owner"]["user_id"]),
+            )
+            legacy_id = str(c.fetchone()[0])
+    legacy = check(client.get("/v1/objective-operations/" + legacy_id,
+                              headers=auth("viewer")), 200)
+    assert legacy["workflow"] is None and legacy["tasks"] == []
+    assert legacy["execution_allowed"] is False
+
+    with psycopg.connect(admin_url) as conn:
+        with conn.cursor() as c:
             c.execute("UPDATE api_access_tokens SET revoked_at=now() WHERE user_id=%s", (actors["owner"]["user_id"],))
     check(client.get("/v1/objective-operations", headers=auth("owner")), 401)
     print("PASS: restricted role, bearer auth, tenant isolation, idempotency, graph, review, audit and revocation")
