@@ -140,3 +140,6 @@ jobs:
       - name: Verify private cloud Compose and security boundaries
         run: python scripts/verify_private_deploy.py
 
+
+      - name: Check guarded deployment launcher syntax
+        run: bash -n deploy/private/scripts/launch.sh

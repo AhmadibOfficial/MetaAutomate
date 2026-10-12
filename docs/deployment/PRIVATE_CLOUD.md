@@ -21,6 +21,18 @@ The discovery URL must be at the exact OIDC issuer + /.well-known/openid-configu
 
 Provision the founder's verified OIDC issuer+subject and organization using the administrator-only scripts/provision_oidc_identity.py. The OIDC subject is an opaque user identifier from the IdP (not an email guessed from the login page). Different organizations require separate explicit provisioning. The live IdP handshake and production security review remain required acceptance tests.
 
+## Guarded single-command initial launch
+
+After an approved cloud VM, Tailscale private tailnet, trusted OIDC application, and private `deploy/private/.env` have been configured, run the integrated launcher **on the VM**:
+
+    bash deploy/private/scripts/launch.sh
+
+The script validates the chosen HTTPS tailnet origin, callback, credential separation, OIDC settings, Docker Compose configuration and active Tailscale connection. It requires explicit `PRIVATE-LAUNCH` confirmation, migrates a **new empty database only**, seeds disabled draft capabilities, provisions the verified owner, starts the restricted API, and configures Tailscale **Serve** (never Funnel). It refuses unsafe/placeholder settings and cannot provision a cloud VM or choose an OIDC provider for you.
+
+Supply `META_OWNER_SUBJECT`, `META_OWNER_EMAIL`, and `META_ORG_SLUG` in the ignored env file after verifying the subject with the IdP administrator. Never paste private credentials or IdP subjects into GitHub issues or chat.
+
+The longer steps below describe what the launcher performs and serve as an incident-response reference. **Do not run them a second time after a successful initial launch.**
+
 ## One-time VM preparation
 
 1. Provision the VM only after explicit approval of provider, account, region, budget and trusted administrators. Install Docker Engine and Compose, restrict SSH/firewall, enable OS updates and backup destination.
