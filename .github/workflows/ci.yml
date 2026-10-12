@@ -143,3 +143,19 @@ jobs:
 
       - name: Check guarded deployment launcher syntax
         run: bash -n deploy/private/scripts/launch.sh
+
+      - name: Build and smoke-test non-root private cloud production image
+        run: |
+          docker build -f apps/api/Dockerfile.prod -t metaautomate-workspace:ci .
+          docker run --rm \
+            -e WORKSPACE_AUTH_MODE=oidc \
+            -e WORKSPACE_ORIGIN=https://metaautomate-private.example.ts.net \
+            -e WORKSPACE_COOKIE_SECURE=1 \
+            -e OIDC_ISSUER=https://idp-ci.example.invalid/tenant \
+            -e OIDC_CLIENT_ID=ci-client \
+            -e OIDC_CLIENT_SECRET=ci-secret \
+            -e OIDC_REDIRECT_URI=https://metaautomate-private.example.ts.net/v1/workspace/oidc/callback \
+            -e OIDC_STATE_SECRET=ci-state-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
+            -e APP_DATABASE_URL=postgresql://metaautomate_runtime:ci-password@postgres:5432/metaautomate \
+            -e WORKSPACE_WEB_ROOT=/srv/metaautomate/web \
+            metaautomate-workspace:ci python -c "from fastapi.testclient import TestClient; from app.main import app; t=TestClient(app); assert t.get('/').status_code==200; assert t.get('/assets/metaautomate-mark.webp').status_code==200; assert t.get('/v1/workspace/config').json()['mode']=='oidc'; assert t.get('/v1/capabilities').status_code==404; print('PASS: private immutable image boots in OIDC mode and serves branded UI')"
