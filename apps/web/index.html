@@ -45,15 +45,17 @@
       <div class="brand sidebar-brand"><div class="brand-mark">M<span>·</span></div><span>MetaAutomate</span></div>
       <div class="sidebar-section-label">WORKSPACE</div>
       <nav aria-label="Main navigation" class="sidebar-nav">
-        <button class="nav-item active" id="nav-overview" type="button" data-view="overview"><span aria-hidden="true">▦</span> Overview</button>
-        <button class="nav-item" id="nav-create" type="button" data-view="create"><span aria-hidden="true">＋</span> New objective</button>
+        <button class="nav-item active" id="nav-overview" title="Overview" type="button" data-view="overview"><span aria-hidden="true">▦</span> Overview</button>
+        <button class="nav-item" id="nav-create" title="New objective" type="button" data-view="create"><span aria-hidden="true">＋</span> New objective</button>
+        <button class="nav-item" id="nav-assessment" title="Digital assessment" type="button" data-view="assessment"><span aria-hidden="true">◈</span> Digital assessment</button>
+        <button class="nav-item" id="nav-assessment-history" title="Assessment reports" type="button" data-view="assessment-history"><span aria-hidden="true">▤</span> Assessment reports</button>
       </nav>
       <div class="sidebar-grow"></div>
       <div class="guard-card">
         <span class="guard-icon">◈</span>
-        <strong>Planning mode</strong>
-        <p>All proposed work remains blocked. Review is not execution permission.</p>
-        <span class="guard-status"><span class="tiny-pulse"></span> Execution disabled</span>
+        <strong>Controlled operations</strong>
+        <p>Draft plans cannot run external actions. Assessments generate reports only.</p>
+        <span class="guard-status"><span class="tiny-pulse"></span> External actions disabled</span>
       </div>
       <div class="sidebar-user">
         <div class="avatar">M</div>
@@ -64,7 +66,7 @@
 
     <main class="content">
       <header class="topbar">
-        <div><span class="topbar-label">META / OBJECTIVES</span><span id="topbar-crumb" class="topbar-current">Overview</span></div>
+        <div><span class="topbar-label">META / OPERATIONAL CORE</span><span id="topbar-crumb" class="topbar-current">Overview</span></div>
         <div class="topbar-right"><span class="environment-tag"><span class="tiny-pulse"></span> LOCAL DEVELOPMENT</span><div class="avatar small">M</div></div>
       </header>
       <div class="content-inner">
@@ -161,6 +163,73 @@
             </div>
           </div>
         </section>
+        <section id="assessment-view" class="app-screen" hidden>
+          <div class="section-heading compact">
+            <div><div class="eyebrow">OPERATIONAL CORE / ASSESSMENT V1</div><h1>From evidence to <em>clear action.</em></h1><p>Assess your organization's digital maturity using 15 transparent statements. Receive a scored report and a practical action plan.</p></div>
+            <button class="button subtle" id="assessment-show-history" type="button">Past reports ↗</button>
+          </div>
+          <div class="note-strip"><span>◈</span><p>This is a structured <strong>self-assessment</strong>, not a live business audit or generative AI agent. It produces a report; it does not change your systems or promise increased revenue.</p></div>
+          <form id="assessment-form">
+            <div class="panel form-panel assessment-intro">
+              <div class="panel-step"><span>01</span><div><h2>Define the business outcome</h2><p>A specific goal gives the assessment useful context.</p></div></div>
+              <label for="assessment-business">Business or project label <span class="required">*</span></label>
+              <input id="assessment-business" required minlength="3" maxlength="120" autocomplete="organization" placeholder="e.g. Northcrest retail operations">
+              <label for="assessment-goal">What outcome matters to this business? <span class="required">*</span></label>
+              <textarea id="assessment-goal" required minlength="15" maxlength="300" rows="3" placeholder="e.g. Reduce order delays and improve customer follow-up"></textarea>
+            </div>
+            <div class="panel form-panel assessment-questionnaire">
+              <div class="panel-step"><span>02</span><div><h2>Rate your current capabilities</h2><p>Choose a score from 0 (not in place) to 4 (consistently demonstrated) for every statement.</p></div></div>
+              <div id="assessment-questions" class="assessment-domains"><p>Loading your assessment questionnaire…</p></div>
+            </div>
+            <div class="panel form-panel assessment-submit-panel">
+              <div class="panel-step"><span>03</span><div><h2>Authorize and generate</h2><p>The report is saved privately in your organization's workspace, with a verifiable computation receipt.</p></div></div>
+              <label class="assessment-authorization" for="assessment-authorized">
+                <input id="assessment-authorized" type="checkbox" required>
+                <span>I authorize MetaAutomate to calculate and store this self-assessment report. No external business action, advertising or payment is initiated.</span>
+              </label>
+              <div id="assessment-error" class="alert error" role="alert" hidden></div>
+              <button class="button primary" id="assessment-submit" type="submit" disabled>Generate verified report →</button>
+            </div>
+          </form>
+        </section>
+
+        <section id="assessment-history-view" class="app-screen" hidden>
+          <div class="section-heading compact">
+            <div><div class="eyebrow">OPERATIONAL CORE / SAVED EVIDENCE</div><h1>Your assessment <em>reports.</em></h1><p>Reopen a completed assessment and verify its recorded calculation.</p></div>
+            <button class="button primary assessment-new-trigger" type="button">+ New assessment</button>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><h2>Report history</h2><p>Visible only within your authenticated organization.</p></div><button class="button subtle" id="assessment-refresh" type="button">↻ Refresh</button></div>
+            <div id="assessment-report-list" class="assessment-report-list"></div>
+            <p id="assessment-history-empty" class="assessment-empty" hidden>No assessments yet. Start one to establish your first evidence-based baseline.</p>
+          </div>
+        </section>
+
+        <section id="assessment-detail-view" class="app-screen" hidden>
+          <div class="detail-top">
+            <button id="assessment-detail-back" class="back-link" type="button">← All assessment reports</button>
+            <span class="status-badge approved">Calculation verified</span>
+          </div>
+          <div class="section-heading compact">
+            <div><div class="eyebrow">OPERATIONAL CORE / VERIFIED REPORT</div><h1 id="assessment-report-title">Assessment result</h1><p id="assessment-report-goal"></p></div>
+            <div class="assessment-score-block"><small>DIGITAL MATURITY</small><strong id="assessment-overall-score">—</strong><span id="assessment-overall-level">Not yet scored</span></div>
+          </div>
+          <div class="panel assessment-results">
+            <div class="panel-head"><div><h2>Domain maturity</h2><p>Five equally weighted domains. Every score is based on your submitted answers.</p></div></div>
+            <div id="assessment-domain-results" class="assessment-domain-results"></div>
+          </div>
+          <div class="panel assessment-actions">
+            <div class="panel-head"><div><h2>Prioritized action plan</h2><p>Ordered by the largest measured gaps. These are recommendations, not completed business changes.</p></div></div>
+            <div id="assessment-prioritized-actions" class="assessment-prioritized-actions"></div>
+          </div>
+          <div class="panel assessment-evidence">
+            <div class="panel-head"><div><h2>Execution receipt and verification</h2><p>Recalculated against the original stored inputs when this report is loaded.</p></div></div>
+            <dl id="assessment-receipt" class="assessment-receipt"></dl>
+            <p class="field-hint">A verified report proves the scoring calculation matches the recorded answers. It does not independently confirm improved finances, operations or cybersecurity.</p>
+          </div>
+          <button class="button subtle" id="assessment-download" type="button">Download report (.json) ↓</button>
+        </section>
+
         <div class="footer-line">META AUTOMATE <span>·</span> SOLUTIONS, CONVENIENCE & EXPERIENCES <span>·</span> DEVELOPMENT WORKSPACE</div>
       </div>
     </main>

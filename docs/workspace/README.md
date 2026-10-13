@@ -45,3 +45,8 @@ After initialization, users interact only with the browser. No terminal or manua
 - A real Chromium browser test signs in, creates a plan through the form, visualizes the DAG, approves it, reloads the page, verifies persistence, checks overview counts, and signs out; a screenshot is attached to the CI job.
 
 No public cloud URL, hosted authentication, external execution engine, AI planning, job scheduling, third-party connections or production authorization is included in this release.
+
+
+## Operational Core v1 extension
+
+The authenticated workspace now includes the Digital Transformation Assessment. See `docs/operational-core/ASSESSMENT_V1.md` for the precise self-report scoring, receipt verification boundary, safe schema upgrade and testing instructions. Report creation is the first **local** deterministic executed analytical capability; it does not enable outside agent actions.

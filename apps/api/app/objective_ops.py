@@ -163,6 +163,9 @@ def create_objective(
             "WHERE organization_id=%s AND scope='OBJECTIVE_CREATE' AND idempotency_key=%s",
             (Jsonb(response), objective_id, org, idempotency_key),
         )
+        # Make the successful write visible before the HTTP response is sent.
+        # Yield-dependency cleanup otherwise commits after the browser can issue a GET.
+        session.conn.commit()
         return response
 
 
@@ -293,6 +296,7 @@ def review_plan(objective_id: UUID, decision: PlanDecision, session: Session):
         )
         _audit(cur, session, "OBJECTIVE_PLAN_REVIEWED", objective_id,
                {"decision": decision.decision, "review_id": str(review["id"])})
+        session.conn.commit()
         return {
             "objective_id": str(objective_id),
             "review_status": decision.decision,
