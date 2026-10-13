@@ -34,7 +34,9 @@ Its build summary and JSON artifact (release-evidence-gate) explain which gate b
 
 ## Administrative release lock still required
 
-A passing Actions job **does not independently block a GitHub merge** on a repository without an enabled branch protection/ruleset. A repository administrator must configure protection for the private main branch, require the status check **Release Evidence Gate**, require the branch to be up to date, and disallow bypasses according to the owner's policy. Do not set or claim this automatically without administrative authority.
+A passing Actions job **does not independently block a GitHub merge** on a repository without an enabled branch protection/ruleset. The repository owner must configure protection for the private main branch, require the status check **Release Evidence Gate**, require the branch to be up to date, and disallow bypasses according to the owner's policy. Do not claim that CI status enforces a merge block until the GitHub rule is active and has been verified.
+
+**Current private repository blocker (2026-10-13):** GitHub reported `403: Upgrade to GitHub Pro or make this repository public to enable this feature` when reading rulesets. Keep MetaAutomate **private**. For a personal private repository, GitHub Pro (or another eligible plan) may be needed before required-status-check branch protection is available. The connected GitHub integration also cannot administer branch-protection settings. The owner must enable and verify the rule directly in GitHub Settings once their account supports it; this PR does not upgrade the account or change repository visibility. Until enforcement is active, merges must be held by an explicit human-controlled release process.
 
 The Render dashboard's Auto-Deploy and PR Previews settings must remain Off; render.yaml validation cannot read live Render settings. Deployment, applying migrations, rotating credentials and enabling outside customer access each remain separate explicit owner-approval actions. There is no deploy job in this release gate.
 
