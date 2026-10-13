@@ -17,7 +17,10 @@ trap cleanup EXIT
 docker compose up -d postgres
 ready=0
 for _ in $(seq 1 40); do
-  if docker compose exec -T postgres pg_isready -q -U metaautomate -d metaautomate; then
+  # The image briefly accepts connections on its temporary bootstrap server.
+  # Require the completed init marker and an actual SQL query on the final server.
+  if docker compose logs --no-color postgres 2>&1 | grep -q 'PostgreSQL init process complete' &&
+     [[ "$(docker compose exec -T postgres psql -X -A -t -U metaautomate -d metaautomate -c 'SELECT 1' 2>/dev/null || true)" == '1' ]]; then
     ready=1
     break
   fi
