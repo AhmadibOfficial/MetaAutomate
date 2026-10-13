@@ -1,56 +1,76 @@
-# MetaAutomate — Business Website
+# MetaAutomate Global Company Experience v2
 
-A premium, self-contained, responsive **public marketing website** for MetaAutomate. The official blue/silver/gold logo and mission/vision/core values are sourced from the approved brand board.
+A distinctive four-page international technology-company website for MetaAutomate.
 
-It is intentionally separate from the Objective Workspace API under apps/api and apps/web.
+Positioning: an emerging-technology business combining intelligent systems, software engineering, cybersecurity, cloud, data, product design and experience. This is a business-facing corporate website, **not** an open-source project launch or a statement that every planned technology is operational.
 
-## What this website can do
+## The brand standard
 
-- Explain MetaAutomate's business mission, vision, tagline and focus sectors.
-- Describe the *current* working Objective Workspace accurately: draft planning, saved graphs and human review only.
-- Showcase the *planned* capability vision without claiming AI agents, payments or external execution are live.
-- Provide mobile navigation, accessible capability filters, and working in-page navigation.
-- Publish as static HTML, CSS, JS, and one approved logo image; **no database, authentication, analytics, or JavaScript API calls**.
+Preserve the owner-approved MetaAutomate mark and deep navy/electric blue/silver/gold palette. Mission, vision, core values and strategic focus remain consistent:
+- Tagline: **Turn Your Vision Into Reality**
+- Descriptor: **Intelligence · Creation · Automation**
+- Proposition: **Solutions, Convenience and Experiences**
+- Values: **Integrity, Excellence, Innovation, Impact, Always HALAL**
+- Mission: To build intelligent systems that automate work, create solutions and empower individuals, organizations and societies to achieve more.
+- Vision: To become the world's most trusted, impact-driven AI automation platform creating opportunities, innovation, and positive change.
+- Strategic sectors: Agriculture, Healthcare, Food Security, Islamic Knowledge Systems and related emerging-technology opportunities.
 
-## Review without hosting
+## Site structure
 
-    cd apps/site
-    python3 -m http.server 18080 --bind 127.0.0.1
+- Home (/): Global MetaAutomate positioning, interactive engineering philosophy, services, sectors and real Objective Workspace foundation.
+- Services (/services/): Six disciplines, with scoped example engagements. Work is defined per project; it does not claim a client track record that hasn't been demonstrated.
+- Company (/company/): Mission, vision, values, meanings behind the approved logo and the four-phase roadmap.
+- Project brief (/engage/): Browser-only interactive project brief builder with TXT download and clipboard copy. It does **not** send submissions or store any data on the server.
 
-Then open http://127.0.0.1:18080/ on the same computer. This is independent of the existing MetaAutomate workspace on port 8000.
+The whole site consists of local HTML, CSS, JS and the approved logo. There are no third-party font calls, tracking scripts, cookies, database connections or API requests.
 
-For automated tests, from the repository root:
+## Preview locally
+
+From repository root, run:
+
+    python3 -m http.server 18080 --bind 127.0.0.1 --directory apps/site
+
+Then open http://127.0.0.1:18080/ in the same computer. It does not touch MetaAutomate's Objective Workspace service on port 8000.
+
+For browser testing, in a separate terminal with the static server running:
 
     python3 -m pip install playwright
     python3 -m playwright install chromium
     python3 scripts/verify_brand_site.py
 
-The test needs the local website server running. GitHub CI starts the server automatically and publishes desktop/mobile screenshots.
+GitHub Actions runs the tests automatically, including keyboard-accessible system tabs, mobile navigation at 390px and 360px, an end-to-end project brief download and verification that no requests leave the local test origin.
 
-## No-card static hosting option
+## Real capabilities versus future roadmap
 
-Render provides a no-payment-required signup and free Static Sites, including an HTTPS onrender.com domain. Link the PRIVATE GitHub repository (authorize access to this repo only), then create a **Static Site** with:
+MetaAutomate's current Objective Workspace is a development-stage planning product with structured objectives, proposed task graphs, saved plans and human review. Autonomous external execution, a production public app and integrated AI agents are **not** available. The website showcases service disciplines and direction while remaining accurate about operational capabilities.
 
-- Repository: AhmadibOfficial/MetaAutomate
-- Branch: merge-reviewed main only
-- Build command: echo "Static website"
-- Publish directory: apps/site
-- Auto deploy: OFF until the owner explicitly approves changes
+## Deployment
 
-The root render.yaml provides the equivalent static-only Blueprint configuration. **No Render service has been created yet.** This site is a **public-facing business homepage**, so anyone can inspect the HTML/CSS/JS and official public logo served to their browser, even though GitHub source stays private.
+The production business site is hosted as a Render **static site**, publishing only apps/site from private GitHub. The Render service already exists and hosts the preceding design version at https://metaautomate-business-website.onrender.com/.
 
-Important: Render's free static-site use consumes the account's included bandwidth and build minutes. A working Objective Workspace, API and durable PostgreSQL database cannot be created by deploying this folder alone.
+**Auto deploy is disabled.** Do not trigger a redeploy automatically when merging this proposal. Get specific approval after the maintainer reviews the screenshots, service descriptions and contact experience. No API or customer data belongs in the public static site.
 
-Render official docs: https://render.com/docs/static-sites
-No-payment setup: https://render.com/docs/your-first-deploy
-Blueprint syntax: https://render.com/docs/blueprint-spec
+The owner has now supplied **metaautomating@gmail.com** for business inquiries. The website presents it as a direct mailto link in every footer and on /engage/. The brief generator offers an optional mailto draft with prefilled project details, clipboard copy and download, while explicitly requiring the visitor to review and send the email themselves. If the brief exceeds a safe mailto URL length, the draft is shortened and the visitor is instructed to attach the full downloaded text. No mail is automatically sent and the static site collects no information on a server. The mailbox ownership and reception capabilities have not been independently tested.
 
-## Business and code licensing
+The repository is private. The existing GPLv2 LICENSE text is unchanged; prior distribution rights, future licensing and official logo rights are separate decisions.
 
-The GitHub repository is private. Its pre-existing root LICENSE still includes GPLv2 text; this static website change does **not** revise or remove it. Repository visibility does not revoke existing third-party rights to copies previously obtained. Brand and copyright ownership should be reviewed separately before issuing a different software license.
+## Official MetaAutomate social channels
 
-The MetaAutomate mark is a brand asset provided/approved by the business owner. Publishing the website makes the logo visible online; it does not by itself create or resolve trademark rights or ownership of independently contributed code.
+MetaAutomate provided the following addresses for the business website. All eight links appear in the global footer and in the homepage's dedicated social network section. The site uses ordinary secure external links and loads **no third-party embeds, trackers, feeds or social APIs**.
 
-## Current limitations
+- **YouTube**: https://youtube.com/@MetaAutomate
+- **LinkedIn**: https://www.linkedin.com/company/meta-automate
+- **Instagram**: https://instagram.com/meta_automate
+- **X / Twitter**: https://twitter.com/MetaAutomate
+- **Facebook**: https://facebook.com/MetaAutomate
+- **TikTok**: https://tiktok.com/@metaautomate
+- **WhatsApp Channel** (broadcast updates; not a one-to-one customer-support chat): https://whatsapp.com/channel/0029VbDSQMdBqbr1vqRyYR2U
+- **Telegram** (owner-supplied public link): https://t.me/Meta_Automate
 
-This website is a business information site, not the logged-in product. Avoid presenting the planned capabilities as already available. No signup, demo request form or lead capture is implemented: those require an approved privacy notice, backend, abuse protection and functional contact channel.
+TikTok's trailing punctuation and LinkedIn's escaped formatting were normalized from the business-provided URLs. The URLs are supplied by the business; platform profile ownership was not independently verified. Do not claim follower counts, verification badges, response time or official customer support through these channels without confirmation.
+
+## Business inquiry address
+
+The business owner supplied **metaautomating@gmail.com** as MetaAutomate's inquiry address. It is a direct correspondence channel, not an authenticated SMTP connection, automated CRM, ticketing system or proof of mailbox control.
+
+The project brief intentionally generates and opens a client-side `mailto:` draft. Visitors must use their own email application and press **Send**; a link click by itself does not deliver an inquiry. For long or complex briefs, download the original `.txt` and attach it manually. The static site makes no fetch/POST requests and stores no project data. Do not share confidential credentials or sensitive personal information in an initial inquiry.
