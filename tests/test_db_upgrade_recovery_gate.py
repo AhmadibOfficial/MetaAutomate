@@ -40,3 +40,6 @@ def test_local_only_gate_and_migration_scope():
         assert version + ".sql" in script
     assert "docker compose down -v" not in script
     assert "workspace-init" not in script
+    assert "has_table_privilege" in script
+    assert "trg_digital_assessments_no_update" in script
+    assert "trg_digital_assessments_no_delete" in script
