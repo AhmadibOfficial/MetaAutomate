@@ -22,9 +22,9 @@ Build a distinctive global technology-company experience. International standard
 
 ## Truth and commercial readiness
 
-The website offers engagement categories and meaningful examples, not guaranteed resources, engagement dates, pricing or proven project outcomes. Do not invent a client logo, corporate registration, city of operation, certification, 24/7 support, global office, revenue or business email.
+The website offers engagement categories and meaningful examples, not guaranteed resources, engagement dates, pricing or proven project outcomes. Do not invent a client logo, corporate registration, city of operation, certification, 24/7 support, global office, revenue or business email. The business owner subsequently provided **metaautomating@gmail.com** as the inquiry address.
 
-Before activating live lead submission, verify a company-owned contact channel and provide a privacy notice appropriate to the data being collected. Do not secretly transmit project briefs to third parties.
+The owner provided metaautomating@gmail.com as the business inquiry address; mailbox control was not independently tested. The website may link to it via `mailto:` but must not claim successful inquiry delivery or silently transmit customer data. Before adding server-side lead submission or a CRM, confirm email control, consent, anti-abuse measures and privacy disclosures appropriate to the data.
 
 MetaAutomate's autonomous capability execution remains blocked behind its own security and authorized-execution milestone. Human approval of a plan is not permission to run it.
 

@@ -115,10 +115,40 @@
     if ([...select.options].some(option=>option.value===service)) select.value=service;
   }
 
+  // Prepare a local mailto draft only. There is no form POST, network
+  // request or automatic sending. Keep links short enough for email clients.
+  const BUSINESS_EMAIL = "metaautomating@gmail.com";
+  const MAILTO_LIMIT = 1850;
+  function composeEmailHref(fullBrief) {
+    const subject = "MetaAutomate | Project discovery inquiry";
+    const intro = "Hello MetaAutomate,\\n\\nPlease review my project discovery brief:\\n\\n";
+    const signature = "\\n\\nPlease reply with the next steps.\\nThank you.";
+    const overflowNote = "\\n\\n[Remaining details omitted from the email draft. Please attach the downloaded complete brief.]";
+    const urlFor = (text, shortened) =>
+      "mailto:" + BUSINESS_EMAIL + "?subject=" + encodeURIComponent(subject) +
+      "&body=" + encodeURIComponent(intro + text + (shortened ? overflowNote : "") + signature);
+    const directUrl = urlFor(fullBrief, false);
+    if (directUrl.length <= MAILTO_LIMIT) return {url:directUrl, shortened:false};
+    // Binary search by Unicode code points avoids splitting emoji or accents.
+    const chars = Array.from(fullBrief);
+    let low = 0, high = chars.length;
+    while (low < high) {
+      const mid = Math.ceil((low + high) / 2);
+      if (urlFor(chars.slice(0, mid).join(""), true).length <= MAILTO_LIMIT) {
+        low = mid;
+      } else {
+        high = mid - 1;
+      }
+    }
+    return {url:urlFor(chars.slice(0, low).join(""), true), shortened:true};
+  }
+
   const result=document.getElementById("brief-result");
   const output=document.getElementById("brief-output");
   const error=document.getElementById("brief-error");
   const status=document.getElementById("brief-status");
+  const emailLink=document.getElementById("brief-email");
+  const emailNote=document.getElementById("brief-email-note");
   let currentBrief="";
 
   const value=id=>document.getElementById(id).value.trim();
@@ -167,6 +197,11 @@
       "This is a project discovery brief, not a contract or accepted engagement."
     ];
     currentBrief=lines.join("\n");
+    const draft=composeEmailHref(currentBrief);
+    emailLink.setAttribute("href", draft.url);
+    emailNote.textContent = draft.shortened
+      ? "This is an abbreviated email draft because your brief is too long for a reliable email link. Download and attach the full .txt brief before sending. Nothing is sent until you press Send in your email application."
+      : "Opens a prepared email in your email application. Review the recipient and details, then press Send yourself. Nothing has been sent yet.";
     output.textContent=currentBrief;
     result.hidden=false;
     status.textContent="";
@@ -175,6 +210,8 @@
 
   form.addEventListener("reset",()=>{
     currentBrief="";
+    emailLink.setAttribute("href", "mailto:" + BUSINESS_EMAIL + "?subject=MetaAutomate%20%7C%20Business%20inquiry");
+    emailNote.textContent="Open an email app to contact MetaAutomate.";
     result.hidden=true;
     error.hidden=true;
     error.textContent="";
@@ -185,7 +222,7 @@
     if (!currentBrief) return;
     try {
       await navigator.clipboard.writeText(currentBrief);
-      status.textContent="Brief copied. You can paste it into your preferred secure business communication channel.";
+      status.textContent="Brief copied. You can paste it into an email to "+BUSINESS_EMAIL+". It has not been sent.";
     } catch {
       status.textContent="Clipboard access is unavailable. Select the brief text above to copy it manually.";
       output.focus();

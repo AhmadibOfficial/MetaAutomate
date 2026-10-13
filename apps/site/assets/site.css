@@ -582,3 +582,22 @@ h1 em{background:linear-gradient(112deg,#07b9ff 0%,#c9e8ff 58%,#efc573 96%);back
   .social-card-name,.social-card.social-featured .social-card-name{font-size:17px}
   .social-card-heading{font-size:6px}
 }
+
+/* Professional, owner-provided MetaAutomate business contact channel */
+.footer-contact{display:flex;justify-content:space-between;align-items:center;gap:32px;border-top:1px solid #25426280;padding:33px 0}
+.footer-contact-copy{display:grid;gap:7px}
+.footer-contact-eyebrow,.brief-direct-contact>span{color:#95d2f2;font-size:10px;font-weight:890;letter-spacing:.15em}
+.footer-contact-copy p{margin:0;font-size:12px;color:#8caac5}
+.footer-contact-email{display:inline-flex;align-items:center;gap:22px;color:#f0f7ff;font-size:clamp(17px,2.1vw,27px);font-weight:750;letter-spacing:-.04em;border-bottom:1px solid #4685b9;padding-bottom:8px;overflow-wrap:anywhere}
+.footer-contact-email:hover{border-bottom-color:#f3c877;color:#ffe3a7}
+.footer-contact-email>span,.brief-direct-contact a>span{color:var(--gold)}
+.brief-direct-contact{margin-top:23px;padding:25px;border:1px solid #c8e3f7;border-radius:11px;background:linear-gradient(135deg,#eaf6ff,#f7fbfe);display:grid;gap:12px}
+.brief-direct-contact>span{color:#147cb1}
+.brief-direct-contact a{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:clamp(16px,2vw,20px);font-weight:790;color:#0a3760;letter-spacing:-.035em;overflow-wrap:anywhere}
+.brief-direct-contact a:hover{color:#078cce}
+.brief-direct-contact p{font-size:12px;line-height:1.75;margin:0;color:#60809b}
+.brief-email-note{font-size:11px;line-height:1.75;color:#5b758f;margin:15px 0 0}
+.brief-result-actions .action{flex-grow:0;min-height:48px}
+@media(max-width:760px){.footer-contact{align-items:flex-start;flex-direction:column;gap:18px}}
+@media(max-width:550px){.footer-contact-email{font-size:21px;gap:13px}.brief-result-actions .action{justify-content:space-between}}
+@media(max-width:370px){.footer-contact-email{font-size:18px}.brief-direct-contact{padding:18px}}

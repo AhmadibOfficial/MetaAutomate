@@ -50,7 +50,7 @@ The production business site is hosted as a Render **static site**, publishing o
 
 **Auto deploy is disabled.** Do not trigger a redeploy automatically when merging this proposal. Get specific approval after the maintainer reviews the screenshots, service descriptions and contact experience. No API or customer data belongs in the public static site.
 
-The business inquiry channel has not been verified. Until a real company-controlled address or contact method is provided, /engage/ produces a local brief for the user to copy or download, and plainly states that it hasn't been sent.
+The owner has now supplied **metaautomating@gmail.com** for business inquiries. The website presents it as a direct mailto link in every footer and on /engage/. The brief generator offers an optional mailto draft with prefilled project details, clipboard copy and download, while explicitly requiring the visitor to review and send the email themselves. If the brief exceeds a safe mailto URL length, the draft is shortened and the visitor is instructed to attach the full downloaded text. No mail is automatically sent and the static site collects no information on a server. The mailbox ownership and reception capabilities have not been independently tested.
 
 The repository is private. The existing GPLv2 LICENSE text is unchanged; prior distribution rights, future licensing and official logo rights are separate decisions.
 
@@ -66,3 +66,9 @@ MetaAutomate provided the following addresses for the business website. They app
 - **TikTok**: https://tiktok.com/@metaautomate
 
 TikTok's trailing punctuation and LinkedIn's escaped formatting were normalized from the business-provided URLs. The URLs are supplied by the business; platform profile ownership was not independently verified. Do not claim follower counts, verification badges, response time or official customer support through these channels without confirmation.
+
+## Business inquiry address
+
+The business owner supplied **metaautomating@gmail.com** as MetaAutomate's inquiry address. It is a direct correspondence channel, not an authenticated SMTP connection, automated CRM, ticketing system or proof of mailbox control.
+
+The project brief intentionally generates and opens a client-side `mailto:` draft. Visitors must use their own email application and press **Send**; a link click by itself does not deliver an inquiry. For long or complex briefs, download the original `.txt` and attach it manually. The static site makes no fetch/POST requests and stores no project data. Do not share confidential credentials or sensitive personal information in an initial inquiry.
