@@ -77,5 +77,13 @@ rls="$(docker compose exec -T postgres psql -X -A -t -v ON_ERROR_STOP=1 -U metaa
 if [[ "$rls" != 't,t' ]]; then
   echo 'ERROR: forced tenant RLS not enabled on digital_assessments.' >&2; exit 1
 fi
+permissions="$(docker compose exec -T postgres psql -X -A -t -v ON_ERROR_STOP=1 -U metaautomate -d metaautomate -c "SELECT has_table_privilege('metaautomate_runtime','public.digital_assessments','SELECT')::text || ',' || has_table_privilege('metaautomate_runtime','public.digital_assessments','INSERT')::text || ',' || has_table_privilege('metaautomate_runtime','public.digital_assessments','UPDATE')::text || ',' || has_table_privilege('metaautomate_runtime','public.digital_assessments','DELETE')::text;")"
+if [[ "$permissions" != 't,t,f,f' ]]; then
+  echo "ERROR: assessment table least-privilege grants failed: $permissions" >&2; exit 1
+fi
+immutability="$(docker compose exec -T postgres psql -X -A -t -v ON_ERROR_STOP=1 -U metaautomate -d metaautomate -c "SELECT count(*) FROM pg_trigger WHERE tgrelid = 'public.digital_assessments'::regclass AND tgname IN ('trg_digital_assessments_no_update','trg_digital_assessments_no_delete') AND tgenabled <> 'D';")"
+if [[ "$immutability" != '2' ]]; then
+  echo 'ERROR: assessment mutation prevention triggers are absent or disabled.' >&2; exit 1
+fi
 echo "PASS: migrations installed, forced RLS checked. Backup retained at $backup"
 echo 'NEXT: independently verify tenant isolation, runtime grants, audit and application browser flows before release.'
