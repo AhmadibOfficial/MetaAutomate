@@ -34,3 +34,7 @@ workspace-init:
 .PHONY: verify-local
 verify-local:
 	@python3 scripts/verify_local_gate.py
+
+.PHONY: staging-source-check
+staging-source-check:
+	@python3 scripts/verify_private_staging_contract.py
