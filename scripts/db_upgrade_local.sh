@@ -36,7 +36,7 @@ if [[ -L "$HOME/metaautomate-db-backups" ]]; then
 fi
 mkdir -p "$HOME/metaautomate-db-backups"
 chmod 700 "$HOME/metaautomate-db-backups"
-backup="$HOME/metaautomate-db-backups/before-operational-core-$(date +%Y%m%d_%H%M%S)-$.dump"
+backup="$HOME/metaautomate-db-backups/before-operational-core-$(date +%Y%m%d_%H%M%S)-$(date +%s%N).dump"
 echo "Backing up existing database to $backup"
 docker compose exec -T postgres pg_dump -Fc -U metaautomate -d metaautomate > "$backup"
 test -s "$backup"
@@ -44,7 +44,7 @@ chmod 600 "$backup"
 # A readable archive alone is insufficient: restore into a separate temporary
 # LOCAL database and verify representative table counts before any migration.
 docker compose exec -T postgres pg_restore --list < "$backup" > /dev/null
-restore_db="metaautomate_restore_$(date +%s)_$"
+restore_db="metaautomate_restore_$(date +%s%N)"
 restore_created=0
 cleanup_restore() {
   if [[ "$restore_created" == '1' ]]; then
