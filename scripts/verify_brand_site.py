@@ -112,6 +112,8 @@ def main():
         expect(page.locator("#brief-output")).to_contain_text(
             "No information was transmitted"
         )
+        page.evaluate("() => { if (document.activeElement) document.activeElement.blur(); window.scrollTo(0, 0); }")
+        page.wait_for_timeout(180)
         page.screenshot(path=str(ART/"metaautomate-global-project-brief.png"), full_page=True)
         with page.expect_download() as download:
             page.locator("#brief-download").click()
