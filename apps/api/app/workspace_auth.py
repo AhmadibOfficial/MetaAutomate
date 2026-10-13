@@ -13,15 +13,13 @@ from psycopg.rows import dict_row
 from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, ConfigDict, Field
-from authlib.integrations.starlette_client import OAuth
-from authlib.integrations.base_client.errors import OAuthError
 
 router = APIRouter(prefix="/v1/workspace", tags=["workspace"])
 SESSION_COOKIE = "mat_workspace"
 CSRF_COOKIE = "mat_csrf"
 LOCAL_MAX_AGE = 8 * 60 * 60
 OIDC_MAX_AGE = 60 * 60
-oauth = OAuth()
+oauth = None
 
 
 def auth_mode() -> str:
@@ -32,6 +30,11 @@ def auth_mode() -> str:
 
 
 if auth_mode() == "oidc":
+    # Import SSO dependencies only in the isolated cloud mode.
+    # Existing owner Kali development image remains usable before a rebuild.
+    from authlib.integrations.starlette_client import OAuth
+    from authlib.integrations.base_client.errors import OAuthError
+    oauth = OAuth()
     issuer = os.environ.get("OIDC_ISSUER", "").rstrip("/")
     if issuer.startswith("https://"):
         oauth.register(
