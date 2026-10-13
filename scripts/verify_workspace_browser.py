@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Real Chromium end-to-end test: login, create, graph, approve, revisit, logout.
+"""Real Chromium end-to-end test: objective review, assessment execution, report verification and logout.
 
 Runs only against ephemeral GitHub Actions PostgreSQL.
 """
@@ -40,7 +40,7 @@ def main():
     screenshots.mkdir(exist_ok=True)
     with sync_playwright() as p:
         browser=p.chromium.launch(headless=True)
-        context=browser.new_context(viewport={"width":1440,"height":960},base_url=BASE)
+        context=browser.new_context(viewport={"width":1440,"height":960},base_url=BASE,accept_downloads=True)
         page=context.new_page()
         page.goto("/")
         expect(page.locator("#login-view")).to_be_visible(timeout=15000)
@@ -75,11 +75,43 @@ def main():
         page.locator("#back-to-overview").click()
         expect(page.locator("#metric-total")).to_have_text("1")
         expect(page.locator("#metric-approved")).to_have_text("1")
+
+        # Operational Core v1: complete browser assessment run with explicit consent.
+        page.locator("#nav-assessment").click()
+        expect(page.locator("#assessment-view")).to_be_visible(timeout=15000)
+        expect(page.locator(".assessment-rating")).to_have_count(15,timeout=15000)
+        page.locator("#assessment-business").fill("MetaAutomate Test Business")
+        page.locator("#assessment-goal").fill(
+            "Reduce operational bottlenecks through practical digital improvement."
+        )
+        for i in range(15):
+            page.locator(".assessment-rating").nth(i).select_option("0" if i >= 12 else "3")
+        page.locator("#assessment-authorized").check()
+        page.locator("#assessment-submit").click()
+        expect(page.locator("#assessment-detail-view")).to_be_visible(timeout=15000)
+        expect(page.locator("#assessment-report-title")).to_have_text("MetaAutomate Test Business")
+        expect(page.locator("#assessment-overall-score")).to_have_text("60/100")
+        expect(page.locator(".assessment-score-row")).to_have_count(5)
+        expect(page.locator(".assessment-action")).to_have_count(5)
+        expect(page.locator("#assessment-receipt")).to_contain_text("CALCULATION_VERIFIED")
+        expect(page.locator("#assessment-receipt")).to_contain_text("None")
+        assessment_url=page.url
+        page.screenshot(path=str(screenshots/"operational-core-assessment-report.png"),full_page=True)
+        with page.expect_download() as download:
+            page.locator("#assessment-download").click()
+        assert download.value.suggested_filename.startswith("metaautomate-assessment-")
+        page.reload()
+        expect(page.locator("#assessment-detail-view")).to_be_visible(timeout=15000)
+        expect(page.locator("#assessment-overall-score")).to_have_text("60/100")
+        page.locator("#assessment-detail-back").click()
+        expect(page.locator(".assessment-record")).to_have_count(1,timeout=15000)
         page.locator("#logout-button").click()
         expect(page.locator("#login-view")).to_be_visible()
         expect(page.locator("#workspace-shell")).to_be_hidden()
         # The restricted cookie session is invalid after logout, including reload.
         page.goto(objective_url)
+        expect(page.locator("#login-view")).to_be_visible()
+        page.goto(assessment_url)
         expect(page.locator("#login-view")).to_be_visible()
         context.close()
         browser.close()
@@ -87,11 +119,15 @@ def main():
         with conn.cursor() as cur:
             cur.execute("SELECT count(*) FROM objectives WHERE organization_id=%s",(org,))
             assert cur.fetchone()[0]==1
+            cur.execute("SELECT count(*) FROM digital_assessments WHERE organization_id=%s",(org,))
+            assert cur.fetchone()[0]==1
+            cur.execute("SELECT count(*) FROM audit_events WHERE organization_id=%s AND entity_type='ASSESSMENT'",(org,))
+            assert cur.fetchone()[0]==1
             cur.execute("SELECT count(*) FROM agent_runs")
             assert cur.fetchone()[0]==0
             cur.execute("SELECT count(*) FROM capability_executions")
             assert cur.fetchone()[0]==0
-    print("PASS: Chromium sign-in, objective submission, saved DAG, review, return visit, logout; no execution")
+    print("PASS: Chromium sign-in, objective review, assessment execution, verified report, download, revisit, logout; no external actions")
 
 if __name__=="__main__":
     main()
