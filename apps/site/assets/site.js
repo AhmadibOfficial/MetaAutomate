@@ -121,9 +121,9 @@
   const MAILTO_LIMIT = 1850;
   function composeEmailHref(fullBrief) {
     const subject = "MetaAutomate | Project discovery inquiry";
-    const intro = "Hello MetaAutomate,\\n\\nPlease review my project discovery brief:\\n\\n";
-    const signature = "\\n\\nPlease reply with the next steps.\\nThank you.";
-    const overflowNote = "\\n\\n[Remaining details omitted from the email draft. Please attach the downloaded complete brief.]";
+    const intro = "Hello MetaAutomate,\n\nPlease review my project discovery brief:\n\n";
+    const signature = "\n\nPlease reply with the next steps.\nThank you.";
+    const overflowNote = "\n\n[Remaining details omitted from the email draft. Please attach the downloaded complete brief.]";
     const urlFor = (text, shortened) =>
       "mailto:" + BUSINESS_EMAIL + "?subject=" + encodeURIComponent(subject) +
       "&body=" + encodeURIComponent(intro + text + (shortened ? overflowNote : "") + signature);

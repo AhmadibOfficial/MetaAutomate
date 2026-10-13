@@ -5,6 +5,7 @@ No cloud deployment, backend, tokens or API calls. Every request must target
 the local static HTTP test server.
 """
 from pathlib import Path
+from urllib.parse import urlsplit, parse_qs
 from playwright.sync_api import sync_playwright, expect
 
 BASE = "http://127.0.0.1:18080"
@@ -85,6 +86,13 @@ def main():
             footer_links=page.locator(".footer-social-link")
             expect(footer_links).to_have_count(6)
             assert sorted(footer_links.evaluate_all("(links)=>links.map(link=>link.href)")) == sorted(expected_socials.values())
+            contact = page.locator(".footer-contact-email")
+            expect(contact).to_have_count(1)
+            expect(contact).to_contain_text("metaautomating@gmail.com")
+            expect(contact).to_have_attribute(
+                "href", "mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Business%20inquiry"
+            )
+
         page.goto(BASE + "/", wait_until="networkidle")
         page.screenshot(path=str(ART/"metaautomate-global-home-desktop.png"), full_page=True)
 
@@ -134,6 +142,46 @@ def main():
         expect(page.locator("#brief-output")).to_contain_text(
             "No information was transmitted"
         )
+        # The owner-provided address opens a draft, not an automatic submission.
+        direct_email = page.locator(".brief-direct-contact a")
+        expect(direct_email).to_have_attribute(
+            "href", "mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Business%20inquiry"
+        )
+        draft_link = page.locator("#brief-email")
+        expect(draft_link).to_be_visible()
+        href = draft_link.get_attribute("href")
+        assert href.startswith("mailto:metaautomating@gmail.com?")
+        assert len(href) <= 1850, len(href)
+        parts = urlsplit(href)
+        assert parts.path == "metaautomating@gmail.com"
+        draft = parse_qs(parts.query)
+        assert draft["subject"] == ["MetaAutomate | Project discovery inquiry"]
+        assert "Cybersecurity & Quality" in draft["body"][0]
+        assert "We need an authorized API security review" in draft["body"][0]
+        assert chr(10) in draft["body"][0]
+        assert (chr(92) + "n") not in draft["body"][0], "Use real newlines in the draft"
+        expect(page.locator("#brief-email-note")).to_contain_text("Nothing has been sent")
+
+        # Large briefs must be exportable in full and email drafts remain bounded.
+        page.locator("#brief-problem").fill("A" * 1700)
+        page.locator("#brief-outcome").fill("B" * 1150)
+        page.locator("#brief-form button[type=submit]").click()
+        long_href = draft_link.get_attribute("href")
+        assert len(long_href) <= 1850, len(long_href)
+        long_body = parse_qs(urlsplit(long_href).query)["body"][0]
+        assert "Remaining details omitted" in long_body
+        assert "A" * 1700 in page.locator("#brief-output").inner_text()
+        expect(page.locator("#brief-email-note")).to_contain_text("abbreviated")
+        # Restore a short brief before capturing the normal project inquiry UI.
+        page.locator("#brief-problem").fill(
+            "We need an authorized API security review for our business application."
+        )
+        page.locator("#brief-outcome").fill(
+            "A prioritized assessment report that identifies material risk."
+        )
+        page.locator("#brief-form button[type=submit]").click()
+        expect(page.locator("#brief-email-note")).to_contain_text("Nothing has been sent")
+
         page.evaluate("() => { if (document.activeElement) document.activeElement.blur(); window.scrollTo(0, 0); }")
         page.wait_for_timeout(180)
         page.screenshot(path=str(ART/"metaautomate-global-project-brief.png"), full_page=True)
@@ -161,6 +209,8 @@ def main():
                 mpage.goto(BASE+path,wait_until="networkidle")
                 inspect_asset(mpage)
                 assert_no_horizontal_overflow(mpage, f"mobile {width} {path}")
+                expect(mpage.locator(".footer-contact-email")).to_have_count(1)
+
             mpage.goto(BASE+"/",wait_until="networkidle")
             menu=mpage.locator("#menu-button")
             expect(mpage.locator("#site-navigation")).to_be_hidden()
