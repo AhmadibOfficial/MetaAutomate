@@ -601,3 +601,15 @@ h1 em{background:linear-gradient(112deg,#07b9ff 0%,#c9e8ff 58%,#efc573 96%);back
 @media(max-width:760px){.footer-contact{align-items:flex-start;flex-direction:column;gap:18px}}
 @media(max-width:550px){.footer-contact-email{font-size:21px;gap:13px}.brief-result-actions .action{justify-content:space-between}}
 @media(max-width:370px){.footer-contact-email{font-size:18px}.brief-direct-contact{padding:18px}}
+
+/* Official WhatsApp Channel and Telegram profile — identity-only links, no embeds. */
+.social-card.social-whatsapp .social-card-icon{
+  color:#beffde;background:#1784503f;font-family:var(--display);font-size:17px;letter-spacing:-.04em
+}
+.social-card.social-telegram .social-card-icon{
+  color:#dcf5ff;background:#1383bb48;font-size:29px
+}
+.social-card.social-whatsapp:hover{border-color:#51dca7}
+.social-card.social-telegram:hover{border-color:#55c8fa}
+.footer-social-link[aria-label^="WhatsApp"] .footer-social-glyph{color:#6ee7b7;font-size:10px;font-weight:900}
+.footer-social-link[aria-label^="Telegram"] .footer-social-glyph{color:#80d7ff}

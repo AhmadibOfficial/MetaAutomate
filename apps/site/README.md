@@ -56,7 +56,7 @@ The repository is private. The existing GPLv2 LICENSE text is unchanged; prior d
 
 ## Official MetaAutomate social channels
 
-MetaAutomate provided the following addresses for the business website. They appear in the global footer and in the homepage's dedicated social network section. The site uses ordinary secure external links and loads **no third-party embeds, trackers, feeds or social APIs**.
+MetaAutomate provided the following addresses for the business website. All eight links appear in the global footer and in the homepage's dedicated social network section. The site uses ordinary secure external links and loads **no third-party embeds, trackers, feeds or social APIs**.
 
 - **YouTube**: https://youtube.com/@MetaAutomate
 - **LinkedIn**: https://www.linkedin.com/company/meta-automate
@@ -64,6 +64,8 @@ MetaAutomate provided the following addresses for the business website. They app
 - **X / Twitter**: https://twitter.com/MetaAutomate
 - **Facebook**: https://facebook.com/MetaAutomate
 - **TikTok**: https://tiktok.com/@metaautomate
+- **WhatsApp Channel** (broadcast updates; not a one-to-one customer-support chat): https://whatsapp.com/channel/0029VbDSQMdBqbr1vqRyYR2U
+- **Telegram** (owner-supplied public link): https://t.me/Meta_Automate
 
 TikTok's trailing punctuation and LinkedIn's escaped formatting were normalized from the business-provided URLs. The URLs are supplied by the business; platform profile ownership was not independently verified. Do not claim follower counts, verification badges, response time or official customer support through these channels without confirmation.
 
