@@ -133,7 +133,10 @@ def run_assessment(
         raise HTTPException(status_code=503, detail="Assessment could not be persisted")
     if row["input_sha256"] != input_hash:
         raise HTTPException(status_code=409, detail="Idempotency key reused with different answers")
-    return _verified_receipt(row)
+    verified = _verified_receipt(row)
+    # Commit atomically persisted report and audit before returning its receipt.
+    session.conn.commit()
+    return verified
 
 
 @router.get("/{assessment_id}")

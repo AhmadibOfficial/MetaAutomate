@@ -57,8 +57,19 @@ def main():
         page.locator("#criterion-metric").fill("qualified appointments")
         page.locator("#criterion-target").fill("20")
         page.locator("#objective-constraints").fill("Contact only opted-in leads")
+        # Surface useful diagnostics rather than silently masking a persist/read race.
+        api_results=[]
+        page.on("response", lambda resp: api_results.append(
+            (resp.request.method,resp.status,resp.url.split("/v1/")[-1])
+        ) if "/v1/objective-operations" in resp.url else None)
         page.locator("#create-submit").click()
-        expect(page.locator("#detail-view")).to_be_visible(timeout=15000)
+        try:
+            expect(page.locator("#detail-view")).to_be_visible(timeout=15000)
+        except AssertionError:
+            print("Objective browser route diagnostics:",api_results,flush=True)
+            print("Create error:",page.locator("#create-error").text_content(),flush=True)
+            print("Status:",page.locator("#toast").text_content(),flush=True)
+            raise
         expect(page.locator("#detail-title")).to_have_text("Increase qualified customer appointments")
         expect(page.locator(".graph-node")).to_have_count(5)
         expect(page.locator("#detail-review-state")).to_have_text("Pending")
