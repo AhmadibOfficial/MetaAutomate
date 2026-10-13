@@ -30,3 +30,7 @@ db-upgrade:
 .PHONY: workspace-init
 workspace-init:
 	bash scripts/workspace_init.sh
+
+.PHONY: verify-local
+verify-local:
+	@python3 scripts/verify_local_gate.py
