@@ -3,7 +3,7 @@
 # private operational data. Deployment requires explicit owner action in Render.
 services:
   - type: web
-    name: metaautomate-business-website
+    name: metaautomate
     runtime: static
     buildCommand: echo "MetaAutomate static website ready"
     staticPublishPath: ./apps/site
