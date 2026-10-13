@@ -21,6 +21,7 @@ def test_required_migration_order_exists():
         "008_capability_registry.sql",
         "009_objective_operations.sql",
         "010_workspace_sessions.sql",
+        "011_operational_assessments.sql",
     ]
 
 
@@ -137,3 +138,18 @@ def test_workspace_browser_sessions_are_revocable_and_tenant_scoped():
     assert "CREATE FUNCTION app.authenticate_workspace_session(" in sql
     assert "CREATE FUNCTION app.revoke_workspace_session(" in sql
     assert "REVOKE ALL ON workspace_sessions FROM metaautomate_runtime;" in sql
+
+
+def test_operational_assessment_is_immutable_and_tenant_bound():
+    sql = (MIGRATIONS / "011_operational_assessments.sql").read_text(encoding="utf-8")
+    for required in (
+        "CREATE TABLE digital_assessments",
+        "UNIQUE (organization_id, request_key)",
+        "ALTER TABLE digital_assessments ENABLE ROW LEVEL SECURITY;",
+        "ALTER TABLE digital_assessments FORCE ROW LEVEL SECURITY;",
+        "CREATE POLICY tenant_digital_assessments",
+        "REFERENCES organization_memberships(organization_id, user_id)",
+        "GRANT SELECT, INSERT ON digital_assessments TO metaautomate_runtime;",
+        "RAISE EXCEPTION 'Assessment evidence is immutable'",
+    ):
+        assert required in sql
