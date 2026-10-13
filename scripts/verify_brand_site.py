@@ -75,7 +75,7 @@ def main():
         assert_no_horizontal_overflow(page, "desktop services")
         page.screenshot(path=str(ART/"metaautomate-global-services-desktop.png"), full_page=True)
         page.locator("#software .discipline-action").click()
-        expect(page).to_have_url(lambda url: "/engage/" in url)
+        assert "/engage/" in page.url
         expect(page.locator("#brief-service")).to_have_value("Software & Digital Products")
 
         # Brand values and roadmap are presented without claiming shipped features.
