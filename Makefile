@@ -30,3 +30,8 @@ db-upgrade:
 .PHONY: workspace-init
 workspace-init:
 	bash scripts/workspace_init.sh
+
+.PHONY: operational-check
+operational-check:
+	@echo "Operational Core assessment is available after an authorized database upgrade."
+	@echo "Run make validate and verify in the browser at the local workspace."
