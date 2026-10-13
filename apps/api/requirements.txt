@@ -5,3 +5,5 @@ redis>=5,<7
 pytest>=8,<10
 
 httpx2>=2.13,<3
+authlib>=1.6,<2
+itsdangerous>=2.2,<3
