@@ -51,7 +51,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r apps/api/requirements.txt
+          pip install -r apps/api/requirements.txt 'PyYAML>=6,<7'
           sudo apt-get update -qq
           sudo apt-get install -y postgresql-client
 
@@ -149,3 +149,32 @@ jobs:
       - uses: actions/checkout@v4
       - name: Rehearse verified backup and migration on disposable Docker PostgreSQL
         run: bash scripts/verify_db_upgrade_recovery_ci.sh
+
+  release-evidence-gate:
+    name: Release Evidence Gate
+    needs: [test, recovery-rehearsal]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install policy parser
+        run: python -m pip install 'PyYAML>=6,<7'
+      - name: Evaluate consolidated release evidence
+        env:
+          TEST_RESULT: ${{ needs.test.result }}
+          RECOVERY_RESULT: ${{ needs['recovery-rehearsal'].result }}
+        run: |
+          python scripts/verify_release_gate.py \
+            --test-result "$TEST_RESULT" \
+            --recovery-result "$RECOVERY_RESULT"
+      - name: Upload release gate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-evidence-gate
+          path: artifacts/validation/release-gate.json
+          if-no-files-found: warn
