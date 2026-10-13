@@ -94,6 +94,11 @@ jobs:
         run: |
           python scripts/verify_operational_assessments.py --database metaautomate
 
+      - name: Verify optional private OIDC identity sessions on disposable CI data
+        env:
+          APP_DATABASE_URL: postgresql://metaautomate_runtime:ci_runtime_password@localhost:5432/metaautomate
+        run: python scripts/verify_oidc_identity.py
+
       - name: Install Chromium browser test dependencies
         run: |
           python -m pip install 'playwright>=1.55,<2'
