@@ -64,6 +64,28 @@ def main():
         expect(page.locator("#tab-verify")).to_be_focused()
         assert_no_horizontal_overflow(page, "desktop home")
         page.goto(BASE+"/", wait_until="networkidle")
+        # Official social presence: exact addresses, secure external-link behavior.
+        expected_socials = {
+            "YouTube": "https://youtube.com/@MetaAutomate",
+            "LinkedIn": "https://www.linkedin.com/company/meta-automate",
+            "Instagram": "https://instagram.com/meta_automate",
+            "X / Twitter": "https://twitter.com/MetaAutomate",
+            "Facebook": "https://facebook.com/MetaAutomate",
+            "TikTok": "https://tiktok.com/@metaautomate",
+        }
+        expect(page.locator(".social-card")).to_have_count(6)
+        for label, url in expected_socials.items():
+            card = page.get_by_role("link", name=f"Visit MetaAutomate on {label} — opens in a new tab")
+            expect(card).to_have_attribute("href", url)
+            expect(card).to_have_attribute("target", "_blank")
+            expect(card).to_have_attribute("rel", "noopener noreferrer")
+        expect(page.locator(".footer-social-link")).to_have_count(6)
+        for page_path in ("/services/", "/company/", "/engage/"):
+            page.goto(BASE + page_path, wait_until="networkidle")
+            footer_links=page.locator(".footer-social-link")
+            expect(footer_links).to_have_count(6)
+            assert sorted(footer_links.evaluate_all("(links)=>links.map(link=>link.href)")) == sorted(expected_socials.values())
+        page.goto(BASE + "/", wait_until="networkidle")
         page.screenshot(path=str(ART/"metaautomate-global-home-desktop.png"), full_page=True)
 
         # Service catalog is addressable and routes to a real on-device brief.

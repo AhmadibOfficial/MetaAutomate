@@ -53,3 +53,16 @@ The production business site is hosted as a Render **static site**, publishing o
 The business inquiry channel has not been verified. Until a real company-controlled address or contact method is provided, /engage/ produces a local brief for the user to copy or download, and plainly states that it hasn't been sent.
 
 The repository is private. The existing GPLv2 LICENSE text is unchanged; prior distribution rights, future licensing and official logo rights are separate decisions.
+
+## Official MetaAutomate social channels
+
+MetaAutomate provided the following addresses for the business website. They appear in the global footer and in the homepage's dedicated social network section. The site uses ordinary secure external links and loads **no third-party embeds, trackers, feeds or social APIs**.
+
+- **YouTube**: https://youtube.com/@MetaAutomate
+- **LinkedIn**: https://www.linkedin.com/company/meta-automate
+- **Instagram**: https://instagram.com/meta_automate
+- **X / Twitter**: https://twitter.com/MetaAutomate
+- **Facebook**: https://facebook.com/MetaAutomate
+- **TikTok**: https://tiktok.com/@metaautomate
+
+TikTok's trailing punctuation and LinkedIn's escaped formatting were normalized from the business-provided URLs. The URLs are supplied by the business; platform profile ownership was not independently verified. Do not claim follower counts, verification badges, response time or official customer support through these channels without confirmation.
