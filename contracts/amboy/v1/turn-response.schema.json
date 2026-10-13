@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Amboy Turn Response (proposed, non-operational)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "request_id",
+    "conversation_id",
+    "status",
+    "reply",
+    "execution_performed"
+  ],
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "conversation_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "answered",
+        "proposed",
+        "approval_required",
+        "completed_verified",
+        "unsupported",
+        "failed"
+      ]
+    },
+    "reply": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 12000
+    },
+    "execution_performed": {
+      "type": "boolean",
+      "description": "Do not mark true without a separate verified execution receipt."
+    },
+    "evidence_refs": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "string",
+        "maxLength": 200
+      }
+    },
+    "proposed_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability_id",
+        "summary",
+        "approval_required"
+      ],
+      "properties": {
+        "capability_id": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "approval_required": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
