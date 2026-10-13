@@ -140,3 +140,12 @@ jobs:
           python scripts/bootstrap_workspace.py
           python scripts/verify_workspace_bootstrap.py
           rm -f .env .workspace-access-key
+
+  recovery-rehearsal:
+    name: Disposable PostgreSQL Backup, Restore and Upgrade
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rehearse verified backup and migration on disposable Docker PostgreSQL
+        run: bash scripts/verify_db_upgrade_recovery_ci.sh
