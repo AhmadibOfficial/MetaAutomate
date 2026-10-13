@@ -24,9 +24,19 @@ recovery and protected off-host backup storage before production.
    merged and installed locally. Confirm this checkout really points to the
    known local MetaAutomate development compose project. Do not fetch unknown
    scripts directly into a privileged shell.
-2. Inspect `docker context show`, `docker compose ps`, disk space and
-   the existing local database's health. Do not use remote Docker contexts,
-   alternate Compose files or overrides when executing the upgrade.
+2. Run the read-only preflight from the reviewed local checkout:
+
+   ```bash
+   bash scripts/db_preflight_readonly.sh
+   ```
+
+   The preflight refuses Docker and Compose target overrides, confirms a local
+   Docker Unix socket and an already-running PostgreSQL container, and displays
+   only the database name, migration markers and summary record counts.
+   It never starts containers or changes database records. Stop on any failure.
+   Independently inspect `docker context show`, `docker compose ps` and disk
+   space. Do not use remote Docker contexts or alternate Compose files during
+   the upgrade.
 3. Confirm maintenance window and stop or quiesce application writes. Record
    pre-migration table counts and current schema for later comparison.
 4. Ensure `.env` is a local ignored private file. Never paste credentials
