@@ -26,7 +26,7 @@
     <div class="auth-form-wrap">
       <form id="login-form" class="login-card">
         <div class="mobile-brand"><div class="brand-mark">M<span>·</span></div> MetaAutomate</div>
-        <div class="pill">PRIVATE DEVELOPMENT WORKSPACE</div>
+        <div class="pill" id="login-environment-label">PRIVATE DEVELOPMENT WORKSPACE</div>
         <h2>Welcome back.</h2>
         <p>Sign in with the access key provisioned for your organization.</p>
         <label for="login-key">Workspace access key</label>
@@ -35,6 +35,7 @@
         <p class="field-hint">Your key is exchanged for a secure, revocable browser session. It is never saved in browser storage.</p>
         <div id="login-error" class="alert error" role="alert" hidden></div>
         <button id="login-submit" class="button primary full" type="submit">Enter workspace <span aria-hidden="true">↗</span></button>
+        <button id="oidc-login-button" class="button primary full" type="button" hidden>Sign in with organization SSO ↗</button>
         <div class="login-footnote">MetaAutomate Objective Operations v1.0 <span>·</span> Local access</div>
       </form>
     </div>
