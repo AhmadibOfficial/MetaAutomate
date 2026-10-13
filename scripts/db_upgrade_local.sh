@@ -78,11 +78,11 @@ if [[ "$three" != "t" ]]; then
   docker compose exec -T postgres psql -X -v ON_ERROR_STOP=1 -U metaautomate -d metaautomate < database/migrations/011_operational_assessments.sql
 fi
 rls="$(docker compose exec -T postgres psql -X -A -t -v ON_ERROR_STOP=1 -U metaautomate -d metaautomate -c "SELECT relrowsecurity::text || ',' || relforcerowsecurity::text FROM pg_class WHERE oid='public.digital_assessments'::regclass;")"
-if [[ "$rls" != 't,t' ]]; then
+if [[ "$rls" != 'true,true' && "$rls" != 't,t' ]]; then
   echo 'ERROR: forced tenant RLS not enabled on digital_assessments.' >&2; exit 1
 fi
 permissions="$(docker compose exec -T postgres psql -X -A -t -v ON_ERROR_STOP=1 -U metaautomate -d metaautomate -c "SELECT has_table_privilege('metaautomate_runtime','public.digital_assessments','SELECT')::text || ',' || has_table_privilege('metaautomate_runtime','public.digital_assessments','INSERT')::text || ',' || has_table_privilege('metaautomate_runtime','public.digital_assessments','UPDATE')::text || ',' || has_table_privilege('metaautomate_runtime','public.digital_assessments','DELETE')::text;")"
-if [[ "$permissions" != 't,t,f,f' ]]; then
+if [[ "$permissions" != 'true,true,false,false' && "$permissions" != 't,t,f,f' ]]; then
   echo "ERROR: assessment table least-privilege grants failed: $permissions" >&2; exit 1
 fi
 immutability="$(docker compose exec -T postgres psql -X -A -t -v ON_ERROR_STOP=1 -U metaautomate -d metaautomate -c "SELECT count(*) FROM pg_trigger WHERE tgrelid = 'public.digital_assessments'::regclass AND tgname IN ('trg_digital_assessments_no_update','trg_digital_assessments_no_delete') AND tgenabled <> 'D';")"
