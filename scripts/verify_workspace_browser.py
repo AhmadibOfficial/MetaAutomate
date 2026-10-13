@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Real Chromium end-to-end test: login, create, graph, approve, revisit, logout.
+"""Real Chromium end-to-end test: objective review, assessment execution, report verification and logout.
 
 Runs only against ephemeral GitHub Actions PostgreSQL.
 """
@@ -40,7 +40,7 @@ def main():
     screenshots.mkdir(exist_ok=True)
     with sync_playwright() as p:
         browser=p.chromium.launch(headless=True)
-        context=browser.new_context(viewport={"width":1440,"height":960},base_url=BASE)
+        context=browser.new_context(viewport={"width":1440,"height":960},base_url=BASE,accept_downloads=True)
         page=context.new_page()
         page.goto("/")
         expect(page.locator("#login-view")).to_be_visible(timeout=15000)
@@ -57,8 +57,19 @@ def main():
         page.locator("#criterion-metric").fill("qualified appointments")
         page.locator("#criterion-target").fill("20")
         page.locator("#objective-constraints").fill("Contact only opted-in leads")
+        # Surface useful diagnostics rather than silently masking a persist/read race.
+        api_results=[]
+        page.on("response", lambda resp: api_results.append(
+            (resp.request.method,resp.status,resp.url.split("/v1/")[-1])
+        ) if "/v1/objective-operations" in resp.url else None)
         page.locator("#create-submit").click()
-        expect(page.locator("#detail-view")).to_be_visible(timeout=15000)
+        try:
+            expect(page.locator("#detail-view")).to_be_visible(timeout=15000)
+        except AssertionError:
+            print("Objective browser route diagnostics:",api_results,flush=True)
+            print("Create error:",page.locator("#create-error").text_content(),flush=True)
+            print("Status:",page.locator("#toast").text_content(),flush=True)
+            raise
         expect(page.locator("#detail-title")).to_have_text("Increase qualified customer appointments")
         expect(page.locator(".graph-node")).to_have_count(5)
         expect(page.locator("#detail-review-state")).to_have_text("Pending")
@@ -75,23 +86,90 @@ def main():
         page.locator("#back-to-overview").click()
         expect(page.locator("#metric-total")).to_have_text("1")
         expect(page.locator("#metric-approved")).to_have_text("1")
+
+        # Operational Core v1: complete browser assessment run with explicit consent.
+        page.locator("#nav-assessment").click()
+        expect(page.locator("#assessment-view")).to_be_visible(timeout=15000)
+        expect(page.locator(".assessment-rating")).to_have_count(15,timeout=15000)
+        page.locator("#assessment-business").fill("MetaAutomate Test Business")
+        page.locator("#assessment-goal").fill(
+            "Reduce operational bottlenecks through practical digital improvement."
+        )
+        for i in range(15):
+            page.locator(".assessment-rating").nth(i).select_option("0" if i >= 12 else "3")
+        page.locator("#assessment-authorized").check()
+        page.locator("#assessment-submit").click()
+        expect(page.locator("#assessment-detail-view")).to_be_visible(timeout=15000)
+        expect(page.locator("#assessment-report-title")).to_have_text("MetaAutomate Test Business")
+        expect(page.locator("#assessment-overall-score")).to_have_text("60/100")
+        expect(page.locator(".assessment-score-row")).to_have_count(5)
+        expect(page.locator(".assessment-action")).to_have_count(5)
+        expect(page.locator("#assessment-receipt")).to_contain_text("CALCULATION_VERIFIED")
+        expect(page.locator("#assessment-receipt")).to_contain_text("None")
+        assessment_url=page.url
+        page.screenshot(path=str(screenshots/"operational-core-assessment-report.png"),full_page=True)
+        with page.expect_download() as download:
+            page.locator("#assessment-download").click()
+        assert download.value.suggested_filename.startswith("metaautomate-assessment-")
+        page.reload()
+        expect(page.locator("#assessment-detail-view")).to_be_visible(timeout=15000)
+        expect(page.locator("#assessment-overall-score")).to_have_text("60/100")
+        page.locator("#assessment-detail-back").click()
+        expect(page.locator(".assessment-record")).to_have_count(1,timeout=15000)
         page.locator("#logout-button").click()
         expect(page.locator("#login-view")).to_be_visible()
         expect(page.locator("#workspace-shell")).to_be_hidden()
         # The restricted cookie session is invalid after logout, including reload.
         page.goto(objective_url)
         expect(page.locator("#login-view")).to_be_visible()
+        page.goto(assessment_url)
+        expect(page.locator("#login-view")).to_be_visible()
         context.close()
+
+        # Mobile report verification and new-assessment navigation (390px viewport).
+        mobile=browser.new_context(
+            viewport={"width":390,"height":844},base_url=BASE,
+            is_mobile=True,has_touch=True,device_scale_factor=1,
+        )
+        mpage=mobile.new_page()
+        mpage.goto(assessment_url)
+        expect(mpage.locator("#login-view")).to_be_visible(timeout=15000)
+        mpage.locator("#login-key").fill(key)
+        mpage.locator("#login-submit").click()
+        expect(mpage.locator("#assessment-detail-view")).to_be_visible(timeout=15000)
+        expect(mpage.locator("#assessment-overall-score")).to_have_text("60/100")
+        measurements=mpage.evaluate(
+            "() => ({viewport:innerWidth,scroll:document.documentElement.scrollWidth})"
+        )
+        assert measurements["scroll"] <= measurements["viewport"]+1, measurements
+        mpage.screenshot(
+            path=str(screenshots/"operational-core-assessment-mobile.png"),
+            full_page=True,
+        )
+        # Every collapsed sidebar icon remains visible and recognizable.
+        for nav_id in ("nav-overview","nav-create","nav-assessment","nav-assessment-history"):
+            icon=mpage.locator("#"+nav_id+" span").first
+            expect(icon).to_be_visible()
+            alpha=icon.evaluate("(n) => getComputedStyle(n).color")
+            assert alpha not in ("transparent","rgba(0, 0, 0, 0)"), (nav_id,alpha)
+        mpage.locator("#nav-assessment").click()
+        expect(mpage.locator("#assessment-view")).to_be_visible(timeout=15000)
+        expect(mpage.locator(".assessment-rating")).to_have_count(15)
+        mobile.close()
         browser.close()
     with psycopg.connect(os.environ["DATABASE_URL"]) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT count(*) FROM objectives WHERE organization_id=%s",(org,))
             assert cur.fetchone()[0]==1
+            cur.execute("SELECT count(*) FROM digital_assessments WHERE organization_id=%s",(org,))
+            assert cur.fetchone()[0]==1
+            cur.execute("SELECT count(*) FROM audit_events WHERE organization_id=%s AND entity_type='ASSESSMENT'",(org,))
+            assert cur.fetchone()[0]==1
             cur.execute("SELECT count(*) FROM agent_runs")
             assert cur.fetchone()[0]==0
             cur.execute("SELECT count(*) FROM capability_executions")
             assert cur.fetchone()[0]==0
-    print("PASS: Chromium sign-in, objective submission, saved DAG, review, return visit, logout; no execution")
+    print("PASS: Chromium sign-in, objective review, assessment execution, verified report, download, revisit, logout; no external actions")
 
 if __name__=="__main__":
     main()

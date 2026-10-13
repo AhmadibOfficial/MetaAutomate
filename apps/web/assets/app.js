@@ -1,9 +1,10 @@
 "use strict";
 
 /* MetaAutomate Objective Workspace: client code never persists access keys. */
-const state = {session:null, capabilities:[], objectives:[], objective:null, inFlightKey:null, graph:null};
+const state = {session:null, capabilities:[], objectives:[], objective:null, inFlightKey:null, graph:null,
+  assessmentQuestions:null, assessment:null, assessmentInFlightKey:null};
 const $ = id => document.getElementById(id);
-const screens = ["overview","create","detail"];
+const screens = ["overview","create","detail","assessment","assessment-history","assessment-detail"];
 const sleep = ms => new Promise(resolve => setTimeout(resolve,ms));
 
 function visible(id, show) { $(id).hidden = !show; }
@@ -59,16 +60,16 @@ function updateShell() {
   if (!state.session) return;
   $("side-role").textContent = label(state.session.role) + " workspace";
   $("side-org").textContent = "Organization " + state.session.organization_id.slice(0,8);
-  for (const element of document.querySelectorAll(".create-trigger, #nav-create")) {
+  for (const element of document.querySelectorAll(".create-trigger, #nav-create, #nav-assessment, .assessment-new-trigger")) {
     element.disabled = !isEditor();
-    element.title = isEditor() ? "" : "Your role cannot create objectives";
+    element.title = isEditor() ? "" : "Your role cannot create objectives or assessments";
   }
 }
 function changeView(view, {history=true, path=null}={}) {
   if (!screens.includes(view)) view = "overview";
   for (const screen of screens) visible(screen+"-view", screen === view);
-  $("topbar-crumb").textContent = {overview:"Overview",create:"New objective",detail:"Objective detail"}[view];
-  for (const nav of document.querySelectorAll(".nav-item")) nav.classList.toggle("active",nav.dataset.view === view);
+  $("topbar-crumb").textContent = {overview:"Overview",create:"New objective",detail:"Objective detail",assessment:"Digital assessment","assessment-history":"Reports","assessment-detail":"Verified report"}[view];
+  for (const nav of document.querySelectorAll(".nav-item")) nav.classList.toggle("active",nav.dataset.view === view || (view==="assessment-detail" && nav.dataset.view==="assessment-history"));
   if (history) window.history.pushState({view}, "", path || (view==="overview"?"/":view==="create"?"/?new=1":location.pathname));
   window.scrollTo({top:0,behavior:"instant"});
   if(view==="detail") requestAnimationFrame(()=>drawGraph());
@@ -300,8 +301,192 @@ async function reviewObjective(event){
     failInto("review-error",err.message);
   }finally{actions.forEach(b=>b.disabled=false);}
 }
+
+/* Operational Core v1: browser workflow for self-assessment execution.
+   All persistence, roles, scoring and verification are server-authoritative. */
+async function assessmentView() {
+  if (!isEditor()) return assessmentHistoryView();
+  changeView("assessment",{path:"/assessments"});
+  clearError("assessment-error");
+  try {
+    if (!state.assessmentQuestions) {
+      state.assessmentQuestions=await api("/v1/assessments/questions");
+    }
+    renderAssessmentQuestions();
+  } catch(err) {
+    if(err.status===401)return lostSession();
+    failInto("assessment-error",err.message);
+  }
+}
+function renderAssessmentQuestions() {
+  const catalog=state.assessmentQuestions;
+  if(!catalog)return;
+  const root=$("assessment-questions");
+  root.replaceChildren();
+  for(const domain of catalog.domains){
+    const section=el("fieldset",{cls:"assessment-domain"});
+    section.append(el("legend",{text:domain.name}));
+    for(const q of domain.questions){
+      const wrap=el("div",{cls:"assessment-question"});
+      const id="rating-"+q.id;
+      const labelNode=el("label",{text:q.prompt,attrs:{for:id}});
+      const select=el("select",{attrs:{id,name:q.id,required:"",class:"assessment-rating"}});
+      select.append(el("option",{text:"Choose a rating…",attrs:{value:""}}));
+      for(const rating of catalog.scale)select.append(el("option",{
+        text:rating.value+" — "+rating.label,attrs:{value:String(rating.value)}
+      }));
+      wrap.append(labelNode,select);section.append(wrap);
+    }
+    root.append(section);
+  }
+  $("assessment-submit").disabled=!isEditor();
+}
+async function assessmentHistoryView(){
+  changeView("assessment-history",{path:"/assessments/reports"});
+  const list=$("assessment-report-list");
+  list.replaceChildren(el("p",{text:"Loading saved reports…"}));
+  try{
+    const records=await api("/v1/assessments?limit=50");
+    list.replaceChildren();
+    visible("assessment-history-empty",!records.items?.length);
+    for(const record of records.items||[]){
+      const button=el("button",{cls:"assessment-record",attrs:{type:"button"}});
+      const name=el("span",{cls:"assessment-record-main"});
+      name.append(el("strong",{text:record.business_label}),
+        el("small",{text:record.objective}));
+      button.append(name,el("span",{cls:"assessment-record-date",text:dateLabel(record.created_at)+" ↗"}));
+      button.addEventListener("click",()=>openAssessment(record.assessment_id));
+      list.append(button);
+    }
+  }catch(err){
+    if(err.status===401)return lostSession();
+    list.replaceChildren(el("p",{text:err.message}));
+  }
+}
+async function submitAssessment(event){
+  event.preventDefault();
+  clearError("assessment-error");
+  if(!isEditor())return failInto("assessment-error","Your role cannot generate reports.");
+  const form=$("assessment-form");
+  if(!form.checkValidity()){form.reportValidity();return;}
+  const q=state.assessmentQuestions;
+  if(!q)return failInto("assessment-error","Assessment questions are not ready.");
+  const answers=[];
+  for(const domain of q.domains){
+    for(const question of domain.questions){
+      const field=$("rating-"+question.id);
+      if(field.value==="")return failInto("assessment-error","Answer every assessment statement.");
+      answers.push({question_id:question.id,score:Number(field.value)});
+    }
+  }
+  const payload={
+    business_label:$("assessment-business").value.trim(),
+    objective:$("assessment-goal").value.trim(),answers
+  };
+  if(!state.assessmentInFlightKey)state.assessmentInFlightKey="assessment-"+crypto.randomUUID();
+  const submit=$("assessment-submit");
+  submit.disabled=true;submit.textContent="Generating and verifying…";
+  try{
+    const saved=await api("/v1/assessments",{
+      method:"POST",
+      headers:{"Idempotency-Key":state.assessmentInFlightKey,
+        "X-Assessment-Consent":"generate-report"},
+      body:JSON.stringify(payload)
+    });
+    state.assessmentInFlightKey=null;
+    form.reset();
+    showToast("Assessment completed. The saved calculation has been verified.");
+    state.assessment=saved;
+    renderAssessmentResult(saved);
+    changeView("assessment-detail",{path:"/assessments/"+saved.assessment_id});
+  }catch(err){
+    if(err.status===401)return lostSession();
+    failInto("assessment-error",err.message);
+  }finally{
+    submit.disabled=!isEditor();
+    submit.textContent="Generate verified report →";
+  }
+}
+async function openAssessment(id,{history=true}={}){
+  try{
+    const saved=await api("/v1/assessments/"+encodeURIComponent(id));
+    state.assessment=saved;
+    renderAssessmentResult(saved);
+    changeView("assessment-detail",{history,path:"/assessments/"+saved.assessment_id});
+  }catch(err){
+    if(err.status===401)return lostSession();
+    showToast(err.status===404?"Report not found in this organization.":err.message);
+    return assessmentHistoryView();
+  }
+}
+function renderAssessmentResult(saved){
+  const report=saved.report;
+  $("assessment-report-title").textContent=report.business_label;
+  $("assessment-report-goal").textContent=report.objective;
+  $("assessment-overall-score").textContent=report.overall_score+"/100";
+  $("assessment-overall-level").textContent=report.maturity_level+" maturity · Self-reported";
+  const domains=$("assessment-domain-results");domains.replaceChildren();
+  for(const result of report.domain_results){
+    const item=el("div",{cls:"assessment-score-row"});
+    const head=el("div",{cls:"assessment-score-row-head"});
+    head.append(el("strong",{text:result.name}),el("span",{text:result.score+"/100"}));
+    const track=el("div",{cls:"assessment-track",attrs:{role:"meter",
+      "aria-label":result.name+" maturity","aria-valuemin":"0","aria-valuemax":"100",
+      "aria-valuenow":String(result.score)}});
+    const bar=el("div",{cls:"assessment-progress"});
+    bar.style.width=Math.max(0,Math.min(100,Number(result.score)))+"%";
+    track.append(bar);
+    item.append(head,track,el("small",{text:result.earned_points+" of "+result.max_points+
+      " points from your three ratings"}));
+    domains.append(item);
+  }
+  const actions=$("assessment-prioritized-actions");
+  actions.replaceChildren();
+  if(!report.prioritized_actions.length){
+    actions.append(el("p",{text:"No gaps were self-reported. Continue measuring outcomes and checking evidence."}));
+  }
+  for(const action of report.prioritized_actions){
+    const card=el("article",{cls:"assessment-action"});
+    const heading=el("div",{cls:"assessment-action-heading"});
+    heading.append(el("span",{cls:"assessment-rank",text:String(action.rank).padStart(2,"0")}),
+      el("strong",{text:action.recommended_action}));
+    card.append(heading,
+      el("p",{text:"Based on "+action.rank_source_question+
+        " (self-rating "+action.self_reported_score+"/4) · Domain score "+
+        action.priority_domain_score+"/100"}),
+      el("small",{text:"Suggested measure: "+action.measurement}));
+    actions.append(card);
+  }
+  const receipt=$("assessment-receipt");receipt.replaceChildren();
+  for(const [key,value] of [
+    ["Status",saved.status],["Verification",saved.verification_status],
+    ["Assessment ID",saved.assessment_id],
+    ["Algorithm version",saved.receipt.scoring_version],
+    ["Generated",dateLabel(saved.receipt.created_at)],
+    ["Input fingerprint",saved.receipt.input_sha256],
+    ["Report fingerprint",saved.receipt.report_sha256],
+    ["Verification scope",saved.receipt.verification_scope],
+    ["External actions","None"]
+  ]){
+    receipt.append(el("dt",{text:key}),el("dd",{text:String(value)}));
+  }
+}
+function downloadAssessment(){
+  if(!state.assessment)return;
+  const report=JSON.stringify(state.assessment,null,2)+"\n";
+  const blob=new Blob([report],{type:"application/json;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement("a");
+  link.href=url;
+  link.download="metaautomate-assessment-"+state.assessment.assessment_id+".json";
+  document.body.append(link);
+  link.click();link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
 function lostSession(){
   state.session=null;state.objective=null;state.objectives=[];state.capabilities=[];
+  state.assessment=null;state.assessmentQuestions=null;state.assessmentInFlightKey=null;
   updateShell();showToast("Your session expired. Please sign in again.");
   history.replaceState({view:"login"},"","/");
 }
@@ -316,6 +501,10 @@ async function login(event){
   finally{button.disabled=false;button.textContent="Enter workspace ↗";}
 }
 async function enterWorkspace(){
+  const assessmentMatch=window.location.pathname.match(/^\/assessments\/([0-9a-f-]{36})$/i);
+  if(assessmentMatch)return openAssessment(assessmentMatch[1],{history:false});
+  if(window.location.pathname==="/assessments/reports")return assessmentHistoryView();
+  if(window.location.pathname==="/assessments")return assessmentView();
   const match=window.location.pathname.match(/^\/objectives\/([0-9a-f-]{36})$/i);
   if(match)return openObjective(match[1],{history:false});
   if(new URLSearchParams(location.search).get("new")==="1")return createView();
@@ -324,12 +513,21 @@ async function enterWorkspace(){
 async function logout(){
   try{await api("/v1/workspace/logout",{method:"POST",body:"{}"});}
   catch(err){if(err.status!==401)showToast(err.message);}
-  state.session=null;state.capabilities=[];state.objective=null;updateShell();
+  state.session=null;state.capabilities=[];state.objective=null;state.assessment=null;
+  state.assessmentQuestions=null;state.assessmentInFlightKey=null;updateShell();
   history.replaceState({view:"login"},"","/");
 }
 async function initialize(){
   document.querySelectorAll(".create-trigger, #nav-create").forEach(x=>x.addEventListener("click",createView));
   $("nav-overview").addEventListener("click",overview);
+  $("nav-assessment").addEventListener("click",assessmentView);
+  $("nav-assessment-history").addEventListener("click",assessmentHistoryView);
+  $("assessment-show-history").addEventListener("click",assessmentHistoryView);
+  $("assessment-refresh").addEventListener("click",assessmentHistoryView);
+  $("assessment-detail-back").addEventListener("click",assessmentHistoryView);
+  document.querySelectorAll(".assessment-new-trigger").forEach(x=>x.addEventListener("click",assessmentView));
+  $("assessment-form").addEventListener("submit",submitAssessment);
+  $("assessment-download").addEventListener("click",downloadAssessment);
   $("cancel-create").addEventListener("click",overview);
   $("back-to-overview").addEventListener("click",overview);
   $("refresh-overview").addEventListener("click",overview);
