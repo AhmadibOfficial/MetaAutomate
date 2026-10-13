@@ -73,3 +73,10 @@ input,textarea{border:1px solid #dce4f0;border-radius:11px;background:white;padd
  .assessment-action{padding:17px}
 }
 @media(prefers-reduced-motion:reduce){.assessment-progress{transition:none}}
+
+/* Collapsed navigation must not hide inactive icons on tablet or mobile. */
+@media(max-width:930px){
+  .sidebar-nav .nav-item:not(.active) span{color:#a8c4e9}
+  .sidebar-nav .nav-item.active span{color:#ffffff}
+  .sidebar-nav .nav-item:focus-visible{outline:2px solid #9dcafe;outline-offset:2px}
+}

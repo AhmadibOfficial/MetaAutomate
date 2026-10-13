@@ -146,6 +146,12 @@ def main():
             path=str(screenshots/"operational-core-assessment-mobile.png"),
             full_page=True,
         )
+        # Every collapsed sidebar icon remains visible and recognizable.
+        for nav_id in ("nav-overview","nav-create","nav-assessment","nav-assessment-history"):
+            icon=mpage.locator("#"+nav_id+" span").first
+            expect(icon).to_be_visible()
+            alpha=icon.evaluate("(n) => getComputedStyle(n).color")
+            assert alpha not in ("transparent","rgba(0, 0, 0, 0)"), (nav_id,alpha)
         mpage.locator("#nav-assessment").click()
         expect(mpage.locator("#assessment-view")).to_be_visible(timeout=15000)
         expect(mpage.locator(".assessment-rating")).to_have_count(15)
