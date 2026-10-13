@@ -125,6 +125,31 @@ def main():
         page.goto(assessment_url)
         expect(page.locator("#login-view")).to_be_visible()
         context.close()
+
+        # Mobile report verification and new-assessment navigation (390px viewport).
+        mobile=browser.new_context(
+            viewport={"width":390,"height":844},base_url=BASE,
+            is_mobile=True,has_touch=True,device_scale_factor=1,
+        )
+        mpage=mobile.new_page()
+        mpage.goto(assessment_url)
+        expect(mpage.locator("#login-view")).to_be_visible(timeout=15000)
+        mpage.locator("#login-key").fill(key)
+        mpage.locator("#login-submit").click()
+        expect(mpage.locator("#assessment-detail-view")).to_be_visible(timeout=15000)
+        expect(mpage.locator("#assessment-overall-score")).to_have_text("60/100")
+        measurements=mpage.evaluate(
+            "() => ({viewport:innerWidth,scroll:document.documentElement.scrollWidth})"
+        )
+        assert measurements["scroll"] <= measurements["viewport"]+1, measurements
+        mpage.screenshot(
+            path=str(screenshots/"operational-core-assessment-mobile.png"),
+            full_page=True,
+        )
+        mpage.locator("#nav-assessment").click()
+        expect(mpage.locator("#assessment-view")).to_be_visible(timeout=15000)
+        expect(mpage.locator(".assessment-rating")).to_have_count(15)
+        mobile.close()
         browser.close()
     with psycopg.connect(os.environ["DATABASE_URL"]) as conn:
         with conn.cursor() as cur:

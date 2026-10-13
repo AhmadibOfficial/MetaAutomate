@@ -130,6 +130,7 @@ jobs:
           path: |
             artifacts/objective-workspace.png
             artifacts/operational-core-assessment-report.png
+            artifacts/operational-core-assessment-mobile.png
           if-no-files-found: ignore
 
       - name: Verify automated local workspace bootstrap and CSRF boundary
