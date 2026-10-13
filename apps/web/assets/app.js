@@ -1,7 +1,7 @@
 "use strict";
 
 /* MetaAutomate Objective Workspace: client code never persists access keys. */
-const state = {session:null, capabilities:[], objectives:[], objective:null, inFlightKey:null, graph:null,
+const state = {session:null, authMode:"dev_key", capabilities:[], objectives:[], objective:null, inFlightKey:null, graph:null,
   assessmentQuestions:null, assessment:null, assessmentInFlightKey:null};
 const $ = id => document.getElementById(id);
 const screens = ["overview","create","detail","assessment","assessment-history","assessment-detail"];
@@ -50,6 +50,26 @@ function showToast(message) {
   visible("toast",true);
   clearTimeout(showToast.timer);
   showToast.timer = setTimeout(()=>visible("toast",false),4300);
+}
+async function configureSignIn(){
+  const config=await api("/v1/workspace/config");
+  if(!["dev_key","oidc"].includes(config.mode))throw new Error("Invalid workspace identity mode");
+  const sso=config.mode==="oidc";
+  state.authMode=config.mode;
+  $("login-environment-label").textContent=sso?"PRIVATE ORGANIZATION SSO":"PRIVATE DEVELOPMENT WORKSPACE";
+  for(const selector of ['#login-form label[for="login-key"]','#login-key','#login-form .field-hint','#login-submit']){
+    const node=document.querySelector(selector);
+    node.hidden=sso;
+    node.style.display=sso?"none":"";
+  }
+  const button=$("oidc-login-button");
+  button.hidden=!sso;
+  button.style.display=sso?"":"none";
+  $("login-key").required=!sso;
+  const intro=$("login-form").querySelector("p:not(.field-hint)");
+  if(intro)intro.textContent=sso
+    ?"Sign in with your approved organization's identity provider."
+    :"Sign in with the access key provisioned for your organization.";
 }
 function isEditor() { return ["OWNER","ADMIN","OPERATOR"].includes(state.session?.role); }
 function isReviewer() { return ["OWNER","ADMIN"].includes(state.session?.role); }
@@ -532,11 +552,14 @@ async function initialize(){
   $("back-to-overview").addEventListener("click",overview);
   $("refresh-overview").addEventListener("click",overview);
   $("login-form").addEventListener("submit",login);
+  $("oidc-login-button").addEventListener("click",()=>window.location.assign("/v1/workspace/oidc/login"));
   $("objective-form").addEventListener("submit",saveObjective);
   $("review-form").addEventListener("submit",reviewObjective);
   $("logout-button").addEventListener("click",logout);
   window.addEventListener("resize",()=>requestAnimationFrame(drawGraph));
   window.addEventListener("popstate",()=>{if(state.session)enterWorkspace();});
+  try{ await configureSignIn(); }
+  catch { failInto("login-error","Private workspace sign-in configuration unavailable."); state.session=null; updateShell(); return; }
   try{
     state.session=await api("/v1/workspace/session");
     updateShell();await enterWorkspace();

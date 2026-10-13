@@ -22,6 +22,7 @@ def test_required_migration_order_exists():
         "009_objective_operations.sql",
         "010_workspace_sessions.sql",
         "011_operational_assessments.sql",
+        "012_oidc_identities.sql",
     ]
 
 
