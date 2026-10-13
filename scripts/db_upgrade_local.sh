@@ -31,8 +31,12 @@ fi
 if [[ "$one" == "t" && "$two" == "t" && "$three" == "t" ]]; then
   echo "Workspace and Operational Core schema already installed."; exit 0
 fi
+if [[ -L "$HOME/metaautomate-db-backups" ]]; then
+  echo 'ERROR: backup directory must not be a symbolic link.' >&2; exit 1
+fi
 mkdir -p "$HOME/metaautomate-db-backups"
-backup="$HOME/metaautomate-db-backups/before-workspace-$(date +%Y%m%d_%H%M%S).dump"
+chmod 700 "$HOME/metaautomate-db-backups"
+backup="$HOME/metaautomate-db-backups/before-operational-core-$(date +%Y%m%d_%H%M%S)-$.dump"
 echo "Backing up existing database to $backup"
 docker compose exec -T postgres pg_dump -Fc -U metaautomate -d metaautomate > "$backup"
 test -s "$backup"
