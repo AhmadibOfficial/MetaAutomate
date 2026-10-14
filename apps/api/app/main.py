@@ -8,6 +8,7 @@ from app.workspace_auth import router as workspace_auth_router
 from app.assessments import router as assessment_router
 from app.amboy_m1 import router as amboy_m1_router
 from app.domain_integrations import router as domain_integrations_router
+from app.synthetic_inventory import router as synthetic_inventory_router
 from pathlib import Path
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -52,6 +53,8 @@ app.include_router(workspace_auth_router)
 app.include_router(assessment_router)
 app.include_router(amboy_m1_router)
 app.include_router(domain_integrations_router)
+if _mode == "dev_key":
+    app.include_router(synthetic_inventory_router)
 
 
 @app.middleware("http")
