@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "classification": "SYNTHETIC_DEMO_ONLY",
+  "items": [
+    {
+      "sku": "DEMO-MAIZE-001",
+      "label": "Synthetic maize bags",
+      "on_hand_units": 18,
+      "reorder_threshold_units": 25,
+      "target_units": 55
+    },
+    {
+      "sku": "DEMO-SOYA-002",
+      "label": "Synthetic soybean bags",
+      "on_hand_units": 62,
+      "reorder_threshold_units": 30,
+      "target_units": 80
+    },
+    {
+      "sku": "DEMO-SORGHUM-003",
+      "label": "Synthetic sorghum bags",
+      "on_hand_units": 9,
+      "reorder_threshold_units": 15,
+      "target_units": 40
+    },
+    {
+      "sku": "DEMO-PACK-004",
+      "label": "Synthetic packaging units",
+      "on_hand_units": 130,
+      "reorder_threshold_units": 60,
+      "target_units": 150
+    }
+  ]
+}
