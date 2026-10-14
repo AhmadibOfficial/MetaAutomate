@@ -108,5 +108,5 @@ def test_full_overlay_requires_local_git_objects():
 
 def test_pinned_source_modules_are_not_imported_by_current_main():
     main = (ROOT / "apps/api/app/main.py").read_text(encoding="utf-8")
-    for _, _, module_path, _ in module.PINNED.items():
+    for _, (_, module_path, _) in module.PINNED.items():
         assert Path(module_path).stem not in main
