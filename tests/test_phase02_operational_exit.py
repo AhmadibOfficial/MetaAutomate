@@ -183,3 +183,20 @@ def test_source_gate_has_no_network_or_deployment_effects():
         "GitHubApiClient", "import boto", "eval(",
     ):
         assert forbidden not in source
+
+
+
+def test_existing_release_report_imports_real_operational_no_go_assessor():
+    from importlib.util import module_from_spec, spec_from_file_location
+    release_path = ROOT / "scripts/verify_release_gate.py"
+    release_spec = spec_from_file_location("p2_release_status", release_path)
+    assert release_spec and release_spec.loader
+    release = module_from_spec(release_spec)
+    release_spec.loader.exec_module(release)
+    result = release.read_phase02_operational_status()
+    assert result["status"] == "NO_GO"
+    assert result["foundation_verified"] == 3
+    assert result["production_release_authorized"] is False
+    release_source = release_path.read_text(encoding="utf-8")
+    assert "'scope': 'CI_SOURCE_EVIDENCE_ONLY'" in release_source
+    assert "'phase03_execution_authorized': False" in release_source
