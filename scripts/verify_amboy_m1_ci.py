@@ -179,6 +179,23 @@ def main():
             )
             assert cur.fetchone()[0] is False
 
+    # Even the restricted runtime role must not reset a consumed quota window.
+    with psycopg.connect(runtime) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM app.authenticate_api_token(%s)",
+                        (hashlib.sha256(user_a["token"].encode("ascii")).hexdigest(),))
+            assert cur.fetchone()
+            try:
+                cur.execute(
+                    "UPDATE amboy_m1_quotas SET request_count=1 "
+                    "WHERE organization_id=%s AND actor_user_id=%s",
+                    (user_a["organization_id"], user_a["user_id"]),
+                )
+            except psycopg.errors.RaiseException:
+                conn.rollback()
+            else:
+                raise AssertionError("Restricted role reset the hourly quota")
+
     with psycopg.connect(admin) as conn:
         with conn.cursor() as cur:
             cur.execute("UPDATE api_access_tokens SET revoked_at=now() WHERE user_id=%s",
