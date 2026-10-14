@@ -130,3 +130,22 @@ def test_direct_policy_is_deny_only_and_role_protected():
     with pytest.raises(Exception) as exc:
         policy_preview("business.lead-intake.validate.v1", role="VIEWER")
     assert getattr(exc.value, "status_code", None) == 403
+
+def test_public_roadmap_marks_parallel_development_without_release_claim():
+    page = (ROOT / "apps/site/company/index.html").read_text(encoding="utf-8")
+    assert "PHASE 01</span><h3>Foundation" in page
+    assert "PHASE 02</span><h3>Platform expansion" in page
+    assert "IN DEVELOPMENT · SOURCE ONLY" in page
+    assert "Foundation remains in development" in page
+    assert "do not enable customer access or external actions" in page
+
+
+def test_main_app_protects_domain_routes_against_browser_caching():
+    from app.main import app
+    with TestClient(app) as client:
+        resp = client.get(
+            "/v1/domain-integrations/contracts",
+            headers={"Authorization": "Bearer invalid-token"},
+        )
+    assert resp.status_code == 401
+    assert resp.headers.get("Cache-Control") == "no-store"
