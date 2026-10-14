@@ -168,6 +168,8 @@ def test_amboy_m1_has_forced_tenant_and_subject_rls():
         "request_count BETWEEN 1 AND 10",
         "trg_amboy_m1_requests_no_update",
         "trg_amboy_m1_requests_no_delete",
+        "trg_amboy_m1_quotas_increment",
+        "AMBOY M1 quota may only increment for the same actor and hour",
         "GRANT SELECT, INSERT ON amboy_m1_requests TO metaautomate_runtime;",
     ):
         assert required in sql
