@@ -75,6 +75,19 @@ jobs:
           path: artifacts/validation/private-staging-source.json
           if-no-files-found: warn
 
+      - name: Publish Foundation release no-go evidence
+        run: |
+          python scripts/verify_foundation_readiness.py \
+            --report artifacts/validation/foundation-readiness.json
+
+      - name: Upload Foundation readiness evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: foundation-readiness-evidence
+          path: artifacts/validation/foundation-readiness.json
+          if-no-files-found: warn
+
       - name: Apply PostgreSQL migrations
         run: |
           for migration in database/migrations/*.sql; do
