@@ -31,7 +31,7 @@ Versioned machine contract: `contracts/domains/v1/operations.json`. Runtime cont
 ## Engineering sequence
 
 1. **P2-01 — Domain contract foundation** (this PR): documented versioned contracts, authenticated discovery, deny-only policy previews, negative tests, CI acceptance.
-2. **P2-02 — Independent product and tenant identity**: a real OneCall backend identity contract, signed server identity, product-scoped authorization, explicit tenant mapping, revocation and denial auditing. Never join MetaAutomate and OneCall users by matching email.
+2. **P2-02 — Independent product and tenant identity**: P2-02a source-only OneCall pilot-auth review and offline dedicated asymmetric assertion signature verifier is implemented; it is NOT connected to AMBOY. P2-02b still requires actual OneCall backend assertion issuance, private service identity, atomic JTI replay prevention, fresh account revocation, product-scoped authorization, tenant mapping and denial auditing. Never join MetaAutomate and OneCall users by matching email.
 3. **P2-03 — Read-only pilot adapter**: choose ONE target domain and one authorized provider, obtain approved sandbox credentials and private staging, verify isolation and provenance with synthetic records.
 4. **P2-04 — Durable integration delivery**: job state, signed webhooks, bounded retry/backoff, rate limits, deduplication, compensating actions, observability and safe incident recovery.
 5. **P2-05 — Controlled write proposals**: scoped authorization for a specific effect, human approval, preflight, idempotency, authoritative provider receipt and independent verification.
