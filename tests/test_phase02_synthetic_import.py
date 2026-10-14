@@ -23,9 +23,11 @@ HEADERS = {"x-metaautomate-demo-data": "SYNTHETIC_ONLY"}
 def client_for(role="OWNER", org=None, peer="127.0.0.1"):
     app = FastAPI()
     app.include_router(router)
+    org_id = org if org is not None else uuid4()
+    user_id = uuid4()
     app.dependency_overrides[get_tenant_session] = lambda: TenantSession(
         conn=None, principal=Principal(
-            organization_id=org or uuid4(), user_id=uuid4(), role=role
+            organization_id=org_id, user_id=user_id, role=role
         ))
     return TestClient(app, client=(peer, 50612))
 
@@ -43,7 +45,7 @@ def input_bytes(fmt):
 
 def send(client, fmt, data=None, *, headers=None, path=None):
     custom = dict(HEADERS)
-    custom["Content-Type"] = "text/csv" if fmt == "csv" else "application/json"
+    custom["content-type"] = "text/csv" if fmt == "csv" else "application/json"
     if headers:
         custom.update(headers)
     return client.post(path or URL + fmt, content=data if data is not None else input_bytes(fmt),
