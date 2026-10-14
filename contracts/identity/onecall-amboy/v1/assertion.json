@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "status": "design-and-offline-signature-tests-only",
+  "product": "onecall",
+  "subject_authority": "verified-onecall-backend-only",
+  "trust_boundary": "different-from-onecall-mobile-jwt",
+  "token_format": "compact-jws",
+  "signature": {
+    "algorithm": "EdDSA",
+    "public_key_type": "Ed25519",
+    "key_distribution": "pinned-reviewed-out-of-band",
+    "kid_required": true,
+    "jwks_url_from_token": false
+  },
+  "claims": {
+    "issuer": "dedicated HTTPS OneCall backend issuer; operator-selected and allowlisted",
+    "audience": "metaautomate-amboy-identity-test",
+    "type": "onecall-amboy-identity+jwt",
+    "product": "onecall",
+    "authority": "onecall-backend",
+    "scope": "amboy:identity-test",
+    "subject": "OneCall internal subject UUIDv4",
+    "jti": "unique UUIDv4",
+    "token_version": "current integer account token version as checked by OneCall",
+    "issued_at": "integer Unix seconds",
+    "not_before": "integer Unix seconds",
+    "expires_at": "integer Unix seconds",
+    "max_ttl_seconds": 60,
+    "clock_skew_seconds": 5
+  },
+  "required_before_live_use": [
+    "OneCall staging PR #3 integration reviewed and accepted",
+    "Dedicated OneCall-to-MetaAutomate issuer and distinct asymmetric signing key; never mobile HS256 secret",
+    "OneCall backend authenticates current user and confirms active account/tokenVersion before issuance",
+    "Per-request server-issued assertion routed over mutually authenticated private service channel",
+    "Atomic one-time JTI redemption with expiry; replay denial audit and nonce management",
+    "Fresh revocation or session-version checks across provider and consumer",
+    "Separate OneCall product scopes and independently reviewed subject-to-tenant mapping",
+    "Per-subject, product and tenant quotas and anomaly monitoring",
+    "End-to-end issuer, recipient, revocation, compromised-key, replay and tenant negative tests",
+    "Explicit owner approval after private staging and Foundation identity security gates"
+  ],
+  "disabled_features": [
+    "live_token_endpoint",
+    "metaautomate_session_creation",
+    "onecall_tenant_mapping",
+    "data_access",
+    "bookings",
+    "payments",
+    "model_inference",
+    "external_actions"
+  ]
+}
