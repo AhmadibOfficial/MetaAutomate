@@ -60,7 +60,7 @@ CREATE TRIGGER trg_amboy_m1_requests_no_delete BEFORE DELETE ON amboy_m1_request
 -- Prevent any runtime caller from resetting quotas, moving an actor's
 -- hourly window or shifting counters between organizations.
 CREATE FUNCTION enforce_amboy_m1_quota_increment()
-RETURNS trigger LANGUAGE plpgsql AS $
+RETURNS trigger LANGUAGE plpgsql AS $amboy_quota$
 BEGIN
     IF NEW.organization_id IS DISTINCT FROM OLD.organization_id
        OR NEW.actor_user_id IS DISTINCT FROM OLD.actor_user_id
@@ -71,7 +71,7 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
-$;
+$amboy_quota$;
 CREATE TRIGGER trg_amboy_m1_quotas_increment
     BEFORE UPDATE ON amboy_m1_quotas
     FOR EACH ROW EXECUTE FUNCTION enforce_amboy_m1_quota_increment();
