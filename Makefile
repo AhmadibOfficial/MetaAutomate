@@ -38,3 +38,10 @@ verify-local:
 .PHONY: staging-source-check
 staging-source-check:
 	@python3 scripts/verify_private_staging_contract.py
+
+.PHONY: foundation-status foundation-release-check
+foundation-status:
+	@python3 scripts/verify_foundation_readiness.py
+
+foundation-release-check:
+	@python3 scripts/verify_foundation_readiness.py --require-complete
