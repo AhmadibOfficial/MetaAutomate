@@ -68,6 +68,19 @@ def _canonical(event: dict[str, object]) -> str:
     return json.dumps(event, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
 
 
+def _state_digest(state: DemoApprovalView) -> str:
+    material = {
+        "tenant_id": str(state.tenant_id), "proposal_id": str(state.proposal_id),
+        "request_key": state.request_key, "operation_id": state.operation_id,
+        "capability_id": state.capability_id, "required_scope": state.required_scope,
+        "risk": state.risk, "scenario": state.scenario, "proposer": state.proposer,
+        "created_tick": state.created_tick, "last_tick": state.last_tick,
+        "revision": state.revision, "reviewers": list(state.reviewers),
+        "status": state.status,
+    }
+    return sha256(_canonical(material).encode("ascii")).hexdigest()
+
+
 @dataclass(frozen=True)
 class DemoAuditEvent:
     ordinal: int
@@ -77,6 +90,7 @@ class DemoAuditEvent:
     revision: int
     tick: int
     previous_hash: str
+    state_digest: str
     hash: str
 
 
@@ -92,6 +106,7 @@ class DemoApprovalView:
     scenario: str
     proposer: str
     created_tick: int
+    last_tick: int
     revision: int
     reviewers: tuple[str, ...]
     status: str
@@ -121,16 +136,17 @@ class OfflineApprovalEvidence:
     def _append(self, state: DemoApprovalView, kind: str, tick: int) -> str:
         chain = self._audit.setdefault(state.tenant_id, [])
         previous = chain[-1].hash if chain else "0" * 64
+        state_digest = _state_digest(state)
         payload = {
             "ordinal": len(chain), "tenant_id": str(state.tenant_id),
             "proposal_id": str(state.proposal_id),
             "kind": kind, "revision": state.revision, "tick": tick,
-            "previous_hash": previous,
+            "previous_hash": previous, "state_digest": state_digest,
         }
         digest = sha256(_canonical(payload).encode("ascii")).hexdigest()
         chain.append(DemoAuditEvent(
             len(chain), state.tenant_id, state.proposal_id, kind,
-            state.revision, tick, previous, digest,
+            state.revision, tick, previous, state_digest, digest,
         ))
         return digest
 
@@ -172,7 +188,7 @@ class OfflineApprovalEvidence:
                 request_key=request_key, operation_id=operation_id,
                 capability_id=spec[0], required_scope=spec[2], risk=spec[3],
                 scenario=scenario, proposer=proposer, created_tick=tick,
-                revision=0, reviewers=(), status=PENDING, audit_head="",
+                last_tick=tick, revision=0, reviewers=(), status=PENDING, audit_head="",
             )
             head = self._append(record, "DEMO_PROPOSED", tick)
             record = replace(record, audit_head=head)
@@ -199,7 +215,7 @@ class OfflineApprovalEvidence:
             if prior is None:
                 raise DemoNotFound("Synthetic proposal unavailable")
             if (prior.status != PENDING or prior.revision != expected_revision
-                    or tick < prior.created_tick or tick > prior.created_tick + TTL
+                    or tick < prior.last_tick or tick > prior.created_tick + TTL
                     or reviewer == prior.proposer
                     or reviewer in prior.reviewers):
                 _deny()
@@ -207,7 +223,7 @@ class OfflineApprovalEvidence:
             required = WRITE_SPECS[prior.operation_id][5]
             status = (DECLINED if vote == "SIM_DECLINE"
                       else REVIEWED if n >= required else PENDING)
-            after = replace(prior, revision=prior.revision + 1,
+            after = replace(prior, last_tick=tick, revision=prior.revision + 1,
                             reviewers=(*prior.reviewers, reviewer), status=status)
             head = self._append(after, vote, tick)
             after = replace(after, audit_head=head)
@@ -237,7 +253,7 @@ class OfflineApprovalEvidence:
                     "ordinal": i, "tenant_id": str(event.tenant_id),
                     "proposal_id": str(event.proposal_id), "kind": event.kind,
                     "revision": event.revision, "tick": event.tick,
-                    "previous_hash": previous,
+                    "previous_hash": previous, "state_digest": event.state_digest,
                 }
                 if event.hash != sha256(_canonical(payload).encode("ascii")).hexdigest():
                     return False
@@ -247,7 +263,8 @@ class OfflineApprovalEvidence:
             for (tenant, _), state in self._records.items():
                 if tenant == tenant_id and not any(
                     x.proposal_id == state.proposal_id
-                    and x.hash == state.audit_head for x in events
+                    and x.hash == state.audit_head
+                    and x.state_digest == _state_digest(state) for x in events
                 ):
                     return False
             return bool(events)
