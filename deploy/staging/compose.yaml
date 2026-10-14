@@ -1,0 +1,68 @@
+# Source-only staging template. NO cloud provisioning or database migration is authorized.
+# Both services stay inactive without the explicitly named profile.
+# Requires separate owner approval, private edge, real OIDC/MFA and credentials.
+name: metaautomate-private-staging
+
+services:
+  postgres:
+    profiles: ["owner-approved-staging"]
+    image: postgres:16-alpine
+    restart: "no"
+    environment:
+      POSTGRES_DB: metaautomate_staging
+      POSTGRES_USER: metaautomate_staging_admin
+      POSTGRES_PASSWORD: ${STAGING_POSTGRES_PASSWORD:?Provide staging-only admin password outside Git}
+    volumes:
+      - staging_pgdata:/var/lib/postgresql/data
+    networks: [db]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U metaautomate_staging_admin -d metaautomate_staging"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["NET_RAW"]
+
+  api:
+    profiles: ["owner-approved-staging"]
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile.prod
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      WORKSPACE_AUTH_MODE: oidc
+      WORKSPACE_COOKIE_SECURE: "1"
+      WORKSPACE_ORIGIN: ${STAGING_WORKSPACE_ORIGIN:?Provide separately authorized private HTTPS origin}
+      APP_DATABASE_URL: ${STAGING_APP_DATABASE_URL:?Provide staging-only restricted database URL}
+      OIDC_ISSUER: ${STAGING_OIDC_ISSUER:?Provide real trusted OIDC issuer}
+      OIDC_CLIENT_ID: ${STAGING_OIDC_CLIENT_ID:?Provide approved OIDC client}
+      OIDC_CLIENT_SECRET: ${STAGING_OIDC_CLIENT_SECRET:?Provide secret outside Git}
+      OIDC_REDIRECT_URI: ${STAGING_OIDC_REDIRECT_URI:?Provide exact private OIDC callback}
+      OIDC_STATE_SECRET: ${STAGING_OIDC_STATE_SECRET:?Provide strong staging-specific state secret}
+      WORKSPACE_WEB_ROOT: /srv/metaautomate/web
+    ports:
+      - "127.0.0.1:8081:8000"
+    networks: [db, egress]
+    read_only: true
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=64m"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    user: "10001:10001"
+    pids_limit: 256
+    mem_limit: 768m
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+networks:
+  db:
+    internal: true
+  egress: {}
+
+volumes:
+  staging_pgdata: {}

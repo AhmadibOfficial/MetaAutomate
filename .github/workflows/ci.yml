@@ -62,6 +62,19 @@ jobs:
             --import-mode=importlib \
             apps/api/tests tests/
 
+      - name: Validate private staging source-only boundaries
+        run: |
+          python scripts/verify_private_staging_contract.py \
+            --report artifacts/validation/private-staging-source.json
+
+      - name: Upload private staging source gate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: private-staging-source-gate
+          path: artifacts/validation/private-staging-source.json
+          if-no-files-found: warn
+
       - name: Apply PostgreSQL migrations
         run: |
           for migration in database/migrations/*.sql; do
