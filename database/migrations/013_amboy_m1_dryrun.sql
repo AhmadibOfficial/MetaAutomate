@@ -57,6 +57,27 @@ CREATE TRIGGER trg_amboy_m1_requests_no_update BEFORE UPDATE ON amboy_m1_request
 CREATE TRIGGER trg_amboy_m1_requests_no_delete BEFORE DELETE ON amboy_m1_requests
     FOR EACH ROW EXECUTE FUNCTION prevent_amboy_m1_mutation();
 
+-- Prevent any runtime caller from resetting quotas, moving an actor's
+-- hourly window or shifting counters between organizations.
+CREATE FUNCTION enforce_amboy_m1_quota_increment()
+RETURNS trigger LANGUAGE plpgsql AS $
+BEGIN
+    IF NEW.organization_id IS DISTINCT FROM OLD.organization_id
+       OR NEW.actor_user_id IS DISTINCT FROM OLD.actor_user_id
+       OR NEW.product IS DISTINCT FROM OLD.product
+       OR NEW.hour_start IS DISTINCT FROM OLD.hour_start
+       OR NEW.request_count IS DISTINCT FROM OLD.request_count + 1 THEN
+        RAISE EXCEPTION 'AMBOY M1 quota may only increment for the same actor and hour';
+    END IF;
+    RETURN NEW;
+END;
+$;
+CREATE TRIGGER trg_amboy_m1_quotas_increment
+    BEFORE UPDATE ON amboy_m1_quotas
+    FOR EACH ROW EXECUTE FUNCTION enforce_amboy_m1_quota_increment();
+
+REVOKE ALL ON FUNCTION prevent_amboy_m1_mutation() FROM PUBLIC;
+REVOKE ALL ON FUNCTION enforce_amboy_m1_quota_increment() FROM PUBLIC;
 REVOKE ALL ON amboy_m1_requests, amboy_m1_quotas FROM PUBLIC;
 REVOKE ALL ON amboy_m1_requests, amboy_m1_quotas FROM metaautomate_runtime;
 GRANT SELECT, INSERT ON amboy_m1_requests TO metaautomate_runtime;
