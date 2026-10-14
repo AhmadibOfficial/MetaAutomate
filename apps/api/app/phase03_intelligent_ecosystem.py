@@ -340,6 +340,8 @@ def validate_phase03_manifest(
         "verification_scope": "SYNTHETIC_CHECKSUM_CONSISTENCY_ONLY",
         "analytics_scope": "DEMO_DENIAL_EVENTS_ONLY",
     }
+    if set(phase03) != set(required) | {"operations"}:
+        raise ContractRejected("Unknown Phase 03 registry fields are forbidden")
     if any(phase03.get(k) != v or type(phase03.get(k)) is not type(v)
            for k, v in required.items()):
         raise ContractRejected("Phase 03 must remain offline and denied")
