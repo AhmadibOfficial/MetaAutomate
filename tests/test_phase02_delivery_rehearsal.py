@@ -221,6 +221,33 @@ def test_receipt_snapshot_is_immutable_and_not_signed_evidence():
     assert not verify_receipt_chain(tampered)
 
 
+def test_receipt_chain_must_match_reported_final_state():
+    service, tenant, job = new_job()
+    job = service.simulate_outcome(
+        tenant, job.job_id, "DEMO-EVT-SUCCESS", "SIM_SUCCESS", tick=0,
+    )
+    assert verify_receipt_chain(job)
+    for stale in (
+        replace(job, state=SIM_QUEUED),
+        replace(job, attempts=0),
+        replace(job, due_tick=99),
+    ):
+        assert not verify_receipt_chain(stale)
+
+
+def test_idempotent_simulated_concurrent_submission():
+    from concurrent.futures import ThreadPoolExecutor
+    service = SyntheticDeliveryRehearsal()
+    tenant = uuid4()
+    with ThreadPoolExecutor(max_workers=12) as pool:
+        ids = list(pool.map(
+            lambda _: service.submit(tenant, "DEMO-KEY-THREAD", SCENE).job_id,
+            range(80),
+        ))
+    assert len(set(ids)) == 1
+    assert len(service.inspect(tenant, ids[0]).receipts) == 1
+
+
 def test_quotas_are_bounded_and_independent_by_tenant():
     service = SyntheticDeliveryRehearsal()
     tenant = uuid4()
