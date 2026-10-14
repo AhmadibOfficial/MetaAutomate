@@ -23,6 +23,7 @@ def test_required_migration_order_exists():
         "010_workspace_sessions.sql",
         "011_operational_assessments.sql",
         "012_oidc_identities.sql",
+        "013_amboy_m1_dryrun.sql",
     ]
 
 
@@ -154,3 +155,22 @@ def test_operational_assessment_is_immutable_and_tenant_bound():
         "RAISE EXCEPTION 'Assessment evidence is immutable'",
     ):
         assert required in sql
+
+def test_amboy_m1_has_forced_tenant_and_subject_rls():
+    sql = (MIGRATIONS / "013_amboy_m1_dryrun.sql").read_text(encoding="utf-8")
+    for required in (
+        "CREATE TABLE amboy_m1_requests",
+        "CREATE TABLE amboy_m1_quotas",
+        "ALTER TABLE amboy_m1_requests FORCE ROW LEVEL SECURITY;",
+        "ALTER TABLE amboy_m1_quotas FORCE ROW LEVEL SECURITY;",
+        "actor_user_id = NULLIF(current_setting('app.user_id', true), '')::uuid",
+        "CHECK (product = 'metaautomate')",
+        "request_count BETWEEN 1 AND 10",
+        "trg_amboy_m1_requests_no_update",
+        "trg_amboy_m1_requests_no_delete",
+        "trg_amboy_m1_quotas_increment",
+        "AMBOY M1 quota may only increment for the same actor and hour",
+        "GRANT SELECT, INSERT ON amboy_m1_requests TO metaautomate_runtime;",
+    ):
+        assert required in sql
+

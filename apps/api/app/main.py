@@ -6,6 +6,7 @@ from app.objectives import router as objective_router
 from app.objective_ops import router as objective_ops_router
 from app.workspace_auth import router as workspace_auth_router
 from app.assessments import router as assessment_router
+from app.amboy_m1 import router as amboy_m1_router
 from pathlib import Path
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -48,6 +49,7 @@ if _mode == "dev_key":
 app.include_router(objective_ops_router)
 app.include_router(workspace_auth_router)
 app.include_router(assessment_router)
+app.include_router(amboy_m1_router)
 
 
 @app.middleware("http")
@@ -62,7 +64,7 @@ async def workspace_security_headers(request, call_next):
         "object-src 'none'; base-uri 'none'; "
         "form-action 'self'; frame-ancestors 'none'"
     )
-    if request.url.path.startswith(("/v1/workspace", "/v1/objective-operations", "/v1/assessments")):
+    if request.url.path.startswith(("/v1/workspace", "/v1/objective-operations", "/v1/assessments", "/v1/amboy")):
         response.headers["Cache-Control"] = "no-store"
     return response
 
