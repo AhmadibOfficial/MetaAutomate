@@ -146,6 +146,10 @@ def main():
             for table in ("tool_calls", "agent_runs", "capability_executions"):
                 cur.execute("SELECT count(*) FROM " + table)
                 assert cur.fetchone()[0] == 0, table
+            # FORCE RLS applies even to the owner role; establish the same
+            # tenant context before proving the append-only trigger runs.
+            cur.execute("SELECT app.set_context(%s,%s)",
+                        (user_a["organization_id"], user_a["user_id"]))
             try:
                 cur.execute("UPDATE amboy_m1_requests SET outcome='unsupported' WHERE id=%s",
                             (receipt_id,))
