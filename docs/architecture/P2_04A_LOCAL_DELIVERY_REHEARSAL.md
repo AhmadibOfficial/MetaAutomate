@@ -21,7 +21,7 @@ All inputs are invented scenario names, bounded `DEMO-` idempotency keys and eve
 
 Idempotency keys are indexed by `(tenant_uuid, key)`. Reuse with the same allowlisted scenario returns the prior snapshot; reuse with a different scenario fails. Each distinct event ID is processed once per job; a conflicting replay fails. The object uses an in-process lock for atomic transitions. Work units are bounded at 32 per demo tenant and 128 per object. No persistent or distributed idempotency is claimed.
 
-Each immutable snapshot includes a SHA-256 chained **demo receipt** for each in-memory transition. This supports consistency checks but is **not signed, immutable storage, trusted time, audit compliance, tamper-proof evidence, or a provider acknowledgement**.
+Each immutable snapshot includes a SHA-256 chained **demo receipt** for each in-memory transition. The checker also compares the final receipt against the reported snapshot state, attempt count and due tick. This supports limited in-memory consistency checks but is **not signed, immutable storage, trusted time, audit compliance, tamper-proof evidence, or a provider acknowledgement**.
 
 ## Local test
 
