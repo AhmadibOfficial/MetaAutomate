@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "product": "metaautomate",
+  "contract_version": "1.0.0",
+  "default_policy": "DENY",
+  "lifecycle": "draft",
+  "adapter_state": "unbound",
+  "external_access": false,
+  "operations": [
+    {
+      "operation_id": "business.lead-intake.validate.v1",
+      "capability_id": "BIZ-002",
+      "domain": "business",
+      "effect": "validate_only",
+      "required_scope": "business.leads.preview",
+      "risk": "low",
+      "approval_required": false
+    },
+    {
+      "operation_id": "business.crm.sync-proposal.v1",
+      "capability_id": "BIZ-006",
+      "domain": "business",
+      "effect": "propose_write",
+      "required_scope": "business.crm.write",
+      "risk": "moderate",
+      "approval_required": true
+    },
+    {
+      "operation_id": "business.inventory.stock-preview.v1",
+      "capability_id": "BIZ-011",
+      "domain": "business",
+      "effect": "read_external",
+      "required_scope": "business.inventory.read",
+      "risk": "moderate",
+      "approval_required": false
+    },
+    {
+      "operation_id": "business.finance.reconciliation-proposal.v1",
+      "capability_id": "BIZ-012",
+      "domain": "business",
+      "effect": "propose_write",
+      "required_scope": "business.finance.write",
+      "risk": "high",
+      "approval_required": true
+    }
+  ]
+}
