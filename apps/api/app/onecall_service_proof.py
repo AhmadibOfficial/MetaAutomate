@@ -39,6 +39,11 @@ class OfflineIdentityPairProof:
     onecall_subject: UUID
     identity_jti: UUID
     service_jti: UUID
+    identity_token_version: int
+    identity_expires_at: int
+    service_expires_at: int
+    identity_issuer: str
+    service_issuer: str
     identity_test_only: bool = True
     metaautomate_access: bool = False
     onecall_tenant_authorized: bool = False
@@ -182,4 +187,9 @@ def verify_offline_onecall_service_proof_pair(
         onecall_subject=identity.subject,
         identity_jti=identity.token_id,
         service_jti=_uuid4(claims["jti"]),
+        identity_token_version=identity.token_version,
+        identity_expires_at=identity.expires_at,
+        service_expires_at=exp,
+        identity_issuer=identity_issuer,
+        service_issuer=service_issuer,
     )
