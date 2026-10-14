@@ -28,10 +28,11 @@ REVOKE ALL ON onecall_m2m_test_proof_redemptions, onecall_m2m_test_events
     FROM metaautomate_runtime;
 
 ALTER TABLE onecall_m2m_test_proof_redemptions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE onecall_m2m_test_proof_redemptions FORCE ROW LEVEL SECURITY;
 ALTER TABLE onecall_m2m_test_events ENABLE ROW LEVEL SECURITY;
-ALTER TABLE onecall_m2m_test_events FORCE ROW LEVEL SECURITY;
--- Deliberately no RLS policies / runtime privileges / callable service route.
+-- Owner-executed SECURITY DEFINER needs owner-only writes; do not FORCE RLS
+-- with no policies, as that would deny the migration-owner function too.
+-- Runtime is blocked by missing privileges/policies, and no function grant exists.
+-- Deliberately no runtime RLS policies or callable service route.
 
 CREATE TRIGGER trg_onecall_m2m_redemptions_immutable
     BEFORE UPDATE OR DELETE ON onecall_m2m_test_proof_redemptions
