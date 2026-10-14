@@ -32,3 +32,5 @@ The M2M proof verifier does not consume the service proof JTI, validate a live O
 - Obtain explicit owner security/release approval for hosting, changes, credentials and customer access. Do not deploy on the strength of this PR's CI.
 
 **No DigitalOcean provisioning, Kali migration, Render update, live OneCall connection, OneCall PR merging, or customer access is authorized by this change.**
+
+The CI handshakes use temporary files for short-lived synthetic keys, never any customer or deployed private key. The PR targets `main` to run the full required workflow and supersedes the standalone, synthetic-only peer policy PR #26 if the complete security review accepts the consolidated source.
