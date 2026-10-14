@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "phase": "01-foundation",
+  "policy": "NO_GO_UNTIL_ALL_NINE_VERIFIED",
+  "generated_context_date": "2026-10-14",
+  "source_ci_run": "https://github.com/AhmadibOfficial/MetaAutomate/actions/runs/38500268670",
+  "checks": [
+    {
+      "id": "F01",
+      "title": "Stable architecture and objective planning",
+      "status": "verified",
+      "reason": "Source: Objective Workspace and Objective Operations lifecycle; browser CI acceptance",
+      "source_path": "docs/objectives/OPERATIONS.md",
+      "external_evidence": [],
+      "owner_signoff": null,
+      "reviewer_signoff": null
+    },
+    {
+      "id": "F02",
+      "title": "Deterministic assessment and automated CI",
+      "status": "verified",
+      "reason": "Source: Operational Core assessment, immutable report receipt and latest green CI",
+      "source_path": "docs/operational-core/ASSESSMENT_V1.md",
+      "external_evidence": [],
+      "owner_signoff": null,
+      "reviewer_signoff": null
+    },
+    {
+      "id": "F03",
+      "title": "Tested tenant isolation and audit foundation",
+      "status": "verified",
+      "reason": "Source: forced RLS, least-privilege runtime, integration tests and append-only audit",
+      "source_path": "database/migrations/011_operational_assessments.sql",
+      "external_evidence": [],
+      "owner_signoff": null,
+      "reviewer_signoff": null
+    },
+    {
+      "id": "F04",
+      "title": "GitHub required-check branch protection",
+      "status": "blocked",
+      "reason": "Main is currently unprotected; private repository ruleset request returned GitHub plan/access error",
+      "source_path": "",
+      "external_evidence": [],
+      "owner_signoff": null,
+      "reviewer_signoff": null
+    },
+    {
+      "id": "F05",
+      "title": "Approved isolated staging infrastructure",
+      "status": "blocked",
+      "reason": "Static staging source template merged; no approved live host, cost ceiling or separate provisioned resources",
+      "source_path": "deploy/staging/compose.yaml",
+      "external_evidence": [],
+      "owner_signoff": null,
+      "reviewer_signoff": null
+    },
+    {
+      "id": "F06",
+      "title": "Real OIDC, MFA and secure private ingress",
+      "status": "blocked",
+      "reason": "OIDC source present but no independently tested real provider, MFA or live authenticated edge",
+      "source_path": "docs/deployment/PRIVATE_OIDC_FOUNDATION_V2.md",
+      "external_evidence": [],
+      "owner_signoff": null,
+      "reviewer_signoff": null
+    },
+    {
+      "id": "F07",
+      "title": "Independent staging backup and restore",
+      "status": "blocked",
+      "reason": "Disposable CI restore passed; no encrypted off-host staging backup and independently verified restore",
+      "source_path": "docs/operational-core/LOCAL_RECOVERY_RUNBOOK.md",
+      "external_evidence": [],
+      "owner_signoff": null,
+      "reviewer_signoff": null
+    },
+    {
+      "id": "F08",
+      "title": "End-to-end security and operational acceptance",
+      "status": "blocked",
+      "reason": "CI success is not live private staging security, monitoring, threat modelling and negative-role acceptance",
+      "source_path": "docs/operational-core/CONTROLLED_STAGING_RELEASE_V2.md",
+      "external_evidence": [],
+      "owner_signoff": null,
+      "reviewer_signoff": null
+    },
+    {
+      "id": "F09",
+      "title": "Initial pilot evidence and measured usefulness",
+      "status": "blocked",
+      "reason": "No consented real-customer pilot, baseline, objective evidence or verified result in connected sources",
+      "source_path": "",
+      "external_evidence": [],
+      "owner_signoff": null,
+      "reviewer_signoff": null
+    }
+  ]
+}
