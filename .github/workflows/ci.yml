@@ -135,6 +135,11 @@ jobs:
           APP_DATABASE_URL: postgresql://metaautomate_runtime:ci_runtime_password@localhost:5432/metaautomate
         run: python scripts/verify_onecall_p2_02b_ci.py
 
+      - name: Verify OneCall M2M proof and identity atomic pair replay on disposable CI
+        env:
+          APP_DATABASE_URL: postgresql://metaautomate_runtime:ci_runtime_password@localhost:5432/metaautomate
+        run: python scripts/verify_onecall_p2_02c_ci.py
+
       - name: Install Chromium browser test dependencies
         run: |
           python -m pip install 'playwright>=1.55,<2'
