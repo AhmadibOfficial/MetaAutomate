@@ -26,13 +26,14 @@ FIN = "business.finance.reconciliation-proposal.v1"
 A = "DEMO-ACTOR-FOUNDER"
 B = "DEMO-ACTOR-REVIEWER"
 C = "DEMO-ACTOR-ACCOUNTANT"
+_DEFAULT_SCENARIO = object()
 
 
-def record(engine, tenant=None, pid=None, *, op=CRM, scenario=None,
+def record(engine, tenant=None, pid=None, *, op=CRM, scenario=_DEFAULT_SCENARIO,
            key="DEMO-IDEMP-ALPHA", actor=A, tick=100):
     tenant = tenant or uuid4()
     pid = pid or uuid4()
-    if scenario is None:
+    if scenario is _DEFAULT_SCENARIO:
         scenario = ("DEMO-CRM-LEAD-ALPHA" if op == CRM
                     else "DEMO-FINANCE-INVOICE-MATCH")
     return engine.propose(
