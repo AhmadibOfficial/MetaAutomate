@@ -24,6 +24,7 @@ def test_required_migration_order_exists():
         "011_operational_assessments.sql",
         "012_oidc_identities.sql",
         "013_amboy_m1_dryrun.sql",
+        "014_onecall_identity_test_replay.sql",
     ]
 
 
