@@ -10,10 +10,21 @@ from uuid import uuid4
 import psycopg
 from fastapi.testclient import TestClient
 
-if os.environ.get("GITHUB_ACTIONS") != "true":
-    raise SystemExit("REFUSED: AMBOY M1 integration may run only on ephemeral GitHub Actions")
-if os.environ.get("DATABASE_URL", "").split("/")[-1] != "metaautomate":
-    raise SystemExit("REFUSED: unexpected CI database name")
+# This test INSERTs tenants, sessions, audit rows and quota records.
+# A spoofable GITHUB_ACTIONS flag or matching local DB name alone is NOT a
+# sufficient safety boundary. Refuse all non-exact disposable CI connection
+# targets, including the owner's Kali development database on port 5433.
+if not (os.environ.get("GITHUB_ACTIONS") == "true"
+        and os.environ.get("CI") == "true"
+        and os.environ.get("GITHUB_REPOSITORY") == "AhmadibOfficial/MetaAutomate"
+        and os.environ.get("GITHUB_RUN_ID", "").isdigit()):
+    raise SystemExit("REFUSED: AMBOY M1 mutation test requires the verified CI runner")
+if os.environ.get("DATABASE_URL") != (
+        "postgresql://metaautomate:ci_only_password@localhost:5432/metaautomate"
+    ) or os.environ.get("APP_DATABASE_URL") != (
+        "postgresql://metaautomate_runtime:ci_runtime_password@localhost:5432/metaautomate"
+    ):
+    raise SystemExit("REFUSED: AMBOY M1 integration targets only disposable CI PostgreSQL")
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "apps" / "api"))
 from app.main import app  # noqa: E402
