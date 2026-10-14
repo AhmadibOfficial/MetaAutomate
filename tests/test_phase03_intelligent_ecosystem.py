@@ -205,12 +205,15 @@ def test_per_tenant_capacity_denial_does_not_evict():
 def test_global_capacity_denial_preserves_existing_receipts():
     gate = OfflineCapabilityPreview()
     tenants = [uuid4() for _ in range(MAX_TENANTS)]
-    for tenant in tenants:
-        for i in range(MAX_PER_TENANT):
-            gate.inspect_once(demo(tenant=tenant, request_id=f"DEMO-REQ-{i:03}"))
-    assert len(gate._by_id) == MAX_REQUESTS if MAX_TENANTS * MAX_PER_TENANT == MAX_REQUESTS else True
-    # Global cap 64 is enforced before all 16*16 hypothetical combinations.
-    assert len(gate._by_id) <= MAX_REQUESTS
+    for i in range(MAX_REQUESTS):
+        gate.inspect_once(demo(
+            tenant=tenants[i // MAX_PER_TENANT],
+            request_id=f"DEMO-REQ-{i % MAX_PER_TENANT:03}",
+        ))
+    assert len(gate._by_id) == MAX_REQUESTS
+    with pytest.raises(CapabilityDenied):
+        gate.inspect_once(demo(tenant=tenants[0], request_id="DEMO-REQ-OVERFLOW"))
+    assert len(gate._by_id) == MAX_REQUESTS
 
 
 @pytest.mark.parametrize("changed", [
