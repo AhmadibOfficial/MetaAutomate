@@ -210,4 +210,4 @@ def test_offline_signature_proof_is_not_wired_to_live_routes():
     for component in (main, amboy, routes):
         assert "onecall_assertion" not in component
     assert "onecall_app" in amboy
-    assert '"amboy:identity-test"' == ASSERTION_SCOPE
+    assert "amboy:identity-test" == ASSERTION_SCOPE
