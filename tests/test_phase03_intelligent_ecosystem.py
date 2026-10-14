@@ -314,7 +314,8 @@ def test_analytics_rejects_malformed_inputs():
     t = uuid4()
     for records in ([], None, tuple((1,) for _ in range(1)),
                     tuple((demo(tenant=t), None) for _ in range(1)),
-                    tuple((demo(tenant=t), preview(demo(tenant=t)))
+                    tuple((demo(tenant=t), preview(demo(
+                        tenant=t, request_id="DEMO-REQ-MISMATCH")))
                           for _ in range(1))):
         with pytest.raises((ReceiptRejected, CapabilityDenied)):
             aggregate_synthetic_denials(t, records)
