@@ -1,0 +1,39 @@
+{
+  "schema": "metaautomate.p2-04e.offline-cross-pr.v1",
+  "base": {
+    "sha": "7144451b0ac37349c3e731bac76d14338280c42e",
+    "main_path": "apps/api/app/main.py"
+  },
+  "source_only": true,
+  "requires_independent_review": true,
+  "phase01_verified_gates": 3,
+  "phase01_total_gates": 9,
+  "merge_permitted": false,
+  "live_execution_permitted": false,
+  "entries": [
+    {
+      "pr": 32,
+      "sha": "2739ca4f9b4a6cd10ad556933b5f45ecab9a6c91",
+      "module": "apps/api/app/synthetic_delivery.py",
+      "test": "tests/test_phase02_delivery_rehearsal.py"
+    },
+    {
+      "pr": 33,
+      "sha": "bf6ec6d1a7538a3bb23d03961ef7379d89fc87e5",
+      "module": "apps/api/app/synthetic_webhook_proof.py",
+      "test": "tests/test_phase02_synthetic_webhook_proof.py"
+    },
+    {
+      "pr": 34,
+      "sha": "0b9556b84386e783da873f954e572338af3100c1",
+      "module": "apps/api/app/synthetic_incident_observability.py",
+      "test": "tests/test_phase02_synthetic_incident_observability.py"
+    },
+    {
+      "pr": 35,
+      "sha": "30a4608ffed00ce99926064315e657f0e8b581ee",
+      "module": "apps/api/app/synthetic_delivery_resilience.py",
+      "test": "tests/test_phase02_synthetic_delivery_resilience.py"
+    }
+  ]
+}

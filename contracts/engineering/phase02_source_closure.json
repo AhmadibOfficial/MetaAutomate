@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "product": "metaautomate",
+  "phase": "02",
+  "track": "source_only_completion_candidate",
+  "recorded_on": "2026-10-14",
+  "foundation_gates_verified": 3,
+  "foundation_gates_required": 9,
+  "release_decision": "NO_GO",
+  "production_execution_authorized": false,
+  "commercial_pilot_authorized": false,
+  "onecall_live_federation_authorized": false,
+  "draft_source_capabilities": [
+    "P2-05c synthetic audit evidence",
+    "P2-05d replay/expiry/version denial",
+    "P2-05e receipt consistency only",
+    "P2-05f joined source regression",
+    "P2-03 read-only synthetic stock",
+    "P2-06a synthetic support",
+    "P2-06b synthetic value and readiness"
+  ],
+  "prs_parked_unmerged": [
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38
+  ],
+  "pin_note": "PR status must be rechecked at time of review; this manifest records the last verified snapshot and is not a live Github API source.",
+  "required_controls": {
+    "independent_review": false,
+    "enforceable_private_branch_protection": false,
+    "live_staging_identity_and_tenant_security": false,
+    "real_provider_receipt": false,
+    "real_onecall_integration": false,
+    "tenant_isolated_customer_pilot": false,
+    "off_host_recovery_and_rotation_evidence": false,
+    "owner_release_authorization": false
+  },
+  "source_modules": [
+    "apps/api/app/phase02_approval_evidence.py",
+    "apps/api/app/phase02_receipt_simulation.py",
+    "apps/api/app/phase02_pilot_simulation.py"
+  ],
+  "untrusted_inputs": "All DEMO identifiers, receipt checksums and support/financial metrics are fake. They are not provider evidence or access grants.",
+  "none_of": [
+    "merge",
+    "deploy",
+    "subscription",
+    "customer_data",
+    "migration",
+    "live_actions",
+    "provider_network_calls"
+  ]
+}
