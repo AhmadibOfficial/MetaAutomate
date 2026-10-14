@@ -32,7 +32,7 @@ From the user's existing Kali checkout and activated `~/.venvs/metaautomate-p204
 ```bash
 cd ~/MetaAutomate
 git status --short
-gh pr checkout <P2-04b-PR-NUMBER>
+gh pr checkout 33
 git rev-parse HEAD
 PYTHONPATH=apps/api python -m pytest -q -p no:cacheprovider \
   --import-mode=importlib tests/test_phase02_synthetic_webhook_proof.py
