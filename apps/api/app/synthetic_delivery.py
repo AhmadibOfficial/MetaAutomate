@@ -46,7 +46,7 @@ class SimulationConflict(SimulationError):
 
 
 class SimulationNotFound(LookupError):
-    """Job absent in the authenticated caller's tenant scope."""
+    """Job absent from the supplied synthetic tenant partition."""
 
 
 @dataclass(frozen=True)
@@ -129,7 +129,14 @@ def verify_receipt_chain(snapshot: Snapshot) -> bool:
                 or receipt.sha256 != _digest(snapshot.job_id, snapshot.tenant_demo_marker, receipt)):
             return False
         previous = receipt.sha256
-    return bool(snapshot.receipts)
+    # A valid sequence alone is insufficient if the returned job snapshot
+    # advertises a state that disagrees with its final recorded transition.
+    if not snapshot.receipts:
+        return False
+    last = snapshot.receipts[-1]
+    return (last.state == snapshot.state
+            and last.attempts == snapshot.attempts
+            and last.due_tick == snapshot.due_tick)
 
 
 class SyntheticDeliveryRehearsal:
