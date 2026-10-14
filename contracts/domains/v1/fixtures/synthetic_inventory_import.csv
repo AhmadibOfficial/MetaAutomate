@@ -1,0 +1,5 @@
+sku,label,on_hand_units,reorder_threshold_units,target_units
+DEMO-MAIZE-001,Synthetic maize bags,18,25,55
+DEMO-SOYA-002,Synthetic soybean bags,62,30,80
+DEMO-SORGHUM-003,Synthetic sorghum bags,9,15,40
+DEMO-PACK-004,Synthetic packaging units,130,60,150
