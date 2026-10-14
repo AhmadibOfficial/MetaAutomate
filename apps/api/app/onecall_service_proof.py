@@ -7,6 +7,7 @@ grant, OneCall account freshness, replay redemption or live service transport.
 from __future__ import annotations
 
 from base64 import urlsafe_b64decode, urlsafe_b64encode
+import binascii
 from dataclasses import dataclass
 from hashlib import sha256
 from hmac import compare_digest
@@ -56,7 +57,7 @@ def _binary(seg: str) -> bytes:
         if urlsafe_b64encode(value).rstrip(b"=").decode("ascii") != seg:
             _fail()
         return value
-    except (ValueError, UnicodeError):
+    except (ValueError, UnicodeError, binascii.Error):
         _fail()
 
 
