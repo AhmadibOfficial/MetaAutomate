@@ -10,6 +10,7 @@ authorization, atomic one-time JTI redemption, revocation, quotas and audit.
 from __future__ import annotations
 
 import base64
+import binascii
 from dataclasses import dataclass
 import json
 import re
@@ -62,7 +63,7 @@ def _decode_segment(part: str) -> bytes:
         if base64.urlsafe_b64encode(value).rstrip(b"=").decode("ascii") != part:
             _reject()
         return value
-    except (ValueError, UnicodeError):
+    except (ValueError, UnicodeError, binascii.Error):
         _reject()
 
 
