@@ -715,3 +715,31 @@ html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){
  .hero-workspace-link{scroll-behavior:auto}
 }
+
+
+/* Publication accessibility review: WCAG AA-oriented foreground contrast.
+ * Preserve the brand's blue palette while avoiding white on bright cyan.
+ * Non-text graphics and AA conformance require separate manual review. */
+.action-primary{
+  color:#fff;
+  background:linear-gradient(115deg,#005caa,#0063b2);
+}
+.action-primary:hover{background:linear-gradient(115deg,#004c8e,#005b9f)}
+.nav-action{color:#fff;background:linear-gradient(110deg,#005caa,#0063b2)}
+.nav-action:hover{color:#fff;background:#00508f}
+.eyebrow:not(.eyebrow-dark){color:#006aa3}
+.clarity-index,.workspace-demo-kicker{color:#00679c}
+.field label span{color:#516a80}
+.field label em{color:#8e4c0c}
+.roadmap-entry>span{color:#00699c}
+.roadmap-entry small{color:#536e83}
+.operation-tab span{color:#78a9d0}
+.workspace-board-foot{font-size:12px}
+.workspace-board-status{font-size:10px}
+.hero-availability{font-size:13px}
+.social-section-compact .social-disclosure{font-size:12px}
+@media(max-width:760px){
+ .clarity-index,.workspace-demo-kicker{font-size:11px}
+ .workspace-node small{font-size:10px}
+ .workspace-node span{font-size:12px}
+}
