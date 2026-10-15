@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "phase": "03",
+  "milestone": "P3-07",
+  "scope": "OFFLINE_DENY_ONLY_CROSS_MODULE_CONFORMANCE",
+  "default_decision": "DENY",
+  "source_contract_count": 8,
+  "declared_contracts": [
+    "contracts/domains/v1/operations.json",
+    "contracts/intelligent/v1/capabilities.json",
+    "contracts/intelligent/v1/planning.json",
+    "contracts/intelligent/v1/outcome_verification.json",
+    "contracts/intelligent/v1/business_analytics.json",
+    "contracts/intelligent/v1/developer_tools.json",
+    "contracts/intelligent/v1/execution_rehearsal.json",
+    "contracts/intelligent/v1/integration_safety.json"
+  ],
+  "real_caller_identity_verified": false,
+  "real_tenant_scope_verified": false,
+  "live_execution_authorized": false,
+  "external_provider_access_enabled": false,
+  "durable_evidence_present": false,
+  "independent_review_verified": false,
+  "phase02_operational_approved": false,
+  "phase01_foundation_verified": 3,
+  "phase01_foundation_required": 9,
+  "real_customer_business_value_measured": false,
+  "source_checks": [
+    "DENY_RECEIPT_AND_PLAN_PARITY",
+    "DENY_NEGATIVE_FIXTURE_PARITY",
+    "DENY_REJECTION_AND_VOLATILE_AUDIT_PARITY",
+    "DEMO_TENANT_PARTITION_CHECK",
+    "CONTRACT_DEFAULT_DENY_ALL_PHASE03",
+    "OPTIONAL_SYNTHETIC_BUSINESS_METRICS_ONLY"
+  ],
+  "limitations": "Offline synthetic denial behavior only. No identity, provider attestation, durable audit, customer permission, real effect or release approval."
+}
