@@ -193,6 +193,27 @@ def run_integrated_demo(request: DemoIntegratedRequest) -> OfflineIntegratedRepo
             metrics.business_value_measured, audit.execution_authorized,
             rejection.release_authorized, audit.digest_is_authenticated,
             audit.externally_persisted, audit.audit_proof_is_durable,
+            # P3-08: reject forged success signals in intermediate DENY data.
+            rejection.actor_authenticated,
+            rejection.human_approval_verified,
+            rejection.tenant_scope_verified,
+            rejection.side_effects_authorized,
+            rejection.provider_receipt_verified,
+            rejection.independent_readback_performed,
+            rejection.durable_idempotency_verified,
+            rejection.compensation_performed,
+            rejection.customer_data_accessed,
+            verification.external_authorization_verified,
+            verification.authoritative_provider_receipt_verified,
+            verification.provider_readback_performed,
+            verification.customer_data_processed,
+            verification.release_authorized,
+            verification.independently_observed_real_outcome,
+            metrics.revenue_verified,
+            metrics.profitability_verified,
+            metrics.live_provider_called,
+            metrics.customer_data_processed,
+            metrics.execution_authorized,
         ))
     )
     if not consistent:
