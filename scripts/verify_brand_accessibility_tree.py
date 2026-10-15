@@ -140,7 +140,7 @@ def test_mobile_menu(browser, evidence: dict) -> None:
     expect(menu).to_be_focused()
     page.keyboard.press("Enter")
     page.keyboard.press("Tab")
-    expect(page.get_by_role("link", name="Solutions", exact=True)).to_be_focused()
+    expect(page.get_by_role("navigation", name="Primary navigation").get_by_role("link", name="Solutions", exact=True)).to_be_focused()
     no_overflow(page, "mobile menu")
     evidence["mobile_menu"] = {
         "skip_brand_menu_tab_order": True,
