@@ -176,7 +176,8 @@ def test_enquiry(browser, evidence: dict) -> None:
     page.get_by_role("button", name="Prepare my enquiry").click()
     expect(page.locator("#brief-error")).to_be_visible()
     expect(page.locator("#brief-service")).to_be_focused()
-    verify_role(snapshot(page), "alert", "Complete the required fields")
+    verify_role(snapshot(page), "alert")
+    expect(page.locator("#brief-error")).to_contain_text("Complete the required fields")
 
     # Fabricated inputs only. The form prepares a mailto and does not submit.
     page.get_by_label("Service area").select_option(label="Cybersecurity & Quality")
