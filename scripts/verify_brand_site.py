@@ -47,12 +47,19 @@ def main():
         # Home: flagship brand and intelligent-system interaction.
         response = page.goto(BASE+"/", wait_until="networkidle")
         assert response.status == 200
-        expect(page).to_have_title("MetaAutomate — Engineering What's Next")
-        expect(page.get_by_role("heading", level=1)).to_contain_text("Make your business")
+        expect(page).to_have_title("MetaAutomate — Smarter Systems for Business Challenges")
+        expect(page.get_by_role("heading", level=1)).to_contain_text("Business challenges deserve")
         expect(page.locator("#solutions .clarity-card")).to_have_count(3)
         expect(page.locator(".clarity-audiences span")).to_have_count(4)
-        expect(page.locator(".hero-availability")).to_contain_text("development-stage")
-        expect(page.get_by_role("link", name="See business solutions")).to_have_attribute("href", "#solutions")
+        expect(page.locator(".hero-availability")).to_contain_text("in development")
+        expect(page.get_by_role("link", name="Explore solutions")).to_have_attribute("href", "#solutions")
+        expect(page.get_by_role("link", name="Experience a sample planning journey")).to_have_attribute("href", "#workspace-demo")
+        assert page.evaluate("""() => {
+          const a = document.querySelector('#solutions').getBoundingClientRect().top + scrollY;
+          const b = document.querySelector('#workspace-demo').getBoundingClientRect().top + scrollY;
+          const c = document.querySelector('#services').getBoundingClientRect().top + scrollY;
+          return a < b && b < c;
+        }"""), "Example should appear before the services and industry catalogs"
         expect(page.locator("#workspace-demo")).to_be_visible()
         expect(page.locator(".workspace-board-status")).to_contain_text("NOT LIVE")
         expect(page.locator(".workspace-board-foot")).to_contain_text("Not a screenshot")
@@ -70,7 +77,8 @@ def main():
         expect(page.locator("#workspace-demo")).to_contain_text("synthetic information")
         expect(page.locator(".service-tile")).to_have_count(6)
         expect(page.locator(".industry-card")).to_have_count(4)
-        expect(page.locator(".proof-feature")).to_have_count(4)
+        expect(page.locator(".proof-section")).to_have_count(0)
+        expect(page.locator(".social-card")).to_have_count(2)
         expect(page.locator(".statement-section")).to_contain_text("Always HALAL")
         inspect_asset(page)
         tabs=page.get_by_role("tab")
@@ -95,12 +103,15 @@ def main():
             "WhatsApp Channel": "https://whatsapp.com/channel/0029VbDSQMdBqbr1vqRyYR2U",
             "Telegram": "https://t.me/Meta_Automate",
         }
-        expect(page.locator(".social-card")).to_have_count(8)
-        for label, url in expected_socials.items():
+        expect(page.locator(".social-card")).to_have_count(2)
+        for label in ("YouTube", "LinkedIn"):
             card = page.get_by_role("link", name=f"Visit MetaAutomate on {label} — opens in a new tab")
-            expect(card).to_have_attribute("href", url)
+            expect(card).to_have_attribute("href", expected_socials[label])
             expect(card).to_have_attribute("target", "_blank")
             expect(card).to_have_attribute("rel", "noopener noreferrer")
+        assert sorted(page.locator(".footer-social-link").evaluate_all(
+            "(links) => links.map(link => link.href)"
+        )) == sorted(expected_socials.values())
         expect(page.locator(".footer-social-link")).to_have_count(8)
         for page_path in ("/services/", "/company/", "/engage/"):
             page.goto(BASE + page_path, wait_until="networkidle")
@@ -141,7 +152,7 @@ def main():
 
         # Privacy-first enquiry: short direct email + optional generated mailto brief.
         page.goto(BASE+"/engage/", wait_until="networkidle")
-        expect(page.get_by_role("heading", level=1)).to_contain_text("Tell us what needs")
+        expect(page.get_by_role("heading", level=1)).to_contain_text("Tell us your business challenge")
         quick_email = page.get_by_role("link", name="Email a project question")
         expect(quick_email).to_have_attribute(
             "href", "mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Business%20inquiry"
@@ -246,9 +257,13 @@ def main():
                     "(links) => links.map(link => link.href)"
                 )) == sorted(expected_socials.values())
                 if path == "/":
-                    expect(mpage.locator(".social-card")).to_have_count(8)
+                    expect(mpage.locator(".social-card")).to_have_count(2)
                     expect(mpage.locator(".clarity-card")).to_have_count(3)
                     expect(mpage.locator(".workspace-node")).to_have_count(4)
+                    if width == 390:
+                        page_height = mpage.evaluate("() => document.documentElement.scrollHeight")
+                        assert page_height < 13200, ("Reduce mobile homepage scrolling", page_height)
+                        print(f"MOBILE_HOME_HEIGHT_390={page_height}")
                     demo = mpage.locator("[data-workspace-step]")
                     demo.nth(1).click()
                     expect(mpage.locator("#workspace-stage-index")).to_have_text("STEP 02 / MAP")
@@ -267,12 +282,34 @@ def main():
             mpage.goto(BASE+"/",wait_until="networkidle")
             if width==390:
                 mpage.screenshot(path=str(ART/"metaautomate-global-home-mobile.png"),full_page=True)
+            if width==360:
+                mpage.screenshot(path=str(ART/"metaautomate-global-home-mobile-360.png"),full_page=True)
             mobile.close()
+
+        # Portrait tablet visual and horizontal-overflow check.
+        tablet = browser.new_context(
+            viewport={"width": 768, "height": 1024},
+            device_scale_factor=1, reduced_motion="reduce",
+        )
+        tpage = tablet.new_page()
+        tpage.on("request", lambda request: (
+            bad_requests.append(request.url)
+            if not request.url.startswith(BASE) else None
+        ))
+        tpage.on("pageerror", lambda error: page_errors.append(str(error)))
+        tpage.goto(BASE + "/", wait_until="networkidle")
+        inspect_asset(tpage)
+        assert_no_horizontal_overflow(tpage, "tablet 768 home")
+        expect(tpage.locator("#workspace-demo")).to_be_visible()
+        tpage.screenshot(
+            path=str(ART/"metaautomate-global-home-tablet-768.png"), full_page=True,
+        )
+        tablet.close()
 
         assert not bad_requests, f"Unexpected third-party HTTP requests: {bad_requests}"
         assert not page_errors, f"Browser JavaScript errors: {page_errors}"
         browser.close()
-    print("PASS: customer clarity hero, 3 solutions, synthetic walkthrough, keyboard controls, privacy-first enquiry, 6 services, 4 sectors, branding, desktop/mobile, no external requests")
+    print("PASS: business value-led hero, early synthetic walkthrough, condensed mobile, tablet 768, mobile 390/360, privacy-first enquiries, secure branding and no external requests")
 
 
 if __name__=="__main__":
