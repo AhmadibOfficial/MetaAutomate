@@ -51,7 +51,11 @@ jobs:
           assert "disk" not in site
           assert "startCommand" not in site
           home=(root/"index.html").read_text(encoding="utf-8")
-          assert "Build beyond" in home
+          assert "Make your business" in home
+          assert 'id="solutions"' in home
+          assert 'id="workspace-demo"' in home
+          assert "ILLUSTRATIVE · NOT LIVE" in home
+          assert "development-stage" in home
           assert "MetaAutomate" in home
           assert "Always HALAL" in home
           for page in pages:
