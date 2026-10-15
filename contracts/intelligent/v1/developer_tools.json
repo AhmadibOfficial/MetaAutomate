@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "phase": "03",
+  "milestone": "P3-05",
+  "kind": "LOCAL_PYTHON_ONLY",
+  "transport": "NONE",
+  "base_url": null,
+  "default_decision": "DENY",
+  "external_provider_access_enabled": false,
+  "external_write_enabled": false,
+  "customer_data_access_enabled": false,
+  "model_tool_invocation_enabled": false,
+  "production_ready": false,
+  "phase02_operational_go": false,
+  "operations": [
+    "business.crm.sync-proposal.v1",
+    "business.finance.reconciliation-proposal.v1",
+    "business.inventory.stock-preview.v1",
+    "business.lead-intake.validate.v1"
+  ],
+  "actions": [
+    {
+      "action": "capability-preview",
+      "operation_required": true,
+      "argument_names": [
+        "operation_id",
+        "request_id"
+      ],
+      "effect": "DENY_ONLY"
+    },
+    {
+      "action": "denied-plan",
+      "operation_required": true,
+      "argument_names": [
+        "operation_id",
+        "request_id",
+        "resource_version"
+      ],
+      "effect": "DENY_ONLY"
+    },
+    {
+      "action": "negative-proof",
+      "operation_required": true,
+      "argument_names": [
+        "operation_id",
+        "request_id",
+        "observed_version"
+      ],
+      "effect": "DENY_ONLY"
+    },
+    {
+      "action": "business-metrics",
+      "operation_required": false,
+      "argument_names": [],
+      "effect": "DENY_ONLY"
+    },
+    {
+      "action": "business-scenario",
+      "operation_required": false,
+      "argument_names": [
+        "extra_orders",
+        "extra_marketing_minor"
+      ],
+      "effect": "DENY_ONLY"
+    }
+  ]
+}
