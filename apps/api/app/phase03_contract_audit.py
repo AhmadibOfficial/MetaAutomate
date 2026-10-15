@@ -86,12 +86,47 @@ DENIAL_FIELDS = {
 }
 
 
+MAX_LOCAL_CONTRACT_BYTES = 131072  # 128 KiB per static manifest
+
+
 class OfflineContractDenied(ValueError):
     """Synthetic source manifest no longer matches the reviewed NO-GO schema."""
 
 
 def _deny() -> None:
     raise OfflineContractDenied("Source contract audit DENIED; never release")
+
+
+def _unique_json_pairs(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    """Reject duplicate object keys at any depth, including adversarial nested keys."""
+    obj: dict[str, object] = {}
+    for key, value in pairs:
+        if key in obj:
+            _deny()
+        obj[key] = value
+    return obj
+
+
+def _forbid_json_constant(value: str) -> None:
+    """Non-standard NaN/Infinity must not become authoritative configuration."""
+    _deny()
+
+
+def _read_strict_manifest(root: Path, relative: str) -> object:
+    path = root / relative
+    if path.is_symlink() or not path.is_file():
+        _deny()
+    # A static allowlist of relative contract paths is used; no user path
+    # names or recursive directory scans are accepted by this audit.
+    with path.open("rb") as stream:
+        raw = stream.read(MAX_LOCAL_CONTRACT_BYTES + 1)
+    if len(raw) > MAX_LOCAL_CONTRACT_BYTES:
+        _deny()
+    return json.loads(
+        raw.decode("utf-8"),
+        object_pairs_hook=_unique_json_pairs,
+        parse_constant=_forbid_json_constant,
+    )
 
 
 @dataclass(frozen=True)
@@ -115,10 +150,10 @@ def audit_local_contracts(root: Path = ROOT) -> LocalContractAudit:
         _deny()
     try:
         manifests = {
-            key: json.loads((root / name).read_text(encoding="utf-8"))
+            key: _read_strict_manifest(root, name)
             for key, name in CONTRACTS.items()
         }
-    except (OSError, ValueError, TypeError, RecursionError) as exc:
+    except (OSError, UnicodeError, ValueError, TypeError, RecursionError) as exc:
         raise OfflineContractDenied("Missing, malformed or unreadable source contract") from exc
     if any(type(value) is not dict for value in manifests.values()):
         _deny()
