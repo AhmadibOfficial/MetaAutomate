@@ -48,7 +48,26 @@ def main():
         response = page.goto(BASE+"/", wait_until="networkidle")
         assert response.status == 200
         expect(page).to_have_title("MetaAutomate — Engineering What's Next")
-        expect(page.get_by_role("heading", level=1)).to_contain_text("Build beyond")
+        expect(page.get_by_role("heading", level=1)).to_contain_text("Make your business")
+        expect(page.locator("#solutions .clarity-card")).to_have_count(3)
+        expect(page.locator(".clarity-audiences span")).to_have_count(4)
+        expect(page.locator(".hero-availability")).to_contain_text("development-stage")
+        expect(page.get_by_role("link", name="See business solutions")).to_have_attribute("href", "#solutions")
+        expect(page.locator("#workspace-demo")).to_be_visible()
+        expect(page.locator(".workspace-board-status")).to_contain_text("NOT LIVE")
+        expect(page.locator(".workspace-board-foot")).to_contain_text("Not a screenshot")
+        demo_buttons = page.locator("[data-workspace-step]")
+        expect(demo_buttons).to_have_count(3)
+        expect(demo_buttons.nth(0)).to_have_attribute("aria-pressed", "true")
+        demo_buttons.nth(1).focus()
+        demo_buttons.nth(1).press("Enter")
+        expect(page.locator("#workspace-stage-title")).to_have_text("Identify what needs to happen first.")
+        expect(demo_buttons.nth(1)).to_have_attribute("aria-pressed", "true")
+        expect(demo_buttons.nth(0)).to_have_attribute("aria-pressed", "false")
+        demo_buttons.nth(2).focus()
+        demo_buttons.nth(2).press("Space")
+        expect(page.locator("#workspace-stage-description")).to_contain_text("No supplier message")
+        expect(page.locator("#workspace-demo")).to_contain_text("synthetic information")
         expect(page.locator(".service-tile")).to_have_count(6)
         expect(page.locator(".industry-card")).to_have_count(4)
         expect(page.locator(".proof-feature")).to_have_count(4)
@@ -120,8 +139,17 @@ def main():
         assert_no_horizontal_overflow(page, "desktop company")
         page.screenshot(path=str(ART/"metaautomate-global-company-desktop.png"), full_page=True)
 
-        # Project brief: form validation, no network POST, copy-safe text and download.
+        # Privacy-first enquiry: short direct email + optional generated mailto brief.
         page.goto(BASE+"/engage/", wait_until="networkidle")
+        expect(page.get_by_role("heading", level=1)).to_contain_text("Tell us what needs")
+        quick_email = page.get_by_role("link", name="Email a project question")
+        expect(quick_email).to_have_attribute(
+            "href", "mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Business%20inquiry"
+        )
+        expect(page.locator(".brief-title")).to_contain_text("No account, automatic submission")
+        expect(page.locator("#brief-form")).to_have_attribute("novalidate", "")
+        expect(page.locator("#brief-form")).not_to_have_attribute("action", "https://example.com")
+        expect(page.locator("#brief-form")).not_to_have_attribute("method", "post")
         page.locator("#brief-form button[type=submit]").click()
         expect(page.locator("#brief-error")).to_be_visible()
         expect(page.locator("#brief-result")).to_be_hidden()
@@ -219,6 +247,11 @@ def main():
                 )) == sorted(expected_socials.values())
                 if path == "/":
                     expect(mpage.locator(".social-card")).to_have_count(8)
+                    expect(mpage.locator(".clarity-card")).to_have_count(3)
+                    expect(mpage.locator(".workspace-node")).to_have_count(4)
+                    demo = mpage.locator("[data-workspace-step]")
+                    demo.nth(1).click()
+                    expect(mpage.locator("#workspace-stage-index")).to_have_text("STEP 02 / MAP")
 
 
             mpage.goto(BASE+"/",wait_until="networkidle")
@@ -239,7 +272,7 @@ def main():
         assert not bad_requests, f"Unexpected third-party HTTP requests: {bad_requests}"
         assert not page_errors, f"Browser JavaScript errors: {page_errors}"
         browser.close()
-    print("PASS: global homepage, 6 services, 4 sectors, brand, keyboard tabs, project brief, download, desktop/mobile, no external requests")
+    print("PASS: customer clarity hero, 3 solutions, synthetic walkthrough, keyboard controls, privacy-first enquiry, 6 services, 4 sectors, branding, desktop/mobile, no external requests")
 
 
 if __name__=="__main__":
