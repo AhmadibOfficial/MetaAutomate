@@ -122,7 +122,8 @@ def _validate(request: DemoPlanningRequest) -> None:
         _deny()
     if type(request.denial_receipt) is not CapabilityDenialReceipt:
         _deny()
-    if (type(request.target_label) is not str
+    if (type(intent.operation_id) is not str
+            or type(request.target_label) is not str
             or request.target_label != TARGETS.get(intent.operation_id)
             or type(request.expected_resource_version) is not int
             or not 1 <= request.expected_resource_version <= 1000
