@@ -102,6 +102,23 @@ def test_evolution_roadmap_distinguishes_delivery_from_long_term_aspiration():
     assert "International readiness" in html
 
 
+def test_operating_philosophy_has_seven_non_operational_steps():
+    html = (SITE / "index.html").read_text(encoding="utf-8")
+    js = (SITE / "assets/site.js").read_text(encoding="utf-8")
+    assert '02 / OUR OPERATING PHILOSOPHY' in html
+    assert "understand, think, design, create, automate, verify and improve" in html
+    assert html.count('class="operation-tab') == 7
+    for number, name in enumerate(
+        ("understand", "think", "design", "create", "automate", "verify", "improve"), 1
+    ):
+        assert f'id="tab-{name}"' in html
+        assert f'data-operation="{name}"' in html
+        assert f'number:"{number:02d} / 07"' in js
+    assert 'id="operation-counter">01 / 07' in html
+    assert "not a live automation demo" in html
+    assert "autonomous execution are not enabled" in html
+
+
 def test_workspace_example_is_truthful_fiction_not_a_fake_product_screenshot():
     html = (SITE / "index.html").read_text()
     assert "ILLUSTRATIVE · NOT LIVE" in html
