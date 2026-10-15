@@ -104,6 +104,46 @@
   }
   if (operationTabs.length) selectPhase(operationTabs[0].dataset.operation);
 
+  // Representative Objective Workspace example; text-only, invented data,
+  // no real Objective Workspace service, API, storage or autonomous action.
+  const workspaceSteps = Object.freeze({
+    define: {
+      number: "STEP 01 / DEFINE",
+      title: "State the business objective.",
+      description: "Example objective: make stock checks more predictable and review replenishment decisions before any supplier contact."
+    },
+    map: {
+      number: "STEP 02 / MAP",
+      title: "Identify what needs to happen first.",
+      description: "Confirm who owns the stock data, define review thresholds and map dependencies before proposing implementation work."
+    },
+    review: {
+      number: "STEP 03 / REVIEW",
+      title: "Record a human decision.",
+      description: "A responsible person reviews the proposed plan. No supplier message, purchase order or external operation is initiated by this demonstration."
+    }
+  });
+  const workspaceButtons = [...document.querySelectorAll("[data-workspace-step]")];
+  function showWorkspaceStep(step) {
+    const sample = workspaceSteps[step];
+    if (!sample) return;
+    const number = document.getElementById("workspace-stage-index");
+    const title = document.getElementById("workspace-stage-title");
+    const description = document.getElementById("workspace-stage-description");
+    if (!number || !title || !description) return;
+    number.textContent = sample.number;
+    title.textContent = sample.title;
+    description.textContent = sample.description;
+    for (const button of workspaceButtons) {
+      const active = button.dataset.workspaceStep === step;
+      button.classList.toggle("is-current", active);
+      button.setAttribute("aria-pressed", String(active));
+    }
+  }
+  for (const button of workspaceButtons) {
+    button.addEventListener("click", () => showWorkspaceStep(button.dataset.workspaceStep));
+  }
+
   // Client-side project brief: never transmits private project information.
   const form=document.getElementById("brief-form");
   if (!form) return;
@@ -205,6 +245,9 @@
     output.textContent=currentBrief;
     result.hidden=false;
     status.textContent="";
+    // Transfer keyboard and screen-reader reading focus to the newly revealed
+    // result landmark. Scroll alone would strand focus on the submit button.
+    document.getElementById("brief-result-title").focus({preventScroll:true});
     result.scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
   });
 

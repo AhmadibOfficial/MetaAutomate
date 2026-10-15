@@ -27,6 +27,38 @@ def inspect_asset(page):
     ), "Official MetaAutomate mark unavailable"
 
 
+def assert_text_contrast(page, selector, minimum=4.5):
+    """Check solid backgrounds or both ends of a CSS gradient, not a WCAG audit."""
+    ratios = page.locator(selector).first.evaluate("""el => {
+      const style = getComputedStyle(el);
+      const parse = value => {
+        const match = value.match(/rgba?\\(([^)]+)\\)/);
+        if (!match) return null;
+        return match[1].split(',').slice(0, 3).map(v => Number.parseFloat(v));
+      };
+      const luminance = rgb => {
+        const transformed = rgb.map(x => {
+          const a = x / 255;
+          return a <= 0.04045 ? a / 12.92 : ((a + 0.055) / 1.055) ** 2.4;
+        });
+        return transformed[0]*0.2126 + transformed[1]*0.7152 + transformed[2]*0.0722;
+      };
+      const foreground = parse(style.color);
+      const gradientStops = [...style.backgroundImage.matchAll(/rgba?\\([^)]+\\)/g)]
+        .map(m => parse(m[0])).filter(Boolean);
+      const solid = parse(style.backgroundColor);
+      const palette = gradientStops.length ? gradientStops : [solid];
+      if (!foreground || palette.some(x => !x || x.length !== 3)) return [];
+      const f = luminance(foreground);
+      return palette.map(x => {
+        const b = luminance(x);
+        return (Math.max(f, b) + 0.05) / (Math.min(f, b) + 0.05);
+      });
+    }""")
+    assert ratios and min(ratios) >= minimum, (selector, ratios, minimum)
+    return min(ratios)
+
+
 def main():
     bad_requests = []
     page_errors = []
@@ -47,11 +79,51 @@ def main():
         # Home: flagship brand and intelligent-system interaction.
         response = page.goto(BASE+"/", wait_until="networkidle")
         assert response.status == 200
-        expect(page).to_have_title("MetaAutomate — Engineering What's Next")
-        expect(page.get_by_role("heading", level=1)).to_contain_text("Build beyond")
+        expect(page).to_have_title("MetaAutomate — Smarter Systems for Business Challenges")
+        expect(page.get_by_role("heading", level=1)).to_contain_text("Business challenges deserve")
+        expect(page.locator("#solutions .clarity-card")).to_have_count(3)
+        expect(page.locator(".clarity-audiences span")).to_have_count(4)
+        expect(page.locator(".hero-availability")).to_contain_text("in development")
+        expect(page.get_by_role("link", name="Explore solutions")).to_have_attribute("href", "#solutions")
+        expect(page.get_by_role("link", name="Experience a sample planning journey")).to_have_attribute("href", "#workspace-demo")
+        assert page.evaluate("""() => {
+          const a = document.querySelector('#solutions').getBoundingClientRect().top + scrollY;
+          const b = document.querySelector('#workspace-demo').getBoundingClientRect().top + scrollY;
+          const c = document.querySelector('#services').getBoundingClientRect().top + scrollY;
+          return a < b && b < c;
+        }"""), "Example should appear before the services and industry catalogs"
+        # High-risk CTA and label contrast measured from computed browser colors.
+        assert_text_contrast(page, ".hero-home .action-primary")
+        assert_text_contrast(page, ".site-navigation .nav-action")
+        # Contrast for text on white solution cards.
+        contrast = page.locator(".clarity-card .clarity-index").first.evaluate("""el => {
+          const nums = getComputedStyle(el).color.match(/\\d+/g).slice(0,3).map(Number);
+          const linear = nums.map(v => {
+            const c = v/255;
+            return c <= 0.04045 ? c/12.92 : ((c+0.055)/1.055)**2.4;
+          });
+          return 1.05/(0.05 + linear[0]*0.2126 + linear[1]*0.7152 + linear[2]*0.0722);
+        }""")
+        assert contrast >= 4.5, ("Solution labels should meet normal-text AA contrast", contrast)
+        expect(page.locator("#workspace-demo")).to_be_visible()
+        expect(page.locator(".workspace-board-status")).to_contain_text("NOT LIVE")
+        expect(page.locator(".workspace-board-foot")).to_contain_text("Not a screenshot")
+        demo_buttons = page.locator("[data-workspace-step]")
+        expect(demo_buttons).to_have_count(3)
+        expect(demo_buttons.nth(0)).to_have_attribute("aria-pressed", "true")
+        demo_buttons.nth(1).focus()
+        demo_buttons.nth(1).press("Enter")
+        expect(page.locator("#workspace-stage-title")).to_have_text("Identify what needs to happen first.")
+        expect(demo_buttons.nth(1)).to_have_attribute("aria-pressed", "true")
+        expect(demo_buttons.nth(0)).to_have_attribute("aria-pressed", "false")
+        demo_buttons.nth(2).focus()
+        demo_buttons.nth(2).press("Space")
+        expect(page.locator("#workspace-stage-description")).to_contain_text("No supplier message")
+        expect(page.locator("#workspace-demo")).to_contain_text("synthetic information")
         expect(page.locator(".service-tile")).to_have_count(6)
         expect(page.locator(".industry-card")).to_have_count(4)
-        expect(page.locator(".proof-feature")).to_have_count(4)
+        expect(page.locator(".proof-section")).to_have_count(0)
+        expect(page.locator(".social-card")).to_have_count(2)
         expect(page.locator(".statement-section")).to_contain_text("Always HALAL")
         inspect_asset(page)
         tabs=page.get_by_role("tab")
@@ -76,12 +148,15 @@ def main():
             "WhatsApp Channel": "https://whatsapp.com/channel/0029VbDSQMdBqbr1vqRyYR2U",
             "Telegram": "https://t.me/Meta_Automate",
         }
-        expect(page.locator(".social-card")).to_have_count(8)
-        for label, url in expected_socials.items():
+        expect(page.locator(".social-card")).to_have_count(2)
+        for label in ("YouTube", "LinkedIn"):
             card = page.get_by_role("link", name=f"Visit MetaAutomate on {label} — opens in a new tab")
-            expect(card).to_have_attribute("href", url)
+            expect(card).to_have_attribute("href", expected_socials[label])
             expect(card).to_have_attribute("target", "_blank")
             expect(card).to_have_attribute("rel", "noopener noreferrer")
+        assert sorted(page.locator(".footer-social-link").evaluate_all(
+            "(links) => links.map(link => link.href)"
+        )) == sorted(expected_socials.values())
         expect(page.locator(".footer-social-link")).to_have_count(8)
         for page_path in ("/services/", "/company/", "/engage/"):
             page.goto(BASE + page_path, wait_until="networkidle")
@@ -112,6 +187,11 @@ def main():
 
         # Brand values and roadmap are presented without claiming shipped features.
         page.goto(BASE+"/company/", wait_until="networkidle")
+        expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("IN DEVELOPMENT")
+        expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("SOURCE ONLY")
+        expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("Real authorized execution is blocked")
+        expect(page.locator(".roadmap-note")).to_contain_text("Foundation remains in development")
+        expect(page.locator(".roadmap-note")).to_contain_text("Phase 02 operational approval remains NO-GO")
         expect(page.locator(".purpose-panel")).to_have_count(2)
         expect(page.locator(".value-principles article")).to_have_count(5)
         expect(page.locator(".principle-halal")).to_contain_text("Always HALAL")
@@ -120,8 +200,18 @@ def main():
         assert_no_horizontal_overflow(page, "desktop company")
         page.screenshot(path=str(ART/"metaautomate-global-company-desktop.png"), full_page=True)
 
-        # Project brief: form validation, no network POST, copy-safe text and download.
+        # Privacy-first enquiry: short direct email + optional generated mailto brief.
         page.goto(BASE+"/engage/", wait_until="networkidle")
+        assert_text_contrast(page, ".brief-shortcut .action-primary")
+        expect(page.get_by_role("heading", level=1)).to_contain_text("Tell us your business challenge")
+        quick_email = page.get_by_role("link", name="Email a project question")
+        expect(quick_email).to_have_attribute(
+            "href", "mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Business%20inquiry"
+        )
+        expect(page.locator(".brief-title")).to_contain_text("No account, automatic submission")
+        expect(page.locator("#brief-form")).to_have_attribute("novalidate", "")
+        expect(page.locator("#brief-form")).not_to_have_attribute("action", "https://example.com")
+        expect(page.locator("#brief-form")).not_to_have_attribute("method", "post")
         page.locator("#brief-form button[type=submit]").click()
         expect(page.locator("#brief-error")).to_be_visible()
         expect(page.locator("#brief-result")).to_be_hidden()
@@ -218,10 +308,24 @@ def main():
                     "(links) => links.map(link => link.href)"
                 )) == sorted(expected_socials.values())
                 if path == "/":
-                    expect(mpage.locator(".social-card")).to_have_count(8)
+                    expect(mpage.locator(".social-card")).to_have_count(2)
+                    expect(mpage.locator(".clarity-card")).to_have_count(3)
+                    expect(mpage.locator(".workspace-node")).to_have_count(4)
+                    if width == 390:
+                        page_height = mpage.evaluate("() => document.documentElement.scrollHeight")
+                        assert page_height < 13200, ("Reduce mobile homepage scrolling", page_height)
+                        print(f"MOBILE_HOME_HEIGHT_390={page_height}")
+                    demo = mpage.locator("[data-workspace-step]")
+                    demo.nth(1).click()
+                    expect(mpage.locator("#workspace-stage-index")).to_have_text("STEP 02 / MAP")
 
 
             mpage.goto(BASE+"/",wait_until="networkidle")
+            # Focus/skip-link affordance remains reachable on narrow screens.
+            mpage.keyboard.press("Tab")
+            expect(mpage.locator(".skip-link")).to_be_focused()
+            mpage.keyboard.press("Enter")
+            assert mpage.evaluate("location.hash") == "#main"
             menu=mpage.locator("#menu-button")
             expect(mpage.locator("#site-navigation")).to_be_hidden()
             menu.click()
@@ -234,12 +338,34 @@ def main():
             mpage.goto(BASE+"/",wait_until="networkidle")
             if width==390:
                 mpage.screenshot(path=str(ART/"metaautomate-global-home-mobile.png"),full_page=True)
+            if width==360:
+                mpage.screenshot(path=str(ART/"metaautomate-global-home-mobile-360.png"),full_page=True)
             mobile.close()
+
+        # Portrait tablet visual and horizontal-overflow check.
+        tablet = browser.new_context(
+            viewport={"width": 768, "height": 1024},
+            device_scale_factor=1, reduced_motion="reduce",
+        )
+        tpage = tablet.new_page()
+        tpage.on("request", lambda request: (
+            bad_requests.append(request.url)
+            if not request.url.startswith(BASE) else None
+        ))
+        tpage.on("pageerror", lambda error: page_errors.append(str(error)))
+        tpage.goto(BASE + "/", wait_until="networkidle")
+        inspect_asset(tpage)
+        assert_no_horizontal_overflow(tpage, "tablet 768 home")
+        expect(tpage.locator("#workspace-demo")).to_be_visible()
+        tpage.screenshot(
+            path=str(ART/"metaautomate-global-home-tablet-768.png"), full_page=True,
+        )
+        tablet.close()
 
         assert not bad_requests, f"Unexpected third-party HTTP requests: {bad_requests}"
         assert not page_errors, f"Browser JavaScript errors: {page_errors}"
         browser.close()
-    print("PASS: global homepage, 6 services, 4 sectors, brand, keyboard tabs, project brief, download, desktop/mobile, no external requests")
+    print("PASS: business value-led hero, early synthetic walkthrough, condensed mobile, tablet 768, mobile 390/360, privacy-first enquiries, secure branding and no external requests")
 
 
 if __name__=="__main__":

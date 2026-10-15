@@ -6,6 +6,7 @@ on:
     paths:
       - "apps/site/**"
       - "scripts/verify_brand_site.py"
+      - "scripts/verify_brand_accessibility_tree.py"
       - "render.yaml"
       - ".github/workflows/brand-site.yml"
   push:
@@ -51,7 +52,14 @@ jobs:
           assert "disk" not in site
           assert "startCommand" not in site
           home=(root/"index.html").read_text(encoding="utf-8")
-          assert "Build beyond" in home
+          assert "Business challenges deserve" in home
+          assert "Invest in clarity" in home
+          assert 'id="solutions"' in home
+          assert 'id="workspace-demo"' in home
+          assert home.index('id="solutions"') < home.index('id="workspace-demo"') < home.index('id="services"')
+          assert 'class="section proof-section"' not in home
+          assert "ILLUSTRATIVE · NOT LIVE" in home
+          assert "development-stage" in home
           assert "MetaAutomate" in home
           assert "Always HALAL" in home
           for page in pages:
@@ -88,10 +96,13 @@ jobs:
             exit 1
           fi
           python scripts/verify_brand_site.py
+          python scripts/verify_brand_accessibility_tree.py
       - name: Upload reviewed global brand desktop and mobile screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: metaautomate-global-company-experience
-          path: artifacts/metaautomate-global-*.png
+          path: |
+            artifacts/metaautomate-global-*.png
+            artifacts/metaautomate-accessibility-tree-report.json
           if-no-files-found: warn
