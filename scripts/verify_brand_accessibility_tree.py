@@ -73,6 +73,11 @@ def test_home(browser, evidence: dict) -> None:
     verify_role(nodes, "status")
     verify_role(nodes, "tablist", "Explore the MetaAutomate system approach")
     verify_role(nodes, "tabpanel", "Understand")
+    verify_role(nodes, "group", "Illustrative business use cases")
+    for example in ("Inventory & purchasing", "Content & client engagement",
+                    "Secure digital products"):
+        verify_role(nodes, "button", example)
+
     for stage in ("Understand", "Think", "Design", "Create", "Automate", "Verify", "Improve"):
         verify_role(nodes, "tab", stage)
 
@@ -111,6 +116,12 @@ def test_home(browser, evidence: dict) -> None:
     tabs.nth(1).press("End")
     expect(tabs.nth(6)).to_be_focused()
     expect(page.locator("#operation-counter")).to_have_text("07 / 07")
+    cases = page.locator("[data-use-case]")
+    cases.nth(1).focus()
+    page.keyboard.press("Space")
+    expect(cases.nth(1)).to_have_attribute("aria-pressed", "true")
+    expect(page.locator("#use-case-detail-title")).to_have_text("Content & client engagement")
+    expect(page.locator("#use-case-stage")).to_have_text("07 / IMPROVE")
     no_overflow(page, "home desktop")
     evidence["home"] = {
         "landmarks": ["banner", "navigation", "main", "contentinfo"],
