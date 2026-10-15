@@ -150,8 +150,9 @@ def test_typed_sdk_business_analytics_are_scenarios_not_profit():
     {"extra_marketing_minor": -1}, {"extra_marketing_minor": 100_000_001},
 ])
 def test_sdk_rejects_bad_operation_and_type_confusion(broken):
+    base = request("denied-plan")
     with pytest.raises(OfflineDeveloperDenied):
-        run_offline_tool(request("denied-plan", **broken))
+        run_offline_tool(replace(base, **broken))
 
 
 def test_operation_must_be_exact_and_nonexecuting():
