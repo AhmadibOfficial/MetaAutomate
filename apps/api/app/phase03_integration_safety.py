@@ -15,7 +15,7 @@ from uuid import UUID
 
 from app.phase03_intelligent_ecosystem import (
     DemoCapabilityIntent, OfflineCapabilityPreview, OPERATION_SPECS,
-    validate_phase03_manifest,
+    validate_phase03_manifest, verify_synthetic_denial,
 )
 from app.phase03_capability_planning import (
     DemoPlanningRequest, TARGETS, create_denied_plan, inspect_denied_plan,
@@ -89,6 +89,15 @@ class OfflineIntegrationResult:
     audited_denial_consistent: bool
     mandatory_trust_checks_missing: tuple[str, ...]
     synthetic_business_alerts: tuple[str, ...]
+    effect: str = ""
+    required_scope: str = ""
+    admission_digest: str = ""
+    planning_digest: str = ""
+    execution_rejection_digest: str = ""
+    demo_audit_hash: str = ""
+    second_reviewer_needed: bool = False
+    synthetic_business_periods: int = 0
+    hypothetical_net_minor: int = 0
     decision: str = "DENY"
     scope: str = "LOCAL_SYNTHETIC_CROSS_MODULE_NEGATIVE_CONFORMANCE"
     actual_authorization_verified: bool = False
@@ -144,6 +153,7 @@ def run_offline_integration(inp: OfflineIntegratedInput) -> OfflineIntegrationRe
         logical_tick=100,
     )
     receipt = OfflineCapabilityPreview().inspect_once(intent)
+    receipt_check = verify_synthetic_denial(receipt, intent)
     req = DemoPlanningRequest(
         intent=intent, denial_receipt=receipt,
         target_label=TARGETS[inp.operation_id],
@@ -181,6 +191,27 @@ def run_offline_integration(inp: OfflineIntegratedInput) -> OfflineIntegrationRe
         or plan.execution_authorized is not False
         or rejection.side_effects_performed is not False
         or receipt.provider_called is not False
+        or not receipt_check.synthetic_checksum_consistent
+        or not receipt_check.request_matches
+        or receipt.tenant_id != plan.tenant_id
+        or receipt.tenant_id != rejection.tenant_id
+        or receipt.operation_id != plan.operation_id
+        or receipt.operation_id != rejection.operation_id
+        or receipt.capability_id != plan.capability_id
+        or receipt.required_scope != plan.required_scope
+        or receipt.request_id != plan.request_id
+        or receipt.request_id != rejection.request_id
+        or rejection.attempt_id != chain.attempt_id
+        or neg.execution_verified is not False
+        or neg.independently_observed_real_outcome is not False
+        or neg.authoritative_provider_receipt_verified is not False
+        or neg.provider_readback_performed is not False
+        or neg.release_authorized is not False
+        or chain.execution_authorized is not False
+        or chain.digest_is_authenticated is not False
+        or chain.externally_persisted is not False
+        or chain.audit_proof_is_durable is not False
+        or rejection.release_authorized is not False
         or not plan_check.synthetic_integrity_consistent
         or not neg.demo_evidence_consistent
         or not chain_check.demo_internal_links_consistent
@@ -190,13 +221,24 @@ def run_offline_integration(inp: OfflineIntegratedInput) -> OfflineIntegrationRe
     ):
         _deny()
     alerts: tuple[str, ...] = ()
+    period_count = 0
+    hypothetical_net = 0
     if inp.attach_synthetic_analytics:
         business = analyze_demo_business(
             inp.tenant_id, demo_business_fixture(inp.tenant_id),
         )
-        if business.decision != "DENY" or business.business_value_measured:
+        if (
+            business.decision != "DENY"
+            or business.business_value_measured is not False
+            or business.revenue_verified is not False
+            or business.profitability_verified is not False
+            or business.execution_authorized is not False
+            or business.customer_data_processed is not False
+        ):
             _deny()
         alerts = business.insight_codes
+        period_count = len(business.periods)
+        hypothetical_net = business.hypothetical_net_minor
     return OfflineIntegrationResult(
         operation_id=inp.operation_id,
         request_id=inp.request_id,
@@ -210,6 +252,15 @@ def run_offline_integration(inp: OfflineIntegratedInput) -> OfflineIntegrationRe
         audited_denial_consistent=chain_check.demo_internal_links_consistent,
         mandatory_trust_checks_missing=rejection.missing_trust_codes,
         synthetic_business_alerts=alerts,
+        effect=plan.effect,
+        required_scope=plan.required_scope,
+        admission_digest=receipt.checksum,
+        planning_digest=plan.checksum,
+        execution_rejection_digest=rejection.audit_fingerprint,
+        demo_audit_hash=chain.demo_chain_hash,
+        second_reviewer_needed=rejection.second_reviewer_needed,
+        synthetic_business_periods=period_count,
+        hypothetical_net_minor=hypothetical_net,
     )
 
 
