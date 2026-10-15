@@ -27,6 +27,38 @@ def inspect_asset(page):
     ), "Official MetaAutomate mark unavailable"
 
 
+def assert_text_contrast(page, selector, minimum=4.5):
+    """Check solid backgrounds or both ends of a CSS gradient, not a WCAG audit."""
+    ratios = page.locator(selector).first.evaluate("""el => {
+      const style = getComputedStyle(el);
+      const parse = value => {
+        const match = value.match(/rgba?\\(([^)]+)\\)/);
+        if (!match) return null;
+        return match[1].split(',').slice(0, 3).map(v => Number.parseFloat(v));
+      };
+      const luminance = rgb => {
+        const transformed = rgb.map(x => {
+          const a = x / 255;
+          return a <= 0.04045 ? a / 12.92 : ((a + 0.055) / 1.055) ** 2.4;
+        });
+        return transformed[0]*0.2126 + transformed[1]*0.7152 + transformed[2]*0.0722;
+      };
+      const foreground = parse(style.color);
+      const gradientStops = [...style.backgroundImage.matchAll(/rgba?\\([^)]+\\)/g)]
+        .map(m => parse(m[0])).filter(Boolean);
+      const solid = parse(style.backgroundColor);
+      const palette = gradientStops.length ? gradientStops : [solid];
+      if (!foreground || palette.some(x => !x || x.length !== 3)) return [];
+      const f = luminance(foreground);
+      return palette.map(x => {
+        const b = luminance(x);
+        return (Math.max(f, b) + 0.05) / (Math.min(f, b) + 0.05);
+      });
+    }""")
+    assert ratios and min(ratios) >= minimum, (selector, ratios, minimum)
+    return min(ratios)
+
+
 def main():
     bad_requests = []
     page_errors = []
@@ -60,6 +92,19 @@ def main():
           const c = document.querySelector('#services').getBoundingClientRect().top + scrollY;
           return a < b && b < c;
         }"""), "Example should appear before the services and industry catalogs"
+        # High-risk CTA and label contrast measured from computed browser colors.
+        assert_text_contrast(page, ".hero-home .action-primary")
+        assert_text_contrast(page, ".site-navigation .nav-action")
+        # Contrast for text on white solution cards.
+        contrast = page.locator(".clarity-card .clarity-index").first.evaluate("""el => {
+          const nums = getComputedStyle(el).color.match(/\\d+/g).slice(0,3).map(Number);
+          const linear = nums.map(v => {
+            const c = v/255;
+            return c <= 0.04045 ? c/12.92 : ((c+0.055)/1.055)**2.4;
+          });
+          return 1.05/(0.05 + linear[0]*0.2126 + linear[1]*0.7152 + linear[2]*0.0722);
+        }""")
+        assert contrast >= 4.5, ("Solution labels should meet normal-text AA contrast", contrast)
         expect(page.locator("#workspace-demo")).to_be_visible()
         expect(page.locator(".workspace-board-status")).to_contain_text("NOT LIVE")
         expect(page.locator(".workspace-board-foot")).to_contain_text("Not a screenshot")
@@ -142,6 +187,11 @@ def main():
 
         # Brand values and roadmap are presented without claiming shipped features.
         page.goto(BASE+"/company/", wait_until="networkidle")
+        expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("IN DEVELOPMENT")
+        expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("SOURCE ONLY")
+        expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("Real authorized execution is blocked")
+        expect(page.locator(".roadmap-note")).to_contain_text("Phase 01 Foundation remains 3/9 verified")
+        expect(page.locator(".roadmap-note")).to_contain_text("Phase 02 operational approval remains NO-GO")
         expect(page.locator(".purpose-panel")).to_have_count(2)
         expect(page.locator(".value-principles article")).to_have_count(5)
         expect(page.locator(".principle-halal")).to_contain_text("Always HALAL")
@@ -152,6 +202,7 @@ def main():
 
         # Privacy-first enquiry: short direct email + optional generated mailto brief.
         page.goto(BASE+"/engage/", wait_until="networkidle")
+        assert_text_contrast(page, ".brief-shortcut .action-primary")
         expect(page.get_by_role("heading", level=1)).to_contain_text("Tell us your business challenge")
         quick_email = page.get_by_role("link", name="Email a project question")
         expect(quick_email).to_have_attribute(
@@ -270,6 +321,11 @@ def main():
 
 
             mpage.goto(BASE+"/",wait_until="networkidle")
+            # Focus/skip-link affordance remains reachable on narrow screens.
+            mpage.keyboard.press("Tab")
+            expect(mpage.locator(".skip-link")).to_be_focused()
+            mpage.keyboard.press("Enter")
+            assert mpage.evaluate("location.hash") == "#main"
             menu=mpage.locator("#menu-button")
             expect(mpage.locator("#site-navigation")).to_be_hidden()
             menu.click()
