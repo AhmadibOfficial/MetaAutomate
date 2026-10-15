@@ -298,3 +298,64 @@ class DemoExecutionAudit:
             if entry is None:
                 raise DemoAuditNotFound("Synthetic audit entry unavailable")
             return entry[2]
+
+
+@dataclass(frozen=True)
+class DemoAuditInspection:
+    demo_internal_links_consistent: bool
+    entries_inspected: int
+    decision: str = "DENY"
+    trustworthy_external_evidence: bool = False
+    signed_by_authoritative_identity: bool = False
+    durable_storage_verified: bool = False
+    real_execution_verified: bool = False
+
+
+def verify_demo_audit_sequence(
+    tenant_id: UUID,
+    records: tuple[tuple[ExecutionRejection, DemoAuditEntry], ...],
+) -> DemoAuditInspection:
+    """Detect accidental chain corruption; attacker can recompute all hashes."""
+    if (type(tenant_id) is not UUID or type(records) is not tuple
+            or len(records) > MAX_PER_TENANT):
+        _reject()
+    current = "0" * 64
+    valid = True
+    for index, pair in enumerate(records, start=1):
+        if type(pair) is not tuple or len(pair) != 2:
+            _reject()
+        report, entry = pair
+        if type(report) is not ExecutionRejection or type(entry) is not DemoAuditEntry:
+            _reject()
+        material = _audit_input(report)
+        link = {
+            "domain": "metaautomate.p3-06.demo-audit-link.v1",
+            "tenant": str(tenant_id), "sequence": index,
+            "previous": current, "attempt": report.attempt_id,
+            "rejection": report.audit_fingerprint,
+        }
+        valid &= (
+            report.tenant_id == tenant_id and entry.tenant_id == tenant_id
+            and report.decision == "DENY" and entry.decision == "DENY"
+            and report.state == "REJECTED_NO_DISPATCH"
+            and report.side_effects_performed is False
+            and entry.execution_authorized is False
+            and entry.digest_is_authenticated is False
+            and entry.externally_persisted is False
+            and entry.audit_proof_is_durable is False
+            and entry.attempt_id == report.attempt_id
+            and entry.request_id == report.request_id
+            and entry.audit_sequence == index
+            and entry.previous_demo_hash == current
+            and type(report.audit_fingerprint) is str
+            and report.audit_fingerprint == _payload_hash(material)
+            and type(entry.rejection_fingerprint) is str
+            and entry.rejection_fingerprint == report.audit_fingerprint
+            and type(entry.demo_chain_hash) is str
+            and entry.demo_chain_hash == _payload_hash(link)
+        )
+        current = entry.demo_chain_hash if type(entry.demo_chain_hash) is str else ""
+    return DemoAuditInspection(
+        demo_internal_links_consistent=bool(valid),
+        entries_inspected=len(records),
+    )
