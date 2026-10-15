@@ -122,7 +122,8 @@ def test_enquiry_is_email_draft_no_submission_or_external_form_action():
 
 def test_company_roadmap_does_not_misrepresent_source_as_live_execution():
     content = (SITE / "company/index.html").read_text(encoding="utf-8")
-    assert "Phase 01 Foundation remains 3/9 verified (NO-GO)" in content
+    assert "Foundation remains in development" in content
+    assert "Phase 01 is 3/9 verified (NO-GO)" in content
     assert "Phase 02 operational approval remains NO-GO" in content
     assert "Phase 03 includes source-only tests and demonstrations" in content
     assert "Real authorized execution is blocked" in content
