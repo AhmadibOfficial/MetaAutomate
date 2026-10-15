@@ -284,6 +284,35 @@ def test_developer_cli_plan_rejects_unsupported_actions(args):
     assert not result.stdout
 
 
+def test_planner_manifest_matches_frozen_offline_source_contract():
+    from app.phase03_capability_planning import REQUIRED_GATES, TARGETS, TTL_TICKS
+    manifest = json.loads(
+        (ROOT / "contracts/intelligent/v1/planning.json").read_text()
+    )
+    assert manifest["schema_version"] == 1
+    assert manifest["phase"] == "03"
+    assert manifest["milestone"] == "P3-02"
+    assert manifest["default_decision"] == "DENY"
+    assert manifest["lifecycle"] == "DRAFT"
+    assert manifest["trusted_execution_authorization_available"] is False
+    assert manifest["external_reads_performed"] is False
+    assert manifest["external_writes_performed"] is False
+    assert manifest["real_tenant_scope_verified"] is False
+    assert manifest["provider_receipts_authenticated"] is False
+    assert manifest["maximum_logical_ttl_ticks"] == TTL_TICKS
+    assert tuple(manifest["mandatory_unverified_gates"]) == REQUIRED_GATES
+    assert {r["operation_id"] for r in manifest["operations"]} == set(OPERATION_SPECS)
+    for row in manifest["operations"]:
+        op = row["operation_id"]
+        assert row["capability_id"] == OPERATION_SPECS[op][0]
+        assert row["fixture_resource"] == TARGETS[op]
+        assert row["execution_authorized"] is False
+        assert row["provider_call_available"] is False
+        assert row["second_reviewer_needed_for_live"] is (
+            OPERATION_SPECS[op][3] == "high"
+        )
+
+
 def test_phase03_planner_is_unrouted_without_provider_or_db_side_effect():
     main = (ROOT / "apps/api/app/main.py").read_text()
     assert "phase03_capability_planning" not in main
