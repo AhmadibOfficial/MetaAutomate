@@ -245,6 +245,9 @@
     output.textContent=currentBrief;
     result.hidden=false;
     status.textContent="";
+    // Transfer keyboard and screen-reader reading focus to the newly revealed
+    // result landmark. Scroll alone would strand focus on the submit button.
+    document.getElementById("brief-result-title").focus({preventScroll:true});
     result.scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
   });
 
