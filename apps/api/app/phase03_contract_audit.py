@@ -39,7 +39,6 @@ DENIAL_FIELDS = {
         "trusted_execution_authorization_available": False,
         "external_reads_performed": False,
         "external_writes_performed": False,
-        "phase02_operational_accepted": False,
     },
     "outcome": {
         "external_receipt_trust_available": False,
