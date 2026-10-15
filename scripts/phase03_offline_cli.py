@@ -20,6 +20,9 @@ from app.phase03_capability_planning import (  # noqa: E402
     DemoPlanningRequest, TARGETS, create_denied_plan, inspect_denied_plan,
     OfflinePlanDenied,
 )
+from app.phase03_contract_audit import (  # noqa: E402
+    OfflineContractDenied, audit_local_contracts,
+)
 from app.phase03_integrated_conformance import (  # noqa: E402
     DemoIntegratedRequest, IntegratedSourceDenied, run_integrated_demo,
     inspect_integrated_demo,
@@ -48,6 +51,12 @@ from app.phase03_intelligent_ecosystem import (  # noqa: E402
 CONTRACT = ROOT / "contracts/intelligent/v1/capabilities.json"
 DOMAIN = ROOT / "contracts/domains/v1/operations.json"
 DEMO_TENANT = UUID("00000000-0000-4000-8000-000000000003")
+contract_check_operations = (
+    "business.lead-intake.validate.v1",
+    "business.crm.sync-proposal.v1",
+    "business.inventory.stock-preview.v1",
+    "business.finance.reconciliation-proposal.v1",
+)
 
 
 def _manifest() -> tuple[dict[str, object], ...]:
@@ -134,10 +143,40 @@ def main(argv: list[str] | None = None) -> int:
     integrated.add_argument("--observed-version", type=int, default=1)
     integrated.add_argument("--reviewer-count", type=int, choices=[0, 1, 2], default=0)
     integrated.add_argument("--observed-tick", type=int, default=101)
+    sub.add_parser(
+        "ecosystem-check",
+        help="Validate eight local source contracts and four DENY-only demo flows",
+    )
     args = parser.parse_args(argv)
     try:
         operations = _manifest()
-        if args.action == "catalog":
+        if args.action == "ecosystem-check":
+            contract_check = audit_local_contracts(ROOT)
+            reports = tuple(
+                run_integrated_demo(DemoIntegratedRequest(
+                    tenant_id=DEMO_TENANT,
+                    operation_id=op,
+                    request_id=f"DEMO-REQ-P307-CHECK-{i:03}",
+                    attempt_id=f"DEMO-ATTEMPT-P307-CHECK-{i:03}",
+                ))
+                for i, op in enumerate(sorted(contract_check_operations), 1)
+            )
+            if not all(
+                r.decision == "DENY" and r.demo_source_consistent
+                and r.side_effects_performed is False
+                and r.release_authorized is False
+                for r in reports
+            ):
+                raise OfflineContractDenied("An integrated source flow changed")
+            result = {
+                "source_contract_audit": asdict(contract_check),
+                "synthetic_operations_checked": len(reports),
+                "synthetic_denials": len(reports),
+                "external_operations_performed": 0,
+                "decision": "DENY",
+                "release_authorized": False,
+            }
+        elif args.action == "catalog":
             result = {
                 "mode": "OFFLINE_DESIGN_ONLY",
                 "decision": "DENY",
@@ -192,7 +231,7 @@ def main(argv: list[str] | None = None) -> int:
             result.pop("tenant_id")
             result["evidence_scope"] = "INVENTED_UNTRUSTED_FIXTURES_ONLY"
         elif args.action == "integrated-demo":
-            offline_developer_doctor(ROOT)
+            audit_local_contracts(ROOT)
             labels = ("DEMO-REVIEWER-ONE", "DEMO-REVIEWER-TWO")[:args.reviewer_count]
             query = DemoIntegratedRequest(
                 tenant_id=DEMO_TENANT,
@@ -274,7 +313,7 @@ def main(argv: list[str] | None = None) -> int:
                  (intent_b, gate.inspect_once(intent_b))),
             )
             result = asdict(report)
-    except (IntegratedSourceDenied, ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, DemoAnalyticsDenied, OfflineDeveloperDenied, ExecutionAttemptDenied, ValueError) as exc:
+    except (OfflineContractDenied, IntegratedSourceDenied, ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, DemoAnalyticsDenied, OfflineDeveloperDenied, ExecutionAttemptDenied, ValueError) as exc:
         print(f"PHASE03_RESULT=DENY: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(result, sort_keys=True, indent=2, default=str))
