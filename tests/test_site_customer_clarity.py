@@ -68,6 +68,40 @@ def test_homepage_communicates_customer_offer_and_has_real_destinations():
     assert "/company/#roadmap" in p.refs
 
 
+def test_nine_capability_cards_are_scoped_and_link_to_real_disciplines():
+    html = (SITE / "index.html").read_text(encoding="utf-8")
+    structure = page("index.html")
+    assert html.count('class="capability-card') == 9
+    for name in (
+        "AI Agents &amp; Orchestration", "Image &amp; Video Generation",
+        "Social Media Automation", "Software Engineering",
+        "Cybersecurity &amp; QA", "Data Analysis &amp; Research",
+        "Cloud &amp; DevOps", "Business Automation",
+        "Islamic Knowledge Systems",
+    ):
+        assert name in html
+    for anchor in ("/services/#ai", "/services/#experience",
+                   "/services/#software", "/services/#security",
+                   "/services/#data", "/services/#cloud"):
+        assert anchor in structure.refs
+    assert "not nine live products" in html
+    assert "scoped, reviewed and tested before live use" in html
+
+
+def test_evolution_roadmap_distinguishes_delivery_from_long_term_aspiration():
+    html = (SITE / "company/index.html").read_text(encoding="utf-8")
+    assert html.count('class="roadmap-entry') == 4
+    for phase in ("PHASE 01", "PHASE 02", "PHASE 03", "PHASE 04"):
+        assert phase in html
+    assert "Engineering a better world, one milestone at a time." in html
+    assert "A Better World." in html
+    assert "ASPIRATION · NOT A LIVE PROGRAM" in html
+    assert "3/9 VERIFIED" in html
+    assert "OPERATIONAL NO-GO" in html
+    assert "Real authorized execution is blocked." in html
+    assert "International readiness" in html
+
+
 def test_workspace_example_is_truthful_fiction_not_a_fake_product_screenshot():
     html = (SITE / "index.html").read_text()
     assert "ILLUSTRATIVE · NOT LIVE" in html

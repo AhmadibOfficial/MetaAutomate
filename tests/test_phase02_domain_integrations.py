@@ -133,9 +133,12 @@ def test_direct_policy_is_deny_only_and_role_protected():
 
 def test_public_roadmap_marks_parallel_development_without_release_claim():
     page = (ROOT / "apps/site/company/index.html").read_text(encoding="utf-8")
-    assert "PHASE 01</span><h3>Foundation" in page
-    assert "PHASE 02</span><h3>Platform expansion" in page
+    assert "PHASE 01 / NOW</span><h3>Foundation" in page
+    assert "PHASE 02 / EXPANSION</span><h3>Platform Expansion" in page
+    assert "IN DEVELOPMENT · 3/9 VERIFIED" in page
+    assert "SOURCE ONLY · OPERATIONAL NO-GO" in page
     assert "IN DEVELOPMENT · SOURCE ONLY" in page
+    assert "Real authorized execution is blocked." in page
     assert "Foundation remains in development" in page
     assert "do not enable customer access or external actions" in page
 
