@@ -12,13 +12,14 @@
 | #47 | P3-04 synthetic analytics | CI #147: 640; owner Kali: 309 passed |
 | #48 | P3-05 local developer tools | CI #150: 708; owner Kali: 377 passed |
 | #49 | P3-06 execution denial rehearsal | CI #151: 768; owner Kali: 437 passed |
-| #50 | P3-07 cross-module security | **Current draft — evidence pending until exact-head CI/Kali** |
+| #50 | P3-07 integrated denial conformance | CI #152 passed (833 Python tests); separate Kali and review pending |
+| #51 | P3-07b eight-contract drift and cross-module security supplement | **Current draft — evidence pending until exact-head CI/Kali** |
 
-PR #50's source history is stacked on #49 (which itself contains earlier unmerged drafts). The PR temporarily targets `main` to trigger existing GitHub CI. This **does not merge the parent PRs or independently approve their contents**. Reconcile the branch topology and reviewer findings before any merge.
+PR #51's source history is stacked on #49 (which itself contains earlier unmerged drafts). The PR temporarily targets `main` to trigger existing GitHub CI. This **does not merge the parent PRs or independently approve their contents**. Reconcile the branch topology and reviewer findings before any merge.
 
 ## 2. Trust and architecture boundaries
 
-P3-07 introduces `phase03_integration_safety.py` as **one synthetic, read-only, no-execution function** that connects P3-01 capability DENY → P3-02 DENY plan → P3-03 invented no-dispatch and readback DENY → P3-06 execution-rehearsal DENY / volatile audit-chain consistency. P3-04 invented business analytics may be included separately; P3-05 local Python tool contracts are checked but **no API, network, queue, customer account, provider or production SDK** is exposed.
+P3-07b adds `phase03_integration_safety.py` as **one synthetic, read-only, no-execution function** that connects P3-01 capability DENY → P3-02 DENY plan → P3-03 invented no-dispatch and readback DENY → P3-06 execution-rehearsal DENY / volatile audit-chain consistency. P3-04 invented business analytics may be included separately; P3-05 local Python tool contracts are checked but **no API, network, queue, customer account, provider or production SDK** is exposed.
 
 `ecosystem-check` loads **eight local source manifests**: Phase 02 domain, P3-01 capabilities, P3-02 planning, P3-03 outcome, P3-04 analytics, P3-05 developer, P3-06 execution and P3-07 integration. It verifies required default DENY / NO-GO flags and compatibility. It **does not authenticate human review or check staging**. A green doctor is not a release approval.
 
@@ -52,7 +53,7 @@ Every CLI response must remain `decision=DENY`, `provider_called=false`, `busine
 
 ## 4. Reviewer work order
 
-A qualified reviewer **distinct from the implementer** should inspect PRs #44–#50, exact base/head SHAs, generated tests, package dependencies, negatives and parent merge conflicts; challenge each above threat with test evidence and a clear PASS/FAIL/REMEDIATION REQUIRED disposition. The reviewer must independently verify the repo's actual branch protections; previous access to policy details was not sufficient to demonstrate enforcement.
+A qualified reviewer **distinct from the implementer** should inspect PRs #44–#51, exact base/head SHAs, generated tests, package dependencies, negatives and parent merge conflicts; challenge each above threat with test evidence and a clear PASS/FAIL/REMEDIATION REQUIRED disposition. The reviewer must independently verify the repo's actual branch protections; previous access to policy details was not sufficient to demonstrate enforcement.
 
 **Required signoff fields** (left intentionally blank):
 - Reviewer GitHub identity / independence from authorship: **NOT VERIFIED**
@@ -68,3 +69,7 @@ A qualified reviewer **distinct from the implementer** should inspect PRs #44–
 **Phase 01 remains 3/9 verified (NO-GO). Phase 02 operational NO-GO (Issue #40). Phase 03 source engineering continues, but real authorized execution and commercial deployment remain NO-GO.**
 
 No subscriptions, DigitalOcean/Render provisioning, migration 012–015, merge, repo-publication, real customer import, AI tool side effect, account write or payment is permitted by this source packet. Authoritative human consent/approvals cannot be provided by an AI-generated document.
+
+## 6. Relationship to the separately prepared PR #50
+
+PR #50 already provides a six-module synthetic end-to-end denial conformance flow and has green CI #152. PR #51 contributes an **additional independent eight-contract drift audit, hostile manifest mutation tests, and a separate fail-closed CLI check**. The two draft branches independently descend from PR #49 and both modify the local CLI. Neither is merged or approved. The authorized reviewer must reconcile the two changes, remove redundant code, and retest a single final SHA; green CI of two sibling branches is not integration acceptance of both together.
