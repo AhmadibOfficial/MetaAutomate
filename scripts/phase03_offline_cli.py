@@ -20,6 +20,10 @@ from app.phase03_capability_planning import (  # noqa: E402
     DemoPlanningRequest, TARGETS, create_denied_plan, inspect_denied_plan,
     OfflinePlanDenied,
 )
+from app.phase03_outcome_verification import (  # noqa: E402
+    DemoEvidenceRejected, make_demo_no_dispatch, make_demo_readback,
+    verify_demo_negative_outcome,
+)
 from app.phase03_intelligent_ecosystem import (  # noqa: E402
     CapabilityDenied, ContractRejected, DemoCapabilityIntent,
     OfflineCapabilityPreview, aggregate_synthetic_denials,
@@ -74,6 +78,10 @@ def main(argv: list[str] | None = None) -> int:
     plan.add_argument("operation_id", help="Existing draft operation only")
     plan.add_argument("--resource-version", type=int, default=1)
     plan.add_argument("--request-id", default="DEMO-REQ-CLI-PLAN-001")
+    verify = sub.add_parser("verify-denial", help="Locally compare invented no-dispatch and unchanged-version DEMO fixtures; no provider access")
+    verify.add_argument("operation_id", help="Existing draft operation only")
+    verify.add_argument("--request-id", default="DEMO-REQ-CLI-VERIFY-001")
+    verify.add_argument("--simulated-observed-version", type=int, default=1)
     args = parser.parse_args(argv)
     try:
         operations = _manifest()
@@ -107,6 +115,30 @@ def main(argv: list[str] | None = None) -> int:
             result.pop("tenant_id")
             result["synthetic_integrity_consistent"] = verdict.synthetic_integrity_consistent
             result["execution_authorized"] = False
+        elif args.action == "verify-denial":
+            intent = _intent(args.operation_id, args.request_id)
+            denied = OfflineCapabilityPreview().inspect_once(intent)
+            request = DemoPlanningRequest(
+                intent=intent, denial_receipt=denied,
+                target_label=TARGETS[intent.operation_id],
+                expected_resource_version=1,
+                requested_tick=intent.logical_tick,
+            )
+            plan = create_denied_plan(request)
+            event = make_demo_no_dispatch(
+                plan, request, event_id="DEMO-EVENT-CLI-NO-DISPATCH",
+                observed_tick=101,
+            )
+            readback = make_demo_readback(
+                plan, request, observed_tick=101,
+                observed_version=args.simulated_observed_version,
+            )
+            report = verify_demo_negative_outcome(
+                plan, request, event, readback, observed_tick=102,
+            )
+            result = asdict(report)
+            result.pop("tenant_id")
+            result["evidence_scope"] = "INVENTED_UNTRUSTED_FIXTURES_ONLY"
         else:
             gate = OfflineCapabilityPreview()
             intent_a = _intent(
@@ -121,7 +153,7 @@ def main(argv: list[str] | None = None) -> int:
                  (intent_b, gate.inspect_once(intent_b))),
             )
             result = asdict(report)
-    except (ContractRejected, CapabilityDenied, OfflinePlanDenied, ValueError) as exc:
+    except (ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, ValueError) as exc:
         print(f"PHASE03_RESULT=DENY: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(result, sort_keys=True, indent=2, default=str))
