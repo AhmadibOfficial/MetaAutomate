@@ -125,7 +125,7 @@ def main():
         demo_buttons.nth(2).press("Space")
         expect(page.locator("#workspace-stage-description")).to_contain_text("No supplier message")
         expect(page.locator("#workspace-demo")).to_contain_text("synthetic information")
-        expect(page.locator(".service-tile")).to_have_count(6)
+        expect(page.locator(".capability-card")).to_have_count(9)
         expect(page.locator(".industry-card")).to_have_count(4)
         expect(page.locator(".proof-section")).to_have_count(0)
         expect(page.locator(".social-card")).to_have_count(2)
