@@ -119,6 +119,26 @@ def test_operating_philosophy_has_seven_non_operational_steps():
     assert "autonomous execution are not enabled" in html
 
 
+def test_operating_use_cases_are_illustrative_complete_and_connected():
+    html = (SITE / "index.html").read_text(encoding="utf-8")
+    js = (SITE / "assets/site.js").read_text(encoding="utf-8")
+    assert html.count('class="use-case-option') == 3
+    for name in ("Inventory &amp; purchasing", "Content &amp; client engagement",
+                 "Secure digital products"):
+        assert name in html
+    for code in ("inventory", "content", "mobile"):
+        assert f'data-use-case="{code}"' in html
+        assert f'    {code}: {{' in js
+    for stage in ("understand", "think", "design", "create", "automate",
+                  "verify", "improve"):
+        assert js.count(f"        {stage}: ") == 3
+    assert 'aria-live="polite"' in html
+    assert "No live execution".lower() in html.lower()
+    assert "Fictional examples" in html
+    assert "not client testimonials" in html.lower()
+    assert "No live automation demo" in html or "not a live automation demo" in html
+
+
 def test_workspace_example_is_truthful_fiction_not_a_fake_product_screenshot():
     html = (SITE / "index.html").read_text()
     assert "ILLUSTRATIVE · NOT LIVE" in html
