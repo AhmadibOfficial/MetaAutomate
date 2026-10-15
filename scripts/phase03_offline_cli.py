@@ -20,6 +20,10 @@ from app.phase03_capability_planning import (  # noqa: E402
     DemoPlanningRequest, TARGETS, create_denied_plan, inspect_denied_plan,
     OfflinePlanDenied,
 )
+from app.phase03_developer_tools import (  # noqa: E402
+    OfflineDeveloperDenied, OfflineToolInvocation, run_offline_tool,
+    source_spec, offline_developer_doctor,
+)
 from app.phase03_business_analytics import (  # noqa: E402
     DemoAnalyticsDenied, demo_business_fixture, analyze_demo_business,
     simulate_demo_increment,
@@ -94,6 +98,19 @@ def main(argv: list[str] | None = None) -> int:
     )
     scenario.add_argument("--extra-orders", type=int, default=5)
     scenario.add_argument("--extra-marketing-minor", type=int, default=10_000)
+    sub.add_parser("dev-spec", help="Print the local-only versioned tool spec; no endpoint")
+    sub.add_parser("dev-doctor", help="Check pinned Phase 03 source contracts, not deployment")
+    sdk = sub.add_parser("sdk-demo", help="Invoke one typed offline-only SDK tool")
+    sdk.add_argument("tool", choices=[
+        "capability-preview", "denied-plan", "negative-proof",
+        "business-metrics", "business-scenario",
+    ])
+    sdk.add_argument("--operation-id", default="")
+    sdk.add_argument("--request-id", default="DEMO-REQ-SDK-001")
+    sdk.add_argument("--resource-version", type=int, default=1)
+    sdk.add_argument("--observed-version", type=int, default=1)
+    sdk.add_argument("--extra-orders", type=int, default=5)
+    sdk.add_argument("--extra-marketing-minor", type=int, default=10_000)
     args = parser.parse_args(argv)
     try:
         operations = _manifest()
@@ -151,6 +168,22 @@ def main(argv: list[str] | None = None) -> int:
             result = asdict(report)
             result.pop("tenant_id")
             result["evidence_scope"] = "INVENTED_UNTRUSTED_FIXTURES_ONLY"
+        elif args.action == "dev-spec":
+            offline_developer_doctor(ROOT)
+            result = source_spec()
+        elif args.action == "dev-doctor":
+            result = offline_developer_doctor(ROOT)
+        elif args.action == "sdk-demo":
+            tool_request = OfflineToolInvocation(
+                action=args.tool,
+                operation_id=args.operation_id,
+                request_id=args.request_id,
+                resource_version=args.resource_version,
+                observed_version=args.observed_version,
+                extra_orders=args.extra_orders,
+                extra_marketing_minor=args.extra_marketing_minor,
+            )
+            result = asdict(run_offline_tool(tool_request))
         elif args.action == "business-demo":
             samples = demo_business_fixture(DEMO_TENANT)
             report = analyze_demo_business(DEMO_TENANT, samples)
@@ -176,7 +209,7 @@ def main(argv: list[str] | None = None) -> int:
                  (intent_b, gate.inspect_once(intent_b))),
             )
             result = asdict(report)
-    except (ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, DemoAnalyticsDenied, ValueError) as exc:
+    except (ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, DemoAnalyticsDenied, OfflineDeveloperDenied, ValueError) as exc:
         print(f"PHASE03_RESULT=DENY: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(result, sort_keys=True, indent=2, default=str))
