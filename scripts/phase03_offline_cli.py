@@ -20,6 +20,10 @@ from app.phase03_capability_planning import (  # noqa: E402
     DemoPlanningRequest, TARGETS, create_denied_plan, inspect_denied_plan,
     OfflinePlanDenied,
 )
+from app.phase03_business_analytics import (  # noqa: E402
+    DemoAnalyticsDenied, demo_business_fixture, analyze_demo_business,
+    simulate_demo_increment,
+)
 from app.phase03_outcome_verification import (  # noqa: E402
     DemoEvidenceRejected, make_demo_no_dispatch, make_demo_readback,
     verify_demo_negative_outcome,
@@ -82,6 +86,14 @@ def main(argv: list[str] | None = None) -> int:
     verify.add_argument("operation_id", help="Existing draft operation only")
     verify.add_argument("--request-id", default="DEMO-REQ-CLI-VERIFY-001")
     verify.add_argument("--simulated-observed-version", type=int, default=1)
+    sub.add_parser(
+        "business-demo", help="Aggregate invented DEMO lead, order, cost and stock metrics"
+    )
+    scenario = sub.add_parser(
+        "scenario-demo", help="Best-case fictional order/cost arithmetic, never forecast"
+    )
+    scenario.add_argument("--extra-orders", type=int, default=5)
+    scenario.add_argument("--extra-marketing-minor", type=int, default=10_000)
     args = parser.parse_args(argv)
     try:
         operations = _manifest()
@@ -139,6 +151,17 @@ def main(argv: list[str] | None = None) -> int:
             result = asdict(report)
             result.pop("tenant_id")
             result["evidence_scope"] = "INVENTED_UNTRUSTED_FIXTURES_ONLY"
+        elif args.action == "business-demo":
+            samples = demo_business_fixture(DEMO_TENANT)
+            report = analyze_demo_business(DEMO_TENANT, samples)
+            result = asdict(report)
+        elif args.action == "scenario-demo":
+            sample = demo_business_fixture(DEMO_TENANT)[-1]
+            report = simulate_demo_increment(
+                DEMO_TENANT, sample, extra_paid_orders=args.extra_orders,
+                extra_marketing_cost_minor=args.extra_marketing_minor,
+            )
+            result = asdict(report)
         else:
             gate = OfflineCapabilityPreview()
             intent_a = _intent(
@@ -153,7 +176,7 @@ def main(argv: list[str] | None = None) -> int:
                  (intent_b, gate.inspect_once(intent_b))),
             )
             result = asdict(report)
-    except (ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, ValueError) as exc:
+    except (ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, DemoAnalyticsDenied, ValueError) as exc:
         print(f"PHASE03_RESULT=DENY: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(result, sort_keys=True, indent=2, default=str))
