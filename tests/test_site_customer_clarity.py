@@ -119,6 +119,25 @@ def test_enquiry_is_email_draft_no_submission_or_external_form_action():
     assert "Do not include passwords" in html
 
 
+
+def test_company_roadmap_does_not_misrepresent_source_as_live_execution():
+    content = (SITE / "company/index.html").read_text(encoding="utf-8")
+    assert "Phase 01 Foundation remains 3/9 verified (NO-GO)" in content
+    assert "Phase 02 operational approval remains NO-GO" in content
+    assert "Phase 03 includes source-only tests and demonstrations" in content
+    assert "Real authorized execution is blocked" in content
+    assert "<small>PLANNED</small>" not in content
+
+
+def test_primary_website_ctas_do_not_use_white_on_bright_cyan():
+    css = (SITE / "assets/site.css").read_text(encoding="utf-8")
+    assert "/* Publication accessibility review:" in css
+    accessibility = css.split("/* Publication accessibility review:", 1)[1]
+    assert "linear-gradient(115deg,#005caa,#0063b2)" in accessibility
+    assert "linear-gradient(110deg,#005caa,#0063b2)" in accessibility
+    assert ".eyebrow:not(.eyebrow-dark){color:#006aa3}" in accessibility
+    assert ".clarity-index,.workspace-demo-kicker{color:#00679c}" in accessibility
+
 def test_website_assets_have_size_budgets_and_no_third_party_dependencies():
     css = (SITE / "assets" / "site.css").read_bytes()
     js = (SITE / "assets" / "site.js").read_bytes()
