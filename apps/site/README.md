@@ -19,7 +19,7 @@ Preserve the owner-approved MetaAutomate mark and deep navy/electric blue/silver
 
 - Home (/): Value-led hero and three challenge-focused solutions, four audiences, service links, existing operating principles and sectors, plus an **illustrative** Objective Workspace planning walkthrough. Its diagram is labelled synthetic; it is **not** an actual screenshot or a live Objective Workspace session.
 - Services (/services/): Six disciplines, with scoped example engagements. Work is defined per project; it does not claim a client track record that hasn't been demonstrated.
-- Company (/company/): Mission, vision, values, meanings behind the approved logo and the four-phase roadmap.
+- Company (/company/): Mission, vision, values, meanings behind the approved logo and a five-stage Vision-to-Impact roadmap (four project phases and the long-term A Better World ambition).
 - Project brief (/engage/): Prominent one-click `mailto:` for quick questions alongside a browser-only interactive brief builder with prepared email draft, TXT download and clipboard copy. It does **not** automatically send a submission or store information on the server.
 
 The whole site consists of local HTML, CSS, JS and the approved logo. There are no third-party font calls, tracking scripts, cookies, database connections or API requests.
@@ -103,3 +103,7 @@ Updated homepage reading order: hero → existing Solutions/Convenience/Experien
 The duplicate Objective Workspace proof panel was removed; its `/#platform` fragment resolves to the illustrative board to avoid breaking old links. The social section emphasizes YouTube and LinkedIn, with all eight owner-supplied social destinations preserved in the footer. Narrow-page spacing was reduced without removing service choices or core values.
 
 Website browser acceptance records desktop, 390px, 360px and 768px tablet homepage screenshots, checks the new early demo ordering, 390px document height against a conservative <13,200px limit, keyboard controls and all internal/external navigation. A green automated test **does not** replace visual design, accessibility and content/legal reviews. Render stays unpublished until separately approved.
+
+## Five-stage Vision to Impact roadmap (October 2026)
+
+The Company page section 04 adopts the supplied project-evolution reference as five sequential stages: Phase 01 Foundation, Phase 02 Platform Expansion, Phase 03 Intelligent Ecosystem, Phase 04 Global Impact and long-term **A Better World**. The new header is **A long-term vision. A purposeful path to lasting impact.** The reference image is an inspiration for subject matter and navy/blue/gold design; the uploaded collage itself is not published on the website. This implementation uses accessible HTML/CSS only, with no external image or provider dependencies. Status labels deliberately distinguish source engineering from operational approval: Phase 01 3/9 NO-GO, Phase 02 operational NO-GO, Phase 03 live execution blocked, Phase 04 future ambition, long-term north star aspirational.
