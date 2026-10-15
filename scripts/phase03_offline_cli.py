@@ -20,6 +20,9 @@ from app.phase03_capability_planning import (  # noqa: E402
     DemoPlanningRequest, TARGETS, create_denied_plan, inspect_denied_plan,
     OfflinePlanDenied,
 )
+from app.phase03_execution_rehearsal import (  # noqa: E402
+    DemoExecutionAttempt, DemoExecutionAudit, ExecutionAttemptDenied,
+)
 from app.phase03_developer_tools import (  # noqa: E402
     OfflineDeveloperDenied, OfflineToolInvocation, run_offline_tool,
     source_spec, offline_developer_doctor,
@@ -111,6 +114,14 @@ def main(argv: list[str] | None = None) -> int:
     sdk.add_argument("--observed-version", type=int, default=1)
     sdk.add_argument("--extra-orders", type=int, default=5)
     sdk.add_argument("--extra-marketing-minor", type=int, default=10_000)
+    ex = sub.add_parser(
+        "execution-rehearsal", help="Locally REJECT an invented capability; no effects"
+    )
+    ex.add_argument("operation_id", help="Exact existing draft operation")
+    ex.add_argument("--request-id", default="DEMO-REQ-CLI-REHEARSAL-001")
+    ex.add_argument("--observed-version", type=int, default=1)
+    ex.add_argument("--reviewer-count", type=int, choices=[0, 1, 2], default=0)
+    ex.add_argument("--observed-tick", type=int, default=101)
     args = parser.parse_args(argv)
     try:
         operations = _manifest()
@@ -168,6 +179,31 @@ def main(argv: list[str] | None = None) -> int:
             result = asdict(report)
             result.pop("tenant_id")
             result["evidence_scope"] = "INVENTED_UNTRUSTED_FIXTURES_ONLY"
+        elif args.action == "execution-rehearsal":
+            intent = _intent(args.operation_id, args.request_id)
+            denied = OfflineCapabilityPreview().inspect_once(intent)
+            request = DemoPlanningRequest(
+                intent=intent, denial_receipt=denied,
+                target_label=TARGETS[intent.operation_id],
+                expected_resource_version=1, requested_tick=intent.logical_tick,
+            )
+            plan = create_denied_plan(request)
+            labels = ("DEMO-REVIEWER-ONE", "DEMO-REVIEWER-TWO")[:args.reviewer_count]
+            attempt = DemoExecutionAttempt(
+                plan=plan, source_request=request,
+                attempt_id="DEMO-ATTEMPT-CLI-HALT-001",
+                observed_tick=args.observed_tick,
+                expected_resource_version=args.observed_version,
+                reviewer_labels=labels,
+            )
+            decision, audit = DemoExecutionAudit().reject_once(attempt)
+            result = {
+                "rejection": asdict(decision),
+                "demo_audit": asdict(audit),
+                "evidence_scope": "UNAUTHENTICATED_VOLATILE_DEMO_ONLY",
+            }
+            result["rejection"].pop("tenant_id")
+            result["demo_audit"].pop("tenant_id")
         elif args.action == "dev-spec":
             offline_developer_doctor(ROOT)
             result = source_spec()
@@ -209,7 +245,7 @@ def main(argv: list[str] | None = None) -> int:
                  (intent_b, gate.inspect_once(intent_b))),
             )
             result = asdict(report)
-    except (ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, DemoAnalyticsDenied, OfflineDeveloperDenied, ValueError) as exc:
+    except (ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, DemoAnalyticsDenied, OfflineDeveloperDenied, ExecutionAttemptDenied, ValueError) as exc:
         print(f"PHASE03_RESULT=DENY: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(result, sort_keys=True, indent=2, default=str))
