@@ -16,6 +16,10 @@ from uuid import UUID
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "apps/api"))
 
+from app.phase03_integration_safety import (  # noqa: E402
+    OfflineIntegratedInput, OfflineIntegrationDenied,
+    run_offline_integration, audit_offline_contracts,
+)
 from app.phase03_capability_planning import (  # noqa: E402
     DemoPlanningRequest, TARGETS, create_denied_plan, inspect_denied_plan,
     OfflinePlanDenied,
@@ -44,6 +48,12 @@ from app.phase03_intelligent_ecosystem import (  # noqa: E402
 CONTRACT = ROOT / "contracts/intelligent/v1/capabilities.json"
 DOMAIN = ROOT / "contracts/domains/v1/operations.json"
 DEMO_TENANT = UUID("00000000-0000-4000-8000-000000000003")
+SCENARIO_OPERATIONS = (
+    "business.lead-intake.validate.v1",
+    "business.crm.sync-proposal.v1",
+    "business.inventory.stock-preview.v1",
+    "business.finance.reconciliation-proposal.v1",
+)
 
 
 def _manifest() -> tuple[dict[str, object], ...]:
@@ -122,10 +132,61 @@ def main(argv: list[str] | None = None) -> int:
     ex.add_argument("--observed-version", type=int, default=1)
     ex.add_argument("--reviewer-count", type=int, choices=[0, 1, 2], default=0)
     ex.add_argument("--observed-tick", type=int, default=101)
+    sub.add_parser(
+        "ecosystem-check",
+        help="Audit eight local source contracts and run all four DENY-only DEMO capabilities",
+    )
+    integrated = sub.add_parser(
+        "integration-demo", help="One cross-module synthetic DENY rehearsal"
+    )
+    integrated.add_argument("operation_id")
+    integrated.add_argument("--observed-version", type=int, default=1)
+    integrated.add_argument("--observed-tick", type=int, default=101)
+    integrated.add_argument("--reviewer-count", type=int, choices=[0,1,2], default=0)
+    integrated.add_argument("--demo-analytics", action="store_true")
     args = parser.parse_args(argv)
     try:
         operations = _manifest()
-        if args.action == "catalog":
+        if args.action == "ecosystem-check":
+            validation = audit_offline_contracts(ROOT)
+            reports = [
+                run_offline_integration(OfflineIntegratedInput(
+                    tenant_id=DEMO_TENANT,
+                    operation_id=operation,
+                    request_id=f"DEMO-REQ-P307-CHECK-{i:03}",
+                    attempt_id=f"DEMO-ATTEMPT-P307-CHECK-{i:03}",
+                ))
+                for i, operation in enumerate(sorted(SCENARIO_OPERATIONS), start=1)
+            ]
+            if not all(
+                x.decision == "DENY" and x.denial_receipt_consistent
+                and x.denied_plan_consistent and x.audited_denial_consistent
+                and not x.business_effect_performed and not x.release_authorized
+                for x in reports
+            ):
+                raise OfflineIntegrationDenied("Source DENY contract mismatch")
+            result = {
+                "contract_audit": asdict(validation),
+                "synthetic_operations_checked": len(reports),
+                "synthetic_denials": len(reports),
+                "external_operations_performed": 0,
+                "decision": "DENY",
+                "release_authorized": False,
+            }
+        elif args.action == "integration-demo":
+            reviewer_labels = (
+                "DEMO-REVIEWER-ALPHA", "DEMO-REVIEWER-BETA",
+            )[:args.reviewer_count]
+            report = run_offline_integration(OfflineIntegratedInput(
+                tenant_id=DEMO_TENANT,
+                operation_id=args.operation_id,
+                observed_resource_version=args.observed_version,
+                observed_tick=args.observed_tick,
+                reviewer_labels=reviewer_labels,
+                attach_synthetic_analytics=args.demo_analytics,
+            ))
+            result = asdict(report)
+        elif args.action == "catalog":
             result = {
                 "mode": "OFFLINE_DESIGN_ONLY",
                 "decision": "DENY",
@@ -245,7 +306,7 @@ def main(argv: list[str] | None = None) -> int:
                  (intent_b, gate.inspect_once(intent_b))),
             )
             result = asdict(report)
-    except (ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, DemoAnalyticsDenied, OfflineDeveloperDenied, ExecutionAttemptDenied, ValueError) as exc:
+    except (ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, DemoAnalyticsDenied, OfflineDeveloperDenied, ExecutionAttemptDenied, OfflineIntegrationDenied, ValueError) as exc:
         print(f"PHASE03_RESULT=DENY: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(result, sort_keys=True, indent=2, default=str))
