@@ -17,7 +17,7 @@ Preserve the owner-approved MetaAutomate mark and deep navy/electric blue/silver
 
 ## Site structure
 
-- Home (/): Customer-focused hero and outcomes, three problem-led solutions, four audiences, service links, existing operating principles and sectors, plus an **illustrative** Objective Workspace planning walkthrough. Its diagram is labelled synthetic; it is **not** an actual screenshot or a live Objective Workspace session.
+- Home (/): Value-led hero and three challenge-focused solutions, four audiences, service links, existing operating principles and sectors, plus an **illustrative** Objective Workspace planning walkthrough. Its diagram is labelled synthetic; it is **not** an actual screenshot or a live Objective Workspace session.
 - Services (/services/): Six disciplines, with scoped example engagements. Work is defined per project; it does not claim a client track record that hasn't been demonstrated.
 - Company (/company/): Mission, vision, values, meanings behind the approved logo and the four-phase roadmap.
 - Project brief (/engage/): Prominent one-click `mailto:` for quick questions alongside a browser-only interactive brief builder with prepared email draft, TXT download and clipboard copy. It does **not** automatically send a submission or store information on the server.
@@ -79,7 +79,7 @@ The project brief intentionally generates and opens a client-side `mailto:` draf
 
 This change is a **website-only draft** branched from `main`, not from Phase 03's source-only PR stack. Keep the private repository and brand assets unchanged. Render auto-deploy stays disabled.
 
-- **Customer clarity:** Above-the-fold value message explains practical AI/workflow, data and secure product offerings, with a `Discuss your project` primary CTA and `See business solutions` secondary link.
+- **Customer clarity:** Above-the-fold value message explains practical AI/workflow, data and secure product offerings, with a `Discuss your project` primary CTA, `Explore solutions` secondary link and direct sample-workspace anchor.
 - **Solution discovery:** Three problem-based cards point to existing service sections. They are not promises that the source-only Phase 03 inventory/finance capability engine is available to customers.
 - **Objective Workspace example:** The static diagram and three-step interactive explanation **illustrate** objective definition, dependencies and human review, using invented inventory data only. It is not an actual application screenshot, authenticated demonstration, client engagement, performance result or provider integration. The existing Objective Workspace planning product remains development stage. **A genuine product screen recording may be added only after privacy/security review of the captured environment and explicit approval.**
 - **Qualified enquiries:** Direct `mailto:` for a short inquiry is usable without completing the form; the optional browser-only brief preserves its existing email draft, copy and download workflow. No external form service, data collection, CRM integration or backend deployment.
@@ -88,3 +88,18 @@ This change is a **website-only draft** branched from `main`, not from Phase 03'
 - **Acceptance requirements:** Reviewer-approved messaging and privacy statements, CI browser tests, screenshots and mobile inspection; **no automatic publication**. No claim of pilot users, third-party certification, generated income or fully deployed Objective Workspace.
 
 Next improvements that need separate decisions: actual private product screenshot/video after redaction, privacy/terms pages after legal review, custom domain and email if owner elects to purchase, and a secure inquiry server only after independent security and data-handling review.
+
+## Customer-first wording and visual-review refinement (15 Oct 2026)
+
+Apply the sales-language image's **mindset rather than mechanically substituting words**:
+- **Buy → invest:** talk about intentional investment in useful systems, never guaranteed return on investment. Keep actual price and contract terms clear.
+- **Problem → challenge:** frame the client's goal constructively; continue using 'problem' when naming real technical failures, faults or vulnerabilities.
+- **Customer → client:** describe a collaborative professional relationship. Neither term implies existing testimonials or client delivery history.
+- **Cost → value:** explain expected usefulness and outcomes, without hiding price, risks, constraints or actual costs.
+- **Try → experience:** invite an honest demonstration; never label illustrations, mockups or synthetic examples as a live or deployed service.
+
+Updated homepage reading order: hero → existing Solutions/Convenience/Experiences principle → challenge-led solution cards → labelled development-stage Workspace illustration → six service disciplines → five-step operating philosophy → sectors → ethics and values → **two featured social cards** → final engagement CTA → footer listing all eight original social destinations.
+
+The duplicate Objective Workspace proof panel was removed; its `/#platform` fragment resolves to the illustrative board to avoid breaking old links. The social section emphasizes YouTube and LinkedIn, with all eight owner-supplied social destinations preserved in the footer. Narrow-page spacing was reduced without removing service choices or core values.
+
+Website browser acceptance records desktop, 390px, 360px and 768px tablet homepage screenshots, checks the new early demo ordering, 390px document height against a conservative <13,200px limit, keyboard controls and all internal/external navigation. A green automated test **does not** replace visual design, accessibility and content/legal reviews. Render stays unpublished until separately approved.
