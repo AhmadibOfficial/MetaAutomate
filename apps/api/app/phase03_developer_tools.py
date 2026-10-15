@@ -228,7 +228,7 @@ def run_offline_tool(request: OfflineToolInvocation) -> OfflineToolResponse:
 
 def offline_developer_doctor(root: Path = ROOT) -> dict[str, object]:
     """Source-only preflight, intentionally not an operations readiness test."""
-    if type(root) is not Path:
+    if not isinstance(root, Path):
         _deny()
     paths = {
         "developer": "contracts/intelligent/v1/developer_tools.json",
