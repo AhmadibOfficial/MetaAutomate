@@ -43,5 +43,21 @@
     "human_review": "MISSING"
   },
   "owner_approval_required": true,
-  "warning": "The source trace is constructed entirely from actor-controlled synthetic inputs and yields no real authorization, outside identity, business ROI, provider attestation or independent security review."
+  "warning": "The source trace is constructed entirely from actor-controlled synthetic inputs and yields no real authorization, outside identity, business ROI, provider attestation or independent security review.",
+  "source_contract_count": 8,
+  "declared_contracts": [
+    "contracts/domains/v1/operations.json",
+    "contracts/intelligent/v1/capabilities.json",
+    "contracts/intelligent/v1/planning.json",
+    "contracts/intelligent/v1/outcome_verification.json",
+    "contracts/intelligent/v1/business_analytics.json",
+    "contracts/intelligent/v1/developer_tools.json",
+    "contracts/intelligent/v1/execution_rehearsal.json",
+    "contracts/intelligent/v1/integration_conformance.json"
+  ],
+  "source_audit_scope": "LOCAL_ONLY_NO_EXTERNAL_AUTHORITY",
+  "live_execution_authorized": false,
+  "external_provider_access_enabled": false,
+  "independent_review_verified": false,
+  "phase02_operational_approved": false
 }
