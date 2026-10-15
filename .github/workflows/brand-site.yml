@@ -51,9 +51,12 @@ jobs:
           assert "disk" not in site
           assert "startCommand" not in site
           home=(root/"index.html").read_text(encoding="utf-8")
-          assert "Make your business" in home
+          assert "Business challenges deserve" in home
+          assert "Invest in clarity" in home
           assert 'id="solutions"' in home
           assert 'id="workspace-demo"' in home
+          assert home.index('id="solutions"') < home.index('id="workspace-demo"') < home.index('id="services"')
+          assert 'class="section proof-section"' not in home
           assert "ILLUSTRATIVE · NOT LIVE" in home
           assert "development-stage" in home
           assert "MetaAutomate" in home
