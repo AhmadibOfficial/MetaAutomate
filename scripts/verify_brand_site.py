@@ -190,7 +190,7 @@ def main():
         expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("IN DEVELOPMENT")
         expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("SOURCE ONLY")
         expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("Real authorized execution is blocked")
-        expect(page.locator(".roadmap-note")).to_contain_text("Phase 01 Foundation remains 3/9 verified")
+        expect(page.locator(".roadmap-note")).to_contain_text("Foundation remains in development")
         expect(page.locator(".roadmap-note")).to_contain_text("Phase 02 operational approval remains NO-GO")
         expect(page.locator(".purpose-panel")).to_have_count(2)
         expect(page.locator(".value-principles article")).to_have_count(5)
