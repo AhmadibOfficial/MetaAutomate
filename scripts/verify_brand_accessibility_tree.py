@@ -66,7 +66,7 @@ def test_home(browser, evidence: dict) -> None:
     verify_role(nodes, "link", "Skip to content")
     verify_role(nodes, "link", "Discuss your project")
     verify_role(nodes, "group", "Objective Workspace example steps")
-    verify_role(nodes, "img", "Illustrative dependency graph")
+    verify_role(nodes, "image", "Illustrative dependency graph")
     verify_role(nodes, "button", "Define the objective")
     verify_role(nodes, "button", "Map dependencies")
     verify_role(nodes, "button", "Record a review")
