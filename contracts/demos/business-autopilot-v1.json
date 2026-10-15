@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "classification": "SYNTHETIC_DEMO_ONLY",
+  "business_label": "Synthetic Qatar Retail",
+  "objective": "Prepare reviewable replenishment drafts for every low-stock item, with no orders sent or stock changed.",
+  "inventory_file": "synthetic_inventory_import.json",
+  "currency": "QAR",
+  "assumption_notice": "Invented per-run assumptions, not customer measurements, quotations, prices or exchange rates. Capacity value is not cash saved.",
+  "answers": {
+    "STR-1": 2, "STR-2": 1, "STR-3": 2,
+    "OPS-1": 1, "OPS-2": 0, "OPS-3": 1,
+    "DAT-1": 2, "DAT-2": 1, "DAT-3": 1,
+    "CUS-1": 3, "CUS-2": 1, "CUS-3": 1,
+    "SEC-1": 2, "SEC-2": 1, "SEC-3": 1
+  },
+  "assumptions": {
+    "manual_minutes_per_draft": 12,
+    "assisted_minutes_per_draft": 3,
+    "staff_hourly_cost_minor": 6000,
+    "delivery_cost_minor": 1000,
+    "unit_cost_minor": {
+      "DEMO-MAIZE-001": 4500,
+      "DEMO-SOYA-002": 6000,
+      "DEMO-SORGHUM-003": 4000,
+      "DEMO-PACK-004": 200
+    }
+  },
+  "scenarios": {
+    "standard": {
+      "label": "Replenishment drafts",
+      "description": "Prepare two synthetic purchase-request drafts for human review.",
+      "blocked_skus": [],
+      "delivery_cost_minor": 1000
+    },
+    "partial_failure": {
+      "label": "One step blocked",
+      "description": "A synthetic supplier check blocks one draft. No retry or substitute supplier is authorized.",
+      "blocked_skus": ["DEMO-SORGHUM-003"],
+      "delivery_cost_minor": 1000
+    },
+    "high_cost": {
+      "label": "Cost outweighs estimated benefit",
+      "description": "The same draft workflow with an invented higher per-run delivery cost.",
+      "blocked_skus": [],
+      "delivery_cost_minor": 5000
+    }
+  }
+}
