@@ -125,21 +125,24 @@ h1 em{background:linear-gradient(112deg,#07b9ff 0%,#c9e8ff 58%,#efc573 96%);back
 .belief-divider{height:40px;width:1px;background:#cdddea}
 .belief-signature{font-size:11px!important;letter-spacing:.13em;font-weight:900;color:#264363!important;text-align:right}
 .belief-signature b{color:var(--gold);padding-inline:6px}
-/* Services */
+/* Website key capabilities: compact cards limit mobile scrolling. */
 .services-section{background:#fff}
-.service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.service-tile{position:relative;display:flex;flex-direction:column;min-height:325px;padding:30px;background:#f4f8fd;border:1px solid #dfe8f2;border-radius:13px;overflow:hidden;transition:transform .25s,border-color .25s,box-shadow .25s}
-.service-tile:hover,.service-tile:focus-visible{transform:translateY(-5px);border-color:#62bceb;box-shadow:0 25px 50px #0a2d5320}
-.service-tile.tile-dark{background:linear-gradient(140deg,#092145,#0c4575);color:#fff;border-color:#0b5d9b}
-.tile-index{font-size:10px;letter-spacing:.13em;color:#6686a3;font-weight:900}
-.tile-dark .tile-index{color:#94c8e9}
-.tile-glyph{position:absolute;right:25px;top:38px;font-size:45px;font-weight:500;color:#088dd1}
-.tile-dark .tile-glyph{color:#69c9fa}
-.service-tile h3{font-size:27px;margin:auto 0 17px;letter-spacing:-.055em;line-height:1.15}
-.service-tile p{font-size:13px;color:#677e99;max-width:265px;line-height:1.7;margin-bottom:0}
-.tile-dark p{color:#b7d4e8}
-.tile-arrow{position:absolute;right:25px;bottom:25px;color:#0a83c8;font-size:23px}
-.tile-dark .tile-arrow{color:var(--gold)}
+.capability-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.capability-card{position:relative;display:flex;flex-direction:column;min-height:198px;padding:24px;border:1px solid #d6e5ef;border-radius:14px;background:#f6f9fd;color:#102c49;transition:transform .2s,border-color .2s,box-shadow .2s}
+.capability-card:hover,.capability-card:focus-visible{transform:translateY(-3px);border-color:#1085c6;box-shadow:0 16px 28px #072a4b1c}
+.capability-card-featured{background:linear-gradient(145deg,#082444,#0c426b);color:#fff;border-color:#116295}
+.capability-number{color:#006b9e;font-size:10px;font-weight:850;letter-spacing:.13em}
+.capability-card-featured .capability-number{color:#c2e6fc}
+.capability-glyph{position:absolute;top:18px;right:22px;font-size:25px;color:#097bb7}
+.capability-card-featured .capability-glyph{color:#f0c66e}
+.capability-card h3{margin:auto 22px 12px 0;font-size:clamp(19px,2vw,25px);line-height:1.15;letter-spacing:-.035em}
+.capability-card p{margin:0;max-width:29ch;font-size:12.5px;line-height:1.5;color:#516c84}
+.capability-card-featured p{color:#c5dcea}
+.capability-arrow{position:absolute;right:20px;bottom:18px;color:#006b9e;font-size:20px}
+.capability-card-featured .capability-arrow{color:#f0c66e}
+.capability-disclaimer{max-width:850px;color:#516c84;line-height:1.7;font-size:12.5px;margin:18px 0 0}
+@media(max-width:980px){.capability-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.capability-grid{gap:10px}.capability-card{min-height:188px;padding:18px 13px}.capability-number{font-size:9px;letter-spacing:.08em}.capability-glyph{top:15px;right:12px;font-size:21px}.capability-card h3{font-size:18px;margin-right:0}.capability-card p{font-size:11.5px;line-height:1.45;padding-right:6px}.capability-arrow{right:11px;bottom:12px;font-size:15px}}
 /* Operating system */
 .system-section{background:radial-gradient(ellipse 50% 65% at 90% 30%,#0d437350,transparent 85%),#06142c;color:#fff;position:relative;overflow:hidden}
 .system-section::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 58px,#93d7ff07 59px 60px);opacity:.45}
@@ -277,17 +280,31 @@ h1 em{background:linear-gradient(112deg,#07b9ff 0%,#c9e8ff 58%,#efc573 96%);back
 .brand-meaning dt{font-size:15px;font-weight:850}
 .brand-meaning dd{font-size:13px;color:#5e7894;margin:0}
 .roadmap-section{background:#fff}
-.roadmap-layout{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
-.roadmap-entry{border-radius:13px;border:1px solid #dbe7f2;background:#f5f9fc;padding:31px 23px;display:flex;flex-direction:column;min-height:290px}
-.roadmap-entry.active{background:linear-gradient(155deg,#0a2b54,#073c68);color:#fff;border-color:#0f6c9e}
-.roadmap-entry>span{color:#018ac7;font-size:10px;font-weight:850;letter-spacing:.15em}
-.roadmap-entry.active>span{color:#c1e6ff}
-.roadmap-entry h3{font-size:24px;margin:36px 0 15px}
-.roadmap-entry p{font-size:13px;line-height:1.7;color:#697f97;margin-bottom:22px}
-.roadmap-entry.active p{color:#bed6e8}
-.roadmap-entry small{margin-top:auto;font-size:9px;font-weight:850;letter-spacing:.1em;color:#83a1b8}
-.roadmap-entry.active small{color:#eed095}
-.roadmap-note{color:#607b96;font-size:12px;line-height:1.75;margin:27px 0 0}
+.roadmap-heading{max-width:950px}
+.roadmap-heading p{max-width:760px;margin:22px 0 0;color:#536f88;font-size:15px;line-height:1.8}
+.roadmap-layout{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:0;padding:0;list-style:none}
+.roadmap-entry{position:relative;border-radius:14px;border:1px solid #dbe7f2;background:#f5f9fc;padding:29px 22px;display:flex;flex-direction:column;min-height:400px}
+.roadmap-entry.active{background:linear-gradient(155deg,#082846,#0b416c);color:#fff;border-color:#0e5d95}
+.roadmap-entry.in-progress{border-top:4px solid #0a80bb}
+.roadmap-entry.future{border-top:4px solid #bb8c2a}
+.roadmap-entry>span:first-child{color:#006b9e;font-size:10px;font-weight:850;letter-spacing:.12em}
+.roadmap-entry.active>span:first-child{color:#c2e6fc}
+.roadmap-entry h3{font-size:23px;letter-spacing:-.03em;margin:23px 0 12px;line-height:1.15}
+.roadmap-entry p{font-size:12.8px;line-height:1.6;color:#526c84;margin:0 0 16px}
+.roadmap-entry.active p{color:#d0e0ef}
+.roadmap-entry ul{padding:0 0 0 17px;margin:0 0 19px;color:#3d5974;font-size:12px;line-height:1.65}
+.roadmap-entry li{margin:0 0 7px}
+.roadmap-entry.active ul{color:#e2eff7}
+.roadmap-entry small{margin-top:auto;font-size:10px;font-weight:850;letter-spacing:.05em;line-height:1.5;color:#526e87}
+.roadmap-entry.active small{color:#f5d68f}
+.roadmap-safety{display:block;font-size:11px;color:#635528;line-height:1.5;margin-top:12px}
+.roadmap-horizon{display:flex;align-items:center;justify-content:space-between;gap:30px;background:#f7fbfc;border:1px solid #c5e1e5;border-left:5px solid #0d7f8d;border-radius:14px;padding:27px 31px;margin-top:15px}
+.roadmap-horizon span{font-size:10px;font-weight:850;letter-spacing:.13em;color:#006f80}
+.roadmap-horizon h3{font-size:clamp(25px,3vw,37px);letter-spacing:-.04em;margin:10px 0}
+.roadmap-horizon p{color:#45627c;font-size:13px;line-height:1.7;max-width:720px;margin:0}
+.roadmap-horizon small{font-size:10px;font-weight:850;line-height:1.5;color:#47657b;flex-shrink:0}
+.roadmap-note{color:#526e85;font-size:12px;line-height:1.75;margin:23px 0 0}
+@media(max-width:760px){.roadmap-horizon{flex-direction:column;align-items:start;padding:23px 20px;gap:14px}}
 .quote-section{text-align:center;background:#081a32;color:#fff}
 .quote-section blockquote{font-size:clamp(28px,3.9vw,48px);letter-spacing:-.035em;font-weight:700;margin:0 0 23px}
 .quote-section span{font-size:11px;letter-spacing:.18em;color:#f0c46d;font-weight:800}
