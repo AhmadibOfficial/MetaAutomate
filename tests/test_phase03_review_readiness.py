@@ -152,7 +152,9 @@ def test_duplicate_top_level_json_keys_are_refused(tmp_path, path):
     root = _copy(tmp_path)
     target = root / path
     # Last-wins JSON parsers would silently mask the injected field.
-    target.write_bytes(target.read_bytes()[:-2] + b',"release_authorized":true}\n')
+    original = target.read_bytes().rstrip()
+    assert original.endswith(b"}")
+    target.write_bytes(original[:-1] + b',"schema_version":false}\n')
     with pytest.raises((ReviewReadinessDenied, OfflineContractDenied)):
         if path == QUEUE:
             build_review_preparation(root)
