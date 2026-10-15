@@ -16,6 +16,10 @@ from uuid import UUID
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "apps/api"))
 
+from app.phase03_capability_planning import (  # noqa: E402
+    DemoPlanningRequest, TARGETS, create_denied_plan, inspect_denied_plan,
+    OfflinePlanDenied,
+)
 from app.phase03_intelligent_ecosystem import (  # noqa: E402
     CapabilityDenied, ContractRejected, DemoCapabilityIntent,
     OfflineCapabilityPreview, aggregate_synthetic_denials,
@@ -66,6 +70,10 @@ def main(argv: list[str] | None = None) -> int:
         help="Invented DEMO-REQ-* only",
     )
     sub.add_parser("demo-analytics", help="Aggregate invented denied previews")
+    plan = sub.add_parser("plan", help="Return denied source-only capability plan")
+    plan.add_argument("operation_id", help="Existing draft operation only")
+    plan.add_argument("--resource-version", type=int, default=1)
+    plan.add_argument("--request-id", default="DEMO-REQ-CLI-PLAN-001")
     args = parser.parse_args(argv)
     try:
         operations = _manifest()
@@ -83,6 +91,22 @@ def main(argv: list[str] | None = None) -> int:
             result = asdict(receipt)
             result.pop("tenant_id")
             result["receipt_scope"] = "UNTRUSTED_DEMO_CHECKSUM_ONLY"
+        elif args.action == "plan":
+            intent = _intent(args.operation_id, args.request_id)
+            denied = OfflineCapabilityPreview().inspect_once(intent)
+            request = DemoPlanningRequest(
+                intent=intent,
+                denial_receipt=denied,
+                target_label=TARGETS[intent.operation_id],
+                expected_resource_version=args.resource_version,
+                requested_tick=intent.logical_tick,
+            )
+            plan = create_denied_plan(request)
+            verdict = inspect_denied_plan(plan, request, observed_tick=101)
+            result = asdict(plan)
+            result.pop("tenant_id")
+            result["synthetic_integrity_consistent"] = verdict.synthetic_integrity_consistent
+            result["execution_authorized"] = False
         else:
             gate = OfflineCapabilityPreview()
             intent_a = _intent(
@@ -97,7 +121,7 @@ def main(argv: list[str] | None = None) -> int:
                  (intent_b, gate.inspect_once(intent_b))),
             )
             result = asdict(report)
-    except (ContractRejected, CapabilityDenied, ValueError) as exc:
+    except (ContractRejected, CapabilityDenied, OfflinePlanDenied, ValueError) as exc:
         print(f"PHASE03_RESULT=DENY: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(result, sort_keys=True, indent=2, default=str))
