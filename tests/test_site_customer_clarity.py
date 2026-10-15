@@ -1,0 +1,124 @@
+"""MetaAutomate customer-clarity site: copy, privacy, asset budget and navigation.
+
+These source-level checks complement Playwright real Chromium acceptance.
+No hosted service, real customer account, or product execution is required.
+"""
+from pathlib import Path
+import re
+from html.parser import HTMLParser
+from urllib.parse import urlsplit
+
+ROOT = Path(__file__).resolve().parents[1]
+SITE = ROOT / "apps" / "site"
+
+
+class PageStructure(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.ids = set()
+        self.refs = []
+        self.forms = []
+        self.images = []
+        self.scripts = []
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if "id" in attrs:
+            self.ids.add(attrs["id"])
+        if tag == "a":
+            self.refs.append(attrs.get("href", ""))
+        if tag == "form":
+            self.forms.append(attrs)
+        if tag == "img":
+            self.images.append(attrs)
+        if tag == "script":
+            self.scripts.append(attrs)
+
+
+def page(path: str) -> PageStructure:
+    content = (SITE / path).read_text(encoding="utf-8")
+    parser = PageStructure()
+    parser.feed(content)
+    return parser
+
+
+def test_homepage_communicates_customer_offer_and_has_real_destinations():
+    html = (SITE / "index.html").read_text()
+    p = page("index.html")
+    assert "Make your business" in html
+    assert "work smarter" in html
+    assert "Start with a business problem" in html
+    assert "Founders &amp; startups" in html
+    assert "Operations teams" in html
+    assert {"solutions", "workspace-demo", "services", "industries", "platform"} <= p.ids
+    assert "/engage/#brief-form" in p.refs
+    assert "#solutions" in p.refs
+    assert "/services/#ai" in p.refs
+    assert "/services/#data" in p.refs
+    assert "/services/#security" in p.refs
+    assert "/company/#roadmap" in p.refs
+
+
+def test_workspace_example_is_truthful_fiction_not_a_fake_product_screenshot():
+    html = (SITE / "index.html").read_text()
+    assert "ILLUSTRATIVE · NOT LIVE" in html
+    assert "synthetic information" in html
+    assert "Not a screenshot" in html
+    assert "No orders, messages or external actions sent" in html
+    assert "development-stage planning product" in html
+    assert html.count("data-workspace-step=") == 3
+    assert 'role="group" aria-label="Objective Workspace example steps"' in html
+    assert 'aria-live="polite"' in html
+    assert 'aria-pressed="true"' in html
+
+
+def test_all_four_pages_keep_brand_and_navigate_to_website_solution_path():
+    for p in ("index.html", "services/index.html",
+              "company/index.html", "engage/index.html"):
+        html = (SITE / p).read_text()
+        structure = page(p)
+        assert "/assets/metaautomate-mark.webp" in html
+        assert "/#solutions" in structure.refs
+        assert "/#workspace-demo" in structure.refs
+        assert "/services/" in structure.refs
+        assert "/company/" in structure.refs
+        assert "/engage/" in structure.refs
+        assert "Always HALAL" in html
+        assert any(img.get("src") == "/assets/metaautomate-mark.webp"
+                   for img in structure.images)
+        for resource in structure.scripts:
+            assert resource.get("src", "").startswith("/assets/")
+
+
+def test_enquiry_is_email_draft_no_submission_or_external_form_action():
+    html = (SITE / "engage/index.html").read_text()
+    structure = page("engage/index.html")
+    assert "Email a project question" in html
+    assert "No account, automatic submission or server storage." in html
+    assert len(structure.forms) == 1
+    assert structure.forms[0].get("id") == "brief-form"
+    assert not structure.forms[0].get("action")
+    assert structure.forms[0].get("method", "").lower() != "post"
+    assert any(x.startswith("mailto:metaautomating@gmail.com")
+               for x in structure.refs)
+    assert "Nothing is sent until" in html or "Nothing is sent" in html
+    assert "Do not include passwords" in html
+
+
+def test_website_assets_have_size_budgets_and_no_third_party_dependencies():
+    css = (SITE / "assets" / "site.css").read_bytes()
+    js = (SITE / "assets" / "site.js").read_bytes()
+    assert len(css) <= 64 * 1024, f"Site CSS size increased unexpectedly: {len(css)}"
+    assert len(js) <= 18 * 1024, f"Site JS size increased unexpectedly: {len(js)}"
+    assert len((SITE / "index.html").read_bytes()) <= 38 * 1024
+    source = js.decode("utf-8")
+    assert "fetch(" not in source
+    assert "XMLHttpRequest" not in source
+    assert "localStorage" not in source
+    assert "sessionStorage" not in source
+    assert "document.cookie" not in source
+    for p in ("index.html", "services/index.html",
+              "company/index.html", "engage/index.html"):
+        html = (SITE / p).read_text()
+        assert not re.search(r'<script[^>]+src="https?://', html)
+        assert not re.search(r'<link[^>]+href="https?://', html)
