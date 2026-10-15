@@ -20,6 +20,10 @@ from app.phase03_capability_planning import (  # noqa: E402
     DemoPlanningRequest, TARGETS, create_denied_plan, inspect_denied_plan,
     OfflinePlanDenied,
 )
+from app.phase03_integrated_conformance import (  # noqa: E402
+    DemoIntegratedRequest, IntegratedSourceDenied, run_integrated_demo,
+    inspect_integrated_demo,
+)
 from app.phase03_execution_rehearsal import (  # noqa: E402
     DemoExecutionAttempt, DemoExecutionAudit, ExecutionAttemptDenied,
 )
@@ -122,6 +126,14 @@ def main(argv: list[str] | None = None) -> int:
     ex.add_argument("--observed-version", type=int, default=1)
     ex.add_argument("--reviewer-count", type=int, choices=[0, 1, 2], default=0)
     ex.add_argument("--observed-tick", type=int, default=101)
+    integrated = sub.add_parser(
+        "integrated-demo", help="Reconcile local DENY traces across Phase 03 modules"
+    )
+    integrated.add_argument("operation_id", help="Exact draft operation")
+    integrated.add_argument("--request-id", default="DEMO-REQ-CLI-INTEGRATION-001")
+    integrated.add_argument("--observed-version", type=int, default=1)
+    integrated.add_argument("--reviewer-count", type=int, choices=[0, 1, 2], default=0)
+    integrated.add_argument("--observed-tick", type=int, default=101)
     args = parser.parse_args(argv)
     try:
         operations = _manifest()
@@ -179,6 +191,23 @@ def main(argv: list[str] | None = None) -> int:
             result = asdict(report)
             result.pop("tenant_id")
             result["evidence_scope"] = "INVENTED_UNTRUSTED_FIXTURES_ONLY"
+        elif args.action == "integrated-demo":
+            offline_developer_doctor(ROOT)
+            labels = ("DEMO-REVIEWER-ONE", "DEMO-REVIEWER-TWO")[:args.reviewer_count]
+            query = DemoIntegratedRequest(
+                tenant_id=DEMO_TENANT,
+                operation_id=args.operation_id,
+                request_id=args.request_id,
+                attempt_id="DEMO-ATTEMPT-INTEGRATION-001",
+                observed_tick=args.observed_tick,
+                observed_version=args.observed_version,
+                reviewer_labels=labels,
+            )
+            report = run_integrated_demo(query)
+            if not inspect_integrated_demo(report, query):
+                raise IntegratedSourceDenied("Cross-module discrepancy")
+            result = asdict(report)
+            result["local_source_integrity_checked"] = True
         elif args.action == "execution-rehearsal":
             intent = _intent(args.operation_id, args.request_id)
             denied = OfflineCapabilityPreview().inspect_once(intent)
@@ -245,7 +274,7 @@ def main(argv: list[str] | None = None) -> int:
                  (intent_b, gate.inspect_once(intent_b))),
             )
             result = asdict(report)
-    except (ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, DemoAnalyticsDenied, OfflineDeveloperDenied, ExecutionAttemptDenied, ValueError) as exc:
+    except (IntegratedSourceDenied, ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, DemoAnalyticsDenied, OfflineDeveloperDenied, ExecutionAttemptDenied, ValueError) as exc:
         print(f"PHASE03_RESULT=DENY: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(result, sort_keys=True, indent=2, default=str))
