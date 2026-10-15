@@ -171,6 +171,13 @@ def run_integrated_demo(request: DemoIntegratedRequest) -> OfflineIntegratedRepo
         and plan_check.input_bound
         and verification.demo_evidence_consistent
         and audit_check.demo_internal_links_consistent
+        and verification.demo_state_unchanged is rejection.demo_resource_version_unchanged
+        and plan_check.expired is rejection.demo_plan_expired
+        and metrics.currency == "DEMO-UNIT"
+        and metrics.customer_data_processed is False
+        and verification.independently_observed_real_outcome is False
+        and verification.authoritative_provider_receipt_verified is False
+        and verification.provider_readback_performed is False
         and receipt.decision == plan.decision == rejection.decision == "DENY"
         and verification.decision == metrics.decision == "DENY"
         and receipt.tenant_id == plan.tenant_id == rejection.tenant_id
