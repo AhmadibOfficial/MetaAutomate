@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "product": "metaautomate",
+  "phase": "03",
+  "milestone": "P3-06",
+  "mode": "DENY_ONLY_EXECUTION_REHEARSAL",
+  "deployment_state": "NOT_DEPLOYED",
+  "source_dependency": "P3-02_DENIED_PLAN_AND_P3-03_SYNTHETIC_NEGATIVE_EVIDENCE",
+  "default_decision": "DENY",
+  "terminal_demo_state": "REJECTED_NO_DISPATCH",
+  "phase01_verified": 3,
+  "phase01_required": 9,
+  "phase02_operational_approved": false,
+  "independent_review_approved": false,
+  "private_branch_protection_verified": false,
+  "trusted_identity_available": false,
+  "tenant_scope_proven": false,
+  "provider_access_available": false,
+  "human_review_authenticated": false,
+  "durable_replay_protection_available": false,
+  "independent_provider_receipt_available": false,
+  "real_execution_authorized": false,
+  "any_effect_performed": false,
+  "automatic_rollback_available": false,
+  "real_customer_data_read": false,
+  "demo_audit_properties": {
+    "hash_algorithm": "SHA256_UNKEYED_NOT_AUTHENTICATED",
+    "storage": "ONE_PROCESS_VOLATILE_ONLY",
+    "global_limit": 64,
+    "per_tenant_limit": 16,
+    "cross_tenant_visibility": "DENY",
+    "signed_or_durable_evidence": false
+  },
+  "required_trust_codes": [
+    "P01_FOUNDATION_NOT_APPROVED",
+    "P02_OPERATIONAL_RELEASE_NOT_APPROVED",
+    "P03_ACTOR_AND_SERVICE_IDENTITY_UNVERIFIED",
+    "P03_TENANT_AND_SCOPE_UNVERIFIED",
+    "P03_PROVIDER_CONSENT_AND_BOUNDARY_UNVERIFIED",
+    "P03_APPROVAL_IS_DEMO_ONLY",
+    "P03_NO_DURABLE_IDEMPOTENCY_OR_AUTHENTICATED_RECEIPT",
+    "P03_NO_INDEPENDENT_PROVIDER_READBACK"
+  ],
+  "business_effect_policy": {
+    "validate_only": "NO_DISPATCH_AND_NO_COMPENSATION_REQUIRED",
+    "read_external": "NO_REAL_EXTERNAL_READ_ALLOWED",
+    "propose_write": "NO_REAL_WRITE;MANUAL_TRIAGE_FUTURE_REVERSAL_PLAN_REQUIRED",
+    "high_risk_finance": "DUAL_REAL_HUMAN_REVIEW_UNVERIFIED"
+  },
+  "future_real_acceptance": [
+    "qualified_independent_review",
+    "protected_private_branch",
+    "real_identity_revocation",
+    "resource_tenant_scope",
+    "provider_and_customer_consent",
+    "bound_exact_human_effect_approval",
+    "transactional_idempotency",
+    "signed_provider_receipt",
+    "independent_authoritative_readback",
+    "rollback_drills",
+    "formal_owner_release_GO"
+  ]
+}
