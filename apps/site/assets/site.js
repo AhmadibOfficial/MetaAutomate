@@ -45,41 +45,119 @@
   // Operating philosophy, a conceptual design rather than a live agent interface.
   const phases = Object.freeze({
     understand: {
-      number:"01 / 05", icon:"◎", title:"Start with the objective.",
-      description:"Understand the problem, the desired outcome, the people involved and the limits of the work before deciding what should be built.",
+      number:"01 / 07", icon:"◎", title:"Start with the objective.",
+      description:"Understand the challenge, the desired outcome, the people involved and the limits of the work before deciding what should be built.",
       keyword:"CLARITY"
     },
+    think: {
+      number:"02 / 07", icon:"✦", title:"Think before we build.",
+      description:"Question assumptions, explore possibilities, evaluate feasibility and risks, and choose a direction grounded in evidence.",
+      keyword:"REASONING"
+    },
     design: {
-      number:"02 / 05", icon:"◈", title:"Engineer the right system.",
-      description:"Translate context into deliberate architecture, capability boundaries and a clear pathway from idea to an implementable solution.",
+      number:"03 / 07", icon:"◈", title:"Engineer the right system.",
+      description:"Turn informed decisions into thoughtful architecture, accessible experiences and clear requirements for implementation.",
       keyword:"ARCHITECTURE"
     },
     create: {
-      number:"03 / 05", icon:"⌘", title:"Make the solution real.",
-      description:"Build interfaces, software and workflows with craft, maintainability and the people who will use them in mind.",
+      number:"04 / 07", icon:"⌘", title:"Make the solution real.",
+      description:"Build software, content and workflows with care for quality, maintainability and the people who will use them.",
       keyword:"CREATION"
     },
+    automate: {
+      number:"05 / 07", icon:"⇄", title:"Make repeatable work simpler.",
+      description:"Design controlled workflows that reduce repetitive effort while preserving human authorization, oversight and clear boundaries.",
+      keyword:"AUTOMATION DESIGN"
+    },
     verify: {
-      number:"04 / 05", icon:"◇", title:"Prove what the system does.",
+      number:"06 / 07", icon:"◇", title:"Prove what the system does.",
       description:"Test assumptions, check requirements, assess security and make responsible decisions from evidence—not promises.",
       keyword:"ASSURANCE"
     },
     improve: {
-      number:"05 / 05", icon:"↗", title:"Keep learning. Keep improving.",
-      description:"Use feedback and measurable outcomes to evolve the system and deepen the value it creates over time.",
+      number:"07 / 07", icon:"↗", title:"Keep learning. Keep improving.",
+      description:"Use feedback and measurable outcomes to refine solutions and strengthen the value they create over time.",
       keyword:"EVOLUTION"
     }
   });
+  // Illustrative use cases are local text only. They do not invoke services or customer actions.
+  const sampleUseCases = Object.freeze({
+    inventory: {
+      label: "Inventory & purchasing",
+      stages: {
+        understand: "Identify stock gaps, inconsistent records and the decisions shop staff need to make.",
+        think: "Compare possible causes of shortages, available data quality and the risk of incorrect reorder advice.",
+        design: "Outline a simple stock view, configurable thresholds and a named person responsible for approvals.",
+        create: "Prototype an inventory import and a read-only stock summary using invented sample records.",
+        automate: "Propose low-stock alerts and draft purchase recommendations for human review; send nothing.",
+        verify: "Check sample figures, duplicate items, access boundaries and the accuracy of the proposed flags.",
+        improve: "Use staff feedback to refine thresholds, clarify exceptions and track whether decisions become easier."
+      }
+    },
+    content: {
+      label: "Content & client engagement",
+      stages: {
+        understand: "Clarify the audience, brand message, content channels and who signs off each post.",
+        think: "Assess the most useful topics, creative options, publishing risks and expected audience value.",
+        design: "Plan a calendar with drafting, brand review, approval and publishing checkpoints.",
+        create: "Prepare example posts, visuals and video scripts aligned with the brand's goals.",
+        automate: "Design approval-gated scheduling and repeatable handoffs; do not publish any example content.",
+        verify: "Review claims, image rights, accessibility, formatting and the approved publication window.",
+        improve: "Use legitimate engagement feedback to refine topics, presentation and posting cadence."
+      }
+    },
+    mobile: {
+      label: "Secure digital products",
+      stages: {
+        understand: "Map the essential mobile and API journeys, users' needs and authorization boundaries.",
+        think: "Evaluate usability trade-offs, possible abuse cases, engineering effort and failure modes.",
+        design: "Specify clear screens, secure API contracts and testable authentication rules.",
+        create: "Build a prototype of the user journey and corresponding API components in a safe environment.",
+        automate: "Plan repeatable build and regression checks, subject to authorized scope and release gates.",
+        verify: "Test permissions, data isolation, user experience and evidence of expected behavior.",
+        improve: "Prioritize fixes using testing results and approved user feedback before any wider rollout."
+      }
+    }
+  });
+  let activeUseCase = "inventory";
+  let activeStage = "understand";
+  const useCaseButtons = [...document.querySelectorAll("[data-use-case]")];
+  function renderUseCase() {
+    const sample = sampleUseCases[activeUseCase];
+    const stage = phases[activeStage];
+    if (!sample || !stage) return;
+    const title = document.getElementById("use-case-detail-title");
+    const stageLabel = document.getElementById("use-case-stage");
+    const description = document.getElementById("use-case-stage-description");
+    if (!title || !stageLabel || !description) return;
+    title.textContent = sample.label;
+    stageLabel.textContent = stage.number.slice(0,2) + " / " + activeStage.toUpperCase();
+    description.textContent = sample.stages[activeStage];
+    for (const button of useCaseButtons) {
+      const selected = button.dataset.useCase === activeUseCase;
+      button.classList.toggle("is-selected",selected);
+      button.setAttribute("aria-pressed",String(selected));
+    }
+  }
+  for (const button of useCaseButtons) {
+    button.addEventListener("click", () => {
+      if (!sampleUseCases[button.dataset.useCase]) return;
+      activeUseCase = button.dataset.useCase;
+      renderUseCase();
+    });
+  }
   const operationTabs = [...document.querySelectorAll("[data-operation]")];
   const operationPanel = document.getElementById("operation-content");
   function selectPhase(key, setFocus=false) {
     const phase=phases[key];
     if (!phase || !operationPanel) return;
+    activeStage = key;
     document.getElementById("operation-counter").textContent=phase.number;
     document.getElementById("operation-title").textContent=phase.title;
     document.getElementById("operation-description").textContent=phase.description;
     document.getElementById("operation-symbol").textContent=phase.icon;
     document.getElementById("operation-keyword").textContent=phase.keyword;
+    renderUseCase();
     for (const tab of operationTabs) {
       const selected=tab.dataset.operation===key;
       tab.classList.toggle("is-selected",selected);
@@ -87,7 +165,11 @@
       tab.tabIndex=selected?0:-1;
       if (selected) {
         operationPanel.setAttribute("aria-labelledby", tab.id);
-        if (setFocus) tab.focus();
+        if (setFocus) {
+          tab.focus();
+          // On narrow screens, keep keyboard-selected tabs within the scrollable rail.
+          tab.scrollIntoView({block:"nearest",inline:"nearest",behavior:"instant"});
+        }
       }
     }
   }

@@ -169,6 +169,46 @@ h1 em{background:linear-gradient(112deg,#07b9ff 0%,#c9e8ff 58%,#efc573 96%);back
 .operation-foot{padding-top:18px;border-top:1px solid #2e759c4a;color:#6fa4c9}
 .operation-foot span:last-child{color:#f0bf68}
 .system-disclosure{color:#8cb0d0;font-size:11px;max-width:760px;line-height:1.8;margin:22px auto 0;text-align:center}
+/* Illustrative, cross-sector scenarios demonstrate how the seven principles connect to real client challenges. */
+.system-use-cases{margin-top:46px;border-top:1px solid #397bac4d;padding-top:39px}
+.use-case-heading{display:grid;grid-template-columns:1.2fr .8fr;align-items:end;gap:24px;margin-bottom:21px}
+.use-case-heading .eyebrow{color:#91d7ff}
+.use-case-heading h3{font-size:clamp(23px,2.7vw,36px);line-height:1.16;letter-spacing:-.035em;margin:11px 0 0}
+.use-case-heading>p{font-size:13px;line-height:1.75;color:#bed8ec;margin:0}
+.use-case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.use-case-option{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:21px 19px;text-align:left;color:#e4f4ff;background:#0a2749;border:1px solid #397bac86;border-radius:12px;min-width:0;cursor:pointer;transition:background .2s,border-color .2s}
+.use-case-option:hover,.use-case-option:focus-visible{border-color:#75c9f1;background:#103a61}
+.use-case-option.is-selected{border-color:#8cdfff;background:#12476f;box-shadow:inset 0 3px 0 #f0c46d}
+.use-case-option .use-case-id{font-size:10px;font-weight:850;letter-spacing:.12em;color:#95d7f7}
+.use-case-option strong{font-size:17px;line-height:1.23}
+.use-case-problem,.use-case-value{font-size:12px;line-height:1.45;color:#c6dcf0}
+.use-case-value{color:#f0d49b;margin-top:auto}
+.use-case-detail{margin-top:15px;padding:24px 27px;border-radius:12px;background:#f3f9fd;color:#102e4d}
+.use-case-detail-meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#315c79;font-weight:850;font-size:10px;letter-spacing:.08em}
+.use-case-detail h4{font-size:21px;letter-spacing:-.03em;margin:15px 0 9px}
+.use-case-detail p{font-size:14px;line-height:1.7;color:#304e68;margin:0;max-width:950px}
+.use-case-disclaimer{font-size:11.5px;color:#b6d4e9;line-height:1.7;margin:18px 0 0}
+@media(max-width:900px){.use-case-heading{grid-template-columns:1fr;gap:11px}}
+@media(max-width:760px){
+ .system-section{padding-block:38px}
+ .system-section .section-heading{margin-bottom:26px}
+ .operating-content{min-height:395px}
+ .operation-visual{height:160px}
+ .operation-ring{width:145px;height:145px}
+ .operation-ring.ring-b{width:220px;height:220px}
+ .system-disclosure{margin-top:14px}
+ .system-use-cases{margin-top:18px;padding-top:18px}
+ .use-case-heading{gap:7px;margin-bottom:12px}
+ .use-case-heading h3{font-size:22px;margin-top:6px}
+ .use-case-heading>p{font-size:12px;line-height:1.55}
+ .use-case-grid{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:1px;padding-bottom:9px;overscroll-behavior-x:contain}
+ .use-case-option{flex:0 0 min(80%,260px);scroll-snap-align:start;padding:14px 16px;gap:5px}
+ .use-case-option strong{font-size:16px}
+ .use-case-detail{margin-top:10px;padding:16px}
+ .use-case-detail h4{font-size:19px;margin:9px 0 5px}
+ .use-case-detail p{font-size:12.5px;line-height:1.55}
+ .use-case-disclaimer{font-size:11px;line-height:1.5;margin-top:12px}
+}
 /* Sectors */
 .industry-section{background:#f4f7fb}
 .industry-mosaic{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
@@ -421,7 +461,8 @@ h1 em{background:linear-gradient(112deg,#07b9ff 0%,#c9e8ff 58%,#efc573 96%);back
   .section-heading h2{font-size:clamp(35px,7.7vw,53px)}
   .service-grid,.operating-panel,.proof-layout,.next-layout,.purpose-grid,.brand-story-layout,.brief-layout{grid-template-columns:1fr}
   .operating-panel{min-height:auto}
-  .operating-rail{flex-direction:row;overflow-x:auto;gap:8px;padding:15px;border-right:0;border-bottom:1px solid #397bac44}
+  .operating-rail{flex-direction:row;overflow-x:auto;gap:8px;padding:15px;border-right:0;border-bottom:1px solid #397bac44;scroll-snap-type:x proximity;overscroll-behavior-x:contain}
+  .operation-tab{scroll-snap-align:start;flex:0 0 auto}
   .operation-tab{white-space:nowrap;font-size:14px;padding:13px 15px}
   .operating-content{padding:30px 26px;min-height:475px}
   .industry-mosaic{grid-template-columns:repeat(2,minmax(0,1fr))}
