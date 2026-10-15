@@ -6,6 +6,7 @@ on:
     paths:
       - "apps/site/**"
       - "scripts/verify_brand_site.py"
+      - "scripts/verify_brand_accessibility_tree.py"
       - "render.yaml"
       - ".github/workflows/brand-site.yml"
   push:
@@ -95,10 +96,13 @@ jobs:
             exit 1
           fi
           python scripts/verify_brand_site.py
+          python scripts/verify_brand_accessibility_tree.py
       - name: Upload reviewed global brand desktop and mobile screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: metaautomate-global-company-experience
-          path: artifacts/metaautomate-global-*.png
+          path: |
+            artifacts/metaautomate-global-*.png
+            artifacts/metaautomate-accessibility-tree-report.json
           if-no-files-found: warn
