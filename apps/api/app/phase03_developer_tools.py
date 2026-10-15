@@ -101,8 +101,24 @@ def source_spec() -> dict[str, object]:
     }
 
 
+def _same_typed_structure(left: object, right: object) -> bool:
+    # JSON comparison alone would regard 0 == False as True.
+    if type(left) is not type(right):
+        return False
+    if type(right) is dict:
+        return (
+            left.keys() == right.keys()
+            and all(_same_typed_structure(left[k], right[k]) for k in right)
+        )
+    if type(right) is list:
+        return len(left) == len(right) and all(
+            _same_typed_structure(a, b) for a, b in zip(left, right)
+        )
+    return left == right
+
+
 def validate_source_spec(candidate: object) -> None:
-    if type(candidate) is not dict or candidate != source_spec():
+    if not _same_typed_structure(candidate, source_spec()):
         raise OfflineDeveloperDenied("Developer source contract mismatch or unsafe change")
 
 
