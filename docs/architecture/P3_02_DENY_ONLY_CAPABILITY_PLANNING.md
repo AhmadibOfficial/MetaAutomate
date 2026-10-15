@@ -47,3 +47,9 @@ python scripts/verify_phase03_local_gate.py --expect-sha <EXACT_SHA>
 ```
 
 **NO-GO:** Phase 03 production execution and Phase 02 operational release remain blocked. No merge, subscriptions, migrations, staging, OneCall product federation, customer account operation, provider read/write or commercial pilot is authorized by this milestone.
+
+## Source review acceptance notes
+
+This draft PR is targeted to `main` to trigger the repository's existing pull-request CI; until PR #44 has been independently reviewed and merged, the PR #45 diff necessarily includes P3-01 and P3-02 code. **Combined CI passing is not separate human review or permission to merge.** The dependency ordering remains P3-01 then P3-02 and release authority remains outside both PRs.
+
+Code reviewers should independently inspect the exact body-field equality used by the negative receipt verifier, the immutable requested resource version and expiry, the in-memory replay limit, tenant/resource binding, strict DEMO allowlists, absence of API/worker wiring, and the guarantee that no `ALLOW` response can be emitted. Reviewers must also note that an actor controlling the demo checksum can regenerate it: the checksum is not cryptographic permission, nor can this planner implement trustworthy issuance until real service identities, tenancy, approvals and provider verification are added later behind operational gates.
