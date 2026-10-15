@@ -421,7 +421,8 @@ h1 em{background:linear-gradient(112deg,#07b9ff 0%,#c9e8ff 58%,#efc573 96%);back
   .section-heading h2{font-size:clamp(35px,7.7vw,53px)}
   .service-grid,.operating-panel,.proof-layout,.next-layout,.purpose-grid,.brand-story-layout,.brief-layout{grid-template-columns:1fr}
   .operating-panel{min-height:auto}
-  .operating-rail{flex-direction:row;overflow-x:auto;gap:8px;padding:15px;border-right:0;border-bottom:1px solid #397bac44}
+  .operating-rail{flex-direction:row;overflow-x:auto;gap:8px;padding:15px;border-right:0;border-bottom:1px solid #397bac44;scroll-snap-type:x proximity;overscroll-behavior-x:contain}
+  .operation-tab{scroll-snap-align:start;flex:0 0 auto}
   .operation-tab{white-space:nowrap;font-size:14px;padding:13px 15px}
   .operating-content{padding:30px 26px;min-height:475px}
   .industry-mosaic{grid-template-columns:repeat(2,minmax(0,1fr))}
