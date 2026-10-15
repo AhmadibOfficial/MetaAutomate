@@ -130,6 +130,38 @@ def test_company_roadmap_does_not_misrepresent_source_as_live_execution():
     assert "<small>PLANNED</small>" not in content
 
 
+def test_five_stage_roadmap_matches_long_term_vision_without_false_launches():
+    content = (SITE / "company/index.html").read_text(encoding="utf-8")
+    css = (SITE / "assets/site.css").read_text(encoding="utf-8")
+    assert "04 / ENGINEERING OUR FUTURE" in content
+    assert "A long-term vision." in content
+    assert "A purposeful path to lasting impact." in content
+    assert content.count('class="roadmap-entry ') == 5
+    assert '<ol class="roadmap-layout" aria-label="MetaAutomate project evolution roadmap">' in content
+    for expected in (
+        "Foundation",
+        "Platform Expansion",
+        "Intelligent Ecosystem",
+        "Global Impact",
+        "A Better World",
+        "AI and creative-system foundations",
+        "Agriculture, healthcare and food security",
+        "Developer tools and capability contracts",
+        "International reach",
+        "Opportunity for more people",
+        "Always HALAL",
+        "IN DEVELOPMENT · 3/9 GATES VERIFIED",
+        "SOURCE DEVELOPMENT · OPERATIONS NO-GO",
+        "SOURCE ONLY · LIVE EXECUTION BLOCKED",
+        "FUTURE AMBITION · NOT DEPLOYED",
+        "OUR NORTH STAR · ASPIRATIONAL",
+    ):
+        assert expected in content
+    assert "Global impact and a better world are long-term ambitions" in content
+    assert "@media(max-width:560px)" in css
+    assert ".roadmap-layout{grid-template-columns:1fr" in css
+
+
 def test_primary_website_ctas_do_not_use_white_on_bright_cyan():
     css = (SITE / "assets/site.css").read_text(encoding="utf-8")
     assert "/* Publication accessibility review:" in css
