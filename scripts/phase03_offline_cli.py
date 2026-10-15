@@ -16,6 +16,10 @@ from uuid import UUID
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "apps/api"))
 
+from app.phase03_integrated_conformance import (  # noqa: E402
+    DemoIntegratedRequest, IntegratedSourceDenied,
+    run_integrated_demo, inspect_integrated_demo,
+)
 from app.phase03_integration_safety import (  # noqa: E402
     OfflineIntegratedInput, OfflineIntegrationDenied,
     run_offline_integration, audit_offline_contracts,
@@ -144,6 +148,14 @@ def main(argv: list[str] | None = None) -> int:
     integrated.add_argument("--observed-tick", type=int, default=101)
     integrated.add_argument("--reviewer-count", type=int, choices=[0,1,2], default=0)
     integrated.add_argument("--demo-analytics", action="store_true")
+    compat = sub.add_parser(
+        "integrated-demo", help="Detailed compatibility trace from the shared DENY engine"
+    )
+    compat.add_argument("operation_id")
+    compat.add_argument("--request-id", default="DEMO-REQ-CLI-INTEGRATION-001")
+    compat.add_argument("--observed-version", type=int, default=1)
+    compat.add_argument("--observed-tick", type=int, default=101)
+    compat.add_argument("--reviewer-count", type=int, choices=[0, 1, 2], default=0)
     args = parser.parse_args(argv)
     try:
         operations = _manifest()
@@ -173,6 +185,24 @@ def main(argv: list[str] | None = None) -> int:
                 "decision": "DENY",
                 "release_authorized": False,
             }
+        elif args.action == "integrated-demo":
+            labels = (
+                "DEMO-REVIEWER-ONE", "DEMO-REVIEWER-TWO",
+            )[:args.reviewer_count]
+            query = DemoIntegratedRequest(
+                tenant_id=DEMO_TENANT,
+                operation_id=args.operation_id,
+                request_id=args.request_id,
+                attempt_id="DEMO-ATTEMPT-INTEGRATION-001",
+                observed_tick=args.observed_tick,
+                observed_version=args.observed_version,
+                reviewer_labels=labels,
+            )
+            report = run_integrated_demo(query)
+            if not inspect_integrated_demo(report, query):
+                raise IntegratedSourceDenied("Source-only trace mismatch")
+            result = asdict(report)
+            result["local_source_integrity_checked"] = True
         elif args.action == "integration-demo":
             reviewer_labels = (
                 "DEMO-REVIEWER-ALPHA", "DEMO-REVIEWER-BETA",
@@ -306,7 +336,7 @@ def main(argv: list[str] | None = None) -> int:
                  (intent_b, gate.inspect_once(intent_b))),
             )
             result = asdict(report)
-    except (ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, DemoAnalyticsDenied, OfflineDeveloperDenied, ExecutionAttemptDenied, OfflineIntegrationDenied, ValueError) as exc:
+    except (ContractRejected, CapabilityDenied, OfflinePlanDenied, DemoEvidenceRejected, DemoAnalyticsDenied, OfflineDeveloperDenied, ExecutionAttemptDenied, OfflineIntegrationDenied, IntegratedSourceDenied, ValueError) as exc:
         print(f"PHASE03_RESULT=DENY: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(result, sort_keys=True, indent=2, default=str))
