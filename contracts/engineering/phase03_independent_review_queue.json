@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "milestone": "P3-08",
+  "purpose": "INDEPENDENT_REVIEW_PREPARATION_NOT_INDEPENDENT_APPROVAL",
+  "review_target": {
+    "pr_number": 53,
+    "source_commit": "c59dab15defc89ecb8b19db869afa1ea0007ade9",
+    "repository": "AhmadibOfficial/MetaAutomate",
+    "review_target_is_parent_source": true,
+    "reviewed_by_independent_human": false
+  },
+  "source_acceptance": {
+    "github_ci_run": 157,
+    "github_ci_python_passed": 903,
+    "owner_kali_phase03_passed": 572,
+    "owner_kali_suites": 9,
+    "owner_kali_provided_not_independent": true
+  },
+  "foundational_status": {
+    "phase01_verified": 3,
+    "phase01_required": 9,
+    "phase02_operational_approved": false,
+    "phase03_live_execution_authorized": false
+  },
+  "review_state": "NOT_REVIEWED",
+  "release_decision": "NO_GO",
+  "merge_authorized": false,
+  "unverified_tasks": [
+    {
+      "id": "P3T-01",
+      "threat": "Tenant ownership and BOLA",
+      "required_external_evidence": "External authoritative tenant-resource ownership and cross-tenant probing",
+      "status": "PENDING_INDEPENDENT_REVIEW",
+      "evidence_provided": false
+    },
+    {
+      "id": "P3T-02",
+      "threat": "Identity and reviewer forgery",
+      "required_external_evidence": "Verified independent human approver identity, revocation, dual-control evidence",
+      "status": "PENDING_INDEPENDENT_REVIEW",
+      "evidence_provided": false
+    },
+    {
+      "id": "P3T-03",
+      "threat": "Replay and effect idempotency",
+      "required_external_evidence": "Durable transaction record and concurrency/replay test in approved staging",
+      "status": "PENDING_INDEPENDENT_REVIEW",
+      "evidence_provided": false
+    },
+    {
+      "id": "P3T-04",
+      "threat": "Plan expiry and resource revision",
+      "required_external_evidence": "Server clock and atomic conditional-effects verification",
+      "status": "PENDING_INDEPENDENT_REVIEW",
+      "evidence_provided": false
+    },
+    {
+      "id": "P3T-05",
+      "threat": "Provider receipt integrity",
+      "required_external_evidence": "Provider-origin authenticated receipt with independent readback",
+      "status": "PENDING_INDEPENDENT_REVIEW",
+      "evidence_provided": false
+    },
+    {
+      "id": "P3T-06",
+      "threat": "Business-data integrity and privacy",
+      "required_external_evidence": "Legal permission, customer consent and external ledger reconciliation",
+      "status": "PENDING_INDEPENDENT_REVIEW",
+      "evidence_provided": false
+    },
+    {
+      "id": "P3T-07",
+      "threat": "Supply-chain and source review",
+      "required_external_evidence": "Independent reviewer, enforced private main checks, provenance",
+      "status": "PENDING_INDEPENDENT_REVIEW",
+      "evidence_provided": false
+    },
+    {
+      "id": "P3T-08",
+      "threat": "Recovery and compensation",
+      "required_external_evidence": "Off-host backup recovery and authorized rollback drill with real receipt",
+      "status": "PENDING_INDEPENDENT_REVIEW",
+      "evidence_provided": false
+    },
+    {
+      "id": "P3T-09",
+      "threat": "Service impersonation and SSRF",
+      "required_external_evidence": "Approved provider allowlist, TLS lifecycle and revocation tests",
+      "status": "PENDING_INDEPENDENT_REVIEW",
+      "evidence_provided": false
+    },
+    {
+      "id": "P3T-10",
+      "threat": "Staging and controlled release",
+      "required_external_evidence": "Isolated staging signoff, cost approval and owner production GO",
+      "status": "PENDING_INDEPENDENT_REVIEW",
+      "evidence_provided": false
+    }
+  ],
+  "limitations": "Machine-readable queue and source test data cannot attest reviewer identity, branch enforcement, provider/customer consent, deployment or real business outcomes. Human review outcomes must be independently checked in provider tools."
+}
