@@ -189,7 +189,26 @@ h1 em{background:linear-gradient(112deg,#07b9ff 0%,#c9e8ff 58%,#efc573 96%);back
 .use-case-detail p{font-size:14px;line-height:1.7;color:#304e68;margin:0;max-width:950px}
 .use-case-disclaimer{font-size:11.5px;color:#b6d4e9;line-height:1.7;margin:18px 0 0}
 @media(max-width:900px){.use-case-heading{grid-template-columns:1fr;gap:11px}}
-@media(max-width:760px){.system-use-cases{margin-top:33px;padding-top:27px}.use-case-grid{grid-template-columns:1fr;gap:9px}.use-case-option{padding:15px 17px;gap:5px}.use-case-option strong{font-size:16px}.use-case-detail{padding:20px 17px}.use-case-detail h4{font-size:19px}}
+@media(max-width:760px){
+ .system-section{padding-block:38px}
+ .system-section .section-heading{margin-bottom:26px}
+ .operating-content{min-height:395px}
+ .operation-visual{height:160px}
+ .operation-ring{width:145px;height:145px}
+ .operation-ring.ring-b{width:220px;height:220px}
+ .system-disclosure{margin-top:14px}
+ .system-use-cases{margin-top:18px;padding-top:18px}
+ .use-case-heading{gap:7px;margin-bottom:12px}
+ .use-case-heading h3{font-size:22px;margin-top:6px}
+ .use-case-heading>p{font-size:12px;line-height:1.55}
+ .use-case-grid{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:1px;padding-bottom:9px;overscroll-behavior-x:contain}
+ .use-case-option{flex:0 0 min(80%,260px);scroll-snap-align:start;padding:14px 16px;gap:5px}
+ .use-case-option strong{font-size:16px}
+ .use-case-detail{margin-top:10px;padding:16px}
+ .use-case-detail h4{font-size:19px;margin:9px 0 5px}
+ .use-case-detail p{font-size:12.5px;line-height:1.55}
+ .use-case-disclaimer{font-size:11px;line-height:1.5;margin-top:12px}
+}
 /* Sectors */
 .industry-section{background:#f4f7fb}
 .industry-mosaic{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
