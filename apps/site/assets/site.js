@@ -45,28 +45,38 @@
   // Operating philosophy, a conceptual design rather than a live agent interface.
   const phases = Object.freeze({
     understand: {
-      number:"01 / 05", icon:"◎", title:"Start with the objective.",
-      description:"Understand the problem, the desired outcome, the people involved and the limits of the work before deciding what should be built.",
+      number:"01 / 07", icon:"◎", title:"Start with the objective.",
+      description:"Understand the challenge, the desired outcome, the people involved and the limits of the work before deciding what should be built.",
       keyword:"CLARITY"
     },
+    think: {
+      number:"02 / 07", icon:"✦", title:"Think before we build.",
+      description:"Question assumptions, explore possibilities, evaluate feasibility and risks, and choose a direction grounded in evidence.",
+      keyword:"REASONING"
+    },
     design: {
-      number:"02 / 05", icon:"◈", title:"Engineer the right system.",
-      description:"Translate context into deliberate architecture, capability boundaries and a clear pathway from idea to an implementable solution.",
+      number:"03 / 07", icon:"◈", title:"Engineer the right system.",
+      description:"Turn informed decisions into thoughtful architecture, accessible experiences and clear requirements for implementation.",
       keyword:"ARCHITECTURE"
     },
     create: {
-      number:"03 / 05", icon:"⌘", title:"Make the solution real.",
-      description:"Build interfaces, software and workflows with craft, maintainability and the people who will use them in mind.",
+      number:"04 / 07", icon:"⌘", title:"Make the solution real.",
+      description:"Build software, content and workflows with care for quality, maintainability and the people who will use them.",
       keyword:"CREATION"
     },
+    automate: {
+      number:"05 / 07", icon:"⇄", title:"Make repeatable work simpler.",
+      description:"Design controlled workflows that reduce repetitive effort while preserving human authorization, oversight and clear boundaries.",
+      keyword:"AUTOMATION DESIGN"
+    },
     verify: {
-      number:"04 / 05", icon:"◇", title:"Prove what the system does.",
+      number:"06 / 07", icon:"◇", title:"Prove what the system does.",
       description:"Test assumptions, check requirements, assess security and make responsible decisions from evidence—not promises.",
       keyword:"ASSURANCE"
     },
     improve: {
-      number:"05 / 05", icon:"↗", title:"Keep learning. Keep improving.",
-      description:"Use feedback and measurable outcomes to evolve the system and deepen the value it creates over time.",
+      number:"07 / 07", icon:"↗", title:"Keep learning. Keep improving.",
+      description:"Use feedback and measurable outcomes to refine solutions and strengthen the value they create over time.",
       keyword:"EVOLUTION"
     }
   });
@@ -87,7 +97,11 @@
       tab.tabIndex=selected?0:-1;
       if (selected) {
         operationPanel.setAttribute("aria-labelledby", tab.id);
-        if (setFocus) tab.focus();
+        if (setFocus) {
+          tab.focus();
+          // On narrow screens, keep keyboard-selected tabs within the scrollable rail.
+          tab.scrollIntoView({block:"nearest",inline:"nearest",behavior:"instant"});
+        }
       }
     }
   }
