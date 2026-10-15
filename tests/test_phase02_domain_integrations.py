@@ -133,11 +133,18 @@ def test_direct_policy_is_deny_only_and_role_protected():
 
 def test_public_roadmap_marks_parallel_development_without_release_claim():
     page = (ROOT / "apps/site/company/index.html").read_text(encoding="utf-8")
-    assert "PHASE 01</span><h3>Foundation" in page
-    assert "PHASE 02</span><h3>Platform expansion" in page
+    # Verify meaningful public stage names/statuses, not obsolete adjacent-tag layout.
+    assert '<span class="roadmap-phase">PHASE 01 <strong>· NOW</strong></span>' in page
+    assert "<h3>Foundation</h3>" in page
+    assert '<span class="roadmap-phase">PHASE 02</span>' in page
+    assert "<h3>Platform Expansion</h3>" in page
     assert "IN DEVELOPMENT · SOURCE ONLY" in page
+    assert "SOURCE DEVELOPMENT · OPERATIONS NO-GO" in page
     assert "Foundation remains in development" in page
     assert "do not enable customer access or external actions" in page
+    assert "Real authorized execution is blocked" in page
+    assert "FUTURE AMBITION · NOT DEPLOYED" in page
+    assert "OUR NORTH STAR · ASPIRATIONAL" in page
 
 
 def test_main_app_protects_domain_routes_against_browser_caching():
