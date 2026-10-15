@@ -108,8 +108,10 @@ def test_expiration_report_cannot_enable_permission():
     None, True, {"external": "provider"},
 ])
 def test_non_allowlisted_targets_fail_closed(invalid):
+    valid_request = request()
+    changed = replace(valid_request, target_label=invalid)
     with pytest.raises(OfflinePlanDenied):
-        create_denied_plan(request(target=invalid))
+        create_denied_plan(changed)
 
 
 @pytest.mark.parametrize("invalid", [-1, 0, 1001, 1.2, "1", None, True])
