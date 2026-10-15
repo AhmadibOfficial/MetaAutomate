@@ -80,16 +80,84 @@
       keyword:"EVOLUTION"
     }
   });
+  // Illustrative use cases are local text only. They do not invoke services or customer actions.
+  const sampleUseCases = Object.freeze({
+    inventory: {
+      label: "Inventory & purchasing",
+      stages: {
+        understand: "Identify stock gaps, inconsistent records and the decisions shop staff need to make.",
+        think: "Compare possible causes of shortages, available data quality and the risk of incorrect reorder advice.",
+        design: "Outline a simple stock view, configurable thresholds and a named person responsible for approvals.",
+        create: "Prototype an inventory import and a read-only stock summary using invented sample records.",
+        automate: "Propose low-stock alerts and draft purchase recommendations for human review; send nothing.",
+        verify: "Check sample figures, duplicate items, access boundaries and the accuracy of the proposed flags.",
+        improve: "Use staff feedback to refine thresholds, clarify exceptions and track whether decisions become easier."
+      }
+    },
+    content: {
+      label: "Content & client engagement",
+      stages: {
+        understand: "Clarify the audience, brand message, content channels and who signs off each post.",
+        think: "Assess the most useful topics, creative options, publishing risks and expected audience value.",
+        design: "Plan a calendar with drafting, brand review, approval and publishing checkpoints.",
+        create: "Prepare example posts, visuals and video scripts aligned with the brand's goals.",
+        automate: "Design approval-gated scheduling and repeatable handoffs; do not publish any example content.",
+        verify: "Review claims, image rights, accessibility, formatting and the approved publication window.",
+        improve: "Use legitimate engagement feedback to refine topics, presentation and posting cadence."
+      }
+    },
+    mobile: {
+      label: "Secure digital products",
+      stages: {
+        understand: "Map the essential mobile and API journeys, users' needs and authorization boundaries.",
+        think: "Evaluate usability trade-offs, possible abuse cases, engineering effort and failure modes.",
+        design: "Specify clear screens, secure API contracts and testable authentication rules.",
+        create: "Build a prototype of the user journey and corresponding API components in a safe environment.",
+        automate: "Plan repeatable build and regression checks, subject to authorized scope and release gates.",
+        verify: "Test permissions, data isolation, user experience and evidence of expected behavior.",
+        improve: "Prioritize fixes using testing results and approved user feedback before any wider rollout."
+      }
+    }
+  });
+  let activeUseCase = "inventory";
+  let activeStage = "understand";
+  const useCaseButtons = [...document.querySelectorAll("[data-use-case]")];
+  function renderUseCase() {
+    const sample = sampleUseCases[activeUseCase];
+    const stage = phases[activeStage];
+    if (!sample || !stage) return;
+    const title = document.getElementById("use-case-detail-title");
+    const stageLabel = document.getElementById("use-case-stage");
+    const description = document.getElementById("use-case-stage-description");
+    if (!title || !stageLabel || !description) return;
+    title.textContent = sample.label;
+    stageLabel.textContent = stage.number.slice(0,2) + " / " + activeStage.toUpperCase();
+    description.textContent = sample.stages[activeStage];
+    for (const button of useCaseButtons) {
+      const selected = button.dataset.useCase === activeUseCase;
+      button.classList.toggle("is-selected",selected);
+      button.setAttribute("aria-pressed",String(selected));
+    }
+  }
+  for (const button of useCaseButtons) {
+    button.addEventListener("click", () => {
+      if (!sampleUseCases[button.dataset.useCase]) return;
+      activeUseCase = button.dataset.useCase;
+      renderUseCase();
+    });
+  }
   const operationTabs = [...document.querySelectorAll("[data-operation]")];
   const operationPanel = document.getElementById("operation-content");
   function selectPhase(key, setFocus=false) {
     const phase=phases[key];
     if (!phase || !operationPanel) return;
+    activeStage = key;
     document.getElementById("operation-counter").textContent=phase.number;
     document.getElementById("operation-title").textContent=phase.title;
     document.getElementById("operation-description").textContent=phase.description;
     document.getElementById("operation-symbol").textContent=phase.icon;
     document.getElementById("operation-keyword").textContent=phase.keyword;
+    renderUseCase();
     for (const tab of operationTabs) {
       const selected=tab.dataset.operation===key;
       tab.classList.toggle("is-selected",selected);
