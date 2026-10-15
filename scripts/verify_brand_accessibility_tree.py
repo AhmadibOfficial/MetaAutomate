@@ -128,7 +128,7 @@ def test_mobile_menu(browser, evidence: dict) -> None:
     page.keyboard.press("Tab")
     expect(page.locator(".skip-link")).to_be_focused()
     page.keyboard.press("Tab")
-    expect(page.locator(".brand")).to_be_focused()
+    expect(page.locator(".site-header .brand")).to_be_focused()
     page.keyboard.press("Tab")
     menu = page.locator("#menu-button")
     expect(menu).to_be_focused()
