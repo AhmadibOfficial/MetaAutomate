@@ -251,7 +251,11 @@ class OfflineEvidenceRegistry:
     def __init__(self) -> None:
         self._lock = RLock()
         self._events: dict[
-            tuple[UUID, str], tuple[DemoNoDispatchEvent, NegativeOutcomeAssessment]
+            tuple[UUID, str], tuple[
+                DemoNoDispatchEvent, DemoReadbackFixture,
+                OfflineCapabilityPlan, DemoPlanningRequest,
+                int, NegativeOutcomeAssessment,
+            ]
         ] = {}
         self._counts: dict[UUID, int] = {}
 
@@ -267,15 +271,19 @@ class OfflineEvidenceRegistry:
             key = (plan.tenant_id, no_dispatch.event_id)
             previous = self._events.get(key)
             if previous is not None:
-                if (previous[0] != no_dispatch or previous[1] != result):
+                if previous != (
+                    no_dispatch, readback, plan, request, observed_tick, result
+                ):
                     _reject()
-                return previous[1]
+                return previous[5]
             if (len(self._events) >= MAX_EVENTS
                     or self._counts.get(plan.tenant_id, 0) >= MAX_PER_TENANT
                     or (plan.tenant_id not in self._counts
                         and len(self._counts) >= MAX_TENANTS)):
                 _reject()
-            self._events[key] = (no_dispatch, result)
+            self._events[key] = (
+                no_dispatch, readback, plan, request, observed_tick, result
+            )
             self._counts[plan.tenant_id] = (
                 self._counts.get(plan.tenant_id, 0) + 1
             )
@@ -289,4 +297,4 @@ class OfflineEvidenceRegistry:
             event = self._events.get((tenant_id, event_id))
             if event is None:
                 raise DemoEvidenceNotFound("Demo evidence unavailable")
-            return event[1]
+            return event[5]
