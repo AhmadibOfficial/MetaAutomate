@@ -45,12 +45,21 @@ def page(path: str) -> PageStructure:
 def test_homepage_communicates_customer_offer_and_has_real_destinations():
     html = (SITE / "index.html").read_text()
     p = page("index.html")
-    assert "Make your business" in html
-    assert "work smarter" in html
-    assert "Start with a business problem" in html
-    assert "Founders &amp; startups" in html
+    assert "Business challenges deserve" in html
+    assert "smarter solutions" in html
+    assert "Invest in clarity" in html
+    assert "stronger client experiences" in html
+    assert "Business owners &amp; founders" in html
     assert "Operations teams" in html
     assert {"solutions", "workspace-demo", "services", "industries", "platform"} <= p.ids
+    assert html.index('id="solutions"') < html.index('id="workspace-demo"') < html.index('id="services"')
+    assert "Experience a sample planning journey" in html
+    assert "The right investment starts" in html
+    assert "Give your team more time" in html
+    assert "Build trust through quality" in html
+    assert 'class="section proof-section"' not in html
+    assert html.count('class="social-card social-') == 2
+    assert html.count('class="footer-social-link"') == 8
     assert "/engage/#brief-form" in p.refs
     assert "#solutions" in p.refs
     assert "/services/#ai" in p.refs
@@ -94,6 +103,11 @@ def test_enquiry_is_email_draft_no_submission_or_external_form_action():
     html = (SITE / "engage/index.html").read_text()
     structure = page("engage/index.html")
     assert "Email a project question" in html
+    assert "Tell us your business challenge" in html
+    assert "value at stake" in html
+    assert "What business challenge are you tackling?" in html
+    assert "What value would a successful outcome create?" in html
+    assert "investment in AI" in html
     assert "No account, automatic submission or server storage." in html
     assert len(structure.forms) == 1
     assert structure.forms[0].get("id") == "brief-form"
