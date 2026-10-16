@@ -180,7 +180,7 @@ def test_in_memory_dedupe_tenant_scope_human_route_and_audit():
                                          expected_workspace="academy_demo")
     ledger=SyntheticMetaReviewLedger("academy_demo")
     assert ledger.receive(inspection) == 1
-    assert ledger.receive(inspection) == 1  # idempotent: no new task
+    assert ledger.receive(inspection) == 0  # idempotent: no new task
     assert len(ledger.tasks()) == 1
     task=ledger.assign_human("FACEBOOK", "SIM-FB-LEAD-01", "SIM-AGENT-01")
     assert task["assigned_agent"] == "SIM-AGENT-01"
