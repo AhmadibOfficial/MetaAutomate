@@ -64,7 +64,11 @@ def test_static_demo_is_navigable_and_discoverable_but_not_live():
     assert "Fictional business data only" in html
     assert "No subscription available" in html
     assert "Disconnected demonstration" in html
-    assert "DEMO CREDITS ≠ REAL CURRENCY" in html
+    assert "ILLUSTRATIVE $ DISPLAY" in html
+    assert "NOT REAL USD TRANSACTIONS" in html
+    assert "not actual US-dollar sales or currency conversions" in html
+    assert "$9/mo" in html and "$29/mo" in html
+    assert "₦" not in html
     assert "not net profit" in html
     assert "Foundation Phase 01 remains 3/9 verified" in html
     assert "F04–F09 blocked" in html

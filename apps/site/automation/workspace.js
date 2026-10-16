@@ -53,8 +53,8 @@
     }
   });
   const byId = id => document.getElementById(id);
-  const money = n => new Intl.NumberFormat("en-NG", {maximumFractionDigits:0}).format(n) + " demo credits";
-  const shortMoney = n => new Intl.NumberFormat("en-NG", {maximumFractionDigits:0}).format(n) + " DC";
+  // Source figures remain DEMO_CREDITS: $ is a fictional display convention, not USD or FX conversion.
+  const shortMoney = n => "$" + new Intl.NumberFormat("en-US", {maximumFractionDigits:0}).format(n);
   const business = byId("business-select");
   const goal = byId("goal-select");
   const target = byId("target-slider");
