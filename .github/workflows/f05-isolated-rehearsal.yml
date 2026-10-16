@@ -1,0 +1,66 @@
+name: MetaAutomate F05 Two-Tenant Sealed Rehearsal (source-only)
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - feature/f05-disposable-tenant-isolation-acceptance
+
+permissions:
+  contents: read
+
+jobs:
+  source-policy:
+    name: Verify sealed database and nonroot worker source contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install free offline YAML and test tools
+        run: python -m pip install 'PyYAML>=6,<7' 'pytest>=8,<10'
+      - name: Adversarial private-network and RLS template tests
+        run: python -m pytest -q tests/test_f05_isolation_rehearsal.py
+      - name: Generate evidence and enforce operational NO-GO
+        run: |
+          python scripts/verify_f05_isolation_rehearsal.py
+          if python scripts/verify_f05_isolation_rehearsal.py --require-live-staging; then
+            echo 'ERROR: F05 source rehearsal incorrectly satisfied live staging'
+            exit 1
+          fi
+          echo 'PASS: only a disposable source test can execute'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: f05-source-isolation-rehearsal-no-go
+          path: artifacts/validation/f05-isolation-rehearsal.json
+          if-no-files-found: error
+
+  ephemeral-isolated-rls:
+    name: Docker internal-network two-tenant RLS and outbound-denial exercise
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Exercise synthetic Postgres and sealed nonroot worker
+        run: |
+          timeout 240s docker compose \
+            -f deploy/staging/compose.isolation-rehearsal.yaml \
+            --profile source-rehearsal-only \
+            up --abort-on-container-exit --exit-code-from worker
+      - name: Delete disposable synthetic database, network and volume
+        if: always()
+        run: |
+          docker compose \
+            -f deploy/staging/compose.isolation-rehearsal.yaml \
+            --profile source-rehearsal-only \
+            down -v --remove-orphans --timeout 5
+      - name: Assert no operational F05 elevation
+        if: success()
+        run: |
+          echo 'PASS: forced RLS and internal-only Docker network were tested in ephemeral CI.'
+          echo 'This did NOT establish an approved private staging environment, real SSO, customer data or offhost backup.'
