@@ -94,7 +94,7 @@ def main():
             page.locator("#tab-setup").click()
             expect(page.locator("#panel-setup")).to_contain_text("In development")
             expect(page.locator("#panel-setup")).to_contain_text("Responsible automation by design")
-            expect(page.locator("#panel-setup")).to_contain_text("3/9")
+            expect(page.locator("#panel-setup")).to_contain_text("customer authorization")
             assert_no_overflow(page,width)
             if width==1440:
                 page.locator("#business-select").select_option("academy_demo")
