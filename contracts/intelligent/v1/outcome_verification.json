@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "product": "metaautomate",
+  "phase": "03",
+  "milestone": "P3-03",
+  "mode": "OFFLINE_NEGATIVE_CONTROL_ONLY",
+  "release_decision": "NO_GO",
+  "source_dependency": "P3-02_DENY_ONLY_PLAN",
+  "supported_result": "DEMO_NO_DISPATCH_CONSISTENT_NOT_EXTERNAL_VERIFICATION",
+  "external_receipt_trust_available": false,
+  "live_provider_readback_enabled": false,
+  "verified_customer_outcomes_available": false,
+  "real_human_approval_verified": false,
+  "customer_data_processing_enabled": false,
+  "external_execution_authorized": false,
+  "synthetic_sources": [
+    "DEMO_NOT_DISPATCHED",
+    "DEMO_UNCHANGED_LOCAL_FIXTURE"
+  ],
+  "integrity_model": "LOCAL_UNKEYED_SHA256_NOT_AUTHENTICATED",
+  "guarantees": [
+    "reject_mismatched_tenant_request_operation_target_plan",
+    "reject_forged_execution_or_readback_flags",
+    "reject_replay_conflicts",
+    "deny_if_demo_state_changed_or_plan_expired",
+    "report_all_external_evidence_as_unverified"
+  ],
+  "limitations": [
+    "test_fixtures_are_generated_locally_not_by_provider",
+    "no_authenticity_or_nonrepudiation",
+    "single_process_bounded_memory_not_distributed",
+    "no_actual_provider_reads_or_independent_external_observation"
+  ],
+  "phase01_foundation_verified": 3,
+  "phase01_foundation_required": 9,
+  "phase02_operational_go": false
+}

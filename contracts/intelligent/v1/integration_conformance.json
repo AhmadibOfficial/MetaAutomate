@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "phase": "03",
+  "milestone": "P3-07",
+  "source_dependency": "P3-01_THROUGH_P3-06_DRAFTS",
+  "scope": "OFFLINE_SYNTHETIC_CONFORMANCE_ONLY",
+  "default_policy": "DENY",
+  "name": "Phase03 joined denial evidence conformance",
+  "source_modules": [
+    "phase03_intelligent_ecosystem",
+    "phase03_capability_planning",
+    "phase03_outcome_verification",
+    "phase03_business_analytics",
+    "phase03_developer_tools",
+    "phase03_execution_rehearsal"
+  ],
+  "checks": [
+    "deny_plan_receipt_binding",
+    "same_synthetic_tenant_and_request",
+    "scope_and_capability_parity",
+    "plan_expiry_and_version_mismatch_detection",
+    "synthetic_negative_evidence_consistency",
+    "rejection_and_volatile_audit_reconstruction",
+    "hypothetical_metrics_separated_from_proven_value",
+    "independent_source_spec_parity",
+    "rehashed_and_tampered_report_refusal"
+  ],
+  "phase01_verified": 3,
+  "phase01_required": 9,
+  "phase02_operational_go": false,
+  "independent_human_review_verified": false,
+  "private_branch_protection_verified": false,
+  "real_provider_execution_allowed": false,
+  "production_dashboard_enabled": false,
+  "customer_data_used": false,
+  "durable_audit_available": false,
+  "release_authorized": false,
+  "evidence_classes": {
+    "source_ci": "AUTOMATED_SOURCE_TEST_ONLY",
+    "local_kali": "OWNER_PROVIDED_SOURCE_TEST_ONLY",
+    "audit": "UNKEYED_VOLATILE_DEMO_ONLY",
+    "finance": "FICTIONAL_DEMO_UNIT",
+    "human_review": "MISSING"
+  },
+  "owner_approval_required": true,
+  "warning": "The source trace is constructed entirely from actor-controlled synthetic inputs and yields no real authorization, outside identity, business ROI, provider attestation or independent security review.",
+  "source_contract_count": 8,
+  "declared_contracts": [
+    "contracts/domains/v1/operations.json",
+    "contracts/intelligent/v1/capabilities.json",
+    "contracts/intelligent/v1/planning.json",
+    "contracts/intelligent/v1/outcome_verification.json",
+    "contracts/intelligent/v1/business_analytics.json",
+    "contracts/intelligent/v1/developer_tools.json",
+    "contracts/intelligent/v1/execution_rehearsal.json",
+    "contracts/intelligent/v1/integration_conformance.json"
+  ],
+  "source_audit_scope": "LOCAL_ONLY_NO_EXTERNAL_AUTHORITY",
+  "live_execution_authorized": false,
+  "external_provider_access_enabled": false,
+  "independent_review_verified": false,
+  "phase02_operational_approved": false
+}
