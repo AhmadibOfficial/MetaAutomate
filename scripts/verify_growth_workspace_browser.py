@@ -78,6 +78,17 @@ def main():
             expect(page.locator("#goal-target")).to_have_text("$25,000")
             expect(page.locator("#goal-gap")).to_have_text("$10,500 to goal")
             expect(page.locator("#goal-progress")).to_have_attribute("aria-valuenow","58")
+            # Goal changes are backed by source-engine decisions, not UI guesswork.
+            page.locator("#goal-select").select_option("repeat")
+            expect(page.locator("#stat-queue")).to_have_text("3")
+            expect(page.locator("#queue-deferred")).to_have_text("1 outside goal")
+            page.locator("#tab-automations").click()
+            expect(page.locator(".queue-side strong.deferred")).to_have_count(1)
+            page.locator("#goal-select").select_option("orders")
+            expect(page.locator("#stat-queue")).to_have_text("3")
+            page.locator("#goal-select").select_option("contribution")
+            expect(page.locator("#stat-queue")).to_have_text("4")
+            expect(page.locator("#queue-deferred")).to_have_text("0 outside goal")
             # Changing business recomputes figures, never claims real income.
             page.locator("#business-select").select_option("bespoke_demo")
             expect(page.locator("#stat-sales")).to_have_text("$35,000")

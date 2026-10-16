@@ -41,3 +41,6 @@ h1,h2,h3,p{margin-top:0}h1,h2,h3{line-height:1.15;letter-spacing:-.045em}h1{font
   .nav-counter{flex-shrink:0;margin-left:auto}
   .sidebar{max-width:100%}
 }
+
+/* A goal-irrelevant event is not a consent/provider rejection. */
+.queue-side strong.deferred{color:#2a618f;background:#eaf5ff;border-color:#c7deef}

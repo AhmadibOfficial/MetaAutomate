@@ -1,7 +1,4 @@
-/* MetaAutomate P2-03i: browser-only demonstration of source-approved P2-03h concepts.
-   ALL values fictional. No fetch/XMLHttpRequest/WebSocket, API, storage, cookies,
-   messaging, payments, scheduling, publication, real client or provider actions.
-*/
+/* P2-03k free explorer: consumes source-generated review decisions without network requests, stored customer data or execution. */
 (() => {
   "use strict";
   const DEMOS = Object.freeze({
@@ -65,29 +62,38 @@
   let demoTarget = DEMOS[selectedWorkspace].target;
   let lastInspected = null;
 
+  // Exact browser projection of the validated P2-03j decisions; no parallel policy.
+  const ENGINE = window.GrowthAutopilotPreviewData;
+  const GOAL_TYPES = Object.freeze({contribution:"CONTRIBUTION",repeat:"RETENTION",orders:"COMPLETED_ORDERS"});
+  if (!ENGINE || ENGINE.schema_version !== 1 ||
+      ENGINE.access !== "FREE_EXPLORER_NO_ACCOUNT" ||
+      ENGINE.source !== "P2-03j_GOAL_ORCHESTRATION") {
+    throw new Error("Growth Automation Engine contract unavailable");
+  }
   function evaluate(data) {
-    const products = Object.fromEntries(data.products.map(p => [p.id,p]));
-    const sales = data.orders.reduce((sum,o) => sum + products[o.product].price * o.units, 0);
-    const cost = data.orders.reduce((sum,o) => sum + products[o.product].cost * o.units, 0);
-    const contribution = sales - cost - data.marketing;
-    const visits = {};
-    for (const order of data.orders) visits[order.journey] = (visits[order.journey] || 0) + 1;
-    const repeat = Object.values(visits).reduce((sum,n) => sum + Math.max(0,n-1),0);
-    const proposals = data.events.map(event => {
-      let state = "REVIEW_REQUIRED";
-      let reason = "Prepared for review. Inspecting the workflow does not approve, send or schedule any communication.";
-      if (event.kind === "CHECKOUT_ABANDONED") {
-        state = "SUPPRESSED_PROVIDER_OWNS";
-        reason = "Provider duplicate prevention: native Selar checkout recovery owns this example. MetaAutomate must not send another reminder.";
-      } else if (!event.consent) {
-        state = "SUPPRESSED_NO_MARKETING_CONSENT";
-        reason = "Marketing consent has not been confirmed. Customer outreach is held until permission is verified.";
-      }
-      return {...event,state,reason};
+    const plan = ENGINE.workspaces[selectedWorkspace].goals[GOAL_TYPES[goal.value]];
+    if (!plan) throw new Error("Selected business goal is unavailable");
+    const states = Object.freeze({
+      PROPOSED_HUMAN_REVIEW_ONLY:"REVIEW_REQUIRED",
+      SUPPRESSED_PROVIDER_OWNS:"SUPPRESSED_PROVIDER_OWNS",
+      SUPPRESSED_CONSENT_UNVERIFIED:"SUPPRESSED_NO_MARKETING_CONSENT",
+      DEFERRED_NOT_GOAL_RELEVANT:"DEFERRED_NOT_GOAL_RELEVANT"
     });
-    return {sales,cost,contribution,repeat,proposals,
-      drafts:proposals.filter(p => p.state === "REVIEW_REQUIRED").length,
-      suppressed:proposals.filter(p => p.state !== "REVIEW_REQUIRED").length};
+    const proposals = data.events.map(event => {
+      const decision = plan.decisions[event.id];
+      if (!decision || !Object.hasOwn(states,decision.state)) {
+        throw new Error("Missing or unauthorized workflow policy");
+      }
+      return {...event,state:states[decision.state],reason:decision.reason};
+    });
+    const m=plan.metrics;
+    return {
+      sales:m.gross_sales,cost:m.variable_cost,marketing:m.marketing_spend,
+      contribution:m.modeled_contribution,repeat:m.repeat_orders,proposals,
+      drafts:proposals.filter(p=>p.state==="REVIEW_REQUIRED").length,
+      deferred:proposals.filter(p=>p.state==="DEFERRED_NOT_GOAL_RELEVANT").length,
+      suppressed:proposals.filter(p=>p.state.startsWith("SUPPRESSED_")).length
+    };
   }
 
   function text(id, value) {
@@ -126,7 +132,8 @@
 
   function inspectProposal(proposal) {
     lastInspected = proposal.id;
-    const status = proposal.state === "REVIEW_REQUIRED" ? "Draft for review" : "Suppressed";
+    const status = proposal.state === "REVIEW_REQUIRED" ? "Draft for review" :
+      proposal.state === "DEFERRED_NOT_GOAL_RELEVANT" ? "Outside current goal" : "Suppressed";
     text("inspection-panel",
       status + ": " + proposal.title + ". " + proposal.detail + " " +
       proposal.reason + " No network request, approval, delivery or saved change occurred.");
@@ -148,8 +155,10 @@
     const side = document.createElement("div");
     side.className="queue-side";
     const badge=document.createElement("strong");
-    badge.textContent=proposal.state === "REVIEW_REQUIRED" ? "REVIEW NEEDED" : "SUPPRESSED";
-    if (proposal.state !== "REVIEW_REQUIRED") badge.className="suppressed";
+    badge.textContent=proposal.state === "REVIEW_REQUIRED" ? "REVIEW NEEDED" :
+      proposal.state === "DEFERRED_NOT_GOAL_RELEVANT" ? "OUTSIDE GOAL" : "SUPPRESSED";
+    if (proposal.state === "DEFERRED_NOT_GOAL_RELEVANT") badge.className="deferred";
+    else if (proposal.state !== "REVIEW_REQUIRED") badge.className="suppressed";
     const button=document.createElement("button");
     button.type="button";
     button.textContent="View workflow";
@@ -170,11 +179,12 @@
     text("nav-count",metrics.drafts);
     text("ledger-sales",shortMoney(metrics.sales));
     text("ledger-cost","− "+shortMoney(metrics.cost));
-    text("ledger-spend","− "+shortMoney(data.marketing));
+    text("ledger-spend","− "+shortMoney(metrics.marketing));
     text("ledger-result",shortMoney(metrics.contribution));
     text("opportunity-copy",data.opportunity);
     text("queue-ready",metrics.drafts + " for review");
     text("queue-suppressed",metrics.suppressed + " suppressed");
+    text("queue-deferred",metrics.deferred + " outside goal");
     text("goal-target",shortMoney(demoTarget));
     text("goal-current",shortMoney(metrics.contribution) + " modeled");
     const delta=demoTarget-metrics.contribution;

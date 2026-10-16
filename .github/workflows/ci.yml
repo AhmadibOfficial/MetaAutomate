@@ -180,6 +180,10 @@ jobs:
           path: artifacts/validation/p2-03j-growth-orchestration-source.json
           if-no-files-found: warn
 
+      - name: Verify browser engine contract matches source
+        run: |
+          python scripts/build_growth_workspace_contract.py --check
+
       - name: Validate private staging source-only boundaries
         run: |
           python scripts/verify_private_staging_contract.py \
