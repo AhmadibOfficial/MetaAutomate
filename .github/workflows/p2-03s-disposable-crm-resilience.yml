@@ -53,6 +53,18 @@ jobs:
       - name: Retest existing federated Meta lead source contracts
         run: |
           python -m pytest -q tests/test_meta_webhook_signature.py tests/test_synthetic_meta_lead_federation.py
+      - name: Verify continuity browser data matches validated intelligence
+        run: python scripts/build_continuity_workspace_contract.py --check
+      - name: Check source-only continuity browser scripts
+        run: |
+          node --check apps/site/intelligence-lab/continuity/data.js
+          node --check apps/site/intelligence-lab/continuity/continuity.js
+          node --check apps/site/intelligence-lab/lab.js
+      - name: Exercise desktop and mobile continuity workspace
+        run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python -m playwright install --with-deps chromium
+          python scripts/verify_continuity_workspace_browser.py
       - name: Upload test policy (source-only report)
         if: always()
         run: |
@@ -61,5 +73,9 @@ jobs:
         if: always()
         with:
           name: p2-03s-disposable-crm-policy
-          path: disposable-crm-evidence.txt
+          path: |
+            disposable-crm-evidence.txt
+            artifacts/validation/continuity-desktop.png
+            artifacts/validation/continuity-mobile-390.png
+            artifacts/validation/continuity-mobile-360.png
           if-no-files-found: warn
