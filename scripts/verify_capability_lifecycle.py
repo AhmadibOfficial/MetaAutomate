@@ -198,8 +198,19 @@ def validate_transition(
     if not all(isinstance(x, list) and x and len(set(x)) == len(x) for x in (positive, negative, source)):
         errors.append(f"{key}: at least one distinct positive test, negative test and source path required")
     else:
+        archived = kind == "DOWNGRADE"
         defined_tests = set(tests)
         defined_modules = {x.get("path") for x in modules if isinstance(x, dict)}
+        if archived:
+            # Downgrade records cite prior evidence being withdrawn; it must not
+            # be carried forward as implementation evidence of a VISION entry.
+            defined_tests.update(
+                x.get("path") for x in before.get("verification_evidence", [])
+                if isinstance(x, dict) and x.get("kind") == "test_definition"
+            )
+            defined_modules.update(
+                x.get("path") for x in before.get("modules", []) if isinstance(x, dict)
+            )
         for path in positive + negative:
             if not registry._file(root, path) or path not in defined_tests:
                 errors.append(f"{key}: positive/negative test not in scoped verified evidence: {path}")
