@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050e23">
+<meta name="description" content="MetaAutomate Creative Workbench: plan rights-aware image concepts and short videos with human review in a private browser-only prototype.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Creative Workbench — MetaAutomate">
+<meta property="og:description" content="Plan image and video production briefs with rights, consent and human review—without claims of live media generation.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" type="image/webp" href="/assets/metaautomate-mark.webp">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/creative.css">
+<script src="/assets/site.js" defer></script>
+<script src="/assets/creative.js" defer></script>
+<title>Creative Workbench — MetaAutomate</title>
+</head><body>
+<a class="skip-link" href="#main">Skip to content</a>  <div class="utility-bar"><div class="shell"><span class="utility-symbol">✦</span><span>Intelligence · Creation · Automation</span><span class="utility-aside">Global ambition. Purpose-led engineering.</span></div></div>
+  <header class="site-header" id="top">
+  <div class="shell header-layout">
+    <a class="brand" href="/" aria-label="MetaAutomate, homepage">
+      <img src="/assets/metaautomate-mark.webp" alt="" width="54" height="54">
+      <span class="brand-copy"><strong>Meta<span>Automate</span></strong><small>INTELLIGENCE · CREATION · AUTOMATION</small></span>
+    </a>
+    <button class="menu-button" id="menu-button" aria-controls="site-navigation" aria-expanded="false" aria-label="Open navigation" type="button">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="site-navigation" id="site-navigation" aria-label="Primary navigation">
+      <a href="/#solutions" >Solutions</a>
+      <a href="/services/" >Services</a>
+      <a href="/#workspace-demo">Workspace example</a>
+      <a href="/company/" >Company</a>
+      <a class="nav-action" href="/engage/" >Start a project <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="creative-page">
+ <section class="creative-hero">
+  <div class="shell creative-hero-grid">
+   <div>
+    <span class="eyebrow">METAAUTOMATE / 02 CAPABILITY / CREATIVE ENGINEERING</span>
+    <h1>Creative ideas deserve<br><em>a responsible workflow.</em></h1>
+    <p class="creative-intro">Plan image concepts and short-form video production with clear rights declarations, human review and useful deliverables—without confusing a brief with finished AI media.</p>
+    <div class="creative-hero-links"><a class="action action-primary" href="#creative-form">Prepare a creative brief <span aria-hidden="true">↗</span></a><a class="creative-text-link" href="/services/#experience">Explore Product Design &amp; Experience ↗</a></div>
+   </div>
+   <div class="creative-hero-panel" aria-label="Creative workflow stages">
+    <p class="creative-mini-label">HOW IT WORKS / NO PROVIDER CALLS</p>
+    <ol><li><span>01</span>Define the audience and outcome</li><li><span>02</span>Record rights and consent</li><li><span>03</span>Prepare scene or visual direction</li><li><span>04</span>Hand off to a human reviewer</li></ol>
+    <div class="creative-pilot-note"><strong>PLANNING PROTOTYPE</strong><span>Runs entirely in your browser. No media is generated, uploaded, saved to our servers or published.</span></div>
+   </div>
+  </div>
+ </section>
+ <section class="creative-section" id="creative-form" aria-labelledby="creative-form-title">
+  <div class="shell creative-grid">
+   <div class="creative-steps">
+    <span class="eyebrow">PRODUCTION / BRIEF WORKSPACE</span>
+    <h2 id="creative-form-title">Turn the idea into an accountable production plan.</h2>
+    <p>Describe the intended business outcome before choosing image or video. This prototype organizes your choices locally so a production team can review them before any model, asset or platform is used.</p>
+    <div class="creative-detail"><strong>Rights come first.</strong> An ownership or licence selection is a <em>self-declared claim</em>, not independent proof. Permission must be checked by the eventual reviewer.</div>
+    <div class="creative-detail"><strong>Human control stays visible.</strong> A named reviewer is a handoff, not an authenticated approval. This page never authorizes generation, payment or publishing.</div>
+   </div>
+   <div class="creative-form-panel">
+    <form id="creative-brief-form" novalidate>
+     <div class="creative-section-tag">01 / PROJECT DIRECTION</div>
+     <div class="creative-two">
+      <div class="creative-field"><label for="creative-kind">Creative format <span aria-hidden="true">*</span></label><select id="creative-kind" name="kind" required><option value="image">Image concept</option><option value="video">Short-form video</option></select></div>
+      <div class="creative-field"><label for="creative-channel">Primary use <span aria-hidden="true">*</span></label><select id="creative-channel" name="channel" required><option value="social">Social education</option><option value="product">Product presentation</option><option value="training">Training &amp; awareness</option><option value="brand">Brand storytelling</option></select></div>
+     </div>
+     <div class="creative-field"><label for="creative-goal">What should this content help people understand or achieve? <span aria-hidden="true">*</span></label><textarea id="creative-goal" name="goal" rows="3" minlength="20" maxlength="700" placeholder="e.g. Explain how accurate stock records help shop owners avoid lost sales" required></textarea><small>Use an educational or practical objective. Avoid unsupported financial promises.</small></div>
+     <div class="creative-two">
+      <div class="creative-field"><label for="creative-audience">Who is the audience? <span aria-hidden="true">*</span></label><input id="creative-audience" name="audience" type="text" minlength="4" maxlength="100" placeholder="e.g. Local shop owners" required></div>
+      <div class="creative-field"><label for="creative-voice">Creative direction</label><select id="creative-voice" name="voice"><option value="clear">Clear and educational</option><option value="minimal">Minimal and professional</option><option value="warm">Warm and conversational</option></select></div>
+     </div>
+     <div class="creative-field" id="creative-video-control" hidden><label for="creative-duration">Video duration</label><select id="creative-duration" name="duration"><option value="30">30 seconds</option><option value="60" selected>60 seconds</option><option value="90">90 seconds</option><option value="120">120 seconds</option></select><small>Recommended 30–120 seconds, with narration or soundtrack and accessible captions.</small></div>
+     <div class="creative-section-tag">02 / RIGHTS &amp; HUMAN OVERSIGHT</div>
+     <div class="creative-two">
+      <div class="creative-field"><label for="creative-rights">Rights to any referenced assets <span aria-hidden="true">*</span></label><select id="creative-rights" name="rights" required><option value="unknown">Not established (hold)</option><option value="owned">Owned or original</option><option value="licensed">Licensed for this use</option><option value="permission">Written permission obtained</option><option value="none">No third-party references</option></select></div>
+      <div class="creative-field"><label for="creative-likeness">Identifiable people or voices? <span aria-hidden="true">*</span></label><select id="creative-likeness" name="likeness"><option value="unknown">Not checked (hold)</option><option value="none">None planned</option><option value="consented">Informed consent recorded</option><option value="missing">Consent missing (hold)</option></select></div>
+     </div>
+     <div class="creative-field"><label for="creative-proof">Source / rights evidence reference</label><input id="creative-proof" name="proof" type="text" maxlength="140" placeholder="e.g. Internal permission reference, licence record or original-work note"><small>No uploads. Do not enter passwords, private identity details or confidential documents.</small></div>
+     <div class="creative-field"><label for="creative-reviewer">Human review owner <span aria-hidden="true">*</span></label><input id="creative-reviewer" name="reviewer" type="text" minlength="3" maxlength="80" placeholder="e.g. Creative lead" required><small>This name assigns responsibility; it does not mean approval has happened.</small></div>
+     <div class="creative-actions"><button type="submit" class="action action-primary" id="creative-create">Build the review brief <span aria-hidden="true">↗</span></button><button type="reset" class="creative-reset">Clear form</button></div>
+     <p class="creative-data-note">Private browser-only planning. No generative API, payment, publishing, telemetry or background uploads.</p>
+    </form>
+   </div>
+  </div>
+ </section>
+ <section class="creative-output-section" id="creative-output" hidden aria-labelledby="creative-output-title">
+  <div class="shell">
+    <div class="creative-output-top"><div><span class="eyebrow">03 / REVIEW PACKAGE</span><h2 id="creative-output-title">Your production brief</h2><p>Prepared locally for creative direction and independent rights review. No media file has been generated.</p></div><div id="creative-outcome" class="creative-outcome" role="status" aria-live="polite"></div></div>
+    <div class="creative-output-grid"><section class="creative-plan-card"><h3>Creative structure</h3><div id="creative-structure" class="creative-plan-content"></div></section><section class="creative-plan-card"><h3>Required human review</h3><ul id="creative-checks" class="creative-checks"></ul></section></div>
+    <div class="creative-output-actions"><button type="button" id="creative-export" class="action action-primary">Download review brief (text) <span aria-hidden="true">↓</span></button><a href="/engage/?service=Product%20Design%20%26%20Experience" class="creative-text-link">Discuss a design project ↗</a></div>
+    <p class="creative-output-caption" id="creative-report-note">Export is a planning record, not permission to generate or distribute content.</p>
+  </div>
+ </section>
+</main>  <footer class="site-footer">
+  <div class="shell">
+    <div class="footer-major">
+      <div>
+        <a class="brand footer-brand" href="/" aria-label="MetaAutomate homepage"><img src="/assets/metaautomate-mark.webp" alt="" width="54" height="54"><span class="brand-copy"><strong>Meta<span>Automate</span></strong><small>TURN YOUR VISION INTO REALITY</small></span></a>
+        <p>Intelligent systems. Distinctive experiences.<br>Technology designed to create value.</p>
+      </div>
+      <div class="footer-linkset"><h3>Explore</h3><a href="/#solutions">Solutions</a><a href="/services/">Services</a><a href="/#workspace-demo">Workspace example</a></div>
+      <div class="footer-linkset"><h3>MetaAutomate</h3><a href="/company/">Our company</a><a href="/company/#values">Our values</a><a href="/engage/">Project brief</a></div>
+      <div class="footer-statement"><span>OUR NORTH STAR</span><strong>Solutions.<br>Convenience.<br><i>Experiences.</i></strong></div>
+    </div>
+    <div class="footer-contact" aria-label="MetaAutomate business inquiries">
+      <div class="footer-contact-copy"><span class="footer-contact-eyebrow">BUSINESS INQUIRIES / GLOBAL</span><p>Technology projects, collaborations and partnerships.</p></div>
+      <a class="footer-contact-email" href="mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Business%20inquiry">metaautomating@gmail.com <span aria-hidden="true">↗</span></a>
+    </div>
+    <nav class="footer-socials" aria-label="MetaAutomate official social channels">
+      <div class="footer-socials-heading"><span>FOLLOW THE WORK</span><small>Ideas, technology and the people shaping what comes next.</small></div>
+      <div class="footer-socials-links">
+        <a class="footer-social-link" href="https://youtube.com/@MetaAutomate" target="_blank" rel="noopener noreferrer" aria-label="YouTube — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">▶</span>YouTube<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
+        <a class="footer-social-link" href="https://www.linkedin.com/company/meta-automate" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">in</span>LinkedIn<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
+        <a class="footer-social-link" href="https://instagram.com/meta_automate" target="_blank" rel="noopener noreferrer" aria-label="Instagram — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">◎</span>Instagram<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
+        <a class="footer-social-link" href="https://twitter.com/MetaAutomate" target="_blank" rel="noopener noreferrer" aria-label="X / Twitter — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">𝕏</span>X / Twitter<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
+        <a class="footer-social-link" href="https://facebook.com/MetaAutomate" target="_blank" rel="noopener noreferrer" aria-label="Facebook — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">f</span>Facebook<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
+        <a class="footer-social-link" href="https://tiktok.com/@metaautomate" target="_blank" rel="noopener noreferrer" aria-label="TikTok — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">♪</span>TikTok<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
+        <a class="footer-social-link" href="https://whatsapp.com/channel/0029VbDSQMdBqbr1vqRyYR2U" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp Channel — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">WA</span>WhatsApp Channel<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
+        <a class="footer-social-link" href="https://t.me/Meta_Automate" target="_blank" rel="noopener noreferrer" aria-label="Telegram — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">➤</span>Telegram<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
+      </div>
+    </nav>
+    <div class="footer-minor"><span>© <span data-year>2026</span> MetaAutomate. All rights reserved in the brand identity.</span><span>Built with integrity · Excellence · Innovation · Impact · Always HALAL</span></div>
+  </div>
+</footer>
+  
+</body></html>
