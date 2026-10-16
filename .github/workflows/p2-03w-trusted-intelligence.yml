@@ -61,3 +61,35 @@ jobs:
           name: p2-03w-model-governance-evidence
           path: p2-03w-policy-evidence.txt
           if-no-files-found: warn
+
+  governance-browser:
+    name: Source-generated 12-module governance map and mobile acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install free browser test environment
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'playwright>=1.50,<2' 'cryptography>=43,<48' 'psycopg[binary]>=3.2,<4'
+          python -m playwright install --with-deps chromium
+      - name: Verify exact Python to browser governance contract
+        run: python scripts/build_intelligence_governance_contract.py --check
+      - name: Verify static JavaScript parses
+        run: |
+          node --check apps/site/intelligence/governance/data.js
+          node --check apps/site/intelligence/governance/governance.js
+      - name: Check governed intelligence UI at three widths
+        run: python scripts/verify_intelligence_governance_browser.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-03w-intelligence-governance-screenshots
+          path: artifacts/validation/intelligence-governance-*.png
+          if-no-files-found: warn
