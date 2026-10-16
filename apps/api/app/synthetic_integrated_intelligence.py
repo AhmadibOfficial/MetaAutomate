@@ -64,7 +64,7 @@ def _no_float(value: str) -> None:
 
 
 def parse_suite_fixture(raw: bytes) -> dict:
-    _require(type(raw) is bytes and 0 < len(raw) <= MAX_BYTES and b"\\x00" not in raw,
+    _require(type(raw) is bytes and 0 < len(raw) <= MAX_BYTES and b"\x00" not in raw,
              "Invalid synthetic fixture size or type")
     try:
         parsed = json.loads(raw.decode("utf-8"), object_pairs_hook=_pairs,
