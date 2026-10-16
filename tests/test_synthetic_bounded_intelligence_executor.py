@@ -359,3 +359,26 @@ def test_atomic_evidence_rollback_when_audit_insert_fails(env):
         "SELECT state,result_json FROM bounded_virtual_actions "
         "WHERE command_id='SIM-CMD-ROLLBACK'").fetchone()
     assert row["state"]=="REVIEWED" and row["result_json"] is None
+
+
+def test_authorized_result_cannot_change_purpose_even_if_rehashed(env):
+    db,gateway,runner,tokens,*_=env
+    ref=approved(env)
+    cmd="SIM-CMD-PURPOSE-TAMPER"
+    runner.grant(*tokens["reviewer"],ref,cmd,"finance",
+                 "ANALYZE_SAMPLE","REVIEW_BUSINESS_EVIDENCE",
+                 {"sample_count":9,"flagged_count":2})
+    runner.run(*tokens["owner"],cmd)
+    import hashlib
+    saved=db.db.execute(
+        "SELECT result_json FROM bounded_virtual_actions WHERE command_id=?",
+        (cmd,)).fetchone()[0]
+    forged=json.loads(saved)
+    forged["purpose"]="PREPARE_HUMAN_DECISION"
+    raw=json.dumps(forged,separators=(",",":"),sort_keys=True,ensure_ascii=True)
+    h=hashlib.sha256(raw.encode("ascii")).hexdigest()
+    db.db.execute(
+        "UPDATE bounded_virtual_actions SET result_json=?,result_sha256=? "
+        "WHERE command_id=?",(raw,h,cmd))
+    with pytest.raises(SyntheticGrowthError,match="mismatch"):
+        runner.verify(*tokens["auditor"],cmd)
