@@ -135,12 +135,13 @@ def test_public_roadmap_marks_parallel_development_without_release_claim():
     page = (ROOT / "apps/site/company/index.html").read_text(encoding="utf-8")
     assert "PHASE 01 / NOW</span><h3>Foundation" in page
     assert "PHASE 02 / EXPANSION</span><h3>Platform Expansion" in page
-    assert "IN DEVELOPMENT · 3/9 VERIFIED" in page
-    assert "SOURCE ONLY · OPERATIONAL NO-GO" in page
-    assert "IN DEVELOPMENT · SOURCE ONLY" in page
-    assert "Real authorized execution is blocked." in page
-    assert "Foundation remains in development" in page
-    assert "do not enable customer access or external actions" in page
+    assert "ENGINEERING FOUNDATION IN PROGRESS" in page
+    assert "INTEGRATION ENGINEERING IN PROGRESS" in page
+    assert "WORKFLOW DESIGN &amp; VALIDATION" in page
+    assert "Customer activation follows independent security and operational review." in page
+    assert "Our roadmap describes active engineering" in page
+    assert "Customer access, provider integrations, automated operations and subscriptions" in page
+    assert "documented security, operational and commercial approvals" in page
 
 
 def test_main_app_protects_domain_routes_against_browser_caching():
