@@ -59,6 +59,10 @@ def fixture():
             for org,who,role in ((tenant1,operator,"OPERATOR"),
                                  (tenant1,owner,"OWNER"),
                                  (tenant2,foreign,"OWNER")):
+                # Existing tenant-write trigger also protects admin CI fixtures.
+                cur.execute("SELECT set_config('app.organization_id',%s,true),"
+                            "set_config('app.user_id',%s,true)",
+                            (str(org),str(who)))
                 cur.execute("INSERT INTO organization_memberships "
                             "(organization_id,user_id,role) VALUES(%s,%s,%s)",
                             (org,who,role))
