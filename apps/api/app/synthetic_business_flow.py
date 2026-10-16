@@ -62,6 +62,8 @@ def parse_synthetic_flow_bytes(raw: bytes) -> dict:
                          object_pairs_hook=_unique_pairs,
                          parse_constant=lambda _: (_ for _ in ()).throw(
                              SyntheticWorkflowError("Non-finite JSON number rejected")))
+    except SyntheticWorkflowError:
+        raise
     except (UnicodeDecodeError, ValueError, RecursionError) as exc:
         raise SyntheticWorkflowError("Invalid synthetic JSON") from exc
     doc = _object(obj, {"schema_version", "classification", "currency", "scenarios"}, "document")
@@ -223,7 +225,8 @@ def _sector_preview(group: dict) -> dict:
 def render_synthetic_business_flow(raw: bytes, *, sector: str = "all") -> dict:
     """Read-only fully deterministic demonstration; no request/session/tenant adapter."""
     doc = parse_synthetic_flow_bytes(raw)
-    _require(sector in {"all", "retail", "wholesale"}, "Invalid local demo selection")
+    _require(type(sector) is str and sector in {"all", "retail", "wholesale"},
+             "Invalid local demo selection")
     previews = [_sector_preview(group) for group in doc["scenarios"]
                 if sector == "all" or group["sector"] == sector]
     result = {
