@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "classification": "SYNTHETIC_SOURCE_ONLY",
+  "envelopes": [
+    {
+      "object": "page",
+      "entry": [
+        {
+          "id": "SIM-PAGE-ACADEMY",
+          "changes": [
+            {
+              "field": "leadgen",
+              "value": {
+                "leadgen_id": "SIM-FB-LEAD-01",
+                "form_id": "SIM-FORM-ACADEMY",
+                "page_id": "SIM-PAGE-ACADEMY"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "object": "page",
+      "entry": [
+        {
+          "id": "SIM-PAGE-BESPOKE",
+          "changes": [
+            {
+              "field": "leadgen",
+              "value": {
+                "leadgen_id": "SIM-FB-LEAD-02",
+                "form_id": "SIM-FORM-BESPOKE",
+                "page_id": "SIM-PAGE-BESPOKE"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "object": "instagram",
+      "entry": [
+        {
+          "id": "SIM-IG-BESPOKE",
+          "messaging": [
+            {
+              "message": {
+                "mid": "SIM-IG-MSG-01"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "object": "whatsapp_business_account",
+      "entry": [
+        {
+          "id": "SIM-WABA-ACADEMY",
+          "changes": [
+            {
+              "field": "messages",
+              "value": {
+                "messages": [
+                  {
+                    "id": "SIM-WA-MSG-01"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
