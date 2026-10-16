@@ -89,6 +89,31 @@ def test_vision_cannot_claim_test_proof():
     assert any("VISION must not claim" in e for e in check(m, c, f))
 
 
+def test_legacy_baseline_cannot_shrink_with_crosswalk():
+    m, c, f = sources()
+    missing_id = c[-1]["capability_id"]
+    c.pop()
+    for entry in m["entries"]:
+        if missing_id in entry["catalog_ids"]:
+            entry["catalog_ids"].remove(missing_id)
+    assert any("exactly 33" in e for e in check(m, c, f))
+
+
+def test_unexpected_operational_field_is_rejected():
+    m, c, f = sources()
+    m["entries"][0]["enable_real_actions"] = True
+    assert any("unexpected/missing entry fields" in e for e in check(m, c, f))
+
+
+def test_unexpected_top_level_or_release_field_is_rejected():
+    m, c, f = sources()
+    m["deploy_now"] = True
+    m["release_boundary"]["bypass_release_checks"] = True
+    errors = check(m, c, f)
+    assert any("Unexpected/missing manifest fields" in e for e in errors)
+    assert any("Unexpected/missing release boundary fields" in e for e in errors)
+
+
 def test_invalid_security_requirement_rejected():
     m, c, f = sources()
     m["entries"][0]["security_requirements"].append("DISABLE_ALL_SECURITY")
