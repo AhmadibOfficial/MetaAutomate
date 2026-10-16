@@ -202,11 +202,11 @@ def test_real_customer_fixture_and_invalid_goal_denied():
         build_committed_value_report(goal=True)
     d = scenario()
     d["currency"] = "USD"
-    with pytest.raises(SyntheticGrowthError, match="Real business records"):
+    with pytest.raises(SyntheticGrowthError, match="Live business records"):
         build_business_value_report(make_bytes(d))
     d = scenario()
     d["classification"] = "REAL_CUSTOMER_DATA"
-    with pytest.raises(SyntheticGrowthError, match="Real business records"):
+    with pytest.raises(SyntheticGrowthError, match="Live business records"):
         build_business_value_report(make_bytes(d))
     f = json.loads(FIXTURE.read_bytes())
     f["workspaces"][1]["events"][0]["email"] = "customer@example.com"
