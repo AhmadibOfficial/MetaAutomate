@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "classification": "SYNTHETIC_SOURCE_ONLY",
+  "evaluated_at": "2026-10-16T09:00:00Z",
+  "records": [
+    {
+      "workspace": "academy_demo",
+      "event_id": "SIM-IG-01",
+      "channel": "INSTANT_FORM",
+      "source_ref": "SIM-CAMPAIGN-EDU-A",
+      "submitted": true,
+      "last_user_message_at": null,
+      "first_ad_message_at": null,
+      "comment_at": null,
+      "private_reply_used": false,
+      "keyword_match": false,
+      "has_marketing_optin": false,
+      "opted_out": false,
+      "qualification": {
+        "interest": "COURSES",
+        "budget_band": "MEDIUM",
+        "location_band": "LOCAL",
+        "timeline": "SOON"
+      },
+      "agent_available": true
+    },
+    {
+      "workspace": "academy_demo",
+      "event_id": "SIM-IG-02",
+      "channel": "ORGANIC_DM",
+      "source_ref": "SIM-PROFILE-EDU-A",
+      "submitted": false,
+      "last_user_message_at": "2026-10-16T08:40:00Z",
+      "first_ad_message_at": null,
+      "comment_at": null,
+      "private_reply_used": false,
+      "keyword_match": false,
+      "has_marketing_optin": false,
+      "opted_out": false,
+      "qualification": {
+        "interest": "COURSES",
+        "budget_band": "LOW",
+        "location_band": "REMOTE",
+        "timeline": "LATER"
+      },
+      "agent_available": true
+    },
+    {
+      "workspace": "bespoke_demo",
+      "event_id": "SIM-IG-03",
+      "channel": "COMMENT_KEYWORD",
+      "source_ref": "SIM-MEDIA-FAS-A",
+      "submitted": false,
+      "last_user_message_at": null,
+      "first_ad_message_at": null,
+      "comment_at": "2026-10-14T09:00:00Z",
+      "private_reply_used": false,
+      "keyword_match": true,
+      "has_marketing_optin": false,
+      "opted_out": false,
+      "qualification": {
+        "interest": "FASHION",
+        "budget_band": "UNKNOWN",
+        "location_band": "UNKNOWN",
+        "timeline": "UNKNOWN"
+      },
+      "agent_available": true
+    },
+    {
+      "workspace": "bespoke_demo",
+      "event_id": "SIM-IG-04",
+      "channel": "COMMENT_KEYWORD",
+      "source_ref": "SIM-MEDIA-FAS-B",
+      "submitted": false,
+      "last_user_message_at": null,
+      "first_ad_message_at": null,
+      "comment_at": "2026-10-06T09:00:00Z",
+      "private_reply_used": false,
+      "keyword_match": true,
+      "has_marketing_optin": false,
+      "opted_out": false,
+      "qualification": {
+        "interest": "FASHION",
+        "budget_band": "UNKNOWN",
+        "location_band": "UNKNOWN",
+        "timeline": "UNKNOWN"
+      },
+      "agent_available": false
+    },
+    {
+      "workspace": "academy_demo",
+      "event_id": "SIM-IG-05",
+      "channel": "CLICK_TO_DIRECT",
+      "source_ref": "SIM-IGAD-EDU-B",
+      "submitted": false,
+      "last_user_message_at": "2026-10-12T09:10:00Z",
+      "first_ad_message_at": "2026-10-12T09:00:00Z",
+      "comment_at": null,
+      "private_reply_used": false,
+      "keyword_match": false,
+      "has_marketing_optin": false,
+      "opted_out": false,
+      "qualification": {
+        "interest": "COURSES",
+        "budget_band": "HIGH",
+        "location_band": "LOCAL",
+        "timeline": "NOW"
+      },
+      "agent_available": true
+    },
+    {
+      "workspace": "bespoke_demo",
+      "event_id": "SIM-IG-06",
+      "channel": "LINK_IN_BIO",
+      "source_ref": "SIM-BIO-FAS-A",
+      "submitted": false,
+      "last_user_message_at": null,
+      "first_ad_message_at": null,
+      "comment_at": null,
+      "private_reply_used": false,
+      "keyword_match": false,
+      "has_marketing_optin": false,
+      "opted_out": false,
+      "qualification": {
+        "interest": "FASHION",
+        "budget_band": "UNKNOWN",
+        "location_band": "UNKNOWN",
+        "timeline": "UNKNOWN"
+      },
+      "agent_available": false
+    },
+    {
+      "workspace": "academy_demo",
+      "event_id": "SIM-IG-07",
+      "channel": "INSTANT_FORM",
+      "source_ref": "SIM-CAMPAIGN-EDU-B",
+      "submitted": false,
+      "last_user_message_at": null,
+      "first_ad_message_at": null,
+      "comment_at": null,
+      "private_reply_used": false,
+      "keyword_match": false,
+      "has_marketing_optin": false,
+      "opted_out": false,
+      "qualification": {
+        "interest": "COURSES",
+        "budget_band": "UNKNOWN",
+        "location_band": "UNKNOWN",
+        "timeline": "UNKNOWN"
+      },
+      "agent_available": false
+    },
+    {
+      "workspace": "bespoke_demo",
+      "event_id": "SIM-IG-08",
+      "channel": "ORGANIC_DM",
+      "source_ref": "SIM-PROFILE-FAS-A",
+      "submitted": false,
+      "last_user_message_at": "2026-10-16T08:20:00Z",
+      "first_ad_message_at": null,
+      "comment_at": null,
+      "private_reply_used": false,
+      "keyword_match": false,
+      "has_marketing_optin": true,
+      "opted_out": true,
+      "qualification": {
+        "interest": "FASHION",
+        "budget_band": "MEDIUM",
+        "location_band": "LOCAL",
+        "timeline": "NOW"
+      },
+      "agent_available": true
+    },
+    {
+      "workspace": "bespoke_demo",
+      "event_id": "SIM-IG-09",
+      "channel": "COMMENT_KEYWORD",
+      "source_ref": "SIM-MEDIA-FAS-C",
+      "submitted": false,
+      "last_user_message_at": null,
+      "first_ad_message_at": null,
+      "comment_at": "2026-10-15T09:00:00Z",
+      "private_reply_used": true,
+      "keyword_match": true,
+      "has_marketing_optin": false,
+      "opted_out": false,
+      "qualification": {
+        "interest": "FASHION",
+        "budget_band": "UNKNOWN",
+        "location_band": "UNKNOWN",
+        "timeline": "UNKNOWN"
+      },
+      "agent_available": true
+    }
+  ]
+}
