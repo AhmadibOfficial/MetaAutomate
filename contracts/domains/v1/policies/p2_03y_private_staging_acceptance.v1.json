@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "classification": "SOURCE_ONLY_PRIVATE_STAGING_ACCEPTANCE",
+  "environment": "NOT_PROVISIONED",
+  "environment_approval": "MISSING",
+  "customer_data_allowed": false,
+  "real_model_calls_allowed": false,
+  "live_external_tools_allowed": false,
+  "release_authorized": false,
+  "foundation_verified": 3,
+  "foundation_total": 9,
+  "phase02_operational_go": false,
+  "phase03_operational_go": false,
+  "requirements": [
+    {
+      "id": "F04",
+      "name": "Enforced GitHub release protection",
+      "evidence_kind": "GITHUB_REQUIRED_CHECK_DENIAL",
+      "independent_witness": true,
+      "available": false
+    },
+    {
+      "id": "F05",
+      "name": "Approved private staging and sealed network perimeter",
+      "evidence_kind": "PRIVATE_PERIMETER_INSPECTION",
+      "independent_witness": true,
+      "available": false
+    },
+    {
+      "id": "F06",
+      "name": "Real IdP login, MFA, membership and revocation",
+      "evidence_kind": "LIVE_IDP_LOGIN_REVOCATION_TRACE",
+      "independent_witness": true,
+      "available": false
+    },
+    {
+      "id": "F07",
+      "name": "Encrypted off-host backup and isolated recovery",
+      "evidence_kind": "OFFHOST_RESTORE_INDEPENDENT_WITNESS",
+      "independent_witness": true,
+      "available": false
+    },
+    {
+      "id": "F08",
+      "name": "Two-tenant, tool isolation and end-to-end security",
+      "evidence_kind": "SECURITY_ACCEPTANCE_RUN",
+      "independent_witness": true,
+      "available": false
+    },
+    {
+      "id": "F09",
+      "name": "Consented pilot with actual baseline and outcomes",
+      "evidence_kind": "CONSENTED_PILOT_MEASUREMENT",
+      "independent_witness": true,
+      "available": false
+    }
+  ],
+  "intelligence_gates": [
+    {
+      "id": "OIDC",
+      "name": "OIDC/PKCE state and verified staff identity",
+      "proof": "ISSUER_SIGNED_ID_TOKEN_AND_LIVE_LOGIN_CALLBACK",
+      "verified": false
+    },
+    {
+      "id": "AGENT",
+      "name": "Worker process and network isolation",
+      "proof": "ENFORCED_RUNTIME_EGRESS_DENIAL",
+      "verified": false
+    },
+    {
+      "id": "MODEL",
+      "name": "Authorized task, model privacy and live benchmarks",
+      "proof": "APPROVED_BUDGET_AND_QUALITY_SAFETY_COST_EVALUATION",
+      "verified": false
+    },
+    {
+      "id": "TOOLS",
+      "name": "Provider-scoped two-person reviewed tool capability",
+      "proof": "LIVE_TOKEN_SCOPE_AND_REPLAY_NEGATIVE_TEST",
+      "verified": false
+    },
+    {
+      "id": "DATA",
+      "name": "Lawful consent, data minimization and retention",
+      "proof": "CONSENT_SOURCE_PROVENANCE_REVIEW",
+      "verified": false
+    },
+    {
+      "id": "RECOVERY",
+      "name": "External audit checkpoint and independent restore",
+      "proof": "SIGNED_OFFHOST_BACKUP_RESTORE_RUN",
+      "verified": false
+    }
+  ],
+  "source_rehearsal": {
+    "project_ids": [
+      "academy_demo",
+      "bespoke_demo"
+    ],
+    "data": "SYNTHETIC_ONLY",
+    "max_model_calls": 0,
+    "network_requests": 0,
+    "cloud_resources_provisioned": 0,
+    "paid_subscriptions": 0,
+    "manual_release_only": true
+  }
+}
