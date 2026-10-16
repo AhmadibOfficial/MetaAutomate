@@ -60,7 +60,7 @@ def main():
             expect(page.locator("#panel-value")).to_be_visible()
             expect(page.locator("#goal-target")).to_have_text("20,000 DC")
             expect(page.locator("#goal-gap")).to_have_text("5,500 DC to goal")
-            page.locator("#target-slider").fill("25000")
+            page.locator("#target-slider").evaluate("(node) => { node.value = '25000'; node.dispatchEvent(new Event('input', {bubbles:true})); }")
             expect(page.locator("#goal-target")).to_have_text("25,000 DC")
             expect(page.locator("#goal-gap")).to_have_text("10,500 DC to goal")
             expect(page.locator("#goal-progress")).to_have_attribute("aria-valuenow","58")
