@@ -152,7 +152,7 @@
         return cards([["Gross sales",short(c.gross_sales),"Illustrative order gross"],["Identified expenses",short(cost),"Six explicit cost groups"],
           ["Cost vs. example budget",short(cost-s.identified_cost_budget),"Positive means above selected cost plan"]])+
           '<div class="split" style="margin-top:14px">'+panel("Financial ledger",'<div class="ledger">'+costs.map(k=>line(label(k),money(c[k]))).join("")+line("Total identified costs",money(cost),true)+'</div>')+
-          panel("Financial coverage",'<p>Cash balance: not established.</p><p>Accounts payable: not established.</p><p>Tax and full fixed overhead: not established.</p><p>Verified profit: unavailable.</p>')+'</div>';
+          panel("Financial coverage",'<p>Cash balance: not established.</p><p>Accounts payable: not established.</p><p>Tax and full fixed overhead: not established.</p><p>Verified profit: unavailable.</p>')+'</div>'+'<p class="callout"><strong>Business continuity and operating-cost intelligence:</strong> Explore the <a href="/intelligence-lab/continuity/" style="text-decoration:underline;color:#0765a7">90-day resilience and expenditure workspace</a> with transparent stress scenarios. All examples are synthetic.</p>';
       case "marketing":
         return cards([["Sample impressions",short(s.marketing.impressions),"Channel engagement, not buyers"],["Sample clicks",short(s.marketing.clicks),percentage(s.marketing.clicks,s.marketing.impressions)+" illustrative click-through"],
           ["Drafts awaiting review",short(s.marketing.drafts-s.marketing.reviewed),"No posts published"]])+
@@ -177,11 +177,11 @@
       }
       case "operations":
         return cards([["Open tasks",short(s.operations.tasks_open),"Illustrative workload"],["Completed tasks",short(s.operations.tasks_completed),"Illustrative period"],["Overdue tasks",short(s.operations.tasks_overdue),percentage(s.operations.tasks_overdue,s.operations.tasks_open)+" of open tasks"]])+
-          note("Observed staff minutes do not prove automation saved time. No staff identities or employee records are stored.");
+          note("Observed staff minutes do not prove automation saved time. No staff identities or employee records are stored.")+'<p class="callout"><strong>Business continuity and operating-cost intelligence:</strong> Explore the <a href="/intelligence-lab/continuity/" style="text-decoration:underline;color:#0765a7">90-day resilience and expenditure workspace</a> with transparent stress scenarios. All examples are synthetic.</p>';
       case "executive":
         return cards([["Contribution after known costs",short(contribution(c)),"Not net profit"],["Known-cost share",percentage(cost,c.gross_sales),"Of illustrative gross sales"],["Priority reviews",short(recommendations(s).length),"Rules need real-world evidence"]])+
           '<h3 style="margin-top:22px">Opportunities worth investigating</h3>'+recommendationsHtml(s)+
-          note("Executive findings are descriptive across example data, with no real integrations or proven incremental income.");
+          note("Executive findings are descriptive across example data, with no real integrations or proven incremental income.")+'<p class="callout"><strong>Business continuity and operating-cost intelligence:</strong> Explore the <a href="/intelligence-lab/continuity/" style="text-decoration:underline;color:#0765a7">90-day resilience and expenditure workspace</a> with transparent stress scenarios. All examples are synthetic.</p>';
       default:return '<p>This module is not available in the current preview.</p>';
     }
   }
