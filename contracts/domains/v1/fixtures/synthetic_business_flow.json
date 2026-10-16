@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "classification": "SYNTHETIC_DEMO_ONLY",
+  "currency": "DEMO_CREDITS",
+  "scenarios": [
+    {
+      "sector": "retail",
+      "scenario_id": "DEMO-RETAIL-01",
+      "inventory": [
+        {
+          "sku": "DEMO-TEA",
+          "label": "Synthetic Tea Pack",
+          "on_hand_units": 16,
+          "reorder_threshold_units": 8,
+          "target_units": 22,
+          "unit_price_demo_credits": 1600
+        },
+        {
+          "sku": "DEMO-BAG",
+          "label": "Synthetic Carry Bag",
+          "on_hand_units": 5,
+          "reorder_threshold_units": 3,
+          "target_units": 12,
+          "unit_price_demo_credits": 2400
+        }
+      ],
+      "orders": [
+        {
+          "order_id": "DEMO-ORD-R1",
+          "customer_label": "Synthetic Customer R1",
+          "lines": [
+            {
+              "sku": "DEMO-TEA",
+              "quantity_units": 3
+            },
+            {
+              "sku": "DEMO-BAG",
+              "quantity_units": 1
+            }
+          ]
+        },
+        {
+          "order_id": "DEMO-ORD-R2",
+          "customer_label": "Synthetic Customer R2",
+          "lines": [
+            {
+              "sku": "DEMO-TEA",
+              "quantity_units": 2
+            },
+            {
+              "sku": "DEMO-BAG",
+              "quantity_units": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sector": "wholesale",
+      "scenario_id": "DEMO-WHOLESALE-01",
+      "inventory": [
+        {
+          "sku": "DEMO-GRAIN",
+          "label": "Synthetic Grain Sack",
+          "on_hand_units": 40,
+          "reorder_threshold_units": 18,
+          "target_units": 80,
+          "unit_price_demo_credits": 8500
+        },
+        {
+          "sku": "DEMO-PACK",
+          "label": "Synthetic Packaging Unit",
+          "on_hand_units": 30,
+          "reorder_threshold_units": 10,
+          "target_units": 55,
+          "unit_price_demo_credits": 1200
+        }
+      ],
+      "orders": [
+        {
+          "order_id": "DEMO-ORD-W1",
+          "customer_label": "Synthetic Customer W1",
+          "lines": [
+            {
+              "sku": "DEMO-GRAIN",
+              "quantity_units": 12
+            },
+            {
+              "sku": "DEMO-PACK",
+              "quantity_units": 8
+            }
+          ]
+        },
+        {
+          "order_id": "DEMO-ORD-W2",
+          "customer_label": "Synthetic Customer W2",
+          "lines": [
+            {
+              "sku": "DEMO-GRAIN",
+              "quantity_units": 20
+            },
+            {
+              "sku": "DEMO-PACK",
+              "quantity_units": 10
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
