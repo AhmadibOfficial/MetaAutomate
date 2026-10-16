@@ -9,7 +9,7 @@ const EXPECTED_MODULES=[
 ];
 const EXPECTED_ENGINES=["measurement","decision","recommendation","automation","learning"];
 const MODELS=["claude-opus-5-5","gpt-6-astra","gpt-6-luna","gpt-6.1-sol"];
-const pretty=x=>x.replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase());
+const pretty=x=>x.replaceAll("_"," ").toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
 function safe(){
  if(!map||map.schema_version!==1||map.classification!=="SYNTHETIC_SOURCE_ONLY"||
     !Array.isArray(map.modules)||map.modules.length!==12||
