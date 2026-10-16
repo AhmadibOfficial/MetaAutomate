@@ -73,7 +73,7 @@ def approved(db,actor,ref="SIM-PLAN-01",scenario="LEAD_QUALIFICATION"):
 ])
 def test_all_four_projects_require_independent_approval(suite,scenario):
     db,actors,_,_=suite
-    ref="SIM-PLAN-"+scenario
+    ref="SIM-PLAN-"+scenario.replace("_","-")
     draft=db.propose(actors["owner"],ref,scenario)
     assert draft["state"]=="DRAFT"
     assert draft["external_execution_enabled"] is False
