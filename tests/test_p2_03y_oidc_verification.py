@@ -138,7 +138,7 @@ def test_different_signer_invalid_and_key_revoked(trust):
 
 def test_pinned_key_and_static_membership_both_required(trust):
     key,config,entry,pin,roster,raw,verifier,claims=trust
-    with pytest.raises(SyntheticGrowthError,match="pinned"):
+    with pytest.raises(SyntheticGrowthError,match="Unapproved or rotated"):
         PinnedOidcTokenVerifier(config,jwks_raw=raw,
             trusted_thumbprints=frozenset({"f"*64}),tenant_roster=roster)
     revoked= PinnedOidcTokenVerifier(config,jwks_raw=raw,
