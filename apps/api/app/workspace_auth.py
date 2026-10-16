@@ -7,6 +7,7 @@ OIDC mode never accepts local developer access keys.
 import hashlib
 import os
 import secrets
+import time
 
 import psycopg
 from psycopg.rows import dict_row
@@ -120,12 +121,38 @@ def login(payload: LoginRequest, request: Request, response: Response):
     }
 
 
+def require_recent_oidc_mfa(userinfo: dict, *, now: int | None = None) -> None:
+    """Fail closed unless the verified OIDC ID-token claims show fresh MFA.
+
+    Authlib's authorize_access_token processes the provider-issued signed
+    id_token and exposes its decoded, validated claims as userinfo. This
+    check supplements, but does not replace, the upstream IdP signature,
+    issuer/audience, JWKS and authorization-code/PKCE verification.
+    A real IdP must be configured to emit signed auth_time and amr=mfa;
+    provider-specific ACR policy requires separate live security approval.
+    """
+    current = int(time.time()) if now is None else now
+    methods = userinfo.get("amr")
+    authenticated_at = userinfo.get("auth_time")
+    if (type(methods) is not list
+            or not all(type(method) is str for method in methods)
+            or "mfa" not in methods
+            or type(authenticated_at) is not int
+            or authenticated_at <= 0
+            or authenticated_at < current - 900
+            or authenticated_at > current + 60):
+        raise HTTPException(
+            status_code=401,
+            detail="Recent verified multifactor authentication required",
+        )
+
+
 @router.get("/oidc/login")
 async def oidc_login(request: Request):
     if auth_mode() != "oidc":
         raise HTTPException(status_code=404, detail="SSO not configured")
     provider = oauth.create_client("meta_idp")
-    return await provider.authorize_redirect(request, os.environ["OIDC_REDIRECT_URI"])
+    return await provider.authorize_redirect(request, os.environ["OIDC_REDIRECT_URI"], max_age=900)
 
 
 @router.get("/oidc/callback", name="oidc_callback")
@@ -145,6 +172,10 @@ async def oidc_callback(request: Request):
             or not subject or len(subject) > 512):
         raise HTTPException(status_code=401, detail="Verified OIDC identity required")
 
+    # Authlib already validated the signed id_token. A provider must also
+    # assert fresh MFA in those verified token claims before an API session
+    # can be created for the private workspaces or financial pilot.
+    require_recent_oidc_mfa(userinfo)
     session_secret = secrets.token_urlsafe(36)
     csrf_secret = secrets.token_urlsafe(32)
     with _connection() as conn:
