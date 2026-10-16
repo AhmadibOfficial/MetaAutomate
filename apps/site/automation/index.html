@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f7f9fc">
+  <meta name="description" content="Explore a fictional MetaAutomate Growth Autopilot workspace. All sample automation proposals are read-only, review-only and disconnected from real business accounts.">
+  <title>Growth Autopilot — MetaAutomate | Interactive Demo</title>
+  <link rel="icon" href="/assets/metaautomate-mark.webp" type="image/webp">
+  <link rel="stylesheet" href="/automation/workspace.css">
+  <script defer src="/automation/workspace.js"></script>
+</head>
+<body>
+<a class="skip" href="#workspace-main">Skip to the workspace</a>
+<div class="notice" role="status"><strong>Interactive product demonstration</strong><span>Fictional business data only · Not connected · No actions sent · No subscription available</span></div>
+<header class="topbar">
+  <a class="brand" href="/" aria-label="MetaAutomate, go to home">
+    <img src="/assets/metaautomate-mark.webp" width="43" height="43" alt="">
+    <span><strong>Meta<span>Automate</span></strong><small>GROWTH AUTOPILOT</small></span>
+  </a>
+  <div class="toplinks"><span class="mode"><span aria-hidden="true" class="dot"></span> DEMO MODE</span><a href="/#solutions">Solutions</a><a href="/engage/">Contact</a></div>
+</header>
+<div class="layout">
+  <aside class="sidebar" aria-label="Workspace sections">
+    <div class="sidebar-title">YOUR WORKSPACE <small>Synthetic business preview</small></div>
+    <nav aria-label="Automation workspace views" class="sidebar-menu" role="tablist" aria-orientation="vertical">
+      <button type="button" id="tab-overview" class="workspace-nav is-active" role="tab" aria-controls="panel-overview" aria-selected="true" tabindex="0" data-view="overview"><span aria-hidden="true">◈</span> Overview</button>
+      <button type="button" id="tab-automations" class="workspace-nav" role="tab" aria-controls="panel-automations" aria-selected="false" tabindex="-1" data-view="automations"><span aria-hidden="true">⇄</span> Automations <span class="nav-counter" id="nav-count">4</span></button>
+      <button type="button" id="tab-value" class="workspace-nav" role="tab" aria-controls="panel-value" aria-selected="false" tabindex="-1" data-view="value"><span aria-hidden="true">↗</span> Value &amp; goals</button>
+      <button type="button" id="tab-setup" class="workspace-nav" role="tab" aria-controls="panel-setup" aria-selected="false" tabindex="-1" data-view="setup"><span aria-hidden="true">☷</span> Getting started</button>
+    </nav>
+    <div class="sidebar-foot">
+      <strong>Nothing runs automatically.</strong>
+      <p>This is a browser-only prototype. No logins, messages, payments, external services or saved changes.</p>
+      <a href="/engage/#brief-form">Discuss a real project <span aria-hidden="true">↗</span></a>
+    </div>
+  </aside>
+  <main id="workspace-main" class="main">
+    <div class="page-intro">
+      <div>
+        <p class="kicker">CUSTOMER EXPERIENCE / 01</p>
+        <h1>Your business growth, <span>made clearer.</span></h1>
+        <p class="intro">Choose a sample business, explore its sales journey and inspect proposed automations. Every number and event below is fictional.</p>
+      </div>
+      <span class="environment"><span aria-hidden="true">○</span> Disconnected demonstration</span>
+    </div>
+
+    <section class="configuration" aria-labelledby="configuration-title">
+      <h2 id="configuration-title" class="section-label">01 / Understand your business</h2>
+      <div class="config-grid">
+        <label class="field">Business example
+          <select id="business-select">
+            <option value="academy_demo">Academy demo · Training &amp; courses</option>
+            <option value="bespoke_demo">Bespoke demo · Fashion &amp; tailoring</option>
+          </select>
+        </label>
+        <label class="field">Your main goal
+          <select id="goal-select">
+            <option value="contribution">Improve contribution after marketing</option>
+            <option value="repeat">Grow repeat purchases</option>
+            <option value="orders">Understand completed orders</option>
+          </select>
+        </label>
+        <div class="connection">
+          <span>Business connections</span>
+          <strong><span aria-hidden="true" class="off-dot"></span> Not connected</strong>
+          <small>Selar · Metricool · CRM · Payments — unavailable in this demo</small>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" class="view">
+      <div class="view-head"><div><p class="kicker">02 / Business pulse</p><h2>See the work that matters.</h2><p id="goal-explainer">Explore the difference between fictional sales and contribution after costs.</p></div><span class="scope-tag">SIMULATED FIGURES</span></div>
+      <div class="stat-grid">
+        <article class="stat"><span>Draft sales value</span><strong id="stat-sales" aria-live="polite">—</strong><small>Fictional completed orders</small></article>
+        <article class="stat"><span>After variable &amp; marketing costs</span><strong id="stat-contribution" aria-live="polite">—</strong><small>Modeled contribution · not net profit</small></article>
+        <article class="stat"><span>Return orders</span><strong id="stat-repeat" aria-live="polite">—</strong><small>Within fictional buyer journeys</small></article>
+        <article class="stat"><span>Review-ready proposals</span><strong id="stat-queue" aria-live="polite">—</strong><small>Never sent or scheduled</small></article>
+      </div>
+      <div class="split">
+        <article class="surface">
+          <div class="surface-head"><h3>Where the demo stands</h3><span>MODELED VALUE</span></div>
+          <p class="body-copy">Sales are not profit. The example subtracts invented direct costs and marketing spend before comparing results with a goal.</p>
+          <div class="ledger">
+            <div><span>Fictional sales</span><strong id="ledger-sales">—</strong></div>
+            <div><span>Variable costs</span><strong id="ledger-cost">—</strong></div>
+            <div><span>Marketing spend</span><strong id="ledger-spend">—</strong></div>
+            <div class="ledger-total"><span>Modeled contribution</span><strong id="ledger-result">—</strong></div>
+          </div>
+        </article>
+        <article class="surface">
+          <div class="surface-head"><h3>Next best review</h3><span>HUMAN IN CONTROL</span></div>
+          <p class="body-copy" id="opportunity-copy">Review a fictional post-purchase idea before doing anything customer-facing.</p>
+          <div class="step-cards">
+            <div><b>01</b><span>Identify an event</span></div>
+            <div><b>02</b><span>Check consent and provider rules</span></div>
+            <div><b>03</b><span>Present a draft for review</span></div>
+          </div>
+          <button class="primary-btn" type="button" id="open-queue">Explore the review queue <span aria-hidden="true">↗</span></button>
+        </article>
+      </div>
+    </section>
+
+    <section id="panel-automations" role="tabpanel" aria-labelledby="tab-automations" class="view" hidden>
+      <div class="view-head"><div><p class="kicker">03 / Automation studio</p><h2>Automate carefully. Keep control.</h2><p>Each fictional trigger creates a review draft or is suppressed. Nothing is delivered.</p></div><span class="scope-tag">NO EXTERNAL ACTIONS</span></div>
+      <div class="queue-summary"><span id="queue-ready">0 for review</span><span id="queue-suppressed">0 suppressed</span><span>0 messages sent</span></div>
+      <div class="queue" id="automation-queue" aria-label="Synthetic automation proposals"></div>
+      <div class="inspection" id="inspection-panel" role="region" aria-label="Automation inspection result" aria-live="polite">
+        Select <strong>Inspect sample</strong> to see why a fictional workflow was proposed or suppressed.
+      </div>
+    </section>
+
+    <section id="panel-value" role="tabpanel" aria-labelledby="tab-value" class="view" hidden>
+      <div class="view-head"><div><p class="kicker">04 / Measure value</p><h2>Know what could be worth improving.</h2><p>A subscription should create measurable, incremental value—not promise guaranteed sales.</p></div><span class="scope-tag">ILLUSTRATION ONLY</span></div>
+      <div class="split">
+        <article class="surface goal-card">
+          <h3>Explore a fictional monthly goal</h3>
+          <label for="target-slider" class="slider-label">Target contribution after marketing <strong id="goal-target">—</strong></label>
+          <input id="target-slider" type="range" min="5000" max="50000" step="500" value="20000">
+          <div class="goal-progress" role="progressbar" id="goal-progress" aria-label="Modeled progress toward fictional monthly goal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="goal-bar"></span></div>
+          <div class="goal-numbers"><span id="goal-current">—</span><span id="goal-gap">—</span></div>
+          <p class="fine">This changes a local example target only. It never saves a business goal or creates a financial record.</p>
+        </article>
+        <article class="surface">
+          <h3>How we would demonstrate business value</h3>
+          <div class="value-metrics"><div><strong>Time saved</strong><span>Requires observed staff time before and after</span></div><div><strong>Incremental revenue</strong><span>Needs a defensible baseline or controlled comparison</span></div><div><strong>Contribution after fees</strong><span>Subtract delivery, advertising, software and service costs</span></div></div>
+          <p class="fine">This demo proves none of these outcomes. It is not evidence of real client profit.</p>
+        </article>
+      </div>
+      <div class="surface pricing">
+        <div><h3>Subscription concept, not a checkout</h3><p>These prices are research hypotheses to test with customers—not active plans.</p></div>
+        <div class="plans"><div><b>Explore</b><strong>Free demo</strong><small>Explore the workflow idea</small></div><div><b>Starter</b><strong>₦9,900/mo</strong><small>Illustrative · unavailable</small></div><div><b>Growth</b><strong>₦29,900/mo</strong><small>Illustrative · unavailable</small></div></div>
+      </div>
+    </section>
+
+    <section id="panel-setup" role="tabpanel" aria-labelledby="tab-setup" class="view" hidden>
+      <div class="view-head"><div><p class="kicker">05 / Future onboarding</p><h2>Business setup should take minutes, not expertise.</h2><p>This shows an intended customer journey. No real integration or sign-up is available.</p></div><span class="scope-tag">DESIGN PREVIEW</span></div>
+      <div class="setup-list">
+        <article><b>01</b><div><h3>Choose your business and outcome</h3><p>Set a business type and a meaningful sales, retention or contribution goal. You can try that above with fictional data.</p></div><span>Demo available</span></article>
+        <article><b>02</b><div><h3>Connect services with permission</h3><p>In a future independently authorized release: least-privilege commerce, messaging and social connections, with consent controls.</p></div><span>Not available</span></article>
+        <article><b>03</b><div><h3>Review, activate and measure</h3><p>Approve specific actions under verified safeguards, prevent duplicate messages, and assess real incremental business value.</p></div><span>Not available</span></article>
+      </div>
+      <div class="setup-warning"><strong>Release boundary</strong><p>Foundation Phase 01 remains 3/9 verified, with F04–F09 blocked. Phase 02 and Phase 03 real operations remain NO-GO. This interface does not authenticate tenants or enable subscriptions, posting, orders, messages or payments.</p></div>
+    </section>
+
+    <footer class="workspace-footer"><span>MetaAutomate / Engineering thoughtful experiences</span><span>DEMO CREDITS ≠ REAL CURRENCY · NO REAL DATA</span></footer>
+  </main>
+</div>
+</body>
+</html>
