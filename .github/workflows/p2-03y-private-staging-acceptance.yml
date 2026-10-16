@@ -1,0 +1,85 @@
+name: MetaAutomate P2-03y Private Staging Security Acceptance (source-only)
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - feature/p2-03y-private-staging-security-acceptance
+
+permissions:
+  contents: read
+
+jobs:
+  oidc-and-acceptance:
+    name: Pinned OIDC signature · false-GO rejection · model and recovery gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install free offline verification libraries
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8,<10' 'cryptography>=43,<48' 'PyYAML>=6,<7'
+      - name: Run malicious JWT, staff roster and key pinning checks
+        run: python -m pytest -q tests/test_p2_03y_oidc_verification.py
+      - name: Check Foundation/Intelligence release truth and model/recovery evidence
+        run: python -m pytest -q tests/test_p2_03y_security_acceptance.py
+      - name: Verify private Compose remains source-only and release remains NO-GO
+        run: |
+          python scripts/verify_p2_03y_acceptance.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('artifacts/validation/p2-03y-private-staging-security.json').read_text())
+          assert report['foundation_verified']==3
+          assert report['foundation_total']==9
+          assert report['production_go'] is False
+          assert report['private_staging_provisioned'] is False
+          assert report['existing_compose_source_valid'] is True
+          assert report['current_api_egress_explicitly_denied'] is False
+          print('PASS: source acceptance checked without operational staging claims')
+          PY
+      - name: Prove operational GO request is rejected
+        run: |
+          if python scripts/verify_p2_03y_acceptance.py --require-operational-go; then
+            echo 'FAIL: operational release was incorrectly authorized'
+            exit 1
+          fi
+          echo 'PASS: staged operations remain NO-GO'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-03y-source-staging-no-go-evidence
+          path: artifacts/validation/p2-03y-private-staging-security.json
+          if-no-files-found: warn
+
+  disposable-worker-isolation:
+    name: Disposable nonroot read-only worker · no-network negative test
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test isolated synthetic CI worker under Docker network=none
+        run: |
+          docker run --rm \
+            --network none \
+            --read-only \
+            --user 65534:65534 \
+            --cap-drop ALL \
+            --security-opt no-new-privileges \
+            --pids-limit 32 \
+            --memory 128m \
+            --cpus 1 \
+            --tmpfs /tmp:rw,noexec,nosuid,size=16m \
+            --mount "type=bind,src=${PWD}/scripts/p2_03y_offline_worker_smoke.py,dst=/app/probe.py,readonly" \
+            python:3.12-alpine \
+            python /app/probe.py
+      - name: Reassert staging worker still unprovisioned
+        run: |
+          echo 'A network-disabled disposable CI container is not a real approved private staging agent.'
+          echo 'No provider endpoints, customer data, IdP tokens, private hosts or subscriptions were used.'
