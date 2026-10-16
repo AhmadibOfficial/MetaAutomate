@@ -372,10 +372,13 @@ def test_z_postgres_dump_restore_preserves_tenant_audit_and_encrypted_evidence(s
         "SELECT 1 FROM pg_database WHERE datname='meta_stage_restore_ci'"
     ).fetchone() is None
     admin.execute("CREATE DATABASE meta_stage_restore_ci")
-    subprocess.run(
+    restored=subprocess.run(
         base+["pg_restore","-h","127.0.0.1","-U","meta_stage_admin",
               "-d","meta_stage_restore_ci","--no-owner","--exit-on-error"],
-        input=dump,capture_output=True,check=True,timeout=100)
+        input=dump,capture_output=True,check=False,timeout=100)
+    assert restored.returncode==0, (
+        "Disposable restore failure: "+restored.stderr.decode(errors="replace")[-2500:]
+    )
     # Authenticate the same two LOGIN roles to a *different*, recovered DB.
     # Verify that the restore did not weaken RLS, grant public access or rewrite
     # any committed audit sequence. Independently compare prior trusted heads.
