@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "classification": "SYNTHETIC_SOURCE_ONLY",
+  "currency": "DEMO_CREDITS",
+  "risk_inputs": [
+    {
+      "workspace": "academy_demo",
+      "operational": {
+        "service_downtime_hours": 3,
+        "late_supplier_deliveries": 2,
+        "unreconciled_cost_entries": 4,
+        "unused_tool_seats": 3
+      },
+      "risks": [
+        {
+          "code": "SUPPLIER_DELAY",
+          "likelihood_score": 3,
+          "impact_score": 4,
+          "illustrative_loss_exposure": 2200,
+          "mitigation_cost": 450,
+          "manual_playbook": "Verify alternate supplier quotes and lead times"
+        },
+        {
+          "code": "SYSTEM_OUTAGE",
+          "likelihood_score": 2,
+          "impact_score": 5,
+          "illustrative_loss_exposure": 3400,
+          "mitigation_cost": 600,
+          "manual_playbook": "Validate offline order capture and restore rehearsal"
+        },
+        {
+          "code": "COST_LEAKAGE",
+          "likelihood_score": 3,
+          "impact_score": 3,
+          "illustrative_loss_exposure": 900,
+          "mitigation_cost": 120,
+          "manual_playbook": "Review unused license seats and invoice owners"
+        }
+      ]
+    },
+    {
+      "workspace": "bespoke_demo",
+      "operational": {
+        "service_downtime_hours": 2,
+        "late_supplier_deliveries": 4,
+        "unreconciled_cost_entries": 3,
+        "unused_tool_seats": 2
+      },
+      "risks": [
+        {
+          "code": "SUPPLIER_DELAY",
+          "likelihood_score": 4,
+          "impact_score": 5,
+          "illustrative_loss_exposure": 6000,
+          "mitigation_cost": 750,
+          "manual_playbook": "Confirm alternate fabric suppliers without placing orders"
+        },
+        {
+          "code": "SYSTEM_OUTAGE",
+          "likelihood_score": 2,
+          "impact_score": 3,
+          "illustrative_loss_exposure": 2200,
+          "mitigation_cost": 450,
+          "manual_playbook": "Validate manual order intake and recovery procedures"
+        },
+        {
+          "code": "COST_LEAKAGE",
+          "likelihood_score": 3,
+          "impact_score": 4,
+          "illustrative_loss_exposure": 1100,
+          "mitigation_cost": 150,
+          "manual_playbook": "Reconcile recurring software and operating invoices"
+        }
+      ]
+    }
+  ]
+}
