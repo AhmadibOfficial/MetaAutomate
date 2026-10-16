@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "classification": "SYNTHETIC_SOURCE_ONLY",
+  "currency": "DEMO_CREDITS",
+  "workspaces": [
+    {
+      "workspace": "academy_demo",
+      "crm": {
+        "active_contacts": 12,
+        "consented_contacts": 7,
+        "followups_due": 4,
+        "optouts": 2
+      },
+      "inventory": [
+        {
+          "sku": "SIM-COURSE-KITS",
+          "on_hand": 4,
+          "reorder_point": 7,
+          "unit_cost": 750,
+          "units_sold_last_30_days": 8
+        },
+        {
+          "sku": "SIM-WORKBOOKS",
+          "on_hand": 18,
+          "reorder_point": 10,
+          "unit_cost": 220,
+          "units_sold_last_30_days": 6
+        }
+      ],
+      "marketing": {
+        "impressions": 500,
+        "clicks": 30,
+        "drafts": 3,
+        "reviewed": 1
+      },
+      "sales": {
+        "quotes": 9,
+        "carts": 4,
+        "returns_handled": 0
+      },
+      "operations": {
+        "tasks_open": 8,
+        "tasks_completed": 5,
+        "tasks_overdue": 2,
+        "minutes_available": 1200
+      },
+      "identified_cost_budget": 14000
+    },
+    {
+      "workspace": "bespoke_demo",
+      "crm": {
+        "active_contacts": 15,
+        "consented_contacts": 9,
+        "followups_due": 5,
+        "optouts": 3
+      },
+      "inventory": [
+        {
+          "sku": "SIM-FABRIC-ROLLS",
+          "on_hand": 3,
+          "reorder_point": 6,
+          "unit_cost": 4500,
+          "units_sold_last_30_days": 5
+        },
+        {
+          "sku": "SIM-CAPS",
+          "on_hand": 14,
+          "reorder_point": 8,
+          "unit_cost": 1200,
+          "units_sold_last_30_days": 7
+        }
+      ],
+      "marketing": {
+        "impressions": 850,
+        "clicks": 42,
+        "drafts": 5,
+        "reviewed": 2
+      },
+      "sales": {
+        "quotes": 11,
+        "carts": 6,
+        "returns_handled": 1
+      },
+      "operations": {
+        "tasks_open": 10,
+        "tasks_completed": 7,
+        "tasks_overdue": 3,
+        "minutes_available": 1800
+      },
+      "identified_cost_budget": 29000
+    }
+  ]
+}
