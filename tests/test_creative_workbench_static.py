@@ -62,7 +62,8 @@ def test_creative_runtime_has_no_external_generation_or_publishing():
     assert "no" in js.lower()
     assert "licensed" in js
     assert "permission" in js
-    assert "unknown" in js
+    assert '<option value="unknown">' in load("creative/index.html")
+    assert 'const rightsKnown = ["owned", "licensed", "permission", "none"].includes(v.rights)' in js
     assert "consented" in js
     assert "NOT APPROVED" in js
     assert "HOLD" in js
