@@ -85,6 +85,10 @@ remain unchanged; new source files **do not automatically justify a maturity
 change**. Any change to the authoritative registry needs a separate
 evidence-backed lifecycle proposal and approved source event.
 
+## Cross-sector contract v1
+
+The next design-only extension is [P2-03d Cross-Sector Business Workflow Contract](P2_03D_CROSS_SECTOR_WORKFLOW_CONTRACT.md). It establishes seven fail-closed sector design profiles, but **does not extend this executable synthetic fixture beyond retail and wholesale** or authorize any live capability.
+
 ## Adapting beyond retail + wholesale
 
 Future *design-only* mappings can reinterpret the same review stages:
