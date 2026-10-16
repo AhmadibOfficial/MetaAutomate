@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -43,6 +44,20 @@ def evaluate(ci_result: str, recovery_result: str, config: dict) -> list[str]:
     return failures
 
 
+def read_phase02_operational_status() -> dict:
+    """Evaluate declared Phase 02 evidence, never convert CI PASS to release GO."""
+    script = ROOT / 'scripts/assess_phase02_operational_exit.py'
+    spec = importlib.util.spec_from_file_location('phase02_exit_assessor', script)
+    if spec is None or spec.loader is None:
+        raise RuntimeError('Operational gate evaluator unavailable')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.assess(
+        json.loads(module.FOUNDATION.read_text(encoding='utf-8')),
+        json.loads(module.SOURCE.read_text(encoding='utf-8')),
+    )
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument('--test-result', required=True)
@@ -54,6 +69,16 @@ def main(argv=None) -> int:
         failures = evaluate(args.test_result, args.recovery_result, config)
     except (OSError, yaml.YAMLError):
         failures = ['Render blueprint missing or cannot be parsed']
+    try:
+        phase02 = read_phase02_operational_status()
+    except (OSError, ValueError, RuntimeError, ImportError):
+        phase02 = {
+            'status': 'INVALID',
+            'production_release_authorized': False,
+            'integrity_errors': ['Operational exit register cannot be verified'],
+        }
+    if phase02['status'] == 'INVALID':
+        failures.append('Phase 02 operational evidence register invalid')
     result = 'PASS' if not failures else 'FAIL'
     report = {
         'schema_version': 1,
@@ -67,6 +92,10 @@ def main(argv=None) -> int:
         'failures': failures,
         'deploy_performed': False,
         'customer_access_enabled': False,
+        'scope': 'CI_SOURCE_EVIDENCE_ONLY',
+        'phase02_operational': phase02,
+        'production_release_authorized': False,
+        'phase03_execution_authorized': False,
     }
     ARTIFACT.parent.mkdir(parents=True, exist_ok=True)
     ARTIFACT.write_text(json.dumps(report, indent=2, sort_keys=True)+'\n', encoding='utf-8')
@@ -76,7 +105,9 @@ def main(argv=None) -> int:
                f'| Functional/browser CI | {args.test_result} |',
                f'| Disposable recovery CI | {args.recovery_result} |',
                f'| Render blueprint | {report["checks"]["render_blueprint"]} |',
-               '', '**No deployment or customer-access change performed.**',
+               '', f'| Phase 02 operational gate | {phase02["status"]} |',
+               '', '**CI_SOURCE_EVIDENCE_ONLY: not a production GO.**',
+               '**No deployment or customer-access change performed.**',
                'Human approval and enabled required-status-check rules are separate release gates.']
     if failures:
         message.extend(['', '**Blocked:**'] + [f'- {why}' for why in failures])
