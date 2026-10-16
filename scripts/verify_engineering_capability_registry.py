@@ -22,6 +22,22 @@ VALID_MATURITY = {"VISION", "SOURCE_CANDIDATE", "SOURCE_TESTED", "LOCAL_SYNTHETI
 VALID_KINDS = {"technology_area", "platform_system"}
 VALID_EVIDENCE = {"source_reference", "test_definition", "gate_record"}
 VALID_RISKS = {"LOW", "MEDIUM", "HIGH", "CRITICAL"}
+EXPECTED_LEGACY_COUNT = 33
+MANIFEST_FIELDS = {
+    "schema_version", "registry_id", "as_of_date", "purpose", "relationship",
+    "release_boundary", "maturity_definitions", "security_control_definitions", "entries",
+}
+RELATIONSHIP_FIELDS = {"existing_catalog", "existing_definition_schema", "contract"}
+RELEASE_FIELDS = {
+    "foundation_evidence", "required_policy", "operational_authorization",
+    "all_capabilities_disabled", "reference_deploy",
+}
+ENTRY_FIELDS = {
+    "id", "kind", "name", "maturity", "operational_status", "implementation_scope",
+    "modules", "verification_evidence", "security_requirements", "depends_on",
+    "catalog_ids", "unmet_release_gates", "risk_class", "known_limitations",
+    "next_acceptance",
+}
 EXPECTED_TECHNOLOGY = {
     "CAP-AI", "CAP-MEDIA", "CAP-SOCIAL", "CAP-SOFTWARE", "CAP-SECURITY",
     "CAP-DATA", "CAP-CLOUD", "CAP-BUSINESS", "CAP-ISLAMIC",
@@ -59,16 +75,28 @@ def validate(manifest: dict, catalog: list[dict], foundation: dict, root: Path =
     errors: list[str] = []
     if not isinstance(manifest, dict):
         return ["Manifest is not an object"]
+    unexpected = set(manifest) - MANIFEST_FIELDS
+    missing = MANIFEST_FIELDS - set(manifest)
+    if unexpected or missing:
+        errors.append(f"Unexpected/missing manifest fields: {sorted(unexpected)} / {sorted(missing)}")
     if manifest.get("schema_version") != "1.0.0":
         errors.append("Schema version must be 1.0.0")
     if manifest.get("registry_id") != "metaautomate-engineering-capability-registry":
         errors.append("Registry identity mismatch")
     rel = manifest.get("relationship", {})
     rb = manifest.get("release_boundary", {})
+    if not isinstance(rel, dict) or set(rel) != RELATIONSHIP_FIELDS:
+        errors.append("Unexpected/missing relationship fields")
+        rel = {} if not isinstance(rel, dict) else rel
+    if not isinstance(rb, dict) or set(rb) != RELEASE_FIELDS:
+        errors.append("Unexpected/missing release boundary fields")
+        rb = {} if not isinstance(rb, dict) else rb
     if rel.get("existing_catalog") != SOURCE_CATALOG or not _file(root, SOURCE_CATALOG):
         errors.append("Existing draft catalog linkage is missing")
-    if rel.get("existing_definition_schema") != "docs/registry/capability.schema.json":
+    if rel.get("existing_definition_schema") != "docs/registry/capability.schema.json" or not _file(root, "docs/registry/capability.schema.json"):
         errors.append("Existing registry definition schema linkage is missing")
+    if not _file(root, "docs/registry/engineering-capabilities.v1.schema.json"):
+        errors.append("Engineering JSON Schema is missing")
     if rb.get("foundation_evidence") != FOUNDATION or rb.get("required_policy") != "NO_GO_UNTIL_ALL_NINE_VERIFIED":
         errors.append("Foundation gate policy reference mismatch")
     if rb.get("operational_authorization") != "NO_GO" or rb.get("all_capabilities_disabled") is not True:
@@ -109,8 +137,8 @@ def validate(manifest: dict, catalog: list[dict], foundation: dict, root: Path =
         errors.append("Nine technology areas and ten platform systems must be covered")
 
     catalog_ids = {row.get("capability_id") for row in catalog}
-    if len(catalog) != len(catalog_ids) or not catalog or any(row.get("lifecycle_status") != "DRAFT" for row in catalog):
-        errors.append("Legacy catalog must have unique disabled DRAFT entries")
+    if len(catalog) != EXPECTED_LEGACY_COUNT or len(catalog) != len(catalog_ids) or any(row.get("lifecycle_status") != "DRAFT" for row in catalog):
+        errors.append("Legacy catalog must preserve exactly 33 unique disabled DRAFT entries")
     referenced: list[str] = []
     graph: dict[str, list[str]] = {}
     idset = set(ids)
@@ -119,6 +147,10 @@ def validate(manifest: dict, catalog: list[dict], foundation: dict, root: Path =
             errors.append("Non-object entry")
             continue
         key = str(entry.get("id", "<missing>"))
+        extra_fields = set(entry) - ENTRY_FIELDS
+        missing_fields = ENTRY_FIELDS - set(entry)
+        if extra_fields or missing_fields:
+            errors.append(f"{key}: unexpected/missing entry fields: {sorted(extra_fields)} / {sorted(missing_fields)}")
         if not re.fullmatch(r"(CAP|SYS)-[A-Z]+", key):
             errors.append(f"{key}: invalid stable engineering ID")
         if entry.get("kind") not in VALID_KINDS:
