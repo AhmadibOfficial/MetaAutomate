@@ -126,7 +126,11 @@ def main():
         expect(page.locator("#workspace-stage-description")).to_contain_text("No supplier message")
         expect(page.locator("#workspace-demo")).to_contain_text("synthetic information")
         expect(page.locator(".capability-card")).to_have_count(9)
-        expect(page.locator(".industry-card")).to_have_count(4)
+        expect(page.locator(".focus-sector-card")).to_have_count(7)
+        for sector in ("Retail", "Wholesale", "Transportation", "Logistics",
+                       "Tourism", "Education", "Healthcare"):
+            expect(page.locator("#industries")).to_contain_text(sector)
+        expect(page.locator("#industries .industry-scope")).to_contain_text("not deployed sector products")
         expect(page.locator(".proof-section")).to_have_count(0)
         expect(page.locator(".social-card")).to_have_count(2)
         expect(page.locator(".statement-section")).to_contain_text("Always HALAL")
