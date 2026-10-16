@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "product": "metaautomate",
+  "phase": "02",
+  "kind": "cross_pr_source_coexistence_only",
+  "base_main_sha": "7144451b0ac37349c3e731bac76d14338280c42e",
+  "default_decision": "DENY",
+  "execution_authorized": false,
+  "production_ready": false,
+  "foundation_gates_verified": 3,
+  "foundation_gates_required": 9,
+  "requires_independent_review": true,
+  "merging_permitted": false,
+  "automatic_deployment": false,
+  "all_source_prs_still_draft": true,
+  "lock_scope": "exact Git blob bytes from eight original draft PR heads",
+  "locked_head_shas": {
+    "32": "2739ca4f9b4a6cd10ad556933b5f45ecab9a6c91",
+    "33": "bf6ec6d1a7538a3bb23d03961ef7379d89fc87e5",
+    "34": "0b9556b84386e783da873f954e572338af3100c1",
+    "35": "30a4608ffed00ce99926064315e657f0e8b581ee",
+    "36": "a4c2be04c69d7c1a97fabb410c2adfdeab037445",
+    "37": "09b01338099091a327d1558c31ddfe7df1e4cb59",
+    "38": "f32b35473f8b6b5b0c1e7c9b091a6b2c4b7c21e2",
+    "39": "da64db81a66087649ed7a50c7152679df453d3a3"
+  },
+  "source_files": [
+    {
+      "pr": 32,
+      "path": "apps/api/app/synthetic_delivery.py",
+      "blob_sha": "fab20705e2d40bc01cb82d1f6ecea4cf801317fe"
+    },
+    {
+      "pr": 32,
+      "path": "docs/architecture/P2_04A_LOCAL_DELIVERY_REHEARSAL.md",
+      "blob_sha": "7ba986f802e6ec539be65694a203c81d204ff077"
+    },
+    {
+      "pr": 32,
+      "path": "docs/engineering/KALI_LOCAL_CHECKOUT_P2_04A.md",
+      "blob_sha": "4ef41c4415402c044a55730ba4387f00ac7dd5ba"
+    },
+    {
+      "pr": 32,
+      "path": "tests/test_phase02_delivery_rehearsal.py",
+      "blob_sha": "9c468c3b5f3bf62ca69af697d9c1c3343dd8a4a4"
+    },
+    {
+      "pr": 33,
+      "path": "apps/api/app/synthetic_webhook_proof.py",
+      "blob_sha": "26fb347571cf35abf0378821aa98a18f9275170f"
+    },
+    {
+      "pr": 33,
+      "path": "docs/architecture/P2_04B_OFFLINE_SYNTHETIC_WEBHOOK_PROOF.md",
+      "blob_sha": "74134dc9356a51dd8fa7f9bdcd2f09ab31c1bf5e"
+    },
+    {
+      "pr": 33,
+      "path": "tests/test_phase02_synthetic_webhook_proof.py",
+      "blob_sha": "7895977f7de88c164a764f52fdc9dcc40bd1dcfd"
+    },
+    {
+      "pr": 34,
+      "path": "apps/api/app/synthetic_incident_observability.py",
+      "blob_sha": "1f23e6abc80c6f4663679a2da152c280c9810294"
+    },
+    {
+      "pr": 34,
+      "path": "docs/architecture/P2_04C_OFFLINE_INCIDENT_OBSERVABILITY.md",
+      "blob_sha": "3d4129f3287659135a32e6b24489550e87a4d9a2"
+    },
+    {
+      "pr": 34,
+      "path": "tests/test_phase02_synthetic_incident_observability.py",
+      "blob_sha": "494a1def6756cadbaada9ad2232aafdfd29dccaf"
+    },
+    {
+      "pr": 35,
+      "path": "apps/api/app/synthetic_delivery_resilience.py",
+      "blob_sha": "2316bc3462199a145796c7db36ec871a35e6a85f"
+    },
+    {
+      "pr": 35,
+      "path": "docs/architecture/P2_04D_OFFLINE_RESILIENCE_REHEARSAL.md",
+      "blob_sha": "9f5287a6a508a45847e49db5747faef424f32b64"
+    },
+    {
+      "pr": 35,
+      "path": "tests/test_phase02_synthetic_delivery_resilience.py",
+      "blob_sha": "431c1e94b4667f3921ab5ffe673d703a098c76ca"
+    },
+    {
+      "pr": 36,
+      "path": "contracts/engineering/p2_04e_offline_sources.json",
+      "blob_sha": "4ac5782f4bd09087359528cfd3dec0cb34cbce76"
+    },
+    {
+      "pr": 36,
+      "path": "docs/architecture/P2_04E_OFFLINE_CONFORMANCE.md",
+      "blob_sha": "34593f1f4ada7b31a637a70ce7bad75793d2a12c"
+    },
+    {
+      "pr": 36,
+      "path": "scripts/verify_p2_04e_offline_stack.py",
+      "blob_sha": "770df9f04d35d0d6a302e4181701ef31ce7ddcbb"
+    },
+    {
+      "pr": 36,
+      "path": "tests/test_phase02_offline_stack_contract.py",
+      "blob_sha": "a6e87d0f4203903a775ed81fce23557e09d0b3ba"
+    },
+    {
+      "pr": 37,
+      "path": "apps/api/app/synthetic_write_proposals.py",
+      "blob_sha": "601351d35659919b0e5485ec5af071cf6a52806e"
+    },
+    {
+      "pr": 37,
+      "path": "docs/architecture/P2_05A_OFFLINE_WRITE_PROPOSALS.md",
+      "blob_sha": "2a5fa3e61a7044753c6623566549d102e5b8849e"
+    },
+    {
+      "pr": 37,
+      "path": "tests/test_phase02_synthetic_write_proposals.py",
+      "blob_sha": "49045fcfb52d3faa11adc87faa33e87e0abd7894"
+    },
+    {
+      "pr": 38,
+      "path": "apps/api/app/synthetic_approval_preflight.py",
+      "blob_sha": "3ebb375814f7e806adcef3308a36dae10c79464b"
+    },
+    {
+      "pr": 38,
+      "path": "docs/architecture/P2_05B_OFFLINE_PREFLIGHT_AND_AUTOMATION.md",
+      "blob_sha": "0383123d53f76e5a6e005ae87cb557e4d1694c3e"
+    },
+    {
+      "pr": 38,
+      "path": "scripts/verify_phase02_local_gate.py",
+      "blob_sha": "87e551bef6106afd121586d692a3bfd0225e9756"
+    },
+    {
+      "pr": 38,
+      "path": "tests/test_phase02_local_gate_helper.py",
+      "blob_sha": "b2f2c81e7dfb9d244c7aca203d05d5f4f6702694"
+    },
+    {
+      "pr": 38,
+      "path": "tests/test_phase02_synthetic_approval_preflight.py",
+      "blob_sha": "b58d83a735d97587329db36731a092912d6ed505"
+    },
+    {
+      "pr": 39,
+      "path": "apps/api/app/phase02_approval_evidence.py",
+      "blob_sha": "a0c2b00a2bd03f266320dbe62d050f104da9eadd"
+    },
+    {
+      "pr": 39,
+      "path": "apps/api/app/phase02_pilot_simulation.py",
+      "blob_sha": "6d6479885091a9a92f88fb544aff8b86647ca877"
+    },
+    {
+      "pr": 39,
+      "path": "apps/api/app/phase02_receipt_simulation.py",
+      "blob_sha": "0756d6ff26df069950968887057d1cbecc93d8b2"
+    },
+    {
+      "pr": 39,
+      "path": "contracts/engineering/phase02_source_closure.json",
+      "blob_sha": "15d716cbd72baa5aeaea37cce794af5b0cfc20bc"
+    },
+    {
+      "pr": 39,
+      "path": "docs/architecture/PHASE_02_SOURCE_CLOSURE_CANDIDATE.md",
+      "blob_sha": "04fc11f26c8c16ef53a33719528cda9f823f118a"
+    },
+    {
+      "pr": 39,
+      "path": "tests/test_phase02_completion_bundle.py",
+      "blob_sha": "628cbfb85b350f949889f29cbca40ec1a0194b47"
+    }
+  ],
+  "source_note": "Source blob reuse into isolated integration branch does NOT merge source PRs, approve them, or make services runnable.",
+  "status": "CI_AND_KALI_PENDING_UNTIL_INDEPENDENTLY_VERIFIED"
+}
