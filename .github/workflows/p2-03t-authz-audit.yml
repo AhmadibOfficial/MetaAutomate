@@ -1,0 +1,79 @@
+name: MetaAutomate P2-03t Authorization, Audit and Recovery (disposable)
+
+on:
+  pull_request:
+    branches:
+      - main
+      - feature/p2-03s-disposable-crm-resilience-lab
+  push:
+    branches:
+      - feature/p2-03t-authz-audit-data-quality
+
+permissions:
+  contents: read
+
+jobs:
+  source-data-validation:
+    name: Signed actor authorization and source provenance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test packages only
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8,<10' 'cryptography>=43,<48' 'psycopg[binary]>=3.2,<4'
+      - name: Check signed tokens, roles and PII/source quarantines
+        run: python -m pytest -q tests/test_disposable_crm_auth_quality.py
+      - name: Regression test Meta signed-event contracts
+        run: python -m pytest -q tests/test_meta_webhook_signature.py tests/test_synthetic_meta_lead_federation.py
+
+  disposable-db-authz:
+    name: Real PostgreSQL RLS, audit integrity, backup/restore
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: meta_stage_admin
+          POSTGRES_PASSWORD: disposable_only_ci_password
+          POSTGRES_DB: meta_stage_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U meta_stage_admin -d meta_stage_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      META_CRM_STAGING_DISPOSABLE: "yes"
+      META_CRM_DATABASE_NAME: "meta_stage_ci"
+      META_CRM_ADMIN_DATABASE_URL: "postgresql://meta_stage_admin:disposable_only_ci_password@127.0.0.1:5432/meta_stage_ci"
+      PYTHONPATH: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install PostgreSQL client and test packages
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8,<10' 'psycopg[binary]>=3.2,<4' 'cryptography>=43,<48'
+      - name: Validate production DB isolation / forensic integrity in disposable CI only
+        run: python -m pytest -q -rs tests/test_disposable_meta_crm_postgres.py
+      - name: Test synthetic business resilience regression
+        run: python -m pytest -q tests/test_synthetic_business_resilience.py
+      - name: Record verified release boundary
+        if: always()
+        run: |
+          printf '%s\n' 'P2-03t: tests only in disposable GitHub Actions PostgreSQL 16; no live Meta access, real credentials, production migration, customer records, paid subscriptions or dispatch.' > p2-03t-release-boundary.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-03t-disposable-security-proof
+          path: p2-03t-release-boundary.txt
+          if-no-files-found: warn
