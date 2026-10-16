@@ -56,6 +56,19 @@ def json_wire(value: dict) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
 
 
+def approved_graph_fingerprint(plan: dict) -> str:
+    """Bind reviews to project + complete typed graph + pinned fixture digest."""
+    require(type(plan) is dict and type(plan.get("workflow")) is list
+            and type(plan.get("project")) is dict
+            and type(plan.get("evidence")) is dict
+            and type(plan["evidence"].get("fixture_sha256")) is str,
+            "Missing complete workflow evidence")
+    return sha256(json_wire({
+        "project": plan["project"], "workflow": plan["workflow"],
+        "fixture_sha256": plan["evidence"]["fixture_sha256"],
+    }).encode("ascii")).hexdigest()
+
+
 class GovernedOrchestration:
     """Transactional two-person review using independently signed test actors.
 
@@ -174,7 +187,7 @@ class GovernedOrchestration:
         require(type(plan_ref) is str and DEMO_PROJECT.fullmatch(plan_ref) is not None,
                 "Only fictional plan references supported")
         plan = build_intelligence_plan(scenario_id)
-        digest = sha256(json_wire(plan["project"]).encode("ascii")).hexdigest()
+        digest = approved_graph_fingerprint(plan)
         with self._transaction():
             actor = self._actor(token, ("tenant_admin",))
             require(actor.workspace in KNOWN_WORKSPACES, "Unknown tenant")
@@ -239,7 +252,7 @@ class GovernedOrchestration:
                     "Only original signed owner may simulate approved plan")
             self._not_revoked(actor.workspace,plan["reviewer_token"])
             design=build_intelligence_plan(plan["scenario"])
-            current=sha256(json_wire(design["project"]).encode("ascii")).hexdigest()
+            current=approved_graph_fingerprint(design)
             require(current == plan["spec_hash"], "Approved architecture changed")
             trace=simulate_intelligence_graph(design)
             require(trace["external_actions_attempted"]==0 and
