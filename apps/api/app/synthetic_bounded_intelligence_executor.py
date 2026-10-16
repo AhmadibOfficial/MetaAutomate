@@ -331,8 +331,25 @@ class BoundedIntelligenceExecutor:
         require(digest(request)==row["request_sha256"]
                 and digest(evidence)==row["result_sha256"],
                 "Stored input or result evidence tampered")
-        require(evidence["command_id"]==command_id
+        self._scope(row["module_id"],row["tool_id"],row["purpose"])
+        portfolio=build_governed_portfolio(ws)
+        source=next(m for m in portfolio["modules"] if m["id"]==row["module_id"])
+        plan=self.store._get(ws,row["plan_ref"])
+        require(row["source_sha256"]==source["source_record_sha256"]
+                and row["workflow_sha256"]==plan["spec_hash"]
+                and approved_graph_fingerprint(
+                    build_intelligence_plan(plan["scenario"]))==plan["spec_hash"],
+                "Saved result refers to altered source or workflow")
+        require(request["workspace"]==ws
+                and request["command_id"]==command_id
+                and request["plan_ref"]==row["plan_ref"]
+                and request["module"]==row["module_id"]
+                and request["tool"]==row["tool_id"]
+                and request["purpose"]==row["purpose"]
+                and evidence["command_id"]==command_id
                 and evidence["workspace"]==ws
+                and evidence["module"]==row["module_id"]
+                and evidence["purpose"]==row["purpose"]
                 and evidence["request_sha256"]==row["request_sha256"]
                 and evidence["source_sha256"]==row["source_sha256"]
                 and evidence["workflow_sha256"]==row["workflow_sha256"]
