@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "classification": "SYNTHETIC_DEMO_ONLY",
+  "currency": "DEMO_CREDITS",
+  "workspaces": [
+    {
+      "workspace": "academy_demo",
+      "business_type": "education",
+      "goal_target_demo_credits": 20000,
+      "marketing_spend_demo_credits": 2500,
+      "products": [
+        {
+          "product_id": "DEMO-COURSE-ALPHA",
+          "label": "Synthetic AI Workshop",
+          "unit_price_demo_credits": 10000,
+          "variable_cost_demo_credits": 3000
+        },
+        {
+          "product_id": "DEMO-COURSE-BETA",
+          "label": "Synthetic Marketing Workshop",
+          "unit_price_demo_credits": 15000,
+          "variable_cost_demo_credits": 5000
+        }
+      ],
+      "orders": [
+        {
+          "order_id": "DEMO-ORDER-EDU01",
+          "journey_id": "DEMO-JOURNEY-EDU01",
+          "product_id": "DEMO-COURSE-ALPHA",
+          "units": 1,
+          "attribution": "SYNTHETIC_CAMPAIGN_LABEL"
+        },
+        {
+          "order_id": "DEMO-ORDER-EDU02",
+          "journey_id": "DEMO-JOURNEY-EDU01",
+          "product_id": "DEMO-COURSE-BETA",
+          "units": 1,
+          "attribution": "UNATTRIBUTED"
+        }
+      ],
+      "events": [
+        {
+          "event_id": "DEMO-EVENT-EDU01",
+          "event_type": "LEAD_OPT_IN",
+          "journey_id": "DEMO-JOURNEY-EDU01",
+          "product_id": "DEMO-COURSE-ALPHA",
+          "consent_status": "SYNTHETIC_OPTED_IN",
+          "order_ref": null
+        },
+        {
+          "event_id": "DEMO-EVENT-EDU02",
+          "event_type": "CHECKOUT_ABANDONED",
+          "journey_id": "DEMO-JOURNEY-EDU01",
+          "product_id": "DEMO-COURSE-ALPHA",
+          "consent_status": "SYNTHETIC_OPTED_IN",
+          "order_ref": null
+        },
+        {
+          "event_id": "DEMO-EVENT-EDU03",
+          "event_type": "PURCHASE_COMPLETED",
+          "journey_id": "DEMO-JOURNEY-EDU01",
+          "product_id": "DEMO-COURSE-ALPHA",
+          "consent_status": "SYNTHETIC_OPTED_IN",
+          "order_ref": "DEMO-ORDER-EDU01"
+        },
+        {
+          "event_id": "DEMO-EVENT-EDU04",
+          "event_type": "LEARNING_COMPLETED",
+          "journey_id": "DEMO-JOURNEY-EDU01",
+          "product_id": "DEMO-COURSE-ALPHA",
+          "consent_status": "SYNTHETIC_OPTED_IN",
+          "order_ref": "DEMO-ORDER-EDU01"
+        },
+        {
+          "event_id": "DEMO-EVENT-EDU05",
+          "event_type": "PURCHASE_COMPLETED",
+          "journey_id": "DEMO-JOURNEY-EDU01",
+          "product_id": "DEMO-COURSE-BETA",
+          "consent_status": "SYNTHETIC_OPTED_IN",
+          "order_ref": "DEMO-ORDER-EDU02"
+        },
+        {
+          "event_id": "DEMO-EVENT-EDU06",
+          "event_type": "LEAD_OPT_IN",
+          "journey_id": "DEMO-JOURNEY-EDU02",
+          "product_id": "DEMO-COURSE-ALPHA",
+          "consent_status": "NOT_RECORDED",
+          "order_ref": null
+        }
+      ]
+    },
+    {
+      "workspace": "bespoke_demo",
+      "business_type": "apparel",
+      "goal_target_demo_credits": 15000,
+      "marketing_spend_demo_credits": 1500,
+      "products": [
+        {
+          "product_id": "DEMO-GARMENT-ALPHA",
+          "label": "Synthetic Tailored Outfit",
+          "unit_price_demo_credits": 30000,
+          "variable_cost_demo_credits": 21000
+        },
+        {
+          "product_id": "DEMO-ACCESSORY-BETA",
+          "label": "Synthetic Coordinated Cap",
+          "unit_price_demo_credits": 5000,
+          "variable_cost_demo_credits": 2500
+        }
+      ],
+      "orders": [
+        {
+          "order_id": "DEMO-ORDER-FAS01",
+          "journey_id": "DEMO-JOURNEY-FAS01",
+          "product_id": "DEMO-GARMENT-ALPHA",
+          "units": 1,
+          "attribution": "UNATTRIBUTED"
+        },
+        {
+          "order_id": "DEMO-ORDER-FAS02",
+          "journey_id": "DEMO-JOURNEY-FAS01",
+          "product_id": "DEMO-ACCESSORY-BETA",
+          "units": 1,
+          "attribution": "UNATTRIBUTED"
+        }
+      ],
+      "events": [
+        {
+          "event_id": "DEMO-EVENT-FAS01",
+          "event_type": "LEAD_OPT_IN",
+          "journey_id": "DEMO-JOURNEY-FAS01",
+          "product_id": "DEMO-GARMENT-ALPHA",
+          "consent_status": "SYNTHETIC_OPTED_IN",
+          "order_ref": null
+        },
+        {
+          "event_id": "DEMO-EVENT-FAS02",
+          "event_type": "CHECKOUT_ABANDONED",
+          "journey_id": "DEMO-JOURNEY-FAS01",
+          "product_id": "DEMO-GARMENT-ALPHA",
+          "consent_status": "SYNTHETIC_OPTED_IN",
+          "order_ref": null
+        },
+        {
+          "event_id": "DEMO-EVENT-FAS03",
+          "event_type": "PURCHASE_COMPLETED",
+          "journey_id": "DEMO-JOURNEY-FAS01",
+          "product_id": "DEMO-GARMENT-ALPHA",
+          "consent_status": "SYNTHETIC_OPTED_IN",
+          "order_ref": "DEMO-ORDER-FAS01"
+        },
+        {
+          "event_id": "DEMO-EVENT-FAS04",
+          "event_type": "GARMENT_DELIVERED",
+          "journey_id": "DEMO-JOURNEY-FAS01",
+          "product_id": "DEMO-GARMENT-ALPHA",
+          "consent_status": "SYNTHETIC_OPTED_IN",
+          "order_ref": "DEMO-ORDER-FAS01"
+        },
+        {
+          "event_id": "DEMO-EVENT-FAS05",
+          "event_type": "PURCHASE_COMPLETED",
+          "journey_id": "DEMO-JOURNEY-FAS01",
+          "product_id": "DEMO-ACCESSORY-BETA",
+          "consent_status": "SYNTHETIC_OPTED_IN",
+          "order_ref": "DEMO-ORDER-FAS02"
+        },
+        {
+          "event_id": "DEMO-EVENT-FAS06",
+          "event_type": "LEAD_OPT_IN",
+          "journey_id": "DEMO-JOURNEY-FAS02",
+          "product_id": "DEMO-GARMENT-ALPHA",
+          "consent_status": "NOT_RECORDED",
+          "order_ref": null
+        }
+      ]
+    }
+  ]
+}
