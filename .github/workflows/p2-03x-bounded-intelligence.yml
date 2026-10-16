@@ -1,0 +1,51 @@
+name: MetaAutomate P2-03x Bounded Intelligence Execution (source-only)
+
+on:
+  pull_request:
+    branches:
+      - feature/p2-03w-trusted-identity-model-evaluation
+      - main
+  push:
+    branches:
+      - feature/p2-03x-bounded-agent-execution-rehearsal
+
+permissions:
+  contents: read
+
+jobs:
+  sandbox-execution:
+    name: Bounded virtual execution, approval leases, revocation and recovery
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install disposable test requirements
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8,<10' 'cryptography>=43,<48' 'psycopg[binary]>=3.2,<4'
+      - name: Enforce source-only bounded tool schema and denial
+        run: python -m pytest -q -rs tests/test_synthetic_bounded_intelligence_executor.py
+      - name: Regress IdP and human-review chain
+        run: |
+          python -m pytest -q tests/test_synthetic_oidc_governed_gateway.py tests/test_synthetic_governed_orchestration.py
+      - name: Regress all twelve modules, five engines and model provenance
+        run: |
+          python -m pytest -q tests/test_synthetic_model_governed_portfolio.py tests/test_synthetic_intelligence_project_architect.py
+      - name: Record no-live-execution boundary
+        if: always()
+        run: |
+          mkdir -p artifacts/validation
+          printf '%s\n' \
+            'P2-03x: synthetic offline deterministic functions only.' \
+            'No live identities, model inference, network adapters, production data, subscriptions, permissions or customer processing.' \
+            'This is not a production-safe deployed agent.' \
+            > artifacts/validation/p2-03x-execution-policy.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-03x-bounded-execution-evidence
+          path: artifacts/validation/p2-03x-execution-policy.txt
+          if-no-files-found: warn
