@@ -288,3 +288,18 @@ def test_one_unverified_revocation_cannot_activate_an_agent(suite):
         db.run_synthetic(actors["owner"],ref)
     assert db.db.execute(
         "SELECT count(*) FROM plans WHERE state='REVOKED'").fetchone()[0]==1
+
+
+def test_mixed_tenant_recovery_export_denied(suite,tmp_path):
+    db,actors,_,_=suite
+    approved(db,actors)
+    db.propose(actors["other"],"SIM-PLAN-OTHER","INVENTORY_RESILIENCE")
+    # Independent authenticated tenants must never be packaged into one
+    # backup by a tenant admin, regardless of the local filesystem location.
+    target=tmp_path/"tenant-leak.p2-03v-demo.sqlite3"
+    with pytest.raises(SyntheticGrowthError,match="mixed-tenant"):
+        db.backup_to(actors["owner"],target)
+    assert not target.exists()
+    with pytest.raises(SyntheticGrowthError,match="mixed-tenant"):
+        db.backup_to(actors["other"],target)
+    assert db.audit_report(actors["auditor"])["workspace"]=="academy_demo"
