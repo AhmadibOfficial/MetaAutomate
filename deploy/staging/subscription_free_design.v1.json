@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "name": "MetaAutomate subscription-free local staging design",
+  "classification": "SOURCE_ONLY_NON_DEPLOYABLE_BLUEPRINT",
+  "purpose": "Exercise synthetic tenant isolation, CI, recovery and release denial without subscribing to cloud services.",
+  "proposed_subscription_cost_ngn": 0,
+  "real_staging_environment_provisioned": false,
+  "real_provider_approved": false,
+  "real_identity_provider_verified": false,
+  "actual_customer_data_allowed": false,
+  "public_ingress_allowed": false,
+  "external_model_calls_allowed": false,
+  "automated_provisioning_allowed": false,
+  "live_deployment_authorized": false,
+  "release_authorized": false,
+  "existing_template": "deploy/staging/compose.yaml",
+  "existing_validator": "scripts/verify_private_staging_contract.py",
+  "stages": [
+    {
+      "id": "S0",
+      "name": "Source contract inspection",
+      "environment": "CI",
+      "data": "SYNTHETIC_ONLY",
+      "network": "DEPENDENCY_INSTALL_ONLY_NO_APPLICATION_EGRESS",
+      "requires_owner_approval": false,
+      "operational_f05_evidence": false
+    },
+    {
+      "id": "S1",
+      "name": "Disposable PostgreSQL and browser rehearsal",
+      "environment": "EPHEMERAL_CI_RUNNER",
+      "data": "SYNTHETIC_ONLY",
+      "network": "TEST_SERVICE_LOOPBACK",
+      "requires_owner_approval": false,
+      "operational_f05_evidence": false
+    },
+    {
+      "id": "S2",
+      "name": "Private hosting proposal and cost review",
+      "environment": "NOT_PROVISIONED",
+      "data": "NO_DATA",
+      "network": "NONE",
+      "requires_owner_approval": true,
+      "operational_f05_evidence": false
+    }
+  ],
+  "prerequisites": [
+    "F04_enforced_private_repository_merge_restrictions",
+    "F05_owner_approved_host_region_cost_ceiling_and_separate_resources",
+    "F06_real_OIDC_MFA_and_verified_private_ingress",
+    "F07_encrypted_off_host_backup_and_independent_recovery",
+    "F08_external_two_tenant_security_acceptance"
+  ],
+  "blockers": [
+    "NO_GITHUB_ENFORCED_PRIVATE_RELEASE_RULE",
+    "NO_APPROVED_PRIVATE_HOSTING_COST_CEILING",
+    "NO_REAL_IDP_OR_MFA_EVIDENCE",
+    "NO_PRODUCTION_RESTORE_ACCEPTANCE",
+    "NO_AUTHORIZED_CUSTOMER_DATA_OR_AI_PROVIDER"
+  ],
+  "stop_conditions": [
+    "REAL_PERSONAL_OR_BUSINESS_DATA_DETECTED",
+    "APP_PUBLIC_NETWORK_LISTENER_DETECTED",
+    "REAL_EXTERNAL_API_TOKEN_PRESENT",
+    "PAID_SUBSCRIPTION_OR_RESOURCE_REQUIRED",
+    "PRODUCTION_DATABASE_OR_MIGRATION_TARGET_DETECTED",
+    "UNAPPROVED_OUTBOUND_MESSAGE_OR_AI_MODEL_CALL"
+  ]
+}

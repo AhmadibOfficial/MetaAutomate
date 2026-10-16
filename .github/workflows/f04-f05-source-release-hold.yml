@@ -1,0 +1,76 @@
+name: MetaAutomate F04-F05 Release and Staging Design (source-only)
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - feature/f04-release-enforcement-audit-and-free-staging-design
+
+permissions:
+  contents: read
+
+jobs:
+  private-release-audit:
+    name: F04 Private Release Enforcement Audit · no authorization
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install tests only, no administrative GitHub tools
+        run: python -m pip install 'pytest>=8,<10'
+      - name: Reject fake enforced GitHub settings and bypass permissions
+        run: python -m pytest -q tests/test_f04_github_protection_audit.py
+      - name: Record F04 as unverified without live enforcement
+        run: |
+          python scripts/inspect_f04_github_protection.py --report artifacts/validation/f04-github-release-protection.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('artifacts/validation/f04-github-release-protection.json').read_text())
+          assert r['foundation_f04_verified'] is False
+          assert r['release_authorized'] is False
+          print('PASS: F04 remains blocked until live GitHub admin rule, independent negative test and attestations.')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: f04-non-enforced-private-merge-evidence
+          path: artifacts/validation/f04-github-release-protection.json
+          if-no-files-found: warn
+
+  free-staging-design:
+    name: F05 Disposable CI and Staging Design · no deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install tests only
+        run: python -m pip install 'pytest>=8,<10'
+      - name: Reject staging manifest unsafe assumptions
+        run: python -m pytest -q tests/test_f05_subscription_free_staging_design.py
+      - name: Inspect zero-subscription source design (no network)
+        run: |
+          python scripts/verify_f05_subscription_free_design.py --report artifacts/validation/f05-zero-subscription-staging.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('artifacts/validation/f05-zero-subscription-staging.json').read_text())
+          assert r['operational_f05_verified'] is False
+          assert r['staging_provisioned'] is False
+          assert r['release_authorized'] is False
+          print('PASS: free design checked, operational F05 remains blocked.')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: f05-subscription-free-staging-source-design
+          path: artifacts/validation/f05-zero-subscription-staging.json
+          if-no-files-found: warn
