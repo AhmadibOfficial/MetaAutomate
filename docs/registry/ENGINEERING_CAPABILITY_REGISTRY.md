@@ -38,6 +38,13 @@ Changes to the engineering inventory require reviewed source commits and green
 validation. Its metadata cannot grant permissions, enable integrations,
 authorize autonomous workflows or change customer availability.
 
+## Capability lifecycle and evidence upgrades
+
+See [Capability Lifecycle & Evidence-Upgrades v1](CAPABILITY_LIFECYCLE.md)
+for source-only transitions, proposal preflight, explicit negative-test evidence,
+dependency/security reviews and replay of accepted source changes from the PR #60
+baseline. No state here grants operational permission.
+
 ## Maturity is never permission
 
 | Maturity | Meaning |
