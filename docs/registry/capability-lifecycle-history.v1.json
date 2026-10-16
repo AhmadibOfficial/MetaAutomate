@@ -1025,7 +1025,7 @@
       "review": {
         "decision": "SOURCE_REVIEWED_ONLY",
         "review_ref": "https://github.com/AhmadibOfficial/MetaAutomate/pull/67",
-        "reviewer": "PENDING_OWNER_APPROVAL_REPLACE_BEFORE_MERGE",
+        "reviewer": "OWNER_SOURCE_REVIEW_APPROVED_PR_67",
         "decision_date": "2026-10-16",
         "separation_statement": "NOT_OPERATIONAL_AUTHORIZATION"
       }
