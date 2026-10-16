@@ -27,7 +27,7 @@ The light-first interface reuses the approved MetaAutomate brand mark and offers
 4. **Inspect automation proposals:** exactly six fictional events per business; four review-only drafts and two suppressions—one checkout reminder handled by the native commerce provider and one missing opt-in. Inspecting a row shows the policy and does not approve/execute anything.
 5. **Explore future setup:** three straightforward steps and disabled integration/billing concepts with explicit NO-GO text. Plan prices, where visible, are hypotheses and have no checkout controls.
 
-The UI is real HTML/CSS/JS and supports mobile layouts, keyboard-operated tabs, visible focus, semantic labels, accessible status text and reduced motion. It stores nothing persistently. It makes zero external requests, has no login or new API endpoint, and cannot send, schedule, publish or bill. All business numbers are denominated **demo credits**, never naira.
+The UI is real HTML/CSS/JS and supports mobile layouts, keyboard-operated tabs, visible focus, semantic labels, accessible status text and reduced motion. It stores nothing persistently. It makes zero external requests, has no login or new API endpoint, and cannot send, schedule, publish or bill. Source fixtures continue to use **DEMO_CREDITS**; the UI now displays monetary figures with **$ as a fictional dollar-style illustration**. This is not an actual USD transaction, exchange-rate conversion, forecast or real profit. Unavailable Starter ($9/month) and Growth ($29/month) tiers are proposed USD-denominated pricing research examples, **not a conversion** of previous ₦ hypotheses, and no billing is activated.
 
 ## Security, privacy and release boundaries
 
@@ -42,3 +42,8 @@ The UI is real HTML/CSS/JS and supports mobile layouts, keyboard-operated tabs, 
 Before anyone can register, connect Selar or a social channel, allow automation, import consented orders or pay a subscription, the team must separately approve and verify: protected tenancy, account access and MFA, provider-specific least-privilege authorization, consent ledger/unsubscribe controls, idempotent messaging deduplication, quiet hours/rate limits, verifiable audit logs, billing/plan entitlements, privacy/deletion flows, signed release gates, monitoring/recovery, and an isolated staging acceptance test.
 
 No subscription is purchased or charged in this milestone.
+
+
+## Public-facing editorial standard (October 2026)
+
+Growth Autopilot is presented publicly as a **Product Preview**. Public copy focuses on customer outcomes and responsible automation, rather than prominently displaying internal staging vocabulary and phase/gate codes. One concise, truthful disclosure makes clear that dollar amounts are **illustrative**, customer accounts are not connected, and outbound actions, integrations, subscriptions and payments require independent approval before activation. Source fixtures, test identifiers and engineering release metadata remain traceable internally and unchanged. No staged scenario is presented as a paying customer result, generated income or working integration. Subscription price cards are withheld pending separately approved commercial terms.

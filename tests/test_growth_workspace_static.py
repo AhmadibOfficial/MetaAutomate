@@ -61,17 +61,24 @@ def test_static_demo_is_navigable_and_discoverable_but_not_live():
     assert 'href="/"' in html
     assert 'href="/engage/"' in html
     assert 'class="skip"' in html and 'href="#workspace-main"' in html
-    assert "Fictional business data only" in html
-    assert "No subscription available" in html
-    assert "Disconnected demonstration" in html
-    assert "DEMO CREDITS ≠ REAL CURRENCY" in html
+    assert "Growth Autopilot / Product Preview" in html
+    assert "Subscription access requires a separate commercial launch" in html
+    assert "Interactive product preview" in html
+    assert "ILLUSTRATIVE FIGURES" in html
+    assert "customer accounts are not connected" in html
+    assert "not actual sales or currency conversions" in html
+    assert "$9/mo" not in html and "$29/mo" not in html
+    assert "₦" not in html
     assert "not net profit" in html
-    assert "Foundation Phase 01 remains 3/9 verified" in html
-    assert "F04–F09 blocked" in html
-    assert "NO-GO" in html
-    assert "Every number and event below is fictional" in html
+    assert "Responsible automation by design" in html
+    assert "F04–F09" not in html
+    assert "NO-GO" not in html
+    customer_copy = re.sub(r"<[^>]+>", " ", html).lower()
+    assert not re.search(r"\b(demo|fictional)\b", customer_copy)
+    assert "figures are illustrative" in customer_copy
+    assert "Choose a business scenario" in html
     assert "subscription" in html.lower()
-    assert "real customer" not in html.lower() or "No real" in html
+    assert "customer accounts are not connected" in html
 
 
 def test_every_workflow_view_is_keyboard_accessible_and_semantic():
@@ -146,10 +153,10 @@ def test_demo_never_calls_api_sends_message_processes_payment_or_stores_client_d
     assert "REVIEW_REQUIRED" in js
     assert 'human approval' in html.lower() or 'human in control' in html.lower()
     assert 'business.value' in js
-    assert "Nothing runs automatically" in html
-    assert "Not connected" in html
-    assert "Illustrative · unavailable" in html
-    assert "No actions sent" in html
+    assert "Designed for decisions that matter" in html
+    assert "In development" in html
+    assert "Subscription access requires a separate commercial launch" in html
+    assert "does not execute those actions" in html
 
 
 def test_official_brand_logo_used_and_css_is_light_first_without_external_fetches():

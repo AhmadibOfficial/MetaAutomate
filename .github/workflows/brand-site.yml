@@ -58,8 +58,9 @@ jobs:
           assert 'id="workspace-demo"' in home
           assert home.index('id="solutions"') < home.index('id="workspace-demo"') < home.index('id="services"')
           assert 'class="section proof-section"' not in home
-          assert "ILLUSTRATIVE · NOT LIVE" in home
-          assert "development-stage" in home
+          assert "PLANNING EXPERIENCE" in home
+          assert "Objective Workspace brings goals" in home
+          assert "guided scenario uses illustrative information" in home
           assert "MetaAutomate" in home
           assert "Always HALAL" in home
           for page in pages:

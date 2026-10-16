@@ -6,7 +6,7 @@
   "use strict";
   const DEMOS = Object.freeze({
     academy_demo: {
-      label: "Academy demo",
+      label: "Academy scenario",
       kind: "Education",
       target: 20000,
       marketing: 2500,
@@ -19,17 +19,17 @@
         {id:"DEMO-ORDER-EDU02",product:"DEMO-COURSE-BETA",journey:"DEMO-JOURNEY-EDU01",units:1}
       ],
       events: [
-        {id:"DEMO-EVENT-EDU01",kind:"LEAD_OPT_IN",consent:true,title:"Welcome a new learner",detail:"Prepare a free sample lesson invitation."},
+        {id:"DEMO-EVENT-EDU01",kind:"LEAD_OPT_IN",consent:true,title:"Welcome a new learner",detail:"Prepare an introductory learning resource."},
         {id:"DEMO-EVENT-EDU02",kind:"CHECKOUT_ABANDONED",consent:true,title:"Checkout recovery",detail:"Selar's native reminder should own checkout recovery; MetaAutomate suppresses duplicates."},
         {id:"DEMO-EVENT-EDU03",kind:"PURCHASE_COMPLETED",consent:true,title:"Help after course purchase",detail:"Suggest course access and onboarding guidance for staff review."},
         {id:"DEMO-EVENT-EDU04",kind:"LEARNING_COMPLETED",consent:true,title:"Explore a next learning step",detail:"Prepare an optional related-course recommendation for human review."},
-        {id:"DEMO-EVENT-EDU05",kind:"PURCHASE_COMPLETED",consent:true,title:"Support another course purchase",detail:"Prepare onboarding guidance for the second fictional course."},
+        {id:"DEMO-EVENT-EDU05",kind:"PURCHASE_COMPLETED",consent:true,title:"Support another course purchase",detail:"Prepare onboarding guidance for the next course."},
         {id:"DEMO-EVENT-EDU06",kind:"LEAD_OPT_IN",consent:false,title:"Unverified marketing permission",detail:"Do not draft a marketing send without verified consent."}
       ],
-      opportunity:"Inspect a fictional course follow-up. It may become useful only after human review, consent verification and authorized service integration."
+      opportunity:"Review a learner engagement workflow with clear approval, consent and connection requirements."
     },
     bespoke_demo: {
-      label: "Bespoke demo",
+      label: "Bespoke scenario",
       kind: "Apparel",
       target: 15000,
       marketing: 1500,
@@ -46,15 +46,15 @@
         {id:"DEMO-EVENT-FAS02",kind:"CHECKOUT_ABANDONED",consent:true,title:"Checkout recovery",detail:"Selar's native recovery owns this step. Suppress extra reminders."},
         {id:"DEMO-EVENT-FAS03",kind:"PURCHASE_COMPLETED",consent:true,title:"Share garment aftercare",detail:"Propose a helpful care and delivery explanation, never auto-send."},
         {id:"DEMO-EVENT-FAS04",kind:"GARMENT_DELIVERED",consent:true,title:"Suggest a matching style",detail:"Prepare a coordinated-accessory idea for independent review."},
-        {id:"DEMO-EVENT-FAS05",kind:"PURCHASE_COMPLETED",consent:true,title:"Support an accessory purchase",detail:"Propose a product care note for the imaginary order."},
+        {id:"DEMO-EVENT-FAS05",kind:"PURCHASE_COMPLETED",consent:true,title:"Support an accessory purchase",detail:"Propose a product care note for this purchase journey."},
         {id:"DEMO-EVENT-FAS06",kind:"LEAD_OPT_IN",consent:false,title:"Unverified marketing permission",detail:"Suppress outreach until a legitimate opt-in is verified."}
       ],
-      opportunity:"Inspect a fictional post-delivery care draft. A real garment buyer must first grant suitable consent and the shop must have authorized controls."
+      opportunity:"Explore a post-delivery care journey supported by consent and business-owner oversight."
     }
   });
   const byId = id => document.getElementById(id);
-  const money = n => new Intl.NumberFormat("en-NG", {maximumFractionDigits:0}).format(n) + " demo credits";
-  const shortMoney = n => new Intl.NumberFormat("en-NG", {maximumFractionDigits:0}).format(n) + " DC";
+  // Source figures remain DEMO_CREDITS: $ is a fictional display convention, not USD or FX conversion.
+  const shortMoney = n => "$" + new Intl.NumberFormat("en-US", {maximumFractionDigits:0}).format(n);
   const business = byId("business-select");
   const goal = byId("goal-select");
   const target = byId("target-slider");
@@ -75,13 +75,13 @@
     const repeat = Object.values(visits).reduce((sum,n) => sum + Math.max(0,n-1),0);
     const proposals = data.events.map(event => {
       let state = "REVIEW_REQUIRED";
-      let reason = "Review-only draft. Even after inspecting this sample, nothing is sent or scheduled.";
+      let reason = "Prepared for review. Inspecting the workflow does not approve, send or schedule any communication.";
       if (event.kind === "CHECKOUT_ABANDONED") {
         state = "SUPPRESSED_PROVIDER_OWNS";
         reason = "Provider duplicate prevention: native Selar checkout recovery owns this example. MetaAutomate must not send another reminder.";
       } else if (!event.consent) {
         state = "SUPPRESSED_NO_MARKETING_CONSENT";
-        reason = "No verified marketing consent exists in this fictional example. Outbound messages are prohibited.";
+        reason = "Marketing consent has not been confirmed. Customer outreach is held until permission is verified.";
       }
       return {...event,state,reason};
     });
@@ -138,7 +138,7 @@
     row.className="queue-row";
     const body = document.createElement("div");
     const code = document.createElement("small");
-    code.textContent = proposal.kind.replaceAll("_"," ") + " · DEMO EVENT";
+    code.textContent = proposal.kind.replaceAll("_"," ") + " · WORKFLOW SCENARIO";
     const title = document.createElement("h3");
     title.textContent = proposal.title;
     const desc = document.createElement("p");
@@ -152,8 +152,8 @@
     if (proposal.state !== "REVIEW_REQUIRED") badge.className="suppressed";
     const button=document.createElement("button");
     button.type="button";
-    button.textContent="Inspect sample";
-    button.setAttribute("aria-label","Inspect " + proposal.title + " fictional automation");
+    button.textContent="View workflow";
+    button.setAttribute("aria-label","Inspect " + proposal.title + " workflow");
     button.addEventListener("click",()=>inspectProposal(proposal));
     side.append(badge,button);
     row.append(body,side);
@@ -178,21 +178,21 @@
     text("goal-target",shortMoney(demoTarget));
     text("goal-current",shortMoney(metrics.contribution) + " modeled");
     const delta=demoTarget-metrics.contribution;
-    text("goal-gap",delta > 0 ? shortMoney(delta) + " to goal" : "Illustrative goal met");
+    text("goal-gap",delta > 0 ? shortMoney(delta) + " to goal" : "Target reached in this scenario");
     const percent=Math.min(100,Math.max(0,Math.round(metrics.contribution/demoTarget*100)));
     byId("goal-bar").style.width=percent+"%";
     byId("goal-progress").setAttribute("aria-valuenow",String(percent));
     byId("goal-progress").setAttribute("aria-valuetext",percent+" percent of synthetic target");
     const explanatory={
-      contribution:"Compare fictional sales with costs and marketing spend to understand modeled contribution.",
-      repeat:"Two fictional orders from the same journey illustrate a repeat-order signal, not retention proof.",
-      orders:"Two fictional paid-order records illustrate completed-order reporting, not live checkout integration."
+      contribution:"Explore how revenue, direct costs and marketing spend affect contribution.",
+      repeat:"Explore how repeat-order signals are identified. Customer retention requires real verified purchase data.",
+      orders:"Explore completed-order insights. Real checkout reporting requires an authorized commerce connection."
     };
     text("goal-explainer",explanatory[goal.value]);
     queue.replaceChildren(...metrics.proposals.map(queueRow));
     if (lastInspected !== null) {
       lastInspected=null;
-      text("inspection-panel","Selection changed. Inspect a fictional workflow to read its policy and preview. No actions have been executed.");
+      text("inspection-panel","Business view updated. Select a workflow to explore its approval requirements. No actions have been executed.");
     }
   }
 

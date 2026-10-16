@@ -90,7 +90,7 @@ def main():
         expect(page.locator(".clarity-audiences span")).to_have_count(4)
         expect(page.locator(".hero-availability")).to_contain_text("in development")
         expect(page.get_by_role("link", name="Explore solutions")).to_have_attribute("href", "#solutions")
-        expect(page.get_by_role("link", name="Experience a sample planning journey")).to_have_attribute("href", "#workspace-demo")
+        expect(page.get_by_role("link", name="Explore our planning approach")).to_have_attribute("href", "#workspace-demo")
         assert page.evaluate("""() => {
           const a = document.querySelector('#solutions').getBoundingClientRect().top + scrollY;
           const b = document.querySelector('#workspace-demo').getBoundingClientRect().top + scrollY;
@@ -111,8 +111,8 @@ def main():
         }""")
         assert contrast >= 4.5, ("Solution labels should meet normal-text AA contrast", contrast)
         expect(page.locator("#workspace-demo")).to_be_visible()
-        expect(page.locator(".workspace-board-status")).to_contain_text("NOT LIVE")
-        expect(page.locator(".workspace-board-foot")).to_contain_text("Not a screenshot")
+        expect(page.locator(".workspace-board-status")).to_contain_text("PLANNING EXPERIENCE")
+        expect(page.locator(".workspace-board-foot")).to_contain_text("Guided planning scenario")
         demo_buttons = page.locator("[data-workspace-step]")
         expect(demo_buttons).to_have_count(3)
         expect(demo_buttons.nth(0)).to_have_attribute("aria-pressed", "true")
@@ -124,7 +124,7 @@ def main():
         demo_buttons.nth(2).focus()
         demo_buttons.nth(2).press("Space")
         expect(page.locator("#workspace-stage-description")).to_contain_text("No supplier message")
-        expect(page.locator("#workspace-demo")).to_contain_text("synthetic information")
+        expect(page.locator("#workspace-demo")).to_contain_text("illustrative information")
         expect(page.locator(".capability-card")).to_have_count(9)
         expect(page.locator(".focus-sector-card")).to_have_count(7)
         for sector in ("Retail", "Wholesale", "Transportation", "Logistics",
@@ -234,19 +234,19 @@ def main():
 
         # Brand values and roadmap are presented without claiming shipped features.
         page.goto(BASE+"/company/", wait_until="networkidle")
-        expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("IN DEVELOPMENT")
-        expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("SOURCE ONLY")
-        expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("Real authorized execution is blocked")
-        expect(page.locator(".roadmap-note")).to_contain_text("Foundation remains in development")
-        expect(page.locator(".roadmap-note")).to_contain_text("Phase 02 operational approval remains NO-GO")
+        expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("WORKFLOW DESIGN")
+        expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("VALIDATION")
+        expect(page.locator(".roadmap-entry").nth(2)).to_contain_text("Customer activation follows independent security and operational review")
+        expect(page.locator(".roadmap-note")).to_contain_text("Our roadmap describes active engineering")
+        expect(page.locator(".roadmap-note")).to_contain_text("Customer access, provider integrations")
         expect(page.locator(".purpose-panel")).to_have_count(2)
         expect(page.locator(".value-principles article")).to_have_count(5)
         expect(page.locator(".principle-halal")).to_contain_text("Always HALAL")
         expect(page.locator(".brand-meaning div")).to_have_count(5)
         expect(page.locator(".roadmap-entry")).to_have_count(4)
-        expect(page.locator(".roadmap-entry").first).to_contain_text("3/9 VERIFIED")
+        expect(page.locator(".roadmap-entry").first).to_contain_text("ENGINEERING FOUNDATION IN PROGRESS")
         expect(page.locator(".roadmap-horizon")).to_contain_text("A Better World.")
-        expect(page.locator(".roadmap-horizon")).to_contain_text("NOT A LIVE PROGRAM")
+        expect(page.locator(".roadmap-horizon")).to_contain_text("OUR LONG-TERM AMBITION")
         assert_no_horizontal_overflow(page, "desktop company")
         page.screenshot(path=str(ART/"metaautomate-global-company-desktop.png"), full_page=True)
 

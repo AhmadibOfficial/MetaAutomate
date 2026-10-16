@@ -88,7 +88,7 @@
         understand: "Identify stock gaps, inconsistent records and the decisions shop staff need to make.",
         think: "Compare possible causes of shortages, available data quality and the risk of incorrect reorder advice.",
         design: "Outline a simple stock view, configurable thresholds and a named person responsible for approvals.",
-        create: "Prototype an inventory import and a read-only stock summary using invented sample records.",
+        create: "Prototype an inventory import and a read-only stock summary using illustrative records.",
         automate: "Propose low-stock alerts and draft purchase recommendations for human review; send nothing.",
         verify: "Check sample figures, duplicate items, access boundaries and the accuracy of the proposed flags.",
         improve: "Use staff feedback to refine thresholds, clarify exceptions and track whether decisions become easier."
