@@ -1,0 +1,318 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:metaautomate:domains:cross-sector-workflow:v1",
+  "title": "MetaAutomate source-only cross-sector business workflow contract v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "contract_id",
+    "classification",
+    "default_policy",
+    "operational_status",
+    "execution_enabled",
+    "actual_business_data_allowed",
+    "external_actions_allowed",
+    "currency",
+    "description",
+    "source_reference",
+    "capability_links",
+    "workflow_stages",
+    "sector_profiles",
+    "hard_denials",
+    "release_evidence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "contract_id": {
+      "const": "metaautomate.cross_sector.business_workflow.v1"
+    },
+    "classification": {
+      "const": "SOURCE_ONLY_SYNTHETIC_AND_DESIGN"
+    },
+    "default_policy": {
+      "const": "DENY"
+    },
+    "operational_status": {
+      "const": "NO_GO"
+    },
+    "execution_enabled": {
+      "const": false
+    },
+    "actual_business_data_allowed": {
+      "const": false
+    },
+    "external_actions_allowed": {
+      "const": false
+    },
+    "currency": {
+      "const": "DEMO_CREDITS_ONLY"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 30
+    },
+    "source_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "module",
+        "fixture",
+        "tests",
+        "architecture"
+      ],
+      "properties": {
+        "module": {
+          "const": "apps/api/app/synthetic_business_flow.py"
+        },
+        "fixture": {
+          "const": "contracts/domains/v1/fixtures/synthetic_business_flow.json"
+        },
+        "tests": {
+          "const": "tests/test_cross_functional_synthetic.py"
+        },
+        "architecture": {
+          "const": "docs/architecture/P2_03C_SYNTHETIC_RETAIL_WHOLESALE_FLOW.md"
+        }
+      }
+    },
+    "capability_links": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "enum": [
+          "BIZ-004",
+          "BIZ-011",
+          "BIZ-012"
+        ]
+      }
+    },
+    "workflow_stages": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "$ref": "#/$defs/stage"
+      }
+    },
+    "sector_profiles": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "$ref": "#/$defs/sector"
+      }
+    },
+    "hard_denials": {
+      "type": "array",
+      "minItems": 12,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "release_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "foundation",
+        "foundation_policy",
+        "required_blocked_gates",
+        "synthetic_reference_sectors",
+        "design_only_sectors",
+        "operational_release"
+      ],
+      "properties": {
+        "foundation": {
+          "const": "docs/operational-core/FOUNDATION_EXIT_EVIDENCE.json"
+        },
+        "foundation_policy": {
+          "const": "NO_GO_UNTIL_ALL_NINE_VERIFIED"
+        },
+        "required_blocked_gates": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": {
+            "pattern": "^F0[4-9]$"
+          }
+        },
+        "synthetic_reference_sectors": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "retail",
+              "wholesale"
+            ]
+          }
+        },
+        "design_only_sectors": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "transportation",
+              "logistics",
+              "tourism",
+              "education",
+              "healthcare"
+            ]
+          }
+        },
+        "operational_release": {
+          "const": "NO_GO"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "stage",
+        "description",
+        "effect",
+        "output_state",
+        "human_review_required"
+      ],
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "stage": {
+          "enum": [
+            "AVAILABILITY_PREVIEW",
+            "QUOTATION_DRAFT",
+            "CUSTOMER_FOLLOWUP_DRAFT",
+            "FINANCE_PREVIEW",
+            "VERIFY_INVARIANTS"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 20
+        },
+        "effect": {
+          "const": "NONE"
+        },
+        "output_state": {
+          "const": "PROPOSAL_ONLY"
+        },
+        "human_review_required": {
+          "const": true
+        }
+      }
+    },
+    "sector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sector",
+        "readiness",
+        "source_scenario",
+        "capacity_model",
+        "quotation_model",
+        "followup_model",
+        "finance_model",
+        "excluded_data_categories",
+        "required_reviews",
+        "risk_notes",
+        "profile_id",
+        "human_review_required",
+        "execution_available"
+      ],
+      "properties": {
+        "sector": {
+          "enum": [
+            "retail",
+            "wholesale",
+            "transportation",
+            "logistics",
+            "tourism",
+            "education",
+            "healthcare"
+          ]
+        },
+        "profile_id": {
+          "type": "string",
+          "pattern": "^meta\\.sector\\.[a-z]+\\.v1$"
+        },
+        "readiness": {
+          "enum": [
+            "SYNTHETIC_REFERENCE_ONLY",
+            "DESIGN_MAPPING_ONLY"
+          ]
+        },
+        "source_scenario": {
+          "anyOf": [
+            {
+              "enum": [
+                "retail",
+                "wholesale"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "capacity_model": {
+          "type": "string",
+          "minLength": 8
+        },
+        "quotation_model": {
+          "type": "string",
+          "minLength": 8
+        },
+        "followup_model": {
+          "type": "string",
+          "minLength": 8
+        },
+        "finance_model": {
+          "type": "string",
+          "minLength": 8
+        },
+        "excluded_data_categories": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "required_reviews": {
+          "type": "array",
+          "minItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "risk_notes": {
+          "type": "string",
+          "minLength": 60
+        },
+        "human_review_required": {
+          "const": true
+        },
+        "execution_available": {
+          "const": false
+        }
+      }
+    }
+  }
+}

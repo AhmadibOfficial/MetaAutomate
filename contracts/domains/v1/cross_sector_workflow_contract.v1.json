@@ -1,0 +1,298 @@
+{
+  "schema_version": "1.0.0",
+  "contract_id": "metaautomate.cross_sector.business_workflow.v1",
+  "classification": "SOURCE_ONLY_SYNTHETIC_AND_DESIGN",
+  "default_policy": "DENY",
+  "operational_status": "NO_GO",
+  "execution_enabled": false,
+  "actual_business_data_allowed": false,
+  "external_actions_allowed": false,
+  "currency": "DEMO_CREDITS_ONLY",
+  "description": "Cross-sector design semantics; retail/wholesale reference existing synthetic source tests, other five sectors have no executable model.",
+  "source_reference": {
+    "module": "apps/api/app/synthetic_business_flow.py",
+    "fixture": "contracts/domains/v1/fixtures/synthetic_business_flow.json",
+    "tests": "tests/test_cross_functional_synthetic.py",
+    "architecture": "docs/architecture/P2_03C_SYNTHETIC_RETAIL_WHOLESALE_FLOW.md"
+  },
+  "capability_links": [
+    "BIZ-004",
+    "BIZ-011",
+    "BIZ-012"
+  ],
+  "workflow_stages": [
+    {
+      "sequence": 1,
+      "stage": "AVAILABILITY_PREVIEW",
+      "description": "Review fictional stock/capacity without reserving resources",
+      "effect": "NONE",
+      "output_state": "PROPOSAL_ONLY",
+      "human_review_required": true
+    },
+    {
+      "sequence": 2,
+      "stage": "QUOTATION_DRAFT",
+      "description": "Create a bounded demonstration estimate, never an issued invoice or sale",
+      "effect": "NONE",
+      "output_state": "PROPOSAL_ONLY",
+      "human_review_required": true
+    },
+    {
+      "sequence": 3,
+      "stage": "CUSTOMER_FOLLOWUP_DRAFT",
+      "description": "Draft human-review messaging without contact details or delivery",
+      "effect": "NONE",
+      "output_state": "PROPOSAL_ONLY",
+      "human_review_required": true
+    },
+    {
+      "sequence": 4,
+      "stage": "FINANCE_PREVIEW",
+      "description": "Create unposted illustrative debit/credit or estimated finance output, not a real accounting event",
+      "effect": "NONE",
+      "output_state": "PROPOSAL_ONLY",
+      "human_review_required": true
+    },
+    {
+      "sequence": 5,
+      "stage": "VERIFY_INVARIANTS",
+      "description": "Check traceability, allocation safety, arithmetic and zero external effects",
+      "effect": "NONE",
+      "output_state": "PROPOSAL_ONLY",
+      "human_review_required": true
+    }
+  ],
+  "sector_profiles": [
+    {
+      "sector": "retail",
+      "readiness": "SYNTHETIC_REFERENCE_ONLY",
+      "source_scenario": "retail",
+      "capacity_model": "stock_units",
+      "quotation_model": "draft_sales_quote",
+      "followup_model": "unsent_order_confirmation",
+      "finance_model": "unposted_quote_journal",
+      "excluded_data_categories": [
+        "real_customer_contact",
+        "real_inventory_records",
+        "payments"
+      ],
+      "required_reviews": [
+        "authorization",
+        "privacy",
+        "finance",
+        "audit",
+        "recovery"
+      ],
+      "risk_notes": "The committed stock fixture is invented. No POS integration, real stock deduction, client contact or financial ledger.",
+      "profile_id": "meta.sector.retail.v1",
+      "human_review_required": true,
+      "execution_available": false
+    },
+    {
+      "sector": "wholesale",
+      "readiness": "SYNTHETIC_REFERENCE_ONLY",
+      "source_scenario": "wholesale",
+      "capacity_model": "bulk_stock_units",
+      "quotation_model": "draft_bulk_order_quote",
+      "followup_model": "unsent_terms_review",
+      "finance_model": "unposted_quote_journal",
+      "excluded_data_categories": [
+        "real_customer_contact",
+        "real_inventory_records",
+        "credit_terms",
+        "payments"
+      ],
+      "required_reviews": [
+        "authorization",
+        "privacy",
+        "finance",
+        "audit",
+        "recovery"
+      ],
+      "risk_notes": "Synthetic bulk ordering cannot establish trade-credit terms, receivables, dispatch or actual buyer approval.",
+      "profile_id": "meta.sector.wholesale.v1",
+      "human_review_required": true,
+      "execution_available": false
+    },
+    {
+      "sector": "transportation",
+      "readiness": "DESIGN_MAPPING_ONLY",
+      "source_scenario": null,
+      "capacity_model": "trip_and_vehicle_capacity",
+      "quotation_model": "unissued_trip_estimate",
+      "followup_model": "unsent_rider_update",
+      "finance_model": "unposted_transport_estimate",
+      "excluded_data_categories": [
+        "driver_identifiers",
+        "vehicle_live_locations",
+        "passenger_data",
+        "payments"
+      ],
+      "required_reviews": [
+        "authorization",
+        "privacy",
+        "finance",
+        "audit",
+        "recovery",
+        "transport_safety",
+        "sector_regulatory"
+      ],
+      "risk_notes": "No vehicle tracking, dispatch, passenger data, road-safety decisions or fare collection; capacity logic requires independent design.",
+      "profile_id": "meta.sector.transportation.v1",
+      "human_review_required": true,
+      "execution_available": false
+    },
+    {
+      "sector": "logistics",
+      "readiness": "DESIGN_MAPPING_ONLY",
+      "source_scenario": null,
+      "capacity_model": "route_and_shipment_slots",
+      "quotation_model": "unissued_delivery_quote",
+      "followup_model": "unsent_milestone_update",
+      "finance_model": "unposted_shipping_estimate",
+      "excluded_data_categories": [
+        "real_shipment_details",
+        "recipient_addresses",
+        "live_tracking",
+        "payments"
+      ],
+      "required_reviews": [
+        "authorization",
+        "privacy",
+        "finance",
+        "audit",
+        "recovery",
+        "sector_regulatory"
+      ],
+      "risk_notes": "No live consignment, geolocation, goods custody, waybill, delivery action or partner carrier connectivity.",
+      "profile_id": "meta.sector.logistics.v1",
+      "human_review_required": true,
+      "execution_available": false
+    },
+    {
+      "sector": "tourism",
+      "readiness": "DESIGN_MAPPING_ONLY",
+      "source_scenario": null,
+      "capacity_model": "tour_and_room_capacity",
+      "quotation_model": "unissued_reservation_estimate",
+      "followup_model": "unsent_guest_enquiry",
+      "finance_model": "unposted_reservation_estimate",
+      "excluded_data_categories": [
+        "guest_identifiers",
+        "passport_data",
+        "travel_itineraries",
+        "payments"
+      ],
+      "required_reviews": [
+        "authorization",
+        "privacy",
+        "finance",
+        "audit",
+        "recovery",
+        "sector_regulatory",
+        "consumer_protection"
+      ],
+      "risk_notes": "No booking hold, supplier inventory, passport record, itinerary confirmation, payment, cancellation or refund processing.",
+      "profile_id": "meta.sector.tourism.v1",
+      "human_review_required": true,
+      "execution_available": false
+    },
+    {
+      "sector": "education",
+      "readiness": "DESIGN_MAPPING_ONLY",
+      "source_scenario": null,
+      "capacity_model": "classroom_and_enrolment_capacity",
+      "quotation_model": "unissued_fee_estimate",
+      "followup_model": "unsent_enrolment_enquiry",
+      "finance_model": "unposted_education_fee_estimate",
+      "excluded_data_categories": [
+        "learner_records",
+        "guardian_contact",
+        "minors_data",
+        "grades",
+        "payments"
+      ],
+      "required_reviews": [
+        "authorization",
+        "privacy",
+        "finance",
+        "audit",
+        "recovery",
+        "minors_and_learners",
+        "sector_regulatory"
+      ],
+      "risk_notes": "No student/child records, enrolment decisions, grading, safeguarding actions, guardians' messages or real fee statements.",
+      "profile_id": "meta.sector.education.v1",
+      "human_review_required": true,
+      "execution_available": false
+    },
+    {
+      "sector": "healthcare",
+      "readiness": "DESIGN_MAPPING_ONLY",
+      "source_scenario": null,
+      "capacity_model": "administrative_appointment_capacity",
+      "quotation_model": "unissued_admin_service_estimate",
+      "followup_model": "unsent_admin_enquiry",
+      "finance_model": "unposted_admin_estimate",
+      "excluded_data_categories": [
+        "patient_data",
+        "medical_records",
+        "diagnoses",
+        "medications",
+        "insurance_claims",
+        "payments"
+      ],
+      "required_reviews": [
+        "authorization",
+        "privacy",
+        "finance",
+        "audit",
+        "recovery",
+        "clinical_boundary",
+        "sector_regulatory"
+      ],
+      "risk_notes": "Administrative mapping only. NO diagnosis, triage, patient identifiers, clinical care, medical billing or scheduling of real patients.",
+      "profile_id": "meta.sector.healthcare.v1",
+      "human_review_required": true,
+      "execution_available": false
+    }
+  ],
+  "hard_denials": [
+    "real_business_records",
+    "personal_or_sensitive_data",
+    "outbound_messages",
+    "inventory_mutation",
+    "reservation_or_capacity_hold",
+    "orders_submitted",
+    "invoice_issuance",
+    "actual_payments",
+    "ledger_posting",
+    "external_connectors",
+    "clinical_operations",
+    "customer_activation"
+  ],
+  "release_evidence": {
+    "foundation": "docs/operational-core/FOUNDATION_EXIT_EVIDENCE.json",
+    "foundation_policy": "NO_GO_UNTIL_ALL_NINE_VERIFIED",
+    "required_blocked_gates": [
+      "F04",
+      "F05",
+      "F06",
+      "F07",
+      "F08",
+      "F09"
+    ],
+    "synthetic_reference_sectors": [
+      "retail",
+      "wholesale"
+    ],
+    "design_only_sectors": [
+      "transportation",
+      "logistics",
+      "tourism",
+      "education",
+      "healthcare"
+    ],
+    "operational_release": "NO_GO"
+  }
+}
