@@ -290,7 +290,72 @@ def test_audit_chain_cannot_be_forged_without_detection(env):
 
 def test_disposable_backup_recovery_retains_receipts(env):
     db,gateway,runner,tokens,_,app_key,tmp_path=env
-    approved(env)
-    runner.grant(*tokens["reviewer"],"SIM-PLAN-DEMO","finance",
+    ref=approved(env)
+    runner.grant(*tokens["reviewer"],ref,"SIM-CMD-BACKUP","finance",
                  "SUMMARIZE_EVIDENCE","REVIEW_BUSINESS_EVIDENCE",
-                 {"baseline_count":5,"current_count":4})  # invalid command intentionally below
+                 {"baseline_count":5,"current_count":4})
+    result=runner.run(*tokens["owner"],"SIM-CMD-BACKUP")
+    checkpoint=db.audit_report(tokens["auditor"][1])["head_sha256"]
+    target=tmp_path/"recovered.p2-03v-demo.sqlite3"
+    db.backup_to(tokens["owner"][1],target)
+    recovered=GovernedOrchestration(target,app_key.public_key(),clock=NOW)
+    try:
+        recovered_gateway=GovernedIntelligenceGateway(recovered,gateway.trust)
+        restored=BoundedIntelligenceExecutor(recovered_gateway)
+        verified=restored.verify(*tokens["auditor"],"SIM-CMD-BACKUP",
+                                 trusted_audit_head=checkpoint)
+        assert verified["evidence_sha256"]==result["evidence_sha256"]
+        assert verified["synthetic_computation_reproduced"]
+        assert recovered.db.execute(
+            "SELECT COUNT(*) FROM bounded_virtual_actions").fetchone()[0]==1
+        assert restored.run(*tokens["owner"],"SIM-CMD-BACKUP")[
+            "idempotent_replay"] is True
+    finally:
+        recovered.close()
+
+
+def test_expiring_lease_even_when_session_still_valid(env):
+    db,gateway,runner,tokens,*_=env
+    ref=approved(env)
+    runner.grant(*tokens["reviewer"],ref,"SIM-CMD-SHORTLEASE","finance",
+                 "ANALYZE_SAMPLE","REVIEW_BUSINESS_EVIDENCE",
+                 {"sample_count":2,"flagged_count":1})
+    db.db.execute(
+        "UPDATE bounded_virtual_actions SET lease_expires_at=? "
+        "WHERE command_id='SIM-CMD-SHORTLEASE'",(NOW+4,))
+    db.clock_override=NOW+6
+    with pytest.raises(SyntheticGrowthError,match="lease expired"):
+        runner.run(*tokens["owner"],"SIM-CMD-SHORTLEASE")
+    assert db.db.execute(
+        "SELECT state FROM bounded_virtual_actions WHERE "
+        "command_id='SIM-CMD-SHORTLEASE'").fetchone()[0]=="REVIEWED"
+
+
+def test_revoked_ci_signing_key_invalidates_preapproved_tool(env):
+    db,gateway,runner,tokens,*_=env
+    ref=approved(env)
+    runner.grant(*tokens["reviewer"],ref,"SIM-CMD-KEYREVOKED","finance",
+                 "ANALYZE_SAMPLE","REVIEW_BUSINESS_EVIDENCE",
+                 {"sample_count":2,"flagged_count":1})
+    gateway.trust=gateway.trust.with_revocation(kid="ci-key-one")
+    with pytest.raises(SyntheticGrowthError):
+        runner.run(*tokens["owner"],"SIM-CMD-KEYREVOKED")
+
+
+def test_atomic_evidence_rollback_when_audit_insert_fails(env):
+    db,gateway,runner,tokens,*_=env
+    ref=approved(env)
+    runner.grant(*tokens["reviewer"],ref,"SIM-CMD-ROLLBACK","finance",
+                 "ANALYZE_SAMPLE","REVIEW_BUSINESS_EVIDENCE",
+                 {"sample_count":4,"flagged_count":1})
+    import sqlite3
+    db.db.execute("""
+        CREATE TRIGGER force_audit_failure BEFORE INSERT ON audit
+        BEGIN SELECT RAISE(ABORT, 'synthetic failure'); END
+    """)
+    with pytest.raises(sqlite3.IntegrityError):
+        runner.run(*tokens["owner"],"SIM-CMD-ROLLBACK")
+    row=db.db.execute(
+        "SELECT state,result_json FROM bounded_virtual_actions "
+        "WHERE command_id='SIM-CMD-ROLLBACK'").fetchone()
+    assert row["state"]=="REVIEWED" and row["result_json"] is None
