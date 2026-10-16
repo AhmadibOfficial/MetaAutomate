@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Source-only capability change classification and measurable evidence requirements. Never authorizes real execution.",
+  "reference_registry": "docs/registry/engineering-capabilities.v1.json",
+  "reference_foundation": "docs/operational-core/FOUNDATION_EXIT_EVIDENCE.json",
+  "operational_status": "NO_GO",
+  "change_types": {
+    "PROMOTE": {
+      "allowed_pairs": [
+        [
+          "VISION",
+          "SOURCE_CANDIDATE"
+        ],
+        [
+          "SOURCE_CANDIDATE",
+          "SOURCE_TESTED"
+        ],
+        [
+          "SOURCE_CANDIDATE",
+          "LOCAL_SYNTHETIC_DEMO"
+        ]
+      ]
+    },
+    "SCOPE_CHANGE": {
+      "allowed_pairs": [
+        [
+          "SOURCE_TESTED",
+          "LOCAL_SYNTHETIC_DEMO"
+        ],
+        [
+          "LOCAL_SYNTHETIC_DEMO",
+          "SOURCE_TESTED"
+        ]
+      ]
+    },
+    "EVIDENCE_REFRESH": {
+      "allowed_pairs": [
+        [
+          "VISION",
+          "VISION"
+        ],
+        [
+          "SOURCE_CANDIDATE",
+          "SOURCE_CANDIDATE"
+        ],
+        [
+          "SOURCE_TESTED",
+          "SOURCE_TESTED"
+        ],
+        [
+          "LOCAL_SYNTHETIC_DEMO",
+          "LOCAL_SYNTHETIC_DEMO"
+        ]
+      ]
+    },
+    "DOWNGRADE": {
+      "allowed_pairs": [
+        [
+          "SOURCE_TESTED",
+          "SOURCE_CANDIDATE"
+        ],
+        [
+          "LOCAL_SYNTHETIC_DEMO",
+          "SOURCE_CANDIDATE"
+        ],
+        [
+          "SOURCE_CANDIDATE",
+          "VISION"
+        ],
+        [
+          "SOURCE_TESTED",
+          "VISION"
+        ],
+        [
+          "LOCAL_SYNTHETIC_DEMO",
+          "VISION"
+        ]
+      ]
+    }
+  },
+  "source_evidence_thresholds": {
+    "VISION": {
+      "min_modules": 0,
+      "min_test_definitions": 0,
+      "max_modules": 0,
+      "max_proofs": 0
+    },
+    "SOURCE_CANDIDATE": {
+      "min_modules": 1,
+      "min_proofs": 1,
+      "min_test_definitions": 0
+    },
+    "SOURCE_TESTED": {
+      "min_modules": 1,
+      "min_proofs": 1,
+      "min_test_definitions": 1
+    },
+    "LOCAL_SYNTHETIC_DEMO": {
+      "min_modules": 1,
+      "min_proofs": 1,
+      "min_test_definitions": 1,
+      "required_control": "EXTERNAL_ACTION_DENY",
+      "scope_must_declare": "synthetic"
+    }
+  },
+  "requirements": {
+    "proposal_positive_and_negative_tests": true,
+    "per_dependency_assessment": true,
+    "per_security_control_assessment": true,
+    "manual_review_for_accepted_event": true,
+    "scope_and_limits_required": true,
+    "no_execution_or_customer_activation": true
+  },
+  "decision_rules": {
+    "proposal_result": "EVIDENCE_REVIEW_REQUIRED",
+    "accepted_event_result": "SOURCE_TRACKED_NOT_OPERATIONAL",
+    "review_decision": "SOURCE_REVIEWED_ONLY",
+    "review_separation_statement": "NOT_OPERATIONAL_AUTHORIZATION"
+  }
+}

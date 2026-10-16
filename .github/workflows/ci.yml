@@ -68,6 +68,24 @@ jobs:
           path: artifacts/validation/engineering-capability-registry.json
           if-no-files-found: warn
 
+      - name: Validate capability lifecycle and evidence-upgrade ledger (source only)
+        run: |
+          python scripts/verify_capability_lifecycle.py \
+            --report artifacts/validation/capability-lifecycle.json
+          python scripts/verify_capability_lifecycle.py \
+            --proposal docs/registry/examples/lifecycle-proposal.example.json \
+            --report artifacts/validation/capability-proposal-review.json
+
+      - name: Upload capability lifecycle source review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capability-lifecycle-source-evidence
+          path: |
+            artifacts/validation/capability-lifecycle.json
+            artifacts/validation/capability-proposal-review.json
+          if-no-files-found: warn
+
       - name: Run Python tests
         run: |
           python -m pytest -q \
