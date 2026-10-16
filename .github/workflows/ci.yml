@@ -158,6 +158,17 @@ jobs:
           python -m pip install 'playwright>=1.55,<2'
           python -m playwright install --with-deps chromium
 
+      - name: Verify standalone synthetic Business Autopilot browser journey
+        run: python scripts/verify_business_autopilot_browser.py
+
+      - name: Upload synthetic Business Autopilot evidence and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: business-autopilot-synthetic-demo
+          path: artifacts/business-autopilot/
+          if-no-files-found: warn
+
       - name: Exercise complete browser Objective Workspace workflow
         env:
           APP_DATABASE_URL: postgresql://metaautomate_runtime:ci_runtime_password@localhost:5432/metaautomate

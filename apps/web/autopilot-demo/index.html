@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Business Autopilot · MetaAutomate demonstration</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/demo.css">
+  <script src="/demo.js" defer></script>
+</head>
+<body>
+  <a href="#main" class="skip">Skip to demonstration</a>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="MetaAutomate demonstration home"><span class="mark" aria-hidden="true">M<span>·</span></span>MetaAutomate</a>
+      <div class="workspace-label">OBJECTIVE WORKSPACE</div>
+      <div class="product-name"><span aria-hidden="true">✧</span> Business Autopilot</div>
+      <p class="sidebar-intro">One objective.<br>A traceable path to an outcome.</p>
+      <nav id="journey" aria-label="Demonstration steps"></nav>
+      <div class="sidebar-bottom">
+        <div class="control-mark" aria-hidden="true">◈</div>
+        <strong>You stay in control</strong>
+        <p>Approval covers synthetic drafts. Live business actions remain disabled.</p>
+        <span class="live-denied">Live execution: DENY</span>
+      </div>
+      <div class="local-note">Local demonstration<br><span>No customer account connected</span></div>
+    </aside>
+    <div class="body">
+      <header class="topbar">
+        <div><span class="crumb">Workspace</span><span class="slash">/</span><span>Investor demonstration</span></div>
+        <span class="pill"><span class="dot" aria-hidden="true"></span> Synthetic data only</span>
+      </header>
+      <main id="main" tabindex="-1">
+        <section class="hero" aria-labelledby="page-title">
+          <div><div class="eyebrow">FROM OBJECTIVE TO EVIDENCE</div>
+            <h1 id="page-title">Business Autopilot<span>.</span></h1>
+            <p>See the problem. Review a plan. Inspect the result.</p>
+          </div>
+          <div class="hero-actions">
+            <button id="restart" class="button secondary" type="button">↻ Restart demo</button>
+            <button id="download" class="button primary" type="button" disabled>↓ Download evidence</button>
+          </div>
+        </section>
+        <div id="error" class="error" role="alert" hidden></div>
+        <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
+        <section class="objective" aria-labelledby="objective-title">
+          <div class="objective-icon" aria-hidden="true">◎</div>
+          <div class="objective-copy"><span class="eyebrow">THE BUSINESS OBJECTIVE</span>
+            <h2 id="objective-title">Prepare low-stock replenishment drafts</h2>
+            <p id="objective-description">Loading the committed synthetic scenario…</p>
+          </div>
+          <div class="scenario-picker"><label for="scenario">Explore a scenario</label>
+            <select id="scenario">
+              <option value="standard">Replenishment drafts</option>
+              <option value="partial_failure">One step blocked</option>
+              <option value="high_cost">Cost exceeds estimated benefit</option>
+            </select>
+          </div>
+        </section>
+        <section class="metrics" aria-label="Demonstration outcomes">
+          <div class="metric"><span>Low-stock items</span><strong id="kpi-low">—</strong><small>Observed in the fixture</small></div>
+          <div class="metric"><span>Drafts prepared</span><strong id="kpi-drafts">—</strong><small>Observed in this simulation</small></div>
+          <div class="metric"><span>Net capacity value</span><strong id="kpi-value">—</strong><small>Illustrative estimate · per run</small></div>
+          <div class="metric"><span>Real cash savings</span><strong class="not-measured">Not measured</strong><small>Customer evidence required</small></div>
+        </section>
+        <div class="main-grid">
+          <section id="stage-panel" class="panel stage-panel" aria-labelledby="stage-title" aria-busy="true">
+            <p>Preparing your local demonstration…</p>
+          </section>
+          <aside class="evidence-column" aria-label="Evidence and controls">
+            <section class="panel summary-panel"><div class="eyebrow">SCENARIO SNAPSHOT</div>
+              <h2>Synthetic Qatar Retail</h2><p>Invented records for a repeatable demonstration.</p>
+              <dl><div><dt>Inventory records</dt><dd id="record-count">—</dd></div>
+                <div><dt>Units proposed</dt><dd id="units-proposed">—</dd></div>
+                <div><dt>Stock actually moved</dt><dd>0</dd></div>
+                <div><dt>Connected systems</dt><dd>0</dd></div></dl>
+              <p class="small-note">Drafting a request does not replenish inventory or send a supplier an order.</p>
+            </section>
+            <section class="panel audit-panel"><div class="panel-heading"><h2>Evidence trail</h2><span id="event-count" class="count">0</span></div>
+              <ol id="audit-list"></ol>
+              <p class="small-note">Each step references the previous receipt. The final check reproduces the committed synthetic scenario.</p>
+            </section>
+          </aside>
+        </div>
+        <footer>Demonstration build · Deterministic rules, no live AI calls.<span>Customer pilots and operational release remain subject to separate approval and evidence.</span></footer>
+      </main>
+    </div>
+  </div>
+  <noscript>This demonstration requires JavaScript. Offline evidence can also be generated with the repository's replay command.</noscript>
+</body>
+</html>

@@ -50,3 +50,7 @@ No public cloud URL, hosted authentication, external execution engine, AI planni
 ## Operational Core v1 extension
 
 The authenticated workspace now includes the Digital Transformation Assessment. See `docs/operational-core/ASSESSMENT_V1.md` for the precise self-report scoring, receipt verification boundary, safe schema upgrade and testing instructions. Report creation is the first **local** deterministic executed analytical capability; it does not enable outside agent actions.
+
+## Business Autopilot demonstration
+
+The separate [Business Autopilot demo](../product/BUSINESS_AUTOPILOT_DEMO.md) reuses this workspace's pure planner, assessment rubric and synthetic inventory parser to demonstrate assess → plan → approve → simulate → verify. Run `python3 scripts/business_autopilot_demo.py serve` with the API dependencies installed, then open http://127.0.0.1:8090. No database or workspace initialization is needed. It has no real sign-in, tenant data or execution authority, and does not change the authenticated workspace on port 8000.

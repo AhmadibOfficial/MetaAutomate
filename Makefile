@@ -45,3 +45,10 @@ foundation-status:
 
 foundation-release-check:
 	@python3 scripts/verify_foundation_readiness.py --require-complete
+
+.PHONY: autopilot-demo autopilot-demo-check
+autopilot-demo:
+	python3 scripts/business_autopilot_demo.py serve
+
+autopilot-demo-check:
+	PYTHONPATH=apps/api python3 -m pytest -q tests/test_business_autopilot.py tests/test_business_autopilot_http.py

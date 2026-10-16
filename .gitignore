@@ -147,3 +147,4 @@ credentials/
 *.zip
 
 .workspace-access-key
+/artifacts/business-autopilot/

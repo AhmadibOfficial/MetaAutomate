@@ -2,6 +2,12 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Business Autopilot synthetic demo (no database)",
+      "type": "shell",
+      "command": "python3 scripts/business_autopilot_demo.py serve",
+      "problemMatcher": []
+    },
+    {
       "label": "Start services",
       "type": "shell",
       "command": "docker compose up -d --build",
