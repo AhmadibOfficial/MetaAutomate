@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "classification": "SYNTHETIC_SOURCE_ONLY",
+  "scenarios": [
+    {
+      "id": "LEAD_QUALIFICATION",
+      "label": "Lead Qualification",
+      "sector": "Sales & customer journeys",
+      "objective": "Reduce the time to review qualified customer enquiries",
+      "success_metric": "Qualified enquiries reviewed",
+      "metric_unit": "COUNT",
+      "sample_baseline": 12,
+      "description": "Reference architecture for a manually supervised, fictional scenario; it contains no personal or organizational data.",
+      "steps": [
+        {
+          "id": "INTAKE",
+          "type": "INPUT",
+          "depends_on": [],
+          "description": "Read-only incoming enquiry metadata",
+          "requires_review": false,
+          "external_effect": false
+        },
+        {
+          "id": "VALIDATE",
+          "type": "QUALITY",
+          "depends_on": [
+            "INTAKE"
+          ],
+          "description": "Review consent and scope",
+          "requires_review": false,
+          "external_effect": false
+        },
+        {
+          "id": "ASSESS",
+          "type": "ANALYSIS",
+          "depends_on": [
+            "VALIDATE"
+          ],
+          "description": "Rank next-best manual follow-up",
+          "requires_review": false,
+          "external_effect": false
+        },
+        {
+          "id": "REVIEW",
+          "type": "HUMAN_REVIEW",
+          "depends_on": [
+            "ASSESS"
+          ],
+          "description": "Human case triage",
+          "requires_review": true,
+          "external_effect": false
+        },
+        {
+          "id": "EXTERNAL",
+          "type": "EXTERNAL_ACTION",
+          "depends_on": [
+            "REVIEW"
+          ],
+          "description": "Proposed external follow-up (disabled)",
+          "requires_review": true,
+          "external_effect": true
+        }
+      ]
+    },
+    {
+      "id": "INVENTORY_RESILIENCE",
+      "label": "Inventory Resilience",
+      "sector": "Commerce & operations",
+      "objective": "Identify stock availability risks before they interrupt fulfillment",
+      "success_metric": "Stock-risk reviews completed",
+      "metric_unit": "COUNT",
+      "sample_baseline": 12,
+      "description": "Reference architecture for a manually supervised, fictional scenario; it contains no personal or organizational data.",
+      "steps": [
+        {
+          "id": "INTAKE",
+          "type": "INPUT",
+          "depends_on": [],
+          "description": "Read-only sample stock positions",
+          "requires_review": false,
+          "external_effect": false
+        },
+        {
+          "id": "VALIDATE",
+          "type": "QUALITY",
+          "depends_on": [
+            "INTAKE"
+          ],
+          "description": "Validate SKU and reorder inputs",
+          "requires_review": false,
+          "external_effect": false
+        },
+        {
+          "id": "ASSESS",
+          "type": "ANALYSIS",
+          "depends_on": [
+            "VALIDATE"
+          ],
+          "description": "Calculate deterministic reorder signals",
+          "requires_review": false,
+          "external_effect": false
+        },
+        {
+          "id": "REVIEW",
+          "type": "HUMAN_REVIEW",
+          "depends_on": [
+            "ASSESS"
+          ],
+          "description": "Human inventory decision",
+          "requires_review": true,
+          "external_effect": false
+        },
+        {
+          "id": "EXTERNAL",
+          "type": "EXTERNAL_ACTION",
+          "depends_on": [
+            "REVIEW"
+          ],
+          "description": "Proposed supplier order (disabled)",
+          "requires_review": true,
+          "external_effect": true
+        }
+      ]
+    },
+    {
+      "id": "CONTENT_OPERATIONS",
+      "label": "Content Operations",
+      "sector": "Creative & social workflows",
+      "objective": "Design a helpful, consistent content quality and approval process",
+      "success_metric": "Content drafts approved",
+      "metric_unit": "COUNT",
+      "sample_baseline": 12,
+      "description": "Reference architecture for a manually supervised, fictional scenario; it contains no personal or organizational data.",
+      "steps": [
+        {
+          "id": "INTAKE",
+          "type": "INPUT",
+          "depends_on": [],
+          "description": "Read-only synthetic campaign brief",
+          "requires_review": false,
+          "external_effect": false
+        },
+        {
+          "id": "VALIDATE",
+          "type": "QUALITY",
+          "depends_on": [
+            "INTAKE"
+          ],
+          "description": "Validate channels and content policy",
+          "requires_review": false,
+          "external_effect": false
+        },
+        {
+          "id": "ASSESS",
+          "type": "ANALYSIS",
+          "depends_on": [
+            "VALIDATE"
+          ],
+          "description": "Assemble editorial review checklist",
+          "requires_review": false,
+          "external_effect": false
+        },
+        {
+          "id": "REVIEW",
+          "type": "HUMAN_REVIEW",
+          "depends_on": [
+            "ASSESS"
+          ],
+          "description": "Human editorial and brand review",
+          "requires_review": true,
+          "external_effect": false
+        },
+        {
+          "id": "EXTERNAL",
+          "type": "EXTERNAL_ACTION",
+          "depends_on": [
+            "REVIEW"
+          ],
+          "description": "Proposed social publishing (disabled)",
+          "requires_review": true,
+          "external_effect": true
+        }
+      ]
+    },
+    {
+      "id": "SECURITY_TRIAGE",
+      "label": "Security Triage",
+      "sector": "Application & API security",
+      "objective": "Prioritize security findings without automated exploitation or disclosure",
+      "success_metric": "Findings reviewed by security owner",
+      "metric_unit": "COUNT",
+      "sample_baseline": 12,
+      "description": "Reference architecture for a manually supervised, fictional scenario; it contains no personal or organizational data.",
+      "steps": [
+        {
+          "id": "INTAKE",
+          "type": "INPUT",
+          "depends_on": [],
+          "description": "Read-only sanitized security finding summary",
+          "requires_review": false,
+          "external_effect": false
+        },
+        {
+          "id": "VALIDATE",
+          "type": "QUALITY",
+          "depends_on": [
+            "INTAKE"
+          ],
+          "description": "Validate scope and severity evidence",
+          "requires_review": false,
+          "external_effect": false
+        },
+        {
+          "id": "ASSESS",
+          "type": "ANALYSIS",
+          "depends_on": [
+            "VALIDATE"
+          ],
+          "description": "Rank finding for investigation",
+          "requires_review": false,
+          "external_effect": false
+        },
+        {
+          "id": "REVIEW",
+          "type": "HUMAN_REVIEW",
+          "depends_on": [
+            "ASSESS"
+          ],
+          "description": "Human security triage",
+          "requires_review": true,
+          "external_effect": false
+        },
+        {
+          "id": "EXTERNAL",
+          "type": "EXTERNAL_ACTION",
+          "depends_on": [
+            "REVIEW"
+          ],
+          "description": "Proposed external security ticket (disabled)",
+          "requires_review": true,
+          "external_effect": true
+        }
+      ]
+    }
+  ]
+}

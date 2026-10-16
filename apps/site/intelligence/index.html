@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light"><meta name="theme-color" content="#f7f9fc">
+<meta name="description" content="Explore MetaAutomate Intelligence: build a synthetic AI-project architecture, assess governance needs, and simulate human-gated workflow planning. No real AI agents or integrations.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>01 / Intelligence — AI Project Workbench | MetaAutomate</title>
+<link rel="icon" type="image/webp" href="/assets/metaautomate-mark.webp">
+<link rel="stylesheet" href="/intelligence/workbench.css">
+<script defer src="/intelligence/data.js"></script>
+<script defer src="/intelligence/workbench.js"></script>
+</head>
+<body>
+<a href="#main" class="skip">Skip to project workbench</a>
+<div class="announcement"><strong>01 / INTELLIGENCE · SOURCE PREVIEW</strong><span>Interactive, rules-based architecture examples. No AI model calls, customers, logins or real workflow execution.</span></div>
+<header class="topbar"><a class="brand" href="/" aria-label="Return to MetaAutomate homepage">
+<img src="/assets/metaautomate-mark.webp" width="46" height="46" alt=""><span>Meta<strong>Automate</strong><small>AI SYSTEMS &amp; AUTOMATION</small></span></a>
+<nav class="toplinks" aria-label="Page links"><a href="/services/#ai">Services</a><a href="/intelligence-lab/">Business Intelligence</a><a href="/engage/?service=AI%20Systems%20%26%20Automation">Scope a project <span aria-hidden="true">↗</span></a></nav>
+</header>
+<main id="main">
+<div class="hero wrap">
+<div class="hero-copy"><p class="eyebrow">AI PROJECT ARCHITECT / BUILD WITH CLARITY</p><h1>Intelligence that starts<br>with a <em>real objective.</em></h1>
+<p>Explore how a business challenge becomes a reviewable workflow: clear inputs, measurable outcomes, safe decisions and a human in control.</p>
+<div class="hero-tags"><span><i aria-hidden="true">✧</i> Four practical workflows</span><span><i aria-hidden="true">◇</i> No account required</span><span><i aria-hidden="true">✓</i> No external actions</span></div>
+</div>
+<div class="hero-panel"><div class="hero-panel-label"><span class="pulse"></span> WORKFLOW ORCHESTRATION</div>
+<div class="mini-step"><span>01</span><div><strong>Understand</strong><small>Find a measurable objective</small></div><i>✓</i></div>
+<div class="mini-step"><span>02</span><div><strong>Assess</strong><small>Verify sources and risks</small></div><i>✓</i></div>
+<div class="mini-step"><span>03</span><div><strong>Design</strong><small>Build a gated work graph</small></div><i>✓</i></div>
+<div class="mini-step muted"><span>04</span><div><strong>Authorize</strong><small>Human decisions required</small></div><i>⊘</i></div>
+<div class="mini-step muted"><span>05</span><div><strong>Connect</strong><small>External execution disabled</small></div><i>⊘</i></div>
+<p>These are illustrative architecture stages, not a running autonomous agent.</p></div>
+</div>
+<section class="wrap builder" aria-labelledby="builder-heading">
+<div class="section-heading"><p class="eyebrow">01 / PROJECT ASSESSMENT</p><h2 id="builder-heading">Design a useful system.</h2><p>Choose a fictional use case and describe the kind of data and action it would require. This workbench uses fixed choices so no sensitive business details are entered.</p></div>
+<div class="builder-layout">
+<div class="panel controls">
+<h3>Project context</h3>
+<label for="scenario">What would you like to improve?</label>
+<select id="scenario"><option value="LEAD_QUALIFICATION">Qualify customer enquiries</option><option value="INVENTORY_RESILIENCE">Reduce inventory disruptions</option><option value="CONTENT_OPERATIONS">Improve content and social approvals</option><option value="SECURITY_TRIAGE">Review application security findings</option></select>
+<label for="data-state">What information is available?</label>
+<select id="data-state"><option value="SAMPLE_ONLY">Illustrative or sample data</option><option value="MISSING">No reliable baseline yet</option><option value="APPROVED_SOURCE_CLAIM">Business-owned data (not independently verified)</option></select>
+<label for="sensitivity">Would it involve sensitive information?</label>
+<select id="sensitivity"><option value="NONE">No sensitive information</option><option value="PERSONAL">Personal or customer information</option><option value="CONFIDENTIAL">Confidential business or security information</option></select>
+<label for="request">What level of automation is envisioned?</label>
+<select id="request"><option value="DESIGN_ONLY">Analysis and recommendation only</option><option value="REQUEST_EXTERNAL_WORKFLOW">Future external action or publishing</option></select>
+<div class="control-actions"><button type="button" id="simulate" class="primary">Simulate safe steps <span aria-hidden="true">→</span></button><button type="button" id="download" class="secondary">Export example plan <span aria-hidden="true">↗</span></button></div>
+<p class="micro">Local browser preview only. Exporting creates a file on your device; nothing is submitted to MetaAutomate.</p>
+</div>
+<div class="panel assessment" aria-labelledby="plan-heading">
+<div class="panel-top"><div><p class="eyebrow">YOUR ARCHITECTURE</p><h3 id="plan-heading">Lead qualification</h3></div><span class="label">SIMULATION ONLY</span></div>
+<p id="plan-description" class="plan-description"></p>
+<div class="objective"><span>OBJECTIVE</span><strong id="objective">—</strong></div>
+<div class="metrics"><div><small>Success measure</small><strong id="measure">—</strong></div><div><small>Example baseline</small><strong id="baseline">—</strong></div></div>
+<p class="mini-title">Proposed dependency graph</p>
+<ol id="graph" class="graph"></ol>
+<div class="simulation" id="simulation" role="status" aria-live="polite"><strong>Ready to simulate</strong><p>No workflow steps have run. External action is disabled.</p></div>
+</div>
+</div>
+</section>
+<section class="wrap checks" aria-labelledby="checks-heading">
+<div class="section-heading"><p class="eyebrow">02 / GOVERNANCE</p><h2 id="checks-heading">What needs verification?</h2><p>Safe automation depends on the quality of the information and the authority to act.</p></div>
+<div class="checks-grid">
+<div class="panel"><h3>Release blockers</h3><ul id="blockers" class="checklist"></ul></div>
+<div class="panel"><h3>Human authorization</h3><div class="approval"><span>WORKFLOW OWNER</span><strong>Not authenticated</strong></div><div class="approval"><span>SECURITY REVIEWER</span><strong>Not authenticated</strong></div><div class="approval"><span>PROVIDER ACCESS</span><strong>Not connected</strong></div><p class="safe-note">Clicking “Simulate” cannot approve an action. Real approval requires verified identities, platform scopes and an independently reviewed environment.</p></div>
+</div>
+</section>
+<section class="wrap principles" aria-labelledby="principles-heading"><p class="eyebrow">03 / RESPONSIBLE INTELLIGENCE</p><h2 id="principles-heading">Five disciplines. One practical path.</h2>
+<div class="discipline-grid">
+<article><span>01</span><h3>Assess</h3><p>Understand the goal, baseline and whether AI is appropriate.</p></article>
+<article><span>02</span><h3>Discover</h3><p>Map work that happens today and where it breaks.</p></article>
+<article><span>03</span><h3>Orchestrate</h3><p>Define typed steps, dependencies and safe failure states.</p></article>
+<article><span>04</span><h3>Govern</h3><p>Preserve human authority, privacy, access and auditable decisions.</p></article>
+<article><span>05</span><h3>Measure</h3><p>Verify actual outcomes rather than claim savings or earnings.</p></article></div>
+<div class="closing"><div><strong>Ready to discuss an actual challenge?</strong><p>We can review your requirements and what verification would be needed before a live implementation.</p></div><a href="/engage/?service=AI%20Systems%20%26%20Automation">Scope an AI project <span aria-hidden="true">↗</span></a></div>
+<p class="footnote">P2-03u source preview. Rules-based architecture and internally simulated steps only. Not a connected large language model, authenticated AI agent service, production deployment, completed client project or guarantee of financial value. External operations are blocked, even if a scenario requests them.</p>
+</section>
+</main>
+<footer class="footer"><span>MetaAutomate · Solving real-world challenges with technology</span><span>HUMAN-CONTROLLED · PRIVACY BY DESIGN</span></footer>
+</body></html>

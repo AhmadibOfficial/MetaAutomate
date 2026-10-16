@@ -1,0 +1,51 @@
+name: MetaAutomate 01 Intelligence Workbench (source-only)
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - feature/p2-03u-intelligence-project-architect
+
+permissions:
+  contents: read
+
+jobs:
+  intelligence-architect:
+    name: AI Project Design · graph guardrails · responsive acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install offline test tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8,<10' 'playwright>=1.50,<2'
+          python -m playwright install --with-deps chromium
+      - name: Check strict scenario graph and human/external guardrails
+        run: python -m pytest -q tests/test_synthetic_intelligence_project_architect.py
+      - name: Verify source-generated browser contract
+        run: python scripts/build_intelligence_workbench_contract.py --check
+      - name: Validate safe client-side scripts
+        run: |
+          node --check apps/site/intelligence/data.js
+          node --check apps/site/intelligence/workbench.js
+      - name: Accept static 01 Intelligence workbench across desktop and mobile
+        run: python scripts/verify_intelligence_workbench_browser.py
+      - name: Upload illustrative screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p2-03u-intelligence-workbench-visuals
+          path: |
+            artifacts/validation/intelligence-desktop.png
+            artifacts/validation/intelligence-mobile-390.png
+            artifacts/validation/intelligence-mobile-360.png
+          if-no-files-found: warn
