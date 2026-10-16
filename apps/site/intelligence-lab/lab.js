@@ -227,7 +227,12 @@
     if(!["price","orders","unit"].includes(e.target.id))return;
     const n=Number(e.target.value);
     if(!Number.isInteger(n)||n<-5000||n>5000)return;
-    state[e.target.id]=n;render();
+    state[e.target.id]=n;
+    const out=$(e.target.id+"-out");
+    if(out)out.textContent=(n>0?"+":"")+(n/100).toFixed(0)+"%";
+  });
+  $("module-content").addEventListener("change",e=>{
+    if(["price","orders","unit"].includes(e.target.id))render();
   });
   $("module-content").addEventListener("click",e=>{
     const add=e.target.closest("[data-add]"),next=e.target.closest("[data-step]");
