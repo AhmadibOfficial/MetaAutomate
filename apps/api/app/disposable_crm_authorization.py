@@ -26,6 +26,7 @@ from .disposable_meta_crm import (
 from .synthetic_growth_autopilot import SyntheticGrowthError
 from .synthetic_meta_lead_federation import inspect_signed_meta_event
 from .synthetic_source_quality import require_disposable_source
+from .disposable_audit_verification import verify_tenant_audit
 
 ISSUER = "metaautomate-disposable-ci"
 AUDIENCE = "meta-stage-crm-rehearsal"
@@ -34,6 +35,7 @@ MAX_LIFETIME_SECONDS = 300
 ROLES = frozenset({"auditor", "reviewer", "tenant_admin"})
 ACTIONS = {
     "read_queue": frozenset({"auditor", "reviewer", "tenant_admin"}),
+    "read_audit": frozenset({"auditor", "tenant_admin"}),
     "ingest_signed_metadata": frozenset({"tenant_admin"}),
     "assign_human": frozenset({"reviewer", "tenant_admin"}),
     "record_consent_review": frozenset({"tenant_admin"}),
@@ -177,6 +179,10 @@ class AuthorizedMetaCRM:
 
     def tasks(self):
         return list_review_tasks(self._conn, self._guard("read_queue"))
+
+    def audit_report(self, trusted_head: str | None = None) -> dict:
+        return verify_tenant_audit(self._conn, self._guard("read_audit"),
+                                   trusted_head=trusted_head)
 
     def ingest_signed(self, raw: bytes, signature: str, test_app_secret: bytes) -> int:
         """Verify, validate and ingest without trusting caller-supplied inspection flags."""
