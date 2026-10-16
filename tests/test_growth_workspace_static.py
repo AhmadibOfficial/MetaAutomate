@@ -73,6 +73,9 @@ def test_static_demo_is_navigable_and_discoverable_but_not_live():
     assert "Responsible automation by design" in html
     assert "F04–F09" not in html
     assert "NO-GO" not in html
+    customer_copy = re.sub(r"<[^>]+>", " ", html).lower()
+    assert not re.search(r"\b(demo|fictional)\b", customer_copy)
+    assert "figures are illustrative" in customer_copy
     assert "Choose a business scenario" in html
     assert "subscription" in html.lower()
     assert "customer accounts are not connected" in html

@@ -92,7 +92,7 @@ def main():
             expect(page.locator("#inspection-panel")).to_contain_text("Selar")
             expect(page.locator("#inspection-panel")).to_contain_text("Suppressed")
             page.locator("#tab-setup").click()
-            expect(page.locator("#panel-setup")).to_contain_text("Not available")
+            expect(page.locator("#panel-setup")).to_contain_text("In development")
             expect(page.locator("#panel-setup")).to_contain_text("Responsible automation by design")
             expect(page.locator("#panel-setup")).to_contain_text("3/9")
             assert_no_overflow(page,width)
