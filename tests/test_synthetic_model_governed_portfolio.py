@@ -73,7 +73,7 @@ def test_model_fixture_parser_fail_closed(bad):
     lambda d:d["models"][0].update({"api_key":"bad"}),
     lambda d:d["models"][0].update({"source_url":"https://attacker.test/"}),
     lambda d:d["tasks"][0].update({"personal_email":"x@invalid.test"}),
-    lambda d:d["tasks"][0].update({"required_tags":["AUTO_PUBLISH"]}),
+    lambda d:d["tasks"][0].update({"required_tags":["GUARANTEED_SAVINGS"]}),
     lambda d:d["tasks"][0].update({"max_case_units":True}),
     lambda d:d["tasks"][1].update({"id":"BUSINESS_COST"}),
     lambda d:d["results"][0].update({"reported_latency_ms":100}),
