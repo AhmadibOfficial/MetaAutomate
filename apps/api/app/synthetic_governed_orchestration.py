@@ -369,6 +369,17 @@ class GovernedOrchestration:
         dest=demo_database_path(target)
         require(dest!=self.path and not dest.exists(),"Backup destination must be unused")
         self.audit_report(token)
+        # A tenant administrator is not authorized to export other tenants.
+        # Real multi-tenant recovery must be operator-controlled, out-of-band,
+        # and independently authorized in private staging.
+        tenants = {row[0] for row in self.db.execute(
+            "SELECT workspace FROM plans UNION "
+            "SELECT workspace FROM revoked_tokens UNION "
+            "SELECT workspace FROM audit UNION "
+            "SELECT workspace FROM synthetic_tool_reviews"
+        ).fetchall()}
+        require(tenants == {actor.workspace},
+                "Tenant backup export denied for mixed-tenant database")
         # SQLite's online backup API creates a consistent snapshot, even under WAL.
         with sqlite3.connect(str(dest)) as out:
             self.db.backup(out)
