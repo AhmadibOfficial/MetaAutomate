@@ -144,6 +144,7 @@ class BoundedIntelligenceExecutor:
             reviewer_ref TEXT NOT NULL,
             reviewer_token_ref TEXT NOT NULL,
             reviewer_idp_jti TEXT NOT NULL,
+            reviewer_idp_kid TEXT NOT NULL,
             state TEXT NOT NULL CHECK(state IN ('REVIEWED','SIMULATED')),
             lease_expires_at INTEGER NOT NULL,
             result_json TEXT,
@@ -222,13 +223,13 @@ class BoundedIntelligenceExecutor:
                     workspace,plan_ref,command_id,module_id,tool_id,purpose,
                     request_sha256,request_json,source_sha256,workflow_sha256,
                     owner_ref,owner_token_ref,reviewer_ref,reviewer_token_ref,
-                    reviewer_idp_jti,state,lease_expires_at
-                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    reviewer_idp_jti,reviewer_idp_kid,state,lease_expires_at
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """,(ws,plan_ref,command_id,module_id,tool_id,purpose,
                  h,wire(request),source["source_record_sha256"],plan["spec_hash"],
                  plan["owner_ref"],plan["owner_token"],
                  actor.actor_ref,actor.token_ref,idp_identity.token_ref,
-                 "REVIEWED",lease))
+                 idp_identity.key_id,"REVIEWED",lease))
             self.store._audit(ws,{"action":"VIRTUAL_INTENT_APPROVED",
                 "ref":plan_ref,"command":command_id,"request_sha256":h,
                 "reviewer":actor.actor_ref})
@@ -261,8 +262,10 @@ class BoundedIntelligenceExecutor:
             # The two independently test-signed credential revocation views
             # are always freshly queried; a previously granted intention
             # cannot bypass a later IdP key/JTI revocation.
-            require(row["reviewer_idp_jti"] not in self.gateway.trust.revoked_jtis,
-                    "Reviewer test identity revoked")
+            require(row["reviewer_idp_jti"] not in self.gateway.trust.revoked_jtis
+                    and row["reviewer_idp_kid"] not in self.gateway.trust.revoked_kids
+                    and row["reviewer_idp_kid"] in self.gateway.trust.keys,
+                    "Reviewer test identity or signing key revoked")
             require(row["lease_expires_at"]>self.store._now(),
                     "Synthetic tool lease expired")
             request=json.loads(row["request_json"])
