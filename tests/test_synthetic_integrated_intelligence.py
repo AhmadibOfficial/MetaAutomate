@@ -53,7 +53,7 @@ def test_unknown_workspace_rejected(value):
 @pytest.mark.parametrize("raw", [
     b"", b"{}", b'{"schema_version":1,"schema_version":1}',
     b'{"schema_version":1.0}', b'{"a":NaN}', b'{"a":true}',
-    b"\\x00" * 100, b"{" + b"x" * 17000,
+    b"\x00" * 100, b"{" + b"x" * 17000,
 ])
 def test_invalid_json_rejected(raw):
     with pytest.raises(SyntheticGrowthError):
