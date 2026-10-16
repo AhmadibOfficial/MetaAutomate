@@ -106,6 +106,19 @@ jobs:
           path: artifacts/validation/retail-wholesale-cross-functional-demo.json
           if-no-files-found: warn
 
+      - name: Validate cross-sector workflow contract v1 (source/design only)
+        run: |
+          python scripts/verify_cross_sector_workflow_contract.py \
+            --report artifacts/validation/cross-sector-workflow-contract-v1.json
+
+      - name: Upload cross-sector contract source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-sector-contract-source-evidence
+          path: artifacts/validation/cross-sector-workflow-contract-v1.json
+          if-no-files-found: warn
+
       - name: Validate private staging source-only boundaries
         run: |
           python scripts/verify_private_staging_contract.py \
