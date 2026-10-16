@@ -1,0 +1,99 @@
+{
+  "proposal_schema_version": "1.0.0",
+  "example_only": true,
+  "capability_id": "SYS-REGISTRY",
+  "change_type": "EVIDENCE_REFRESH",
+  "from_maturity": "SOURCE_TESTED",
+  "to_maturity": "SOURCE_TESTED",
+  "motivation": "Example-only: demonstrate a measurable, reviewable documentation/evidence update without promoting a live service.",
+  "after": {
+    "id": "SYS-REGISTRY",
+    "kind": "platform_system",
+    "name": "Capability & Tool Registry",
+    "maturity": "SOURCE_TESTED",
+    "operational_status": "NO_GO",
+    "implementation_scope": "Read-only draft catalog; all 33 existing entries are disabled",
+    "modules": [
+      {
+        "path": "docs/registry/capabilities.csv",
+        "scope": "source_reference"
+      },
+      {
+        "path": "apps/api/app/registry.py",
+        "scope": "source_reference"
+      }
+    ],
+    "verification_evidence": [
+      {
+        "path": "tests/test_seed_registry.py",
+        "kind": "test_definition",
+        "note": "CSV draft safety checks"
+      },
+      {
+        "path": "apps/api/tests/test_registry.py",
+        "kind": "test_definition",
+        "note": "Read-only catalog API tests"
+      }
+    ],
+    "security_requirements": [
+      "LEAST_PRIVILEGE",
+      "EXTERNAL_ACTION_DENY",
+      "INDEPENDENT_VERIFICATION"
+    ],
+    "depends_on": [
+      "SYS-IDENTITY"
+    ],
+    "catalog_ids": [
+      "CORE-002"
+    ],
+    "unmet_release_gates": [
+      "F04",
+      "F05",
+      "F06",
+      "F07",
+      "F08",
+      "F09"
+    ],
+    "risk_class": "HIGH",
+    "known_limitations": "Catalog is not an agent/tool execution registry; local key is not a production identity model.",
+    "next_acceptance": "Example-only source evidence review: document planned registry negative tests; operational NO-GO remains unchanged."
+  },
+  "evidence": {
+    "positive_test_paths": [
+      "tests/test_engineering_capability_registry.py"
+    ],
+    "negative_test_paths": [
+      "tests/test_seed_registry.py"
+    ],
+    "source_paths": [
+      "apps/api/app/registry.py"
+    ],
+    "scope_note": "Read-only draft catalog source; this example does not change runtime behavior.",
+    "known_limits": "No production principal, tenant API, write action or permission grant.",
+    "ci_run_url": null
+  },
+  "dependency_assessments": [
+    {
+      "id": "SYS-IDENTITY",
+      "current_maturity": "SOURCE_TESTED",
+      "impact": "Source-reference dependency only. Not proof of operational security."
+    }
+  ],
+  "control_assessments": [
+    {
+      "id": "LEAST_PRIVILEGE",
+      "state": "UNVERIFIED",
+      "note": "Example-only: independently verify before production use."
+    },
+    {
+      "id": "EXTERNAL_ACTION_DENY",
+      "state": "UNVERIFIED",
+      "note": "Example-only: independently verify before production use."
+    },
+    {
+      "id": "INDEPENDENT_VERIFICATION",
+      "state": "UNVERIFIED",
+      "note": "Example-only: independently verify before production use."
+    }
+  ]
+}
