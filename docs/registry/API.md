@@ -1,5 +1,12 @@
 # MetaAutomate Capability Registry API v1.0
 
+> **New source-only engineering evidence overlay:** See
+> [Unified Engineering Capability Registry](ENGINEERING_CAPABILITY_REGISTRY.md).
+> This connects the 33 unchanged DRAFT catalog records to nine technology areas
+> and ten platform systems. It records source maturity, dependencies, security
+> requirements and traceable evidence, without changing this read-only API,
+> seeding, database migrations or operational NO-GO gates.
+
 Scope: **read-only global catalog**. Not a capability executor, tenant API, or production authentication system.
 
 ## Stored data

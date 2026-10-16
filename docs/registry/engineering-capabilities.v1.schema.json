@@ -1,0 +1,243 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:metaautomate:schemas:engineering-capabilities:v1",
+  "title": "MetaAutomate engineering capability registry — source-only v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "registry_id",
+    "as_of_date",
+    "purpose",
+    "relationship",
+    "release_boundary",
+    "maturity_definitions",
+    "security_control_definitions",
+    "entries"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "registry_id": {
+      "const": "metaautomate-engineering-capability-registry"
+    },
+    "as_of_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 10
+    },
+    "relationship": {
+      "type": "object",
+      "required": [
+        "existing_catalog",
+        "existing_definition_schema",
+        "contract"
+      ]
+    },
+    "release_boundary": {
+      "type": "object",
+      "required": [
+        "foundation_evidence",
+        "required_policy",
+        "operational_authorization",
+        "all_capabilities_disabled"
+      ],
+      "properties": {
+        "operational_authorization": {
+          "const": "NO_GO"
+        },
+        "all_capabilities_disabled": {
+          "const": true
+        },
+        "required_policy": {
+          "const": "NO_GO_UNTIL_ALL_NINE_VERIFIED"
+        }
+      }
+    },
+    "maturity_definitions": {
+      "type": "object",
+      "required": [
+        "VISION",
+        "SOURCE_CANDIDATE",
+        "SOURCE_TESTED",
+        "LOCAL_SYNTHETIC_DEMO"
+      ]
+    },
+    "security_control_definitions": {
+      "type": "object",
+      "minProperties": 2,
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 19,
+      "maxItems": 19,
+      "items": {
+        "$ref": "#/$defs/entry"
+      }
+    }
+  },
+  "$defs": {
+    "pathReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "scope"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 2
+        },
+        "scope": {
+          "const": "source_reference"
+        }
+      }
+    },
+    "proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "kind",
+        "note"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 2
+        },
+        "kind": {
+          "enum": [
+            "source_reference",
+            "test_definition",
+            "gate_record"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "minLength": 3
+        }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "name",
+        "maturity",
+        "operational_status",
+        "implementation_scope",
+        "modules",
+        "verification_evidence",
+        "security_requirements",
+        "depends_on",
+        "catalog_ids",
+        "unmet_release_gates",
+        "risk_class",
+        "known_limitations",
+        "next_acceptance"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(CAP|SYS)-[A-Z]+$"
+        },
+        "kind": {
+          "enum": [
+            "technology_area",
+            "platform_system"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 3
+        },
+        "maturity": {
+          "enum": [
+            "VISION",
+            "SOURCE_CANDIDATE",
+            "SOURCE_TESTED",
+            "LOCAL_SYNTHETIC_DEMO"
+          ]
+        },
+        "operational_status": {
+          "const": "NO_GO"
+        },
+        "implementation_scope": {
+          "type": "string",
+          "minLength": 5
+        },
+        "modules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pathReference"
+          }
+        },
+        "verification_evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/proof"
+          }
+        },
+        "security_requirements": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "depends_on": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(CAP|SYS)-[A-Z]+$"
+          }
+        },
+        "catalog_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]+-[0-9]{3}$"
+          }
+        },
+        "unmet_release_gates": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^F0[1-9]$"
+          }
+        },
+        "risk_class": {
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "CRITICAL"
+          ]
+        },
+        "known_limitations": {
+          "type": "string",
+          "minLength": 5
+        },
+        "next_acceptance": {
+          "type": "string",
+          "minLength": 5
+        }
+      }
+    }
+  }
+}
