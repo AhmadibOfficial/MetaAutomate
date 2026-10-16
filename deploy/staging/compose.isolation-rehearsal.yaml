@@ -1,0 +1,54 @@
+# F05 disposable local/CI rehearsal only. Not the owner-approved private staging
+# template and not a real identity, customer or deployment environment.
+# Explicitly opt in via: docker compose -f this-file --profile source-rehearsal-only ...
+# All passwords below are fictional ephemeral CI credentials, NEVER production.
+name: metaautomate-f05-rehearsal
+
+services:
+  postgres:
+    profiles: ["source-rehearsal-only"]
+    image: postgres:16-alpine
+    restart: "no"
+    environment:
+      POSTGRES_DB: f05_ci_rehearsal
+      POSTGRES_USER: ci_stage_admin
+      POSTGRES_PASSWORD: ci_dummy_admin_only
+    volumes:
+      - ephemeral_pgdata:/var/lib/postgresql/data
+      - ./rehearsal/seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro
+    networks: [sealed]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ci_stage_admin -d f05_ci_rehearsal"]
+      interval: 2s
+      timeout: 3s
+      retries: 24
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["NET_RAW"]
+
+  worker:
+    profiles: ["source-rehearsal-only"]
+    image: postgres:16-alpine
+    restart: "no"
+    user: "65534:65534"
+    command: ["/bin/sh", "/rehearsal/probe.sh"]
+    read_only: true
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=16m"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    pids_limit: 32
+    mem_limit: 128m
+    cpus: 1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./rehearsal/probe.sh:/rehearsal/probe.sh:ro
+    networks: [sealed]
+
+networks:
+  sealed:
+    driver: bridge
+    internal: true
+
+volumes:
+  ephemeral_pgdata: {}
