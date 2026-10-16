@@ -93,6 +93,19 @@ jobs:
             --import-mode=importlib \
             apps/api/tests tests/
 
+      - name: Verify retail and wholesale cross-functional synthetic proposals (no execution)
+        run: |
+          python scripts/verify_cross_functional_synthetic.py \
+            --report artifacts/validation/retail-wholesale-cross-functional-demo.json
+
+      - name: Upload retail and wholesale synthetic demo report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: retail-wholesale-synthetic-demo
+          path: artifacts/validation/retail-wholesale-cross-functional-demo.json
+          if-no-files-found: warn
+
       - name: Validate private staging source-only boundaries
         run: |
           python scripts/verify_private_staging_contract.py \
