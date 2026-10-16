@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "product": "metaautomate",
+  "phase": "03",
+  "milestone": "P3-02",
+  "lifecycle": "DRAFT",
+  "kind": "OFFLINE_NEGATIVE_PLANNING_ONLY",
+  "default_decision": "DENY",
+  "source_dependency": "P3-01_OFFLINE_DENIAL_RECEIPT",
+  "trusted_execution_authorization_available": false,
+  "requires_authenticated_external_identity": true,
+  "requires_independent_human_approval_for_writes": true,
+  "external_reads_performed": false,
+  "external_writes_performed": false,
+  "provider_receipts_authenticated": false,
+  "real_tenant_scope_verified": false,
+  "maximum_logical_ttl_ticks": 10,
+  "mandatory_unverified_gates": [
+    "trusted_actor_identity",
+    "trusted_service_identity_and_revocation",
+    "authoritative_tenant_resource_ownership",
+    "server_issued_scoped_credential",
+    "provider_binding_and_allowlist",
+    "approved_private_staging",
+    "enforced_source_and_release_review",
+    "durable_transactional_replay_protection",
+    "customer_privacy_and_processing_authorization",
+    "independent_execution_result_verification"
+  ],
+  "operations": [
+    {
+      "operation_id": "business.lead-intake.validate.v1",
+      "capability_id": "BIZ-002",
+      "fixture_resource": "DEMO-TARGET-LEAD-001",
+      "second_reviewer_needed_for_live": false,
+      "execution_authorized": false,
+      "provider_call_available": false
+    },
+    {
+      "operation_id": "business.crm.sync-proposal.v1",
+      "capability_id": "BIZ-006",
+      "fixture_resource": "DEMO-TARGET-CRM-001",
+      "second_reviewer_needed_for_live": false,
+      "execution_authorized": false,
+      "provider_call_available": false
+    },
+    {
+      "operation_id": "business.inventory.stock-preview.v1",
+      "capability_id": "BIZ-011",
+      "fixture_resource": "DEMO-TARGET-STOCK-001",
+      "second_reviewer_needed_for_live": false,
+      "execution_authorized": false,
+      "provider_call_available": false
+    },
+    {
+      "operation_id": "business.finance.reconciliation-proposal.v1",
+      "capability_id": "BIZ-012",
+      "fixture_resource": "DEMO-TARGET-FINANCE-001",
+      "second_reviewer_needed_for_live": true,
+      "execution_authorized": false,
+      "provider_call_available": false
+    }
+  ],
+  "source_only_warning": "Not an execution plan or security grant; DEMO hashes, UUIDs and actors are not authentic identity, scopes or receipts."
+}
