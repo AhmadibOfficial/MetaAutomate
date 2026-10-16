@@ -54,6 +54,20 @@ app.include_router(workspace_auth_router)
 app.include_router(assessment_router)
 app.include_router(amboy_m1_router)
 app.include_router(domain_integrations_router)
+# Prospective *private OIDC only* pilot capability. This source flag is NOT
+# proof of F04-F08 approval. Operators must separately inspect and authorize
+# the independent acceptance record before enabling a private environment.
+if os.environ.get("MAT_PILOT_OUTCOMES_ENABLED") == "1":
+    if _mode != "oidc":
+        raise RuntimeError("Pilot outcome intake may run only with private OIDC")
+    reference = os.environ.get("MAT_PILOT_ACCEPTANCE_RECORD", "")
+    check = urlsplit(reference)
+    if (check.scheme != "https" or not check.hostname or
+        check.username or check.password or check.fragment or
+        check.query or len(reference) > 500):
+        raise RuntimeError("An independently reviewed HTTPS pilot acceptance reference is required")
+    from app.pilot_outcomes import router as pilot_outcomes_router
+    app.include_router(pilot_outcomes_router)
 if _mode == "dev_key":
     app.include_router(synthetic_inventory_router)
     app.include_router(synthetic_inventory_import_router)
@@ -71,7 +85,7 @@ async def workspace_security_headers(request, call_next):
         "object-src 'none'; base-uri 'none'; "
         "form-action 'self'; frame-ancestors 'none'"
     )
-    if request.url.path.startswith(("/v1/workspace", "/v1/objective-operations", "/v1/assessments", "/v1/amboy", "/v1/domain-integrations")):
+    if request.url.path.startswith(("/v1/workspace", "/v1/objective-operations", "/v1/assessments", "/v1/amboy", "/v1/domain-integrations", "/v1/pilot-outcomes")):
         response.headers["Cache-Control"] = "no-store"
     return response
 
