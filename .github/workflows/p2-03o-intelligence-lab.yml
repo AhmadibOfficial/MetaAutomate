@@ -1,0 +1,53 @@
+name: MetaAutomate Unified Intelligence Lab (source-only)
+
+on:
+  pull_request:
+    branches:
+      - feature/p2-03n-business-decision-workspace
+      - main
+  push:
+    branches:
+      - feature/p2-03o-unified-business-intelligence-lab
+
+permissions:
+  contents: read
+
+jobs:
+  unified-intelligence-source:
+    name: Twelve Modules · Five Engines · Browser Acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install source and browser test tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8,<10' 'playwright>=1.50,<2'
+          python -m playwright install --with-deps chromium
+      - name: Verify source-engine reconciliation and all 12 modules
+        run: |
+          python -m pytest -q tests/test_synthetic_growth_value_intelligence.py tests/test_synthetic_business_decisions.py tests/test_synthetic_integrated_intelligence.py
+      - name: Verify browser data matches both validated fixtures
+        run: python scripts/build_intelligence_lab_contract.py --check
+      - name: Check browser JavaScript syntax
+        run: |
+          node --check apps/site/intelligence-lab/data.js
+          node --check apps/site/intelligence-lab/lab.js
+      - name: Test accessible desktop and mobile workspace
+        run: python scripts/verify_intelligence_lab_browser.py
+      - name: Upload source-only visual acceptance artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p2-03o-unified-intelligence-lab-visuals
+          path: |
+            artifacts/validation/intelligence-lab-desktop.png
+            artifacts/validation/intelligence-lab-mobile-390.png
+            artifacts/validation/intelligence-lab-mobile-360.png
+          if-no-files-found: warn
