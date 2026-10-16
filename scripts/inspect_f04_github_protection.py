@@ -55,9 +55,11 @@ def fail_reasons(branch:dict, protection:dict|None=None)->list[str]:
     admin=protection.get("enforce_admins")
     if type(admin) is not dict or admin.get("enabled") is not True:
         problems.append("administrators_may_bypass_rules")
-    if protection.get("allow_force_pushes",{}).get("enabled") is not False:
+    force_pushes=protection.get("allow_force_pushes")
+    if type(force_pushes) is not dict or force_pushes.get("enabled") is not False:
         problems.append("force_push_state_not_explicitly_disabled")
-    if protection.get("allow_deletions",{}).get("enabled") is not False:
+    deletions=protection.get("allow_deletions")
+    if type(deletions) is not dict or deletions.get("enabled") is not False:
         problems.append("branch_deletion_state_not_explicitly_disabled")
     conversation=protection.get("required_conversation_resolution")
     if type(conversation) is not dict or conversation.get("enabled") is not True:
