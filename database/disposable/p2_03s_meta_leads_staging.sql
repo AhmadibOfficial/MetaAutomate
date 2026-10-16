@@ -88,6 +88,30 @@ CREATE TABLE meta_stage.review_tasks (
   REFERENCES meta_stage.events(tenant_id, platform, account_ref, event_ref)
 );
 
+-- Transaction-serialized append-only revocation guard. A caller with direct
+-- INSERT privilege cannot bypass it by skipping the Python review client.
+CREATE FUNCTION meta_stage.guard_consent_revocation() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = pg_catalog, meta_stage AS $
+BEGIN
+  PERFORM pg_advisory_xact_lock(hashtextextended(
+    NEW.tenant_id::text || '|' || NEW.platform || '|' || NEW.account_ref
+    || '|' || NEW.event_ref || '|' || NEW.purpose, 0));
+  IF NEW.reviewed_state = 'DOCUMENTED_EXAMPLE' AND EXISTS (
+    SELECT 1 FROM meta_stage.consent_reviews
+    WHERE tenant_id = NEW.tenant_id AND platform = NEW.platform
+      AND account_ref = NEW.account_ref AND event_ref = NEW.event_ref
+      AND purpose = NEW.purpose AND reviewed_state = 'REVOKED_EXAMPLE'
+  ) THEN
+    RAISE EXCEPTION 'CONSENT_REVOKED_REVIEW_REQUIRED';
+  END IF;
+  RETURN NEW;
+END $;
+REVOKE ALL ON FUNCTION meta_stage.guard_consent_revocation() FROM PUBLIC;
+CREATE TRIGGER consent_revocation_guard
+  BEFORE INSERT ON meta_stage.consent_reviews
+  FOR EACH ROW EXECUTE FUNCTION meta_stage.guard_consent_revocation();
+
 -- The seal is DB login identity: a caller cannot choose another tenant by
 -- issuing SET app.tenant_id. Runtime roles cannot SELECT login_tenants.
 DO $rls$
