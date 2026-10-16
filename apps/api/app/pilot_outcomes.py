@@ -296,8 +296,12 @@ def compare_periods(
     if (base["period_kind"]!="BASELINE" or now["period_kind"]!="CURRENT" or
         base["project_key"]!=now["project_key"] or
         base["measurements"]["currency"]!=now["measurements"]["currency"] or
-        base["period_end"]>=now["period_start"]):
-        raise HTTPException(422,"Incompatible, overlapping or mismatched periods")
+        base["period_end"]>=now["period_start"] or
+        (date.fromisoformat(base["period_end"]) -
+         date.fromisoformat(base["period_start"])).days !=
+        (date.fromisoformat(now["period_end"]) -
+         date.fromisoformat(now["period_start"])).days):
+        raise HTTPException(422,"Incompatible, overlapping, unequal-duration or mismatched periods")
     b=base["measurements"]["contribution_after_identified_costs_minor"]
     n=now["measurements"]["contribution_after_identified_costs_minor"]
     return {
