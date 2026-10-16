@@ -21,7 +21,7 @@
 | More-developed → less-developed | DOWNGRADE | Explicit risk rationale and recorded acceptance; operational gating unchanged |
 
 There is **no ACTIVE, GO, DEPLOYED, AUTONOMOUS or PRODUCTION stage** in this lifecycle.
-Changing the engineering classification cannot change \`operational_status: NO_GO\`.
+Changing the engineering classification cannot change `operational_status: NO_GO`.
 A source-tested API module and a synthetic inventory sample are different kinds of evidence,
 not proof that all workflows can safely run.
 
@@ -30,12 +30,12 @@ not proof that all workflows can safely run.
 1. **Specify scope:** name a stable capability ID, proposed bounded outcome, current and target classification, known limits, risk and catalog links.
 2. **Create a proposal JSON:** include a complete proposed entry; positive *and* negative test paths, changed source paths, explicit dependency impact for **every direct dependency**, and security-control reviews for **every declared control**. No private data, secrets or unapproved external URLs.
 3. **Preflight offline:** run
-   \`\`\`bash
+   ```bash
    python scripts/verify_capability_lifecycle.py --proposal docs/registry/examples/lifecycle-proposal.example.json
-   \`\`\`
-   The result is \`EVIDENCE_REVIEW_REQUIRED\`, never \`APPROVED\` or \`GO\`.
+   ```
+   The result is `EVIDENCE_REVIEW_REQUIRED`, never `APPROVED` or `GO`.
 4. **Review evidence:** actually run appropriate tests and check CI, inspect negative cases, verify scopes, dependency limitations and denied effects; record what is genuinely demonstrated. A link to a test **definition** is not a passing test report. A run URL in a JSON file is not cryptographically authenticated.
-5. **Separate source acceptance:** only after an explicit owner-approved PR may a change to the engineering manifest be paired with a \`SOURCE_REVIEWED_ONLY\` lifecycle event. The event's PR reference, reviewer identification, rationale, CI run and evidence references are **review metadata**, not trusted signatures.
+5. **Separate source acceptance:** only after an explicit owner-approved PR may a change to the engineering manifest be paired with a `SOURCE_REVIEWED_ONLY` lifecycle event. The event's PR reference, reviewer identification, rationale, CI run and evidence references are **review metadata**, not trusted signatures.
 6. **Source consistency check:** validator replays events from the PR #60 baseline, rejects unexplained changes, unexpected transitions, stale dependency evaluations, missing paths, invalid test coverage, cycles and any operational status changes. It emits a machine-readable report.
 7. **Operational release stays separate:** any staging rollout, customer activation, cloud subscription, database migration, AI model, OneCall federation or live external actions require their own independent operational controls, approvals and verified gate evidence.
 
@@ -43,12 +43,12 @@ This first version contains **zero accepted upgrade events**. The example propos
 
 ## Developer commands
 
-\`\`\`bash
+```bash
 python scripts/verify_engineering_capability_registry.py
 python scripts/verify_capability_lifecycle.py --report artifacts/validation/capability-lifecycle.json
 python scripts/verify_capability_lifecycle.py --proposal docs/registry/examples/lifecycle-proposal.example.json
 python -m pytest -q tests/test_capability_lifecycle.py
-\`\`\`
+```
 
 All commands are offline: **no database, network, provider activation, customer data or subscriptions**.
 
@@ -56,7 +56,7 @@ All commands are offline: **no database, network, provider activation, customer 
 
 A ledger event must capture the full new entry, prior maturity, evidence links,
 dependency/control reviews, the approved PR URL, the identified reviewer,
-review decision and explicit \`NOT_OPERATIONAL_AUTHORIZATION\` statement.
+review decision and explicit `NOT_OPERATIONAL_AUTHORIZATION` statement.
 The validator checks sequential event transitions against the baseline and requires the final state to match the actual manifest. It detects common silent edits, but cannot prevent a malicious contributor from modifying the validator and ledger together. Human review, code ownership rules and independently enforced branch protections are **still required** before treating changes as tamper resistant.
 
 The 19-entry and 33-ID inventory baseline stays fixed under v1. Adding/deleting
