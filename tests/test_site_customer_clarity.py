@@ -98,7 +98,7 @@ def test_nine_capability_cards_are_scoped_and_link_to_real_disciplines():
         "Islamic Knowledge Systems",
     ):
         assert name in html
-    for anchor in ("/services/#ai", "/services/#experience",
+    for anchor in ("/services/#ai", "/creative/",
                    "/services/#software", "/services/#security",
                    "/services/#data", "/services/#cloud"):
         assert anchor in structure.refs
