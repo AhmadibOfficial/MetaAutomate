@@ -39,10 +39,10 @@ def main():
             page.on("pageerror",lambda err: errors.append(str(err)))
             res = page.goto(BASE+"/automation/",wait_until="networkidle")
             assert res and res.status == 200
-            expect(page).to_have_title("Growth Autopilot — MetaAutomate | Interactive Demo")
+            expect(page).to_have_title("Growth Autopilot — MetaAutomate | Product Preview")
             expect(page.locator(".brand img")).to_be_visible()
             assert page.locator(".brand img").evaluate("(el)=>el.complete && el.naturalWidth > 0")
-            expect(page.locator(".notice")).to_contain_text("Not connected")
+            expect(page.locator(".notice")).to_contain_text("Product Preview")
             expect(page.locator("#stat-sales")).to_have_text("$25,000")
             expect(page.locator("#stat-contribution")).to_have_text("$14,500")
             expect(page.locator("#stat-repeat")).to_have_text("1")
@@ -93,7 +93,7 @@ def main():
             expect(page.locator("#inspection-panel")).to_contain_text("Suppressed")
             page.locator("#tab-setup").click()
             expect(page.locator("#panel-setup")).to_contain_text("Not available")
-            expect(page.locator("#panel-setup")).to_contain_text("NO-GO")
+            expect(page.locator("#panel-setup")).to_contain_text("Responsible automation by design")
             expect(page.locator("#panel-setup")).to_contain_text("3/9")
             assert_no_overflow(page,width)
             if width==1440:

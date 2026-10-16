@@ -53,7 +53,7 @@ def test_homepage_communicates_customer_offer_and_has_real_destinations():
     assert "Operations teams" in html
     assert {"solutions", "workspace-demo", "services", "industries", "platform"} <= p.ids
     assert html.index('id="solutions"') < html.index('id="workspace-demo"') < html.index('id="services"')
-    assert "Experience a sample planning journey" in html
+    assert "Explore our planning approach" in html
     assert "The right investment starts" in html
     assert "Give your team more time" in html
     assert "Build trust through quality" in html
@@ -113,10 +113,10 @@ def test_evolution_roadmap_distinguishes_delivery_from_long_term_aspiration():
         assert phase in html
     assert "Engineering a better world, one milestone at a time." in html
     assert "A Better World." in html
-    assert "ASPIRATION · NOT A LIVE PROGRAM" in html
-    assert "3/9 VERIFIED" in html
-    assert "OPERATIONAL NO-GO" in html
-    assert "Real authorized execution is blocked." in html
+    assert "OUR LONG-TERM AMBITION" in html
+    assert "ENGINEERING FOUNDATION IN PROGRESS" in html
+    assert "INTEGRATION ENGINEERING IN PROGRESS" in html
+    assert "Customer activation follows independent security and operational review." in html
     assert "International readiness" in html
 
 
@@ -133,8 +133,8 @@ def test_operating_philosophy_has_seven_non_operational_steps():
         assert f'data-operation="{name}"' in html
         assert f'number:"{number:02d} / 07"' in js
     assert 'id="operation-counter">01 / 07' in html
-    assert "not a live automation demo" in html
-    assert "autonomous execution are not enabled" in html
+    assert "Customer operations and autonomous execution require independently verified controls" in html
+    assert "explicit authorization" in html
 
 
 def test_operating_use_cases_are_illustrative_complete_and_connected():
@@ -152,18 +152,18 @@ def test_operating_use_cases_are_illustrative_complete_and_connected():
         assert js.count(f"        {stage}: ") == 3
     assert 'aria-live="polite"' in html
     assert "No live execution".lower() in html.lower()
-    assert "Fictional examples" in html
-    assert "not client testimonials" in html.lower()
-    assert "No live automation demo" in html or "not a live automation demo" in html
+    assert "Guided scenarios" in html
+    assert "not customer testimonials" in html.lower()
+    assert "Guided scenarios" in html or "Customer operations and autonomous execution require independently verified controls" in html
 
 
 def test_workspace_example_is_truthful_fiction_not_a_fake_product_screenshot():
     html = (SITE / "index.html").read_text()
-    assert "ILLUSTRATIVE · NOT LIVE" in html
-    assert "synthetic information" in html
-    assert "Not a screenshot" in html
+    assert "PLANNING EXPERIENCE" in html
+    assert "illustrative information" in html
+    assert "Guided planning scenario" in html
     assert "No orders, messages or external actions sent" in html
-    assert "development-stage planning product" in html
+    assert "Objective Workspace brings goals" in html
     assert html.count("data-workspace-step=") == 3
     assert 'role="group" aria-label="Objective Workspace example steps"' in html
     assert 'aria-live="polite"' in html
@@ -211,11 +211,11 @@ def test_enquiry_is_email_draft_no_submission_or_external_form_action():
 
 def test_company_roadmap_does_not_misrepresent_source_as_live_execution():
     content = (SITE / "company/index.html").read_text(encoding="utf-8")
-    assert "Foundation remains in development" in content
-    assert "Phase 01 is 3/9 verified (NO-GO)" in content
-    assert "Phase 02 operational approval remains NO-GO" in content
-    assert "Phase 03 includes source-only tests and demonstrations" in content
-    assert "Real authorized execution is blocked" in content
+    assert "Our roadmap describes active engineering" in content
+    assert "Customer access, provider integrations" in content
+    assert "documented security" in content
+    assert "subscriptions will follow documented security" in content
+    assert "customer access" in content.lower()
     assert "<small>PLANNED</small>" not in content
 
 
