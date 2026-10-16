@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "classification": "SYNTHETIC_SOURCE_ONLY",
+  "evaluated_at": "2026-10-16T09:00:00Z",
+  "leads": [
+    {
+      "workspace": "academy_demo",
+      "lead_id": "SIM-LEAD-EDU-01",
+      "entry": "CTWA_AD",
+      "source_reference": "SIM-AD-EDU-01",
+      "last_user_message_at": "2026-10-16T08:40:00Z",
+      "qualification": {"interest": "COURSES", "budget_band": "MEDIUM", "location_band": "LOCAL", "timeline": "SOON"},
+      "message_purpose": "SERVICE",
+      "optin": {"marketing": false, "utility": false, "recorded_at": null},
+      "opted_out": false,
+      "template_state": "NONE",
+      "agent_available": true
+    },
+    {
+      "workspace": "bespoke_demo",
+      "lead_id": "SIM-LEAD-FAS-01",
+      "entry": "QR_CODE",
+      "source_reference": "SIM-QR-FAS-01",
+      "last_user_message_at": "2026-10-14T10:00:00Z",
+      "qualification": {"interest": "FASHION", "budget_band": "HIGH", "location_band": "LOCAL", "timeline": "NOW"},
+      "message_purpose": "MARKETING",
+      "optin": {"marketing": true, "utility": false, "recorded_at": "2026-10-14T10:03:00Z"},
+      "opted_out": false,
+      "template_state": "APPROVED",
+      "agent_available": true
+    },
+    {
+      "workspace": "academy_demo",
+      "lead_id": "SIM-LEAD-EDU-02",
+      "entry": "WEBSITE_LINK",
+      "source_reference": "SIM-WEB-EDU-02",
+      "last_user_message_at": "2026-10-16T08:45:00Z",
+      "qualification": {"interest": "COURSES", "budget_band": "LOW", "location_band": "REMOTE", "timeline": "LATER"},
+      "message_purpose": "SERVICE",
+      "optin": {"marketing": true, "utility": false, "recorded_at": "2026-10-16T08:48:00Z"},
+      "opted_out": true,
+      "template_state": "NONE",
+      "agent_available": false
+    },
+    {
+      "workspace": "bespoke_demo",
+      "lead_id": "SIM-LEAD-FAS-02",
+      "entry": "OWNED_LINK",
+      "source_reference": "SIM-LINK-FAS-02",
+      "last_user_message_at": null,
+      "qualification": {"interest": "FASHION", "budget_band": "UNKNOWN", "location_band": "UNKNOWN", "timeline": "UNKNOWN"},
+      "message_purpose": "MARKETING",
+      "optin": {"marketing": false, "utility": false, "recorded_at": null},
+      "opted_out": false,
+      "template_state": "NONE",
+      "agent_available": true
+    },
+    {
+      "workspace": "academy_demo",
+      "lead_id": "SIM-LEAD-EDU-03",
+      "entry": "WEBSITE_LINK",
+      "source_reference": "SIM-WEB-EDU-03",
+      "last_user_message_at": "2026-10-14T08:00:00Z",
+      "qualification": {"interest": "COURSES", "budget_band": "MEDIUM", "location_band": "LOCAL", "timeline": "SOON"},
+      "message_purpose": "MARKETING",
+      "optin": {"marketing": false, "utility": true, "recorded_at": "2026-10-14T08:01:00Z"},
+      "opted_out": false,
+      "template_state": "APPROVED",
+      "agent_available": true
+    }
+  ]
+}
