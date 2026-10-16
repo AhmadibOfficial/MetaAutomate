@@ -80,7 +80,7 @@ def test_false_operational_evidence_is_rejected(mutation):
 ])
 def test_invalid_json_denied(bad):
     with pytest.raises(SyntheticGrowthError):
-        parse_json(bad)
+        check_policy(parse_json(bad))
 
 
 def test_current_foundation_register_remains_blocked():
