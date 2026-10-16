@@ -74,14 +74,19 @@ CREATE TRIGGER trg_pilot_reviews_tenant
 -- The database itself rejects self-review, hash substitution, forged reviewers
 -- and a reviewer who is no longer an active OWNER/ADMIN member.
 CREATE FUNCTION app.validate_pilot_evidence_review()
-RETURNS trigger LANGUAGE plpgsql
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER
 SET search_path=pg_catalog,public,app
-AS $$
+AS $
 DECLARE
   submitted_by uuid;
   expected_source text;
   role_in_org text;
 BEGIN
+  -- SECURITY DEFINER reads member status without granting runtime direct
+  -- access to the membership table. Tenant and actor must match before reads.
+  IF NEW.organization_id IS DISTINCT FROM app.current_org_id() THEN
+    RAISE EXCEPTION 'review organization must equal authenticated tenant';
+  END IF;
   IF NEW.reviewer_user_id IS DISTINCT FROM app.current_user_id() THEN
     RAISE EXCEPTION 'review identity is not the authenticated actor';
   END IF;
