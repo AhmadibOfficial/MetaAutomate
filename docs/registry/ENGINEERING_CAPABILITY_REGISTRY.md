@@ -19,6 +19,25 @@ permissions, organization activation, or execution records.
 - `docs/registry/engineering-capabilities.v1.schema.json`: machine-readable
   structural schema; the Python validator adds cross-file and graph checks.
 
+## Source-level authority and change control
+
+Once PR #60 is explicitly accepted and merged to `main`, the engineering
+manifest is the **authoritative source-controlled map of MetaAutomate's
+technology areas, platform subsystems, maturity labels, declared dependencies,
+security control expectations and source evidence references**. This authority
+does **not** supersede:
+
+- `docs/registry/capabilities.csv` and migration 008 for **legacy DRAFT catalog
+  IDs, stored versions and disabled flags**.
+- `docs/operational-core/FOUNDATION_EXIT_EVIDENCE.json` for **release gate
+  status and operational NO-GO**.
+- Real authorization policy, credential review, independent staging acceptance,
+  owner signoff or future deployment decisions.
+
+Changes to the engineering inventory require reviewed source commits and green
+validation. Its metadata cannot grant permissions, enable integrations,
+authorize autonomous workflows or change customer availability.
+
 ## Maturity is never permission
 
 | Maturity | Meaning |
@@ -50,7 +69,8 @@ python scripts/verify_engineering_capability_registry.py --report artifacts/vali
 python -m pytest -q tests/test_engineering_capability_registry.py
 ```
 
-Validation fails for orphan/duplicate legacy IDs, missing files, invalid controls,
+Validation fails for orphan/duplicate legacy IDs, changes to the 33-entry
+baseline, unexpected operational status fields, missing files, invalid controls,
 dependency cycles, fake test evidence for vision-only work, or altered NO-GO
 release boundaries. CI runs both the dedicated checker and source tests and uploads
 a machine-readable report. A PASS means **consistent source metadata only**.
