@@ -10,7 +10,7 @@ test ! -d /run/secrets || { echo "FAILED: secrets mounted"; exit 1; }
 if awk 'NR>1 && $2=="00000000" { found=1 } END { exit found ? 0 : 1 }' /proc/net/route; then
   echo "FAILED: worker has a default IPv4 route"; exit 1
 fi
-if [ -f /proc/net/ipv6_route ] && awk '($1=="00000000000000000000000000000000" && $2=="00") { found=1 } END { exit found ? 0 : 1 }' /proc/net/ipv6_route; then
+if [ -f /proc/net/ipv6_route ] && awk '($1=="00000000000000000000000000000000" && $2=="00" && $10!="lo") { found=1 } END { exit found ? 0 : 1 }' /proc/net/ipv6_route; then
   echo "FAILED: worker has a default IPv6 route"; exit 1
 fi
 if ( touch /forbidden-rehearsal-write ) 2>/dev/null; then
