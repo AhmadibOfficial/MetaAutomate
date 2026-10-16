@@ -148,13 +148,14 @@ def test_fictitious_order_and_repeat_event_must_match_and_be_justified():
 @pytest.mark.parametrize("amount", [True, False, -1, 1.4, None, "100"])
 def test_reject_bad_prices(amount):
     rejected(lambda d: d["workspaces"][0]["products"][0].update(
-        unit_price_demo_credits=amount), "invalid integer")
+        unit_price_demo_credits=amount),
+        "Floating-point" if type(amount) is float else "invalid integer")
 
 
 @pytest.mark.parametrize("amount", [True, False, -1, 1.4, None, "1", 101])
 def test_reject_bad_units(amount):
     rejected(lambda d: d["workspaces"][0]["orders"][0].update(units=amount),
-             "invalid integer")
+             "Floating-point" if type(amount) is float else "invalid integer")
 
 
 def test_reject_negative_unit_contribution_goal_or_misleading_attribution():
