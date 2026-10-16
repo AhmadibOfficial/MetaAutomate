@@ -86,6 +86,20 @@ jobs:
             artifacts/validation/capability-proposal-review.json
           if-no-files-found: warn
 
+      - name: Preflight transportation CAP-BUSINESS evidence refresh (no apply)
+        run: |
+          python scripts/verify_capability_lifecycle.py \
+            --proposal docs/registry/proposals/P2_03F_TRANSPORTATION_EVIDENCE_REFRESH.v1.json \
+            --report artifacts/validation/p2-03f-transportation-evidence-proposal.json
+
+      - name: Upload transportation capability proposal review artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: transportation-source-evidence-proposal
+          path: artifacts/validation/p2-03f-transportation-evidence-proposal.json
+          if-no-files-found: warn
+
       - name: Run Python tests
         run: |
           python -m pytest -q \
