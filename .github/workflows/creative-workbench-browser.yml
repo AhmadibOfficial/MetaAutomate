@@ -1,0 +1,47 @@
+name: MetaAutomate Creative Workbench (browser-only acceptance)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, feature/p2-04b-creative-workbench]
+
+permissions:
+  contents: read
+
+jobs:
+  creative-browser:
+    name: Local creative rights and human-review workflow desktop and mobile
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify offline creative source contract
+        run: |
+          python -m pip install 'pytest>=8,<10' 'playwright>=1.55,<2'
+          python -m pytest -q tests/test_creative_workbench_static.py
+      - name: Install no-cost Chromium test browser
+        run: python -m playwright install --with-deps chromium
+      - name: Browser acceptance on localhost only
+        run: |
+          python3 -m http.server 18080 --bind 127.0.0.1 --directory apps/site > /tmp/meta-creative-site.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18080/creative/ >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          test "${ready:-0}" = 1
+          python scripts/verify_creative_workbench_browser.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: metaautomate-creative-workbench-desktop-mobile
+          path: artifacts/validation/creative-workbench-*.png
+          if-no-files-found: warn
