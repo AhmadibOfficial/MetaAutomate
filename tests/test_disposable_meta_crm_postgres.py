@@ -360,7 +360,7 @@ def test_z_postgres_dump_restore_preserves_tenant_audit_and_encrypted_evidence(s
         bespoke_events=b.execute("SELECT count(*) FROM meta_stage.events").fetchone()[0]
     # Service container uses the already-downloaded official postgres:16 image.
     # No backup, secret, or database connection goes to external infrastructure.
-    base=["docker","run","--rm","--network","host",
+    base=["docker","run","-i","--rm","--network","host",
           "-e","PGPASSWORD=disposable_only_ci_password","postgres:16"]
     dump=subprocess.run(
         base+["pg_dump","-h","127.0.0.1","-U","meta_stage_admin",
