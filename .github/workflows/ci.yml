@@ -154,6 +154,19 @@ jobs:
           path: artifacts/validation/transportation-synthetic-demo.json
           if-no-files-found: warn
 
+      - name: Verify synthetic growth automation business goals and denied effects
+        run: |
+          python scripts/verify_synthetic_growth_autopilot.py \
+            --report artifacts/validation/p2-03h-growth-autopilot-synthetic.json
+
+      - name: Upload synthetic growth automation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: growth-autopilot-synthetic-source-evidence
+          path: artifacts/validation/p2-03h-growth-autopilot-synthetic.json
+          if-no-files-found: warn
+
       - name: Validate private staging source-only boundaries
         run: |
           python scripts/verify_private_staging_contract.py \
