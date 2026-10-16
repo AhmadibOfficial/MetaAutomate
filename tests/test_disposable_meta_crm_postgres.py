@@ -76,8 +76,7 @@ def stage():
     }
     for ws, (name, password) in roles.items():
         admin.execute(
-            sql.SQL("CREATE ROLE {} LOGIN PASSWORD %s NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS").format(sql.Identifier(name)),
-            (password,),
+            sql.SQL("CREATE ROLE {} LOGIN PASSWORD {} NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS").format(sql.Identifier(name), sql.Literal(password)),
         )
         admin.execute("INSERT INTO meta_stage.login_tenants(login_role,tenant_id)"
                       " VALUES (%s,%s)", (name,TENANTS[ws]))
@@ -117,8 +116,7 @@ def test_authenticated_role_session_isolation_and_untrusted_guc(stage):
         assert scoped_tenant(b, "bespoke_demo")==TENANTS["bespoke_demo"]
         assert a.execute("SELECT count(*) FROM meta_stage.accounts").fetchone()[0] == 3
         assert b.execute("SELECT count(*) FROM meta_stage.accounts").fetchone()[0] == 3
-        assert a.execute("SELECT count(*) FROM meta_stage.login_tenants") if False else True
-        a.execute("SET app.tenant_id = %s", (str(TENANTS["bespoke_demo"]),))
+        a.execute("SELECT set_config(\'app.tenant_id\', %s, false)", (str(TENANTS["bespoke_demo"]),))
         assert scoped_tenant(a,"academy_demo")==TENANTS["academy_demo"]
         with pytest.raises(SyntheticGrowthError):
             scoped_tenant(a,"bespoke_demo")
