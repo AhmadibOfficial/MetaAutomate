@@ -110,7 +110,7 @@ def test_each_module_runs_only_scoped_synthetic_sample(env,module):
     db,gateway,runner,tokens,*_=env
     ref=approved(env,ref="SIM-PLAN-"+module.upper().replace("_","-"))
     tool="ANALYZE_SAMPLE"
-    cmd="SIM-CMD-"+module.upper().replace("_","-")
+    cmd="SIM-CMD-"+module.upper().replace("_","-")+"-TASK"
     grant=runner.grant(*tokens["reviewer"],ref,cmd,module,tool,
                        "REVIEW_BUSINESS_EVIDENCE",
                        {"sample_count":10,"flagged_count":3})
@@ -213,18 +213,18 @@ def test_replay_and_changed_input_forbidden(env):
     db,gateway,runner,tokens,*_=env
     ref=approved(env)
     good={"baseline_count":17,"current_count":14}
-    runner.grant(*tokens["reviewer"],ref,"SIM-CMD-ONE","finance",
+    runner.grant(*tokens["reviewer"],ref,"SIM-CMD-ONE1","finance",
                  "SUMMARIZE_EVIDENCE","REVIEW_BUSINESS_EVIDENCE",good)
     with pytest.raises(SyntheticGrowthError):
-        runner.grant(*tokens["reviewer"],ref,"SIM-CMD-ONE","finance",
+        runner.grant(*tokens["reviewer"],ref,"SIM-CMD-ONE1","finance",
                      "SUMMARIZE_EVIDENCE","REVIEW_BUSINESS_EVIDENCE",
                      {"baseline_count":17,"current_count":13})
-    evidence=runner.run(*tokens["owner"],"SIM-CMD-ONE")
+    evidence=runner.run(*tokens["owner"],"SIM-CMD-ONE1")
     assert evidence["synthetic_execution"]["result"]["illustrative_change"]==-3
     with pytest.raises(SyntheticGrowthError):
-        runner.run(*tokens["other"],"SIM-CMD-ONE")
+        runner.run(*tokens["other"],"SIM-CMD-ONE1")
     with pytest.raises(SyntheticGrowthError):
-        runner.run(*tokens["reviewer"],"SIM-CMD-ONE")
+        runner.run(*tokens["reviewer"],"SIM-CMD-ONE1")
 
 
 def test_expiry_and_role_revocation_after_grant_are_fail_closed(env):
