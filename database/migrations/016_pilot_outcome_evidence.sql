@@ -76,7 +76,7 @@ CREATE TRIGGER trg_pilot_reviews_tenant
 CREATE FUNCTION app.validate_pilot_evidence_review()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER
 SET search_path=pg_catalog,public,app
-AS $
+AS $$
 DECLARE
   submitted_by uuid;
   expected_source text;
