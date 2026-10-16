@@ -12,6 +12,13 @@ import pytest
 from fastapi import HTTPException
 
 from app.authn import Principal,TenantSession
+# These integration tests run only in the dedicated, freshly migrated CI instance.
+# Global unit-test runs must not connect to or write into another database.
+pytestmark=pytest.mark.skipif(
+    os.environ.get("P2_03Z_CI_ONLY")!="1",
+    reason="Requires isolated newly provisioned disposable P2-03z PostgreSQL fixture",
+)
+
 from app.pilot_outcomes import (
     OutcomePeriodInput,ReviewInput,submit_period,review_period,
     get_period,compare_periods,list_periods,
