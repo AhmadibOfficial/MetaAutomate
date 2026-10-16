@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "classification": "SOURCE_DESIGN_ONLY",
+  "execution_mode": "NO_EXTERNAL_EXECUTION",
+  "providers": [
+    {
+      "provider_id": "SELAR",
+      "supported_business_types": [
+        "education",
+        "apparel"
+      ],
+      "capability": "COMMERCE_EVENT_READ",
+      "provider_owns_checkout_recovery": true,
+      "connection_state": "CONTRACT_ONLY",
+      "credential_use_enabled": false,
+      "external_execution_enabled": false
+    },
+    {
+      "provider_id": "METRICOOL",
+      "supported_business_types": [
+        "education",
+        "apparel"
+      ],
+      "capability": "SOCIAL_CONTENT_DRAFT",
+      "provider_owns_checkout_recovery": false,
+      "connection_state": "CONTRACT_ONLY",
+      "credential_use_enabled": false,
+      "external_execution_enabled": false
+    },
+    {
+      "provider_id": "EMAIL_MARKETING",
+      "supported_business_types": [
+        "education",
+        "apparel"
+      ],
+      "capability": "OPT_IN_OUTREACH_DRAFT",
+      "provider_owns_checkout_recovery": false,
+      "connection_state": "CONTRACT_ONLY",
+      "credential_use_enabled": false,
+      "external_execution_enabled": false
+    },
+    {
+      "provider_id": "CUSTOMER_MESSAGING",
+      "supported_business_types": [
+        "education",
+        "apparel"
+      ],
+      "capability": "SUPPORT_MESSAGE_DRAFT",
+      "provider_owns_checkout_recovery": false,
+      "connection_state": "CONTRACT_ONLY",
+      "credential_use_enabled": false,
+      "external_execution_enabled": false
+    },
+    {
+      "provider_id": "SUBSCRIPTION_BILLING",
+      "supported_business_types": [
+        "education",
+        "apparel"
+      ],
+      "capability": "ENTITLEMENT_DESIGN",
+      "provider_owns_checkout_recovery": false,
+      "connection_state": "CONTRACT_ONLY",
+      "credential_use_enabled": false,
+      "external_execution_enabled": false
+    }
+  ],
+  "safety_policy": {
+    "customer_approval_required": true,
+    "consent_verification_required": true,
+    "durable_replay_protection_enabled": false,
+    "customer_data_enabled": false,
+    "billing_enabled": false,
+    "live_activation_enabled": false
+  }
+}

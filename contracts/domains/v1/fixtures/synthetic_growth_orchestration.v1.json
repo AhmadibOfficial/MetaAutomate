@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "classification": "SYNTHETIC_DEMO_ONLY",
+  "currency": "DEMO_CREDITS",
+  "workspaces": [
+    {
+      "workspace": "academy_demo",
+      "goal": {
+        "metric": "CONTRIBUTION_AFTER_MARKETING_AND_WORKFLOW_COSTS",
+        "target": 20000,
+        "priority_event_types": [
+          "LEAD_OPT_IN",
+          "LEARNING_COMPLETED"
+        ]
+      },
+      "funnel": {
+        "measured_sessions": 40,
+        "qualified_enquiries": 7
+      },
+      "workflow_cost_demo_credits": 600,
+      "replayed_event_ids": [
+        "DEMO-EVENT-EDU01"
+      ],
+      "subscription_research_tier": "STARTER_RESEARCH"
+    },
+    {
+      "workspace": "bespoke_demo",
+      "goal": {
+        "metric": "REPEAT_ORDER_COUNT",
+        "target": 3,
+        "priority_event_types": [
+          "PURCHASE_COMPLETED",
+          "GARMENT_DELIVERED"
+        ]
+      },
+      "funnel": {
+        "measured_sessions": 25,
+        "qualified_enquiries": 5
+      },
+      "workflow_cost_demo_credits": 500,
+      "replayed_event_ids": [
+        "DEMO-EVENT-FAS04"
+      ],
+      "subscription_research_tier": "GROWTH_RESEARCH"
+    }
+  ]
+}
