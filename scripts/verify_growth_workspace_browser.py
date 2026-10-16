@@ -13,7 +13,13 @@ ART.mkdir(parents=True, exist_ok=True)
 
 
 def assert_no_overflow(page, width):
-    metric = page.evaluate("({scroll:document.documentElement.scrollWidth,width:innerWidth})")
+    metric = page.evaluate("""() => ({scroll:document.documentElement.scrollWidth,
+      width:innerWidth,
+      offenders:[...document.querySelectorAll("body *")].filter(el => {
+        const r=el.getBoundingClientRect();
+        return r.right > innerWidth+1 && getComputedStyle(el).position !== "fixed";
+      }).slice(0,8).map(el=>({tag:el.tagName,className:el.className,
+        right:Math.round(el.getBoundingClientRect().right)}))})""")
     assert metric["scroll"] <= metric["width"] + 1, (width, metric)
 
 
