@@ -180,6 +180,19 @@ jobs:
           path: artifacts/validation/p2-03j-growth-orchestration-source.json
           if-no-files-found: warn
 
+      - name: Verify P2-03l consent-first review lifecycle and replay evidence
+        run: |
+          python scripts/verify_synthetic_growth_review_lab.py \
+            --report artifacts/validation/p2-03l-growth-review-source.json
+
+      - name: Upload P2-03l source-only review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: growth-review-p2-03l-safety-evidence
+          path: artifacts/validation/p2-03l-growth-review-source.json
+          if-no-files-found: warn
+
       - name: Verify browser engine contract matches source
         run: |
           python scripts/build_growth_workspace_contract.py --check
