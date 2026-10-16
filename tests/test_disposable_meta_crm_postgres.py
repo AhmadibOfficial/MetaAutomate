@@ -34,6 +34,7 @@ pytestmark = pytest.mark.skipif(
 SECRET = b"synthetic-only-test-meta-webhook-secret"
 MASTER = secrets.token_bytes(32)
 SQL = ROOT / "database/disposable/p2_03s_meta_leads_staging.sql"
+AUDIT_SQL = ROOT / "database/disposable/p2_03t_meta_audit.sql"
 
 
 def envelope(platform, account, event_id):
@@ -69,6 +70,7 @@ def stage():
     assert admin.execute("SELECT current_setting('is_superuser')").fetchone()[0] == "on"
     admin.execute("SET metaautomate.disposable = 'yes'")
     admin.execute(SQL.read_text(encoding="utf-8"))
+    admin.execute(AUDIT_SQL.read_text(encoding="utf-8"))
     host = "127.0.0.1"
     roles = {
         "academy_demo": ("meta_stage_login_academy", secrets.token_urlsafe(24)),
@@ -92,6 +94,7 @@ def stage():
             "GRANT USAGE ON SCHEMA meta_stage TO {}",
             "GRANT EXECUTE ON FUNCTION meta_stage.session_tenant() TO {}",
             "GRANT SELECT ON meta_stage.accounts TO {}",
+            "GRANT SELECT ON meta_stage.audit_events TO {}",
             "GRANT SELECT,INSERT ON meta_stage.events TO {}",
             "GRANT SELECT,INSERT ON meta_stage.private_evidence TO {}",
             "GRANT SELECT,INSERT ON meta_stage.consent_reviews TO {}",
