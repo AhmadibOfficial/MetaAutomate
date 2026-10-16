@@ -1,0 +1,53 @@
+name: MetaAutomate Instagram Lead Intelligence (source-only)
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - feature/p2-03q-instagram-consent-led-acquisition
+
+permissions:
+  contents: read
+
+jobs:
+  instagram-acquisition-source:
+    name: Consent, Meta event security, browser acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install source tests and Chromium
+        run: |
+          python -m pip install --upgrade pip
+          pip install 'pytest>=8,<10' 'playwright>=1.50,<2'
+          python -m playwright install --with-deps chromium
+      - name: Verify Instagram acquisition policy and webhook crypto
+        run: |
+          python -m pytest -q tests/test_synthetic_instagram_lead_pipeline.py tests/test_meta_webhook_signature.py
+      - name: Check generated synthetic browser contract
+        run: python scripts/build_instagram_lead_contract.py --check
+      - name: Validate JavaScript
+        run: |
+          node --check apps/site/intelligence-lab/instagram/data.js
+          node --check apps/site/intelligence-lab/instagram/instagram.js
+          node --check apps/site/intelligence-lab/lab.js
+      - name: Inspect desktop/mobile and prohibited send paths
+        run: python scripts/verify_instagram_leads_browser.py
+      - name: Upload synthetic visual review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p2-03q-instagram-lead-source-visuals
+          path: |
+            artifacts/validation/instagram-leads-desktop.png
+            artifacts/validation/instagram-leads-mobile-390.png
+            artifacts/validation/instagram-leads-mobile-360.png
+          if-no-files-found: warn
