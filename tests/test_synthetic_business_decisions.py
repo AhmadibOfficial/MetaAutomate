@@ -1,9 +1,12 @@
 """P2-03n evidence: synthetic-only decision workflow and safety guards."""
 import pytest
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'apps/api'))
 
-from apps.api.app.synthetic_growth_autopilot import SyntheticGrowthError
-from apps.api.app.synthetic_growth_value_intelligence import build_committed_value_report
-from apps.api.app.synthetic_business_decisions import (
+from app.synthetic_growth_autopilot import SyntheticGrowthError
+from app.synthetic_growth_value_intelligence import build_committed_value_report
+from app.synthetic_business_decisions import (
     build_demo_workspace, decision_dashboard, simulate_decision,
     create_manual_action, transition_manual_action, verify_outcome,
 )
