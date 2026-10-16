@@ -55,6 +55,19 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y postgresql-client
 
+      - name: Validate unified engineering capability registry (source only)
+        run: |
+          python scripts/verify_engineering_capability_registry.py \
+            --report artifacts/validation/engineering-capability-registry.json
+
+      - name: Upload engineering capability registry validation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engineering-capability-registry-evidence
+          path: artifacts/validation/engineering-capability-registry.json
+          if-no-files-found: warn
+
       - name: Run Python tests
         run: |
           python -m pytest -q \
