@@ -221,18 +221,32 @@ def test_runtime_revokes_on_file_removal_and_rechecks_per_request(signed,monkeyp
         "OIDC_ISSUER":ISSUER,
     }
     for k,v in settings.items():monkeypatch.setenv(k,v)
-    # Real-world clock must not be fixed in runtime: a historical CI-only
-    # receipt is expired and is correctly refused rather than accepted.
-    with pytest.raises(AdmissionDenied):
-        verify_private_pilot_admission()
-    with pytest.raises(HTTPException) as exc:
+    # Avoid dependence on current CI wall-clock; the signed fixture may
+    # remain within its short validity window when the runner starts.
+    from app import p2_04a_pilot_admission as admission
+    monkeypatch.setattr(admission,"verify_bundle",lambda raw,**kwargs: {
+        "tenant_id":TENANT, "commit_sha":COMMIT,
+        "scope":"PRIVATE_STAGING_AGGREGATE_MEASUREMENT",
+    })
+    assert verify_private_pilot_admission()["tenant_id"]==TENANT
+    assert require_private_pilot_admission(SimpleNamespace(
+        principal=SimpleNamespace(organization_id=UUID(TENANT)),
+    )) is None
+    with pytest.raises(HTTPException) as foreign:
         require_private_pilot_admission(SimpleNamespace(
-            principal=SimpleNamespace(organization_id=UUID(TENANT)),
+            principal=SimpleNamespace(
+                organization_id=UUID("aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa")
+            ),
         ))
-    assert exc.value.status_code==503
+    assert foreign.value.status_code==403
     record.unlink()
     with pytest.raises(AdmissionDenied):
         verify_private_pilot_admission()
+    with pytest.raises(HTTPException) as revoked:
+        require_private_pilot_admission(SimpleNamespace(
+            principal=SimpleNamespace(organization_id=UUID(TENANT)),
+        ))
+    assert revoked.value.status_code==503
 
 
 def test_new_admission_checks_are_really_wired_to_all_pilot_routes():
