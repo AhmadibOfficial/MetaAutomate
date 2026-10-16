@@ -257,7 +257,8 @@ def evidence(doc: dict, root: Path = ROOT) -> dict:
         name = preview["sector"]
         if preview.get("approval_state") != "HUMAN_REVIEW_REQUIRED":
             raise ValueError("Synthetic scenario lost human-review boundary")
-        if len(preview["sales_drafts"]) != len(preview["customer_followup_drafts"]) != len(preview["finance_journal_previews"]):
+        if not (len(preview["sales_drafts"]) == len(preview["customer_followup_drafts"])
+                == len(preview["finance_journal_previews"])):
             raise ValueError("Source counts disagree")
         sales = {item["order_id"] for item in preview["sales_drafts"]}
         if (sales != {item["order_id"] for item in preview["customer_followup_drafts"]}
