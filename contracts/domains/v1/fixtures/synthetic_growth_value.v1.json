@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "classification": "SYNTHETIC_SOURCE_ONLY",
+  "currency": "DEMO_CREDITS",
+  "comparison_basis": "EQUAL_30_DAY_EXAMPLES",
+  "workspaces": [
+    {
+      "workspace": "academy_demo",
+      "baseline": {
+        "period_id": "SIM-BASELINE-ACADEMY_DEMO",
+        "days": 30,
+        "gross_sales": 18000,
+        "variable_cost": 7000,
+        "marketing_spend": 2500,
+        "processing_fees": 500,
+        "fulfillment_cost": 400,
+        "software_cost": 600,
+        "refunds": 0,
+        "completed_orders": 2,
+        "repeat_orders": 0,
+        "staff_minutes": 360
+      },
+      "current": {
+        "period_id": "SIM-CURRENT-ACADEMY_DEMO",
+        "days": 30,
+        "gross_sales": 25000,
+        "variable_cost": 8000,
+        "marketing_spend": 2500,
+        "processing_fees": 1000,
+        "fulfillment_cost": 500,
+        "software_cost": 700,
+        "refunds": 0,
+        "completed_orders": 2,
+        "repeat_orders": 1,
+        "staff_minutes": 300
+      }
+    },
+    {
+      "workspace": "bespoke_demo",
+      "baseline": {
+        "period_id": "SIM-BASELINE-BESPOKE_DEMO",
+        "days": 30,
+        "gross_sales": 37000,
+        "variable_cost": 26000,
+        "marketing_spend": 2400,
+        "processing_fees": 500,
+        "fulfillment_cost": 1000,
+        "software_cost": 400,
+        "refunds": 1000,
+        "completed_orders": 3,
+        "repeat_orders": 0,
+        "staff_minutes": 700
+      },
+      "current": {
+        "period_id": "SIM-CURRENT-BESPOKE_DEMO",
+        "days": 30,
+        "gross_sales": 35000,
+        "variable_cost": 23500,
+        "marketing_spend": 1500,
+        "processing_fees": 900,
+        "fulfillment_cost": 900,
+        "software_cost": 3000,
+        "refunds": 500,
+        "completed_orders": 2,
+        "repeat_orders": 1,
+        "staff_minutes": 680
+      }
+    }
+  ]
+}

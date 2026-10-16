@@ -180,6 +180,19 @@ jobs:
           path: artifacts/validation/p2-03j-growth-orchestration-source.json
           if-no-files-found: warn
 
+      - name: Verify P2-03m Business Value Intelligence evidence
+        run: |
+          python scripts/verify_synthetic_growth_value_intelligence.py \
+            --report artifacts/validation/p2-03m-growth-value-source.json
+
+      - name: Upload P2-03m Business Value Intelligence evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p2-03m-business-value-intelligence-source
+          path: artifacts/validation/p2-03m-growth-value-source.json
+          if-no-files-found: warn
+
       - name: Verify browser engine contract matches source
         run: |
           python scripts/build_growth_workspace_contract.py --check
