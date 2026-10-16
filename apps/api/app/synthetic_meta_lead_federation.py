@@ -255,18 +255,20 @@ class SyntheticMetaReviewLedger:
             key = row["platform"] + "|" + row["account_ref"] + "|" + row["event_ref"]
             _check(key not in new, "Duplicate records in batch")
             new[key] = dict(row)
+        inserted = 0
         for key, row in new.items():
             if key in self._events:
                 _check(self._events[key] == row, "Collision with changed webhook event")
                 continue
             self._events[key] = row
+            inserted += 1
             self._tasks[key] = {
                 "event_ref": row["event_ref"], "platform": row["platform"],
                 "workspace": self.workspace, "state": "HUMAN_REVIEW_REQUIRED",
                 "assigned_agent": None, "customer_contact": None,
                 "automatic_followup": False,
             }
-        return len(new)
+        return inserted
 
     def tasks(self) -> list[dict]:
         return [dict(t) for t in self._tasks.values()]
