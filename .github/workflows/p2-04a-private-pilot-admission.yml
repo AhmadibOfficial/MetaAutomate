@@ -1,0 +1,40 @@
+name: MetaAutomate P2-04a Signed Private Pilot Admission (source-only)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [feature/p2-04a-authenticated-business-value-admission]
+
+permissions:
+  contents: read
+
+jobs:
+  signed-intake-safety:
+    name: Offline independent signature and tenant admission negative tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source-only test dependencies
+        run: |
+          python -m pip install 'fastapi>=0.115,<1' 'psycopg[binary]>=3.2,<4' 'cryptography>=43,<48' 'pytest>=8,<10'
+      - name: Reject forged, stale, one-signer or wrongly scoped pilot admission
+        run: |
+          PYTHONPATH=apps/api python -m pytest -q tests/test_p2_04a_pilot_admission.py
+      - name: Confirm inherited Foundation and pilot remain NO-GO
+        run: |
+          python scripts/inspect_f04_github_protection.py
+          if python scripts/inspect_f04_github_protection.py --require-enforced; then
+            echo 'F04 cannot become operational from offline source checks'
+            exit 1
+          fi
+          python scripts/verify_p2_03z_pilot_readiness.py
+          if python scripts/verify_p2_03z_pilot_readiness.py --require-operational-go; then
+            echo 'Real pilot incorrectly authorized by synthetic CI'
+            exit 1
+          fi
+          echo 'PASS: signed source claims do not waive live Foundation gates'
