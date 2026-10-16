@@ -119,6 +119,19 @@ jobs:
           path: artifacts/validation/cross-sector-workflow-contract-v1.json
           if-no-files-found: warn
 
+      - name: Verify synthetic transportation preview (source only)
+        run: |
+          python scripts/verify_synthetic_transportation.py \
+            --report artifacts/validation/transportation-synthetic-demo.json
+
+      - name: Upload transportation synthetic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: transportation-synthetic-source-evidence
+          path: artifacts/validation/transportation-synthetic-demo.json
+          if-no-files-found: warn
+
       - name: Validate private staging source-only boundaries
         run: |
           python scripts/verify_private_staging_contract.py \
