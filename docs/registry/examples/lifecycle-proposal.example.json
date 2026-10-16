@@ -60,10 +60,10 @@
   },
   "evidence": {
     "positive_test_paths": [
-      "tests/test_engineering_capability_registry.py"
+      "tests/test_seed_registry.py"
     ],
     "negative_test_paths": [
-      "tests/test_seed_registry.py"
+      "apps/api/tests/test_registry.py"
     ],
     "source_paths": [
       "apps/api/app/registry.py"
