@@ -358,7 +358,7 @@
       "name": "Business Automation",
       "maturity": "LOCAL_SYNTHETIC_DEMO",
       "operational_status": "NO_GO",
-      "implementation_scope": "Synthetic inventory preview and four draft, deny-only domain integration declarations",
+      "implementation_scope": "Bounded synthetic-only inventory and cross-functional retail/wholesale/transportation previews plus four draft DENY-only integration declarations; transportation is an offline, fictional trip-capacity experiment, not a contract-v1 activated sector adapter.",
       "modules": [
         {
           "path": "apps/api/app/synthetic_inventory.py",
@@ -366,6 +366,18 @@
         },
         {
           "path": "apps/api/app/domain_integrations.py",
+          "scope": "source_reference"
+        },
+        {
+          "path": "apps/api/app/synthetic_business_flow.py",
+          "scope": "source_reference"
+        },
+        {
+          "path": "apps/api/app/synthetic_transportation.py",
+          "scope": "source_reference"
+        },
+        {
+          "path": "contracts/domains/v1/cross_sector_workflow_contract.v1.json",
           "scope": "source_reference"
         }
       ],
@@ -379,6 +391,21 @@
           "path": "tests/test_phase02_domain_integrations.py",
           "kind": "test_definition",
           "note": "Deny-only contract tests"
+        },
+        {
+          "path": "tests/test_cross_functional_synthetic.py",
+          "kind": "test_definition",
+          "note": "Source/CI: fictional retail and wholesale order-to-quote-to-finance invariant tests, with negative cases; no production integration acceptance"
+        },
+        {
+          "path": "tests/test_synthetic_transportation.py",
+          "kind": "test_definition",
+          "note": "PR #65, successful CI 38850185421: fictional trip-capacity, quotes, unsent updates, denied real-world effects, malformed inputs and oversell tests; not operational proof"
+        },
+        {
+          "path": "tests/test_cross_sector_workflow_contract.py",
+          "kind": "test_definition",
+          "note": "Source/CI: cross-sector contract v1 denies transportation source promotion and preserves design-only profile; not independent safety certification"
         }
       ],
       "security_requirements": [
@@ -413,8 +440,8 @@
         "F09"
       ],
       "risk_class": "HIGH",
-      "known_limitations": "No CRM write, actual stock sync, payroll operation or paid booking is enabled.",
-      "next_acceptance": "Obtain approved private staging, validated tenant and action authorization, and independently signed release evidence before any real customer operation."
+      "known_limitations": "No real inventory, CRM, booking, driver/passenger identity, route or geolocation, payment, invoice, transport safety assessment, tenant-bound transport API, supplier connection, dispatch or production audit. Transportation remains DESIGN_MAPPING_ONLY in Cross-Sector v1, despite a local synthetic module and successful CI.",
+      "next_acceptance": "Separate review and explicit acceptance of this source-only CAP-BUSINESS evidence refresh; no change to maturity from LOCAL_SYNTHETIC_DEMO. Transportation contract reclassification requires a separately versioned proposal/review. Operational use requires Foundation F04-F09 verification, private staging, sector safety/privacy authorization, genuine identity and customer consent."
     },
     {
       "id": "CAP-ISLAMIC",

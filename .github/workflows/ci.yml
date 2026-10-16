@@ -86,18 +86,26 @@ jobs:
             artifacts/validation/capability-proposal-review.json
           if-no-files-found: warn
 
-      - name: Preflight transportation CAP-BUSINESS evidence refresh (no apply)
+      - name: Replay proposed CAP-BUSINESS lifecycle acceptance (source only)
         run: |
           python scripts/verify_capability_lifecycle.py \
-            --proposal docs/registry/proposals/P2_03F_TRANSPORTATION_EVIDENCE_REFRESH.v1.json \
-            --report artifacts/validation/p2-03f-transportation-evidence-proposal.json
+            --report artifacts/validation/p2-03g-transportation-lifecycle-replay.json
+          python scripts/verify_lifecycle_owner_review.py \
+            --report artifacts/validation/p2-03g-owner-review-pending.json
 
-      - name: Upload transportation capability proposal review artifact
+      - name: Refuse pending lifecycle approval metadata on main
+        if: github.event_name == 'push'
+        run: |
+          python scripts/verify_lifecycle_owner_review.py --require-owner-review
+
+      - name: Upload transportation source lifecycle evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: transportation-source-evidence-proposal
-          path: artifacts/validation/p2-03f-transportation-evidence-proposal.json
+          name: transportation-source-lifecycle-evidence
+          path: |
+            artifacts/validation/p2-03g-transportation-lifecycle-replay.json
+            artifacts/validation/p2-03g-owner-review-pending.json
           if-no-files-found: warn
 
       - name: Run Python tests

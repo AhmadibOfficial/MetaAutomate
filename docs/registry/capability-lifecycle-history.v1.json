@@ -871,5 +871,164 @@
       }
     ]
   },
-  "events": []
+  "events": [
+    {
+      "capability_id": "CAP-BUSINESS",
+      "change_type": "EVIDENCE_REFRESH",
+      "from_maturity": "LOCAL_SYNTHETIC_DEMO",
+      "to_maturity": "LOCAL_SYNTHETIC_DEMO",
+      "motivation": "Record new P2-03e transportation synthetic source and negative tests as independently reviewable evidence for CAP-BUSINESS, without changing capability maturity, the cross-sector design-only profile, or any operational permission.",
+      "after": {
+        "id": "CAP-BUSINESS",
+        "kind": "technology_area",
+        "name": "Business Automation",
+        "maturity": "LOCAL_SYNTHETIC_DEMO",
+        "operational_status": "NO_GO",
+        "implementation_scope": "Bounded synthetic-only inventory and cross-functional retail/wholesale/transportation previews plus four draft DENY-only integration declarations; transportation is an offline, fictional trip-capacity experiment, not a contract-v1 activated sector adapter.",
+        "modules": [
+          {
+            "path": "apps/api/app/synthetic_inventory.py",
+            "scope": "source_reference"
+          },
+          {
+            "path": "apps/api/app/domain_integrations.py",
+            "scope": "source_reference"
+          },
+          {
+            "path": "apps/api/app/synthetic_business_flow.py",
+            "scope": "source_reference"
+          },
+          {
+            "path": "apps/api/app/synthetic_transportation.py",
+            "scope": "source_reference"
+          },
+          {
+            "path": "contracts/domains/v1/cross_sector_workflow_contract.v1.json",
+            "scope": "source_reference"
+          }
+        ],
+        "verification_evidence": [
+          {
+            "path": "tests/test_phase02_synthetic_inventory.py",
+            "kind": "test_definition",
+            "note": "Synthetic stock simulator tests"
+          },
+          {
+            "path": "tests/test_phase02_domain_integrations.py",
+            "kind": "test_definition",
+            "note": "Deny-only contract tests"
+          },
+          {
+            "path": "tests/test_cross_functional_synthetic.py",
+            "kind": "test_definition",
+            "note": "Source/CI: fictional retail and wholesale order-to-quote-to-finance invariant tests, with negative cases; no production integration acceptance"
+          },
+          {
+            "path": "tests/test_synthetic_transportation.py",
+            "kind": "test_definition",
+            "note": "PR #65, successful CI 38850185421: fictional trip-capacity, quotes, unsent updates, denied real-world effects, malformed inputs and oversell tests; not operational proof"
+          },
+          {
+            "path": "tests/test_cross_sector_workflow_contract.py",
+            "kind": "test_definition",
+            "note": "Source/CI: cross-sector contract v1 denies transportation source promotion and preserves design-only profile; not independent safety certification"
+          }
+        ],
+        "security_requirements": [
+          "EXPLICIT_APPROVAL",
+          "EXTERNAL_ACTION_DENY",
+          "TENANT_ISOLATION",
+          "AUDIT_TRAIL"
+        ],
+        "depends_on": [
+          "SYS-DATA",
+          "SYS-INTEGRATIONS"
+        ],
+        "catalog_ids": [
+          "BIZ-001",
+          "BIZ-002",
+          "BIZ-003",
+          "BIZ-004",
+          "BIZ-005",
+          "BIZ-006",
+          "BIZ-007",
+          "BIZ-010",
+          "BIZ-011",
+          "BIZ-012",
+          "SPEC-002"
+        ],
+        "unmet_release_gates": [
+          "F04",
+          "F05",
+          "F06",
+          "F07",
+          "F08",
+          "F09"
+        ],
+        "risk_class": "HIGH",
+        "known_limitations": "No real inventory, CRM, booking, driver/passenger identity, route or geolocation, payment, invoice, transport safety assessment, tenant-bound transport API, supplier connection, dispatch or production audit. Transportation remains DESIGN_MAPPING_ONLY in Cross-Sector v1, despite a local synthetic module and successful CI.",
+        "next_acceptance": "Separate review and explicit acceptance of this source-only CAP-BUSINESS evidence refresh; no change to maturity from LOCAL_SYNTHETIC_DEMO. Transportation contract reclassification requires a separately versioned proposal/review. Operational use requires Foundation F04-F09 verification, private staging, sector safety/privacy authorization, genuine identity and customer consent."
+      },
+      "evidence": {
+        "positive_test_paths": [
+          "tests/test_synthetic_transportation.py",
+          "tests/test_cross_functional_synthetic.py"
+        ],
+        "negative_test_paths": [
+          "tests/test_synthetic_transportation.py",
+          "tests/test_cross_sector_workflow_contract.py"
+        ],
+        "source_paths": [
+          "apps/api/app/synthetic_transportation.py",
+          "apps/api/app/synthetic_business_flow.py",
+          "contracts/domains/v1/cross_sector_workflow_contract.v1.json"
+        ],
+        "scope_note": "Fixed, committed fictional fixtures only: trip seat availability, draft quotations, unsent follow-ups, unposted journal illustrations, traceability and repeated/negative deterministic source tests. No transport connector, tenant-owned record, dispatch or live booking.",
+        "known_limits": "A PR #65 GitHub CI pass is source-test evidence, not independent verification of transportation safety or a working production platform. No operational controls or private staging were exercised by these sector tests.",
+        "ci_run_url": "https://github.com/AhmadibOfficial/MetaAutomate/actions/runs/38850185421"
+      },
+      "dependency_assessments": [
+        {
+          "id": "SYS-DATA",
+          "current_maturity": "LOCAL_SYNTHETIC_DEMO",
+          "impact": "SYS-DATA's local synthetic inventory/file analysis is not a transport capacity service; no tenant data, customer identity or persistent storage is authorized."
+        },
+        {
+          "id": "SYS-INTEGRATIONS",
+          "current_maturity": "SOURCE_TESTED",
+          "impact": "SYS-INTEGRATIONS has draft DENY-only contracts; transportation simulation must not invoke, bind or bypass them. No provider scopes or third-party access."
+        }
+      ],
+      "control_assessments": [
+        {
+          "id": "EXPLICIT_APPROVAL",
+          "state": "DESIGNED",
+          "note": "Synthetic output flags human review required; no real approval token, sign-off service or privileged transport operation exists."
+        },
+        {
+          "id": "EXTERNAL_ACTION_DENY",
+          "state": "SOURCE_TESTED",
+          "note": "Source negative cases and no-effect assertions passed PR #65 CI, but live ingress, side-effect isolation and transport provider boundaries have not been proven."
+        },
+        {
+          "id": "TENANT_ISOLATION",
+          "state": "UNVERIFIED",
+          "note": "The offline synthetic transportation module has no tenant principal or database access; per-tenant security is not implemented and cannot be inferred."
+        },
+        {
+          "id": "AUDIT_TRAIL",
+          "state": "UNVERIFIED",
+          "note": "Fixture and report SHA-256 are local provenance aids, not tamper-evident production receipts or independently validated audit logs."
+        }
+      ],
+      "event_id": "LCE-0001",
+      "review": {
+        "decision": "SOURCE_REVIEWED_ONLY",
+        "review_ref": "https://github.com/AhmadibOfficial/MetaAutomate/pull/67",
+        "reviewer": "OWNER_SOURCE_REVIEW_APPROVED_PR_67",
+        "decision_date": "2026-10-16",
+        "separation_statement": "NOT_OPERATIONAL_AUTHORIZATION"
+      }
+    }
+  ]
 }
