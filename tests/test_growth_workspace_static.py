@@ -53,7 +53,7 @@ def test_static_demo_is_navigable_and_discoverable_but_not_live():
     assert (ROOT / "apps/site/index.html").read_text().count(
         'href="/automation/"'
     ) == 1
-    assert p.scripts == ["/automation/workspace.js"]
+    assert p.scripts == ["/automation/engine-snapshot.js", "/automation/workspace.js"]
     assert "/automation/workspace.css" in p.links
     assert len(p.ids) == len(set(p.ids))
     assert p.forms == 0

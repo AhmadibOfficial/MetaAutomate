@@ -9,17 +9,18 @@
   <title>Growth Autopilot — MetaAutomate | Product Preview</title>
   <link rel="icon" href="/assets/metaautomate-mark.webp" type="image/webp">
   <link rel="stylesheet" href="/automation/workspace.css">
+  <script defer src="/automation/engine-snapshot.js"></script>
   <script defer src="/automation/workspace.js"></script>
 </head>
 <body>
 <a class="skip" href="#workspace-main">Skip to the workspace</a>
-<div class="notice" role="status"><strong>Growth Autopilot / Product Preview</strong><span>Explore sales intelligence and workflow decisions. Figures are illustrative; customer accounts are not connected.</span></div>
+<div class="notice" role="status"><strong>Growth Autopilot / Product Preview</strong><span>Explore sales intelligence and workflow decisions. Figures are illustrative; customer accounts are not connected. Free access requires no sign-in or payment.</span></div>
 <header class="topbar">
   <a class="brand" href="/" aria-label="MetaAutomate, go to home">
     <img src="/assets/metaautomate-mark.webp" width="43" height="43" alt="">
     <span><strong>Meta<span>Automate</span></strong><small>GROWTH AUTOPILOT</small></span>
   </a>
-  <div class="toplinks"><span class="mode"><span aria-hidden="true" class="dot"></span> PRODUCT PREVIEW</span><a href="/#solutions">Solutions</a><a href="/engage/">Contact</a></div>
+  <div class="toplinks"><span class="mode"><span aria-hidden="true" class="dot"></span> FREE TO EXPLORE</span><a href="/#solutions">Solutions</a><a href="/engage/">Contact</a></div>
 </header>
 <div class="layout">
   <aside class="sidebar" aria-label="Workspace sections">
@@ -41,7 +42,7 @@
       <div>
         <p class="kicker">CUSTOMER EXPERIENCE / 01</p>
         <h1>Your business growth, <span>made clearer.</span></h1>
-        <p class="intro">Choose a business scenario, explore its sales journey and discover how guided automations support smarter decisions. Dollar figures are illustrative, not actual sales or currency conversions.</p>
+        <p class="intro">Explore a business scenario, choose your growth goal and review recommendations powered by our automation engine. Free to explore—no account or card required. Dollar figures are illustrative, not actual sales or currency conversions.</p>
       </div>
       <span class="environment"><span aria-hidden="true">○</span> Interactive product preview</span>
     </div>
@@ -103,8 +104,8 @@
     </section>
 
     <section id="panel-automations" role="tabpanel" aria-labelledby="tab-automations" class="view" hidden>
-      <div class="view-head"><div><p class="kicker">03 / Automation studio</p><h2>Automate carefully. Keep control.</h2><p>Explore how customer events become proposed workflows, guided by consent, provider rules and human approval.</p></div><span class="scope-tag">REVIEW-LED AUTOMATION</span></div>
-      <div class="queue-summary"><span id="queue-ready">0 for review</span><span id="queue-suppressed">0 suppressed</span><span>0 messages sent</span></div>
+      <div class="view-head"><div><p class="kicker">03 / Automation studio</p><h2>Automate carefully. Keep control.</h2><p>Recommendations reflect your selected business goal, with consent, provider safeguards and human review built into the decision path.</p></div><span class="scope-tag">REVIEW-LED AUTOMATION</span></div>
+      <div class="queue-summary"><span id="queue-ready">0 for review</span><span id="queue-deferred">0 outside goal</span><span id="queue-suppressed">0 suppressed</span><span>0 messages sent</span></div>
       <div class="queue" id="automation-queue" aria-label="Synthetic automation proposals"></div>
       <div class="inspection" id="inspection-panel" role="region" aria-label="Automation inspection result" aria-live="polite">
         Select <strong>View workflow</strong> to see why a proposed action is ready for review or held by a safeguard.
