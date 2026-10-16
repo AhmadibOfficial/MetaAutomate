@@ -92,7 +92,7 @@ CREATE TABLE meta_stage.review_tasks (
 -- INSERT privilege cannot bypass it by skipping the Python review client.
 CREATE FUNCTION meta_stage.guard_consent_revocation() RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER
-SET search_path = pg_catalog, meta_stage AS $
+SET search_path = pg_catalog, meta_stage AS $guard_body$
 BEGIN
   PERFORM pg_advisory_xact_lock(hashtextextended(
     NEW.tenant_id::text || '|' || NEW.platform || '|' || NEW.account_ref
@@ -106,7 +106,7 @@ BEGIN
     RAISE EXCEPTION 'CONSENT_REVOKED_REVIEW_REQUIRED';
   END IF;
   RETURN NEW;
-END $;
+END $guard_body$;
 REVOKE ALL ON FUNCTION meta_stage.guard_consent_revocation() FROM PUBLIC;
 CREATE TRIGGER consent_revocation_guard
   BEFORE INSERT ON meta_stage.consent_reviews
