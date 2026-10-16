@@ -1,0 +1,44 @@
+name: MetaAutomate P2-03v Governed Intelligence (source-only)
+
+on:
+  pull_request:
+    branches:
+      - main
+      - feature/p2-03u-intelligence-project-architect
+  push:
+    branches:
+      - feature/p2-03v-verifiable-identity-governed-orchestration
+
+permissions:
+  contents: read
+
+jobs:
+  governed-intelligence:
+    name: Signed owner and reviewer · revocation · virtual-tool sandbox · audit recovery
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install source-only test requirements
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8,<10' 'cryptography>=43,<48' 'psycopg[binary]>=3.2,<4'
+      - name: Exercise durable authorized workflow state machine and recovery
+        run: |
+          python -m pytest -q -rs tests/test_synthetic_governed_orchestration.py
+      - name: Verify project graphs and signed actor regressions
+        run: |
+          python -m pytest -q tests/test_synthetic_intelligence_project_architect.py tests/test_disposable_crm_auth_quality.py
+      - name: Record operational separation
+        if: always()
+        run: |
+          printf '%s\n' 'P2-03v test actors are fictional; SQLite is temporary; no OIDC/MFA, external AI agents, customer data, live credentials, network requests or production deployment.' > p2-03v-source-only-evidence.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-03v-governed-intelligence-evidence
+          path: p2-03v-source-only-evidence.txt
+          if-no-files-found: warn
