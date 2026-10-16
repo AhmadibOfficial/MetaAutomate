@@ -76,7 +76,7 @@ def test_static_demo_is_navigable_and_discoverable_but_not_live():
     customer_copy = re.sub(r"<[^>]+>", " ", html).lower()
     assert not re.search(r"\b(demo|fictional)\b", customer_copy)
     assert "figures are illustrative" in customer_copy
-    assert "Choose a business scenario" in html
+    assert "Explore a business scenario" in html
     assert "subscription" in html.lower()
     assert "customer accounts are not connected" in html
 
