@@ -20,17 +20,33 @@ def sources():
     return lc.load_sources(ROOT)
 
 
-def errors_for(proposal):
+def historical_before_acceptance():
+    """Exercise the old proposal against its actual baseline, not the new accepted state."""
     manifest, policy, history, foundation, catalog, root = sources()
-    return lc.evaluate(manifest, policy, history, foundation, catalog, root, proposal)[0]
+    assert len(history["events"]) == 1
+    assert history["events"][0]["event_id"] == "LCE-0001"
+    original = copy.deepcopy(next(
+        x for x in history["baseline"]["entries"] if x["id"] == "CAP-BUSINESS"
+    ))
+    manifest["entries"] = [
+        original if entry["id"] == "CAP-BUSINESS" else entry
+        for entry in manifest["entries"]
+    ]
+    history["events"] = []
+    return manifest, policy, history, foundation, catalog, root
 
 
-def test_transportation_proposal_preflight_passes_without_applying():
+def errors_for(proposal):
+    return lc.evaluate(*historical_before_acceptance(), proposal)[0]
+
+
+def test_transportation_proposal_is_historically_valid_and_event_replay_matches():
     manifest, policy, history, foundation, catalog, root = sources()
     original_manifest = copy.deepcopy(manifest)
     original_history = copy.deepcopy(history)
     proposal = read_proposal()
-    assert lc.evaluate(manifest, policy, history, foundation, catalog, root, proposal)[0] == []
+    assert lc.evaluate(manifest, policy, history, foundation, catalog, root)[0] == []
+    assert errors_for(proposal) == []
     assert manifest == original_manifest
     assert history == original_history
     assert proposal["example_only"] is False
@@ -38,10 +54,13 @@ def test_transportation_proposal_preflight_passes_without_applying():
     assert proposal["from_maturity"] == proposal["to_maturity"] == "LOCAL_SYNTHETIC_DEMO"
     assert proposal["after"]["operational_status"] == "NO_GO"
     assert proposal["capability_id"] == proposal["after"]["id"] == "CAP-BUSINESS"
-    assert history["events"] == []
+    assert len(history["events"]) == 1
     current = next(x for x in manifest["entries"] if x["id"] == "CAP-BUSINESS")
-    assert current["modules"] != proposal["after"]["modules"]
-    assert current["maturity"] == proposal["after"]["maturity"]
+    assert current == proposal["after"]
+    baseline = next(x for x in history["baseline"]["entries"] if x["id"] == "CAP-BUSINESS")
+    assert len(baseline["modules"]) == 2
+    assert len(current["modules"]) == 5
+    assert current["maturity"] == baseline["maturity"]
     assert sum(x["status"] == "verified" for x in foundation["checks"]) == 3
 
 

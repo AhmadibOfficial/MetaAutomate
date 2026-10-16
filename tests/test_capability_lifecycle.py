@@ -34,7 +34,7 @@ def accepted_event(proposal):
         for key, value in proposal.items()
         if key not in {"example_only", "proposal_schema_version"}
     }
-    event["event_id"] = "LCE-0001"
+    event["event_id"] = "LCE-0002"
     event["evidence"]["ci_run_url"] = (
         "https://github.com/AhmadibOfficial/MetaAutomate/actions/runs/38844242125"
     )
@@ -59,7 +59,9 @@ def replace_entry(manifest, target):
 def test_lifecycle_genesis_exact_and_source_only():
     manifest, policy, history, foundation, catalog = sources()
     assert evaluate(manifest, policy, history, foundation, catalog) == []
-    assert history["events"] == []
+    assert len(history["events"]) == 1
+    assert history["events"][0]["event_id"] == "LCE-0001"
+    assert history["events"][0]["capability_id"] == "CAP-BUSINESS"
     assert len(history["baseline"]["entries"]) == 19
     assert history["baseline"]["commit"] == lifecycle.BASELINE_COMMIT
     assert all(x["operational_status"] == "NO_GO" for x in manifest["entries"])
@@ -71,7 +73,10 @@ def test_example_proposal_is_complete_but_requires_review():
     assert proposal["example_only"] is True
     assert proposal["change_type"] == "EVIDENCE_REFRESH"
     assert evaluate(manifest, policy, history, foundation, catalog, proposal) == []
-    assert manifest["entries"] == history["baseline"]["entries"]
+    baseline = {entry["id"]: entry for entry in history["baseline"]["entries"]}
+    current = {entry["id"]: entry for entry in manifest["entries"]}
+    assert all(current[key] == value for key, value in baseline.items() if key != "CAP-BUSINESS")
+    assert current["CAP-BUSINESS"] == history["events"][0]["after"]
 
 
 def test_silent_evidence_change_is_rejected():
