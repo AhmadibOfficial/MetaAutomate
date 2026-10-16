@@ -1,0 +1,94 @@
+name: MetaAutomate P2-03z Evidence-Backed Pilot Outcomes (source-only)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [feature/p2-03z-evidence-backed-business-outcomes]
+
+permissions:
+  contents: read
+
+jobs:
+  aggregate-validator:
+    name: Aggregate-only accounting and fail-closed pilot admission
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install open source validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'fastapi>=0.115,<1' 'pydantic>=2.8,<3' 'pytest>=8,<10' 'psycopg[binary]>=3.2,<4'
+      - name: Reproduce arithmetic and reject PII, unauthenticated or false reports
+        env:
+          PYTHONPATH: apps/api
+        run: python -m pytest -q tests/test_p2_03z_pilot_outcomes.py
+      - name: Record release NO-GO and block false live-pilot claims
+        run: |
+          python scripts/verify_p2_03z_pilot_readiness.py
+          if python scripts/verify_p2_03z_pilot_readiness.py --require-operational-go; then
+            echo 'FAIL: source-only pilot gate unexpectedly authorized real customer data'
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-03z-real-pilot-no-go-evidence
+          path: artifacts/validation/p2-03z-operational-pilot-readiness.json
+          if-no-files-found: error
+
+  transactional-postgres:
+    name: Disposable PostgreSQL 16 - real RLS, idempotency, independent review
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: metaautomate
+          POSTGRES_PASSWORD: ci_only_password
+          POSTGRES_DB: metaautomate
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U metaautomate"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://metaautomate:ci_only_password@127.0.0.1:5432/metaautomate
+      APP_DATABASE_URL: postgresql://metaautomate_runtime:ci_runtime_password@127.0.0.1:5432/metaautomate
+      PGPASSWORD: ci_only_password
+      PYTHONPATH: apps/api
+      P2_03Z_CI_ONLY: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python, PostgreSQL-client tooling and tests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'fastapi>=0.115,<1' 'pydantic>=2.8,<3' 'pytest>=8,<10' 'psycopg[binary]>=3.2,<4'
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client
+      - name: Apply migrations only to disposable CI database
+        run: |
+          for migration in database/migrations/*.sql; do
+            echo "Disposable CI migration: $migration"
+            psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -f "$migration"
+          done
+          psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 \
+            -c "ALTER ROLE metaautomate_runtime LOGIN PASSWORD 'ci_runtime_password'"
+      - name: Verify real PostgreSQL RLS and append-only review path
+        run: python -m pytest -q -rs tests/test_p2_03z_postgres.py
+      - name: Explain why CI is not authorized staging or live financial evidence
+        if: always()
+        run: |
+          echo "PostgreSQL tests used only fictional tenant/org/member records on a disposable CI instance."
+          echo "Migration 016 was NOT applied to owner Kali, private staging or any permanent database."
+          echo "No real customer consent, staff SSO, off-host recovery or business result has been verified."
