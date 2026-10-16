@@ -6,6 +6,7 @@ superuser changes impossible or substitute for immutable external audit anchorin
 """
 from __future__ import annotations
 from hashlib import sha256
+import json
 import re
 
 from .disposable_meta_crm import scoped_tenant
@@ -33,7 +34,7 @@ def verify_tenant_audit(conn, workspace: str, trusted_head: str | None = None) -
             or type(payload) is not str
             or HEX.fullmatch(stored) is None
             or sha256((prior+":"+payload).encode("utf-8")).hexdigest() != stored
-            or ('"tenant": "'+str(tenant)+'"') not in payload):
+            or json.loads(payload).get("tenant") != str(tenant)):
             raise SyntheticGrowthError("Audit chain invalid or incomplete")
         predecessor = stored
     if trusted_head is not None and predecessor != trusted_head:
