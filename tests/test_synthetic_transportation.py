@@ -203,7 +203,13 @@ def test_limit_quote_and_no_real_finance_actions():
     report = render_synthetic_transportation(raw(d))
     assert report["payments_processed"] is False
     assert report["ledger_posted"] is False
-    assert report["totals"]["quoted_demo_credits"] == 805900
+    assert report["totals"]["quoted_demo_credits"] == 705400
+    d = data()
+    d["trips"][0]["capacity_seats"] = 50
+    d["trips"][0]["existing_demo_holds"] = 0
+    d["trips"][0]["fare_per_seat_demo_credits"] = 100000
+    d["requests"][0]["seats_requested"] = 11
+    must_reject(d, "Out-of-range demo quotation")
 
 
 def test_schema_stages_aligned_with_v1_contract_without_promoting_readiness():
