@@ -67,6 +67,15 @@ if os.environ.get("MAT_PILOT_OUTCOMES_ENABLED") == "1":
         check.query or len(reference) > 500):
         raise RuntimeError("An independently reviewed HTTPS pilot acceptance reference is required")
     from app.pilot_outcomes import router as pilot_outcomes_router
+    from app.p2_04a_pilot_admission import (
+        verify_private_pilot_admission, require_private_pilot_admission,
+    )
+    from fastapi import Depends
+    # A self-supplied HTTPS URL alone is NOT a pilot release authorization.
+    # The startup check and an additional per-request dependency require two
+    # distinct verified attestations with per-tenant/commit/IdP scope and expiry.
+    verify_private_pilot_admission()
+    pilot_outcomes_router.dependencies.append(Depends(require_private_pilot_admission))
     app.include_router(pilot_outcomes_router)
 if _mode == "dev_key":
     app.include_router(synthetic_inventory_router)
