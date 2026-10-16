@@ -68,6 +68,24 @@ def test_homepage_communicates_customer_offer_and_has_real_destinations():
     assert "/company/#roadmap" in p.refs
 
 
+def test_seven_target_sectors_are_explicit_not_live_product_claims():
+    home = (SITE / "index.html").read_text(encoding="utf-8")
+    services = (SITE / "services/index.html").read_text(encoding="utf-8")
+    assert home.count('class="focus-sector-card"') == 7
+    for name in ("Retail", "Wholesale", "Transportation", "Logistics",
+                 "Tourism", "Education", "Healthcare"):
+        assert f"<h3>{name}</h3>" in home
+        assert name.lower() in services.lower()
+    for workflow in ("inventory", "sales", "customer follow-ups", "finance",
+                     "operational decisions"):
+        assert workflow in home.lower()
+    assert "not deployed sector products" in home
+    assert "not seven deployed sector platforms" in services
+    assert "Agriculture, food security and Islamic knowledge systems" in home
+    assert "no promise of guaranteed earnings" not in home.lower()
+    assert "not a promise of guaranteed earnings" in home
+
+
 def test_nine_capability_cards_are_scoped_and_link_to_real_disciplines():
     html = (SITE / "index.html").read_text(encoding="utf-8")
     structure = page("index.html")

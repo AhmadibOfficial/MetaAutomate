@@ -224,6 +224,15 @@ h1 em{background:linear-gradient(112deg,#07b9ff 0%,#c9e8ff 58%,#efc573 96%);back
 .industry-card h3{font-size:29px;margin:8px 0 13px}
 .industry-card p{font-size:12px;color:#e5f2fce6;line-height:1.7;margin:0}
 .industry-scope{color:#58718e;font-size:12px;margin:26px 0 0}
+/* Seven target sectors: concise, responsive opportunity map rather than implying live products. */
+.focus-sector-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.focus-sector-card{position:relative;display:flex;flex-direction:column;gap:10px;min-height:190px;padding:24px 21px;border:1px solid #cbdfea;border-radius:13px;background:#fff;box-shadow:0 10px 25px #123b5d0a}
+.focus-sector-card::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:#147ab5;border-radius:13px 0 0 13px}
+.focus-sector-index{font-size:10px;font-weight:850;letter-spacing:.13em;color:#0a6d9d}
+.focus-sector-card h3{font-size:23px;letter-spacing:-.03em;line-height:1.2;color:#102b49;margin:1px 0 0}
+.focus-sector-card p{font-size:12px;line-height:1.55;color:#45617a;margin:0}
+@media(max-width:940px){.focus-sector-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.focus-sector-card{min-height:145px;padding:18px}}
+@media(max-width:760px){.focus-sector-grid{gap:9px}.focus-sector-card{min-height:137px;padding:14px 13px;gap:7px}.focus-sector-card h3{font-size:17px}.focus-sector-card p{font-size:11px;line-height:1.4}.focus-sector-index{font-size:9px}}
 /* Proof */
 .proof-section{background:#fff}
 .proof-layout{display:grid;grid-template-columns:.83fr 1.17fr;gap:90px;align-items:center}
