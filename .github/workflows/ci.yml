@@ -167,6 +167,19 @@ jobs:
           path: artifacts/validation/p2-03h-growth-autopilot-synthetic.json
           if-no-files-found: warn
 
+      - name: Verify goal-driven Growth Autopilot orchestration source boundaries
+        run: |
+          python scripts/verify_growth_orchestration_source.py \
+            --report artifacts/validation/p2-03j-growth-orchestration.json
+
+      - name: Upload goal-driven Growth Autopilot source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p2-03j-growth-orchestration-source-evidence
+          path: artifacts/validation/p2-03j-growth-orchestration.json
+          if-no-files-found: warn
+
       - name: Validate private staging source-only boundaries
         run: |
           python scripts/verify_private_staging_contract.py \
