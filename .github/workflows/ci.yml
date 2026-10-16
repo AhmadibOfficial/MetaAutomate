@@ -250,6 +250,36 @@ jobs:
           python -m pip install 'playwright>=1.55,<2'
           python -m playwright install --with-deps chromium
 
+      - name: Exercise customer Growth Autopilot static demo (desktop and mobile)
+        run: |
+          python3 -m http.server 18080 --bind 127.0.0.1 --directory apps/site > /tmp/meta-growth-site.log 2>&1 &
+          site_pid=$!
+          trap 'kill "$site_pid" || true' EXIT
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18080/automation/ >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" != 1 ]; then
+            cat /tmp/meta-growth-site.log
+            exit 1
+          fi
+          python scripts/verify_growth_workspace_browser.py
+
+      - name: Upload customer workspace synthetic visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: growth-autopilot-customer-workspace-visuals
+          path: |
+            artifacts/validation/growth-autopilot-desktop.png
+            artifacts/validation/growth-autopilot-mobile-390.png
+            artifacts/validation/growth-autopilot-mobile-360.png
+          if-no-files-found: warn
+
       - name: Exercise complete browser Objective Workspace workflow
         env:
           APP_DATABASE_URL: postgresql://metaautomate_runtime:ci_runtime_password@localhost:5432/metaautomate
