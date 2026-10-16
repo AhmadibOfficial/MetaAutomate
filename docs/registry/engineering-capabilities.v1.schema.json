@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://metaautomate.example/schemas/engineering-capabilities.v1.schema.json",
+  "$id": "urn:metaautomate:schemas:engineering-capabilities:v1",
   "title": "MetaAutomate engineering capability registry — source-only v1",
   "type": "object",
   "additionalProperties": false,
