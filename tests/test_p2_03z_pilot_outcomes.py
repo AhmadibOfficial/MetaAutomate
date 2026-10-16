@@ -161,3 +161,25 @@ def test_source_gate_and_consent_are_never_proof_of_live_release():
         "source hash mismatch",
     ):
         assert marker in sql
+
+
+def test_different_observation_windows_cannot_claim_growth(monkeypatch):
+    from types import SimpleNamespace
+    from app import pilot_outcomes as outcomes
+    old=OutcomePeriodInput.model_validate(sample())
+    latest=OutcomePeriodInput.model_validate(sample(
+        period_kind="CURRENT",period_start="2026-02-01",
+        period_end="2026-02-04",gross_sales_minor=9_000_000))
+    old_id,new_id=uuid4(),uuid4()
+    actor=uuid4()
+    row_old={**old.model_dump(),"id":old_id,"submitted_by_user_id":actor,
+             "input_sha256":canonical_hash(input_document(old))}
+    row_new={**latest.model_dump(),"id":new_id,"submitted_by_user_id":actor,
+             "input_sha256":canonical_hash(input_document(latest))}
+    approved={"decision":"EVIDENCE_CHECKED","reviewer_receipt_sha256":"a"*64}
+    monkeypatch.setattr(outcomes,"_one",
+                        lambda session,key:(row_old if key==old_id else row_new,approved))
+    session=SimpleNamespace(principal=SimpleNamespace(role="OWNER"))
+    with pytest.raises(HTTPException) as denied:
+        outcomes.compare_periods(old_id,new_id,session)
+    assert denied.value.status_code==422
