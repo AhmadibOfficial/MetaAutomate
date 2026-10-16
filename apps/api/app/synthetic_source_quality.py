@@ -30,7 +30,7 @@ KINDS = {
     "INSTAGRAM": "INBOUND_DM_METADATA",
     "WHATSAPP": "INBOUND_WHATSAPP_METADATA",
 }
-SOURCE_KIND = {name: platform for name, platform in CHANNELS.items()}
+SOURCE_KIND = {platform: name for name, platform in CHANNELS.items()}
 
 
 def quality_gate(inspection: Any, raw_body: bytes,
