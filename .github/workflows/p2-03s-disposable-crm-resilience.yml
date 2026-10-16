@@ -1,0 +1,65 @@
+name: MetaAutomate Disposable CRM and Resilience Lab
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - feature/p2-03s-disposable-crm-resilience-lab
+
+permissions:
+  contents: read
+
+jobs:
+  disposable-crm:
+    name: PostgreSQL 16 Tenant Isolation, Signed Events and Encrypted Evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: meta_stage_admin
+          POSTGRES_PASSWORD: disposable_only_ci_password
+          POSTGRES_DB: meta_stage_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U meta_stage_admin -d meta_stage_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      META_CRM_STAGING_DISPOSABLE: "yes"
+      META_CRM_DATABASE_NAME: "meta_stage_ci"
+      META_CRM_ADMIN_DATABASE_URL: "postgresql://meta_stage_admin:disposable_only_ci_password@127.0.0.1:5432/meta_stage_ci"
+      PYTHONPATH: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install disposable tests (no external SaaS)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8,<10' 'psycopg[binary]>=3.2,<4' 'cryptography>=43,<48'
+      - name: Rehearse strict RLS, separate login roles, idempotency and encryption
+        run: |
+          python -m pytest -q -rs tests/test_disposable_meta_crm_postgres.py
+      - name: Test deterministic continuity and expense intelligence
+        run: |
+          python -m pytest -q tests/test_synthetic_business_resilience.py
+      - name: Retest existing federated Meta lead source contracts
+        run: |
+          python -m pytest -q tests/test_meta_webhook_signature.py tests/test_synthetic_meta_lead_federation.py
+      - name: Upload test policy (source-only report)
+        if: always()
+        run: |
+          echo 'Only GitHub disposable meta_stage_ci exercised; no Kali, external cloud, production CRM, customer PII, or paid provider.' > disposable-crm-evidence.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-03s-disposable-crm-policy
+          path: disposable-crm-evidence.txt
+          if-no-files-found: warn
