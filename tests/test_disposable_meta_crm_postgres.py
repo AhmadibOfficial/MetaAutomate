@@ -9,6 +9,12 @@ import os
 from pathlib import Path
 import secrets
 import sys
+import base64
+import subprocess
+import time
+from hashlib import sha256
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 import psycopg
 from psycopg import sql
@@ -24,6 +30,10 @@ from app.disposable_meta_crm import (
 )
 from app.synthetic_meta_lead_federation import inspect_signed_meta_event
 from app.synthetic_growth_autopilot import SyntheticGrowthError
+from app.disposable_crm_authorization import AuthorizedMetaCRM, ISSUER, AUDIENCE
+from app.disposable_audit_verification import verify_tenant_audit
+from app.disposable_meta_crm import derive_ephemeral_tenant_key
+
 
 pytestmark = pytest.mark.skipif(
     not (os.getenv("GITHUB_ACTIONS") == "true" and
@@ -102,9 +112,10 @@ def stage():
             "GRANT UPDATE (state,agent_ref) ON meta_stage.review_tasks TO {}",
         ]:
             admin.execute(sql.SQL(template).format(role_id))
-    def open_for(ws):
+    def open_for(ws, database="meta_stage_ci"):
+        assert database in ("meta_stage_ci", "meta_stage_restore_ci")
         name, password=roles[ws]
-        c=psycopg.connect(dbname="meta_stage_ci",host=host,port=5432,user=name,
+        c=psycopg.connect(dbname=database,host=host,port=5432,user=name,
                           password=password,autocommit=True)
         assert c.execute("SELECT session_user").fetchone()[0] == name
         return c
@@ -232,3 +243,181 @@ def test_permissions_and_real_authorization_remain_off(stage):
         "SELECT count(*) FROM pg_roles WHERE rolname LIKE 'meta_stage_login_%'"
         " AND (rolsuper OR rolbypassrls OR rolcreatedb OR rolcreaterole)"
     ).fetchone()[0]==0
+
+
+# P2-03t tests: exercise working Ed25519 application checks against the
+# independently authenticated, restricted PostgreSQL login.
+def _actor_token(private_key, role="tenant_admin", workspace="academy_demo",
+                 actor="SIM-ACTOR-01", expires_offset=120):
+    now = int(time.time())
+    claims = {
+        "version": 1, "issuer": ISSUER, "audience": AUDIENCE,
+        "workspace": workspace, "actor_ref": actor, "role": role,
+        "issued_at": now-5, "expires_at": now+expires_offset,
+        "token_ref": "SIM-TOKEN-STAGE-01",
+    }
+    payload=json.dumps(claims,separators=(",",":"),sort_keys=True).encode()
+    encoded=base64.urlsafe_b64encode(payload).rstrip(b"=").decode()
+    body="v1."+encoded
+    signature=base64.urlsafe_b64encode(private_key.sign(body.encode())).rstrip(b"=").decode()
+    return body+"."+signature
+
+
+def test_application_actor_roles_deny_cross_tenant_and_privilege_escalation(stage):
+    _,open_for=stage
+    private=Ed25519PrivateKey.generate()
+    key=private.public_key()
+    with open_for("academy_demo") as a, open_for("bespoke_demo") as b:
+        auditor=AuthorizedMetaCRM(a,_actor_token(private,"auditor"),key)
+        assert isinstance(auditor.tasks(),list)
+        assert auditor.audit_report()["entry_count"]>=1
+        with pytest.raises(SyntheticGrowthError):
+            auditor.assign("FACEBOOK","SIM-FB-PERSIST-01","SIM-AGENT-01")
+        with pytest.raises(SyntheticGrowthError):
+            auditor.protect_note(MASTER,"FACEBOOK","SIM-PAGE-ACADEMY",
+                                 "SIM-FB-PERSIST-01",b"SIMULATED:prohibited")
+        reviewer=AuthorizedMetaCRM(a,_actor_token(private,"reviewer"),key)
+        assert isinstance(reviewer.tasks(),list)
+        with pytest.raises(SyntheticGrowthError):
+            reviewer.audit_report()
+        with pytest.raises(SyntheticGrowthError):
+            reviewer.review_consent("FACEBOOK","SIM-FB-PERSIST-01","MARKETING",
+                                    "UNVERIFIED","SIM-EVID-NEW-01","SIM-AGENT-01")
+        with pytest.raises(SyntheticGrowthError):
+            AuthorizedMetaCRM(b,_actor_token(private,"tenant_admin",
+                                                "academy_demo"),key)
+        with pytest.raises(SyntheticGrowthError):
+            AuthorizedMetaCRM(a,_actor_token(private,"tenant_admin",
+                                                "bespoke_demo"),key)
+        with pytest.raises(SyntheticGrowthError):
+            AuthorizedMetaCRM(a,_actor_token(private,expires_offset=-1),key)
+
+
+def test_only_authorized_signed_quality_checked_ingest_and_consent(stage):
+    _,open_for=stage
+    private=Ed25519PrivateKey.generate()
+    with open_for("academy_demo") as a:
+        admin=AuthorizedMetaCRM(a,_actor_token(private),private.public_key())
+        event=envelope("FACEBOOK","SIM-PAGE-ACADEMY","SIM-FB-AUTH-01")
+        raw=json.dumps(event,separators=(",",":"),sort_keys=True).encode()
+        sig="sha256="+hmac.new(SECRET,raw,"sha256").hexdigest()
+        assert admin.ingest_signed(raw,sig,SECRET)==1
+        assert admin.ingest_signed(raw,sig,SECRET)==0
+        assert admin.assign("FACEBOOK","SIM-FB-AUTH-01","SIM-AGENT-01")
+        admin.review_consent("FACEBOOK","SIM-FB-AUTH-01","SERVICE",
+                             "UNVERIFIED","SIM-EVID-AUTH-01","SIM-AGENT-01")
+        with pytest.raises(SyntheticGrowthError):
+            admin.review_consent("FACEBOOK","SIM-FB-AUTH-01","MARKETING",
+                                 "DOCUMENTED_EXAMPLE","SIM-EVID-AUTH-02",
+                                 "SIM-AGENT-99")
+        with pytest.raises(SyntheticGrowthError):
+            admin.ingest_signed(raw+b" ",sig,SECRET)
+        assert any(x["event_ref"]=="SIM-FB-AUTH-01" for x in admin.tasks())
+        assert admin.audit_report()["entry_count"]>=5
+
+
+def test_hash_chain_commits_atomically_and_cannot_be_changed_by_login(stage):
+    _,open_for=stage
+    with open_for("academy_demo") as a, open_for("bespoke_demo") as b:
+        report=verify_tenant_audit(a,"academy_demo")
+        other=verify_tenant_audit(b,"bespoke_demo")
+        assert report["entry_count"]>=7 and other["entry_count"]>=3
+        assert report["head_sha256"]!=other["head_sha256"]
+        assert verify_tenant_audit(a,"academy_demo",
+                                   trusted_head=report["head_sha256"])==report
+        with pytest.raises(SyntheticGrowthError):
+            verify_tenant_audit(a,"academy_demo",trusted_head="f"*64)
+        with pytest.raises(psycopg.Error):
+            a.execute("UPDATE meta_stage.audit_events SET entry_sha256=%s",
+                      ("0"*64,))
+        with pytest.raises(psycopg.Error):
+            a.execute("DELETE FROM meta_stage.audit_events")
+        with pytest.raises(psycopg.Error):
+            a.execute("INSERT INTO meta_stage.audit_events "
+                      "(tenant_id,sequence_number,source_login,payload,"
+                      "previous_sha256,entry_sha256) "
+                      "VALUES (%s,9001,'fake','{}',%s,%s)",
+                      (TENANTS["academy_demo"],"0"*64,"0"*64))
+        # Attempting to read the other tenant's sequence by its UUID reveals nothing.
+        assert a.execute(
+            "SELECT count(*) FROM meta_stage.audit_events WHERE tenant_id=%s",
+            (TENANTS["bespoke_demo"],),
+        ).fetchone()[0]==0
+
+
+def test_z_postgres_dump_restore_preserves_tenant_audit_and_encrypted_evidence(stage):
+    """Recovery drill, synthetic only; archive not retained or uploaded."""
+    admin,open_for=stage
+    assert os.environ["GITHUB_ACTIONS"]=="true"
+    assert os.environ["META_CRM_STAGING_DISPOSABLE"]=="yes"
+    assert admin.execute("SELECT current_database()").fetchone()[0]=="meta_stage_ci"
+    with open_for("academy_demo") as a, open_for("bespoke_demo") as b:
+        before={
+            "academy_demo":verify_tenant_audit(a,"academy_demo"),
+            "bespoke_demo":verify_tenant_audit(b,"bespoke_demo"),
+        }
+        academy_events=a.execute("SELECT count(*) FROM meta_stage.events").fetchone()[0]
+        bespoke_events=b.execute("SELECT count(*) FROM meta_stage.events").fetchone()[0]
+    # Service container uses the already-downloaded official postgres:16 image.
+    # No backup, secret, or database connection goes to external infrastructure.
+    base=["docker","run","--rm","--network","host",
+          "-e","PGPASSWORD=disposable_only_ci_password","postgres:16"]
+    dump=subprocess.run(
+        base+["pg_dump","-h","127.0.0.1","-U","meta_stage_admin",
+              "-d","meta_stage_ci","--format=custom","--no-owner"],
+        check=True,capture_output=True,timeout=100).stdout
+    assert dump.startswith(b"PGDMP") and len(dump)>1000
+    assert b"SIMULATED:training-inquiry" not in dump
+    assert admin.execute(
+        "SELECT 1 FROM pg_database WHERE datname='meta_stage_restore_ci'"
+    ).fetchone() is None
+    admin.execute("CREATE DATABASE meta_stage_restore_ci")
+    subprocess.run(
+        base+["pg_restore","-h","127.0.0.1","-U","meta_stage_admin",
+              "-d","meta_stage_restore_ci","--no-owner","--exit-on-error"],
+        input=dump,capture_output=True,check=True,timeout=100)
+    # Authenticate the same two LOGIN roles to a *different*, recovered DB.
+    # Verify that the restore did not weaken RLS, grant public access or rewrite
+    # any committed audit sequence. Independently compare prior trusted heads.
+    with open_for("academy_demo",database="meta_stage_restore_ci") as a, \
+         open_for("bespoke_demo",database="meta_stage_restore_ci") as b:
+        for ws,conn,count in (
+            ("academy_demo",a,academy_events),
+            ("bespoke_demo",b,bespoke_events),
+        ):
+            assert conn.execute(
+                "SELECT count(*) FROM meta_stage.events"
+            ).fetchone()[0]==count
+            rows=conn.execute(
+                "SELECT sequence_number,payload::text,previous_sha256,entry_sha256 "
+                "FROM meta_stage.audit_events ORDER BY sequence_number"
+            ).fetchall()
+            predecessor="0"*64
+            for seq,payload,prev,head in rows:
+                assert seq>=1 and seq==rows.index((seq,payload,prev,head))+1
+                assert prev==predecessor
+                assert sha256((prev+":"+payload).encode("utf-8")).hexdigest()==head
+                predecessor=head
+            assert len(rows)==before[ws]["entry_count"]
+            assert predecessor==before[ws]["head_sha256"]
+        assert a.execute(
+            "SELECT count(*) FROM meta_stage.events WHERE tenant_id=%s",
+            (TENANTS["bespoke_demo"],),
+        ).fetchone()[0]==0
+        assert b.execute(
+            "SELECT count(*) FROM meta_stage.audit_events WHERE tenant_id=%s",
+            (TENANTS["academy_demo"],),
+        ).fetchone()[0]==0
+        row=a.execute(
+            "SELECT nonce,ciphertext FROM meta_stage.private_evidence "
+            "WHERE event_ref='SIM-FB-PERSIST-01'"
+        ).fetchone()
+        assert row is not None
+        aad=(str(TENANTS["academy_demo"]) +
+             "|FACEBOOK|SIM-PAGE-ACADEMY|SIM-FB-PERSIST-01").encode()
+        recovered=AESGCM(derive_ephemeral_tenant_key(
+            MASTER,TENANTS["academy_demo"])).decrypt(
+                bytes(row[0]),bytes(row[1]),aad)
+        assert recovered==b"SIMULATED:training-inquiry"
+        with pytest.raises(psycopg.Error):
+            a.execute("TRUNCATE meta_stage.audit_events")
