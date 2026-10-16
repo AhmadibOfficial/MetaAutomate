@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "classification": "SYNTHETIC_DEMO_ONLY",
+  "currency": "DEMO_CREDITS",
+  "sector": "transportation",
+  "trips": [
+    {
+      "trip_id": "DEMO-TRIP-A1",
+      "route_label": "Synthetic Route Alpha",
+      "capacity_seats": 12,
+      "existing_demo_holds": 2,
+      "fare_per_seat_demo_credits": 1500
+    },
+    {
+      "trip_id": "DEMO-TRIP-B2",
+      "route_label": "Synthetic Route Beta",
+      "capacity_seats": 8,
+      "existing_demo_holds": 1,
+      "fare_per_seat_demo_credits": 2700
+    }
+  ],
+  "requests": [
+    {
+      "request_id": "DEMO-REQ-T1",
+      "trip_id": "DEMO-TRIP-A1",
+      "party_label": "Synthetic Party One",
+      "seats_requested": 3
+    },
+    {
+      "request_id": "DEMO-REQ-T2",
+      "trip_id": "DEMO-TRIP-A1",
+      "party_label": "Synthetic Party Two",
+      "seats_requested": 4
+    },
+    {
+      "request_id": "DEMO-REQ-T3",
+      "trip_id": "DEMO-TRIP-B2",
+      "party_label": "Synthetic Party Three",
+      "seats_requested": 2
+    }
+  ]
+}
