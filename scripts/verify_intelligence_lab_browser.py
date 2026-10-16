@@ -52,7 +52,7 @@ def main() -> int:
                     expect(page.locator("#module-content")).not_to_be_empty()
                 page.locator('[data-module="decision"]').click()
                 before = page.locator("#module-content").inner_text()
-                page.locator("#price").fill("1000")
+                page.locator("#price").evaluate("""el => { el.value = "1000"; el.dispatchEvent(new Event("input", {bubbles: true})); el.dispatchEvent(new Event("change", {bubbles: true})); }""")
                 page.locator("#price").dispatch_event("change")
                 after = page.locator("#module-content").inner_text()
                 assert after != before and "10%" in after
