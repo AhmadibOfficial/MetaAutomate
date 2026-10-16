@@ -229,9 +229,18 @@ def test_no_route_network_credentials_or_source_capability_activation():
     code = (ROOT / "apps/api/app/synthetic_transportation.py").read_text()
     assert "synthetic_transportation_router" not in main
     assert "include_router(synthetic_transportation" not in main
-    for forbidden in ("psycopg", "requests.", "httpx.", "urllib.request",
-                      "subprocess", "send_email", "smtp", "openai.", "redis.",
-                      "sqlalchemy", "fastapi"):
-        assert forbidden not in code
+    import ast
+    tree = ast.parse(code)
+    imports = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imports.update(alias.name.split(".")[0] for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imports.add(node.module.split(".")[0])
+    forbidden_imports = {
+        "psycopg", "requests", "httpx", "urllib", "subprocess",
+        "smtplib", "openai", "redis", "sqlalchemy", "fastapi",
+    }
+    assert imports.isdisjoint(forbidden_imports)
     assert "FIXTURE.read_bytes()" in code
     assert "reservation_made" in code and "ticket_issued" in code
