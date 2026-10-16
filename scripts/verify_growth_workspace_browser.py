@@ -48,6 +48,14 @@ def main():
             expect(page.locator("#stat-repeat")).to_have_text("1")
             expect(page.locator("#stat-queue")).to_have_text("4")
             assert_no_overflow(page,width)
+            if width <= 390:
+                # Every destination remains visible without hidden horizontal scrolling.
+                for tab in ("tab-overview", "tab-automations", "tab-value", "tab-setup"):
+                    expect(page.locator("#" + tab)).to_be_visible()
+                    right = page.locator("#" + tab).evaluate(
+                        "(el) => el.getBoundingClientRect().right"
+                    )
+                    assert right <= width + 1, (width, tab, right)
             # The customer can navigate to the queue and inspect an invented workflow.
             page.locator("#open-queue").click()
             expect(page.locator("#panel-automations")).to_be_visible()
