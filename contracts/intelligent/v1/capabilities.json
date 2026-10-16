@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "product": "metaautomate",
+  "phase": "03",
+  "contract_version": "0.1.0",
+  "mode": "OFFLINE_DESIGN_ONLY",
+  "default_policy": "DENY",
+  "release_status": "NO_GO",
+  "foundation_gates_verified": 3,
+  "foundation_gates_required": 9,
+  "phase02_operational_accepted": false,
+  "live_execution_authorized": false,
+  "external_data_access": false,
+  "developer_interface": "LOCAL_CLI_ONLY",
+  "verification_scope": "SYNTHETIC_CHECKSUM_CONSISTENCY_ONLY",
+  "analytics_scope": "DEMO_DENIAL_EVENTS_ONLY",
+  "operations": [
+    {
+      "operation_id": "business.lead-intake.validate.v1",
+      "capability_id": "BIZ-002",
+      "effect": "validate_only",
+      "required_scope": "business.leads.preview",
+      "risk": "low",
+      "approval_required": false,
+      "lifecycle": "draft",
+      "execution_enabled": false,
+      "provider_bound": false,
+      "autonomous_execution_enabled": false
+    },
+    {
+      "operation_id": "business.crm.sync-proposal.v1",
+      "capability_id": "BIZ-006",
+      "effect": "propose_write",
+      "required_scope": "business.crm.write",
+      "risk": "moderate",
+      "approval_required": true,
+      "lifecycle": "draft",
+      "execution_enabled": false,
+      "provider_bound": false,
+      "autonomous_execution_enabled": false
+    },
+    {
+      "operation_id": "business.inventory.stock-preview.v1",
+      "capability_id": "BIZ-011",
+      "effect": "read_external",
+      "required_scope": "business.inventory.read",
+      "risk": "moderate",
+      "approval_required": false,
+      "lifecycle": "draft",
+      "execution_enabled": false,
+      "provider_bound": false,
+      "autonomous_execution_enabled": false
+    },
+    {
+      "operation_id": "business.finance.reconciliation-proposal.v1",
+      "capability_id": "BIZ-012",
+      "effect": "propose_write",
+      "required_scope": "business.finance.write",
+      "risk": "high",
+      "approval_required": true,
+      "lifecycle": "draft",
+      "execution_enabled": false,
+      "provider_bound": false,
+      "autonomous_execution_enabled": false
+    }
+  ]
+}
