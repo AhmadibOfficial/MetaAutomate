@@ -1,0 +1,95 @@
+name: MetaAutomate P2-03w Trusted Intelligence Integration (source-only)
+
+on:
+  pull_request:
+    branches:
+      - main
+      - feature/p2-03v-verifiable-identity-governed-orchestration
+  push:
+    branches:
+      - feature/p2-03w-trusted-identity-model-evaluation
+
+permissions:
+  contents: read
+
+jobs:
+  identity-and-policy:
+    name: Offline OIDC pinning, staff policy and signed virtual tool authorization
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install free source-only test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8,<10' 'cryptography>=43,<48' 'psycopg[binary]>=3.2,<4'
+      - name: Verify independent synthetic IdP and app signatures, MFA and revocation
+        run: python -m pytest -q tests/test_synthetic_oidc_governed_gateway.py
+      - name: Retest full signed two-person review, audit and consent-policy contracts
+        run: |
+          python -m pytest -q tests/test_synthetic_governed_orchestration.py tests/test_disposable_crm_auth_quality.py
+
+  portfolio-model-evidence:
+    name: Twelve modules, five engines and no-provider model evaluation
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install free offline source validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8,<10' 'cryptography>=43,<48' 'psycopg[binary]>=3.2,<4'
+      - name: Test model input provenance, no-API scores and 12+5 portfolio
+        run: |
+          python -m pytest -q tests/test_synthetic_model_governed_portfolio.py
+      - name: Retest original interconnected business and AI architecture suites
+        run: |
+          python -m pytest -q tests/test_synthetic_business_resilience.py tests/test_synthetic_intelligence_project_architect.py
+      - name: Record source-only, zero-subscription proof
+        if: always()
+        run: |
+          echo 'P2-03w: fixture-only evaluation, fictional IdP/JWKS, no real API calls, no clients, no credentials, no new infrastructure, no production execution or publishing.' > p2-03w-policy-evidence.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-03w-model-governance-evidence
+          path: p2-03w-policy-evidence.txt
+          if-no-files-found: warn
+
+  governance-browser:
+    name: Source-generated 12-module governance map and mobile acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install free browser test environment
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'playwright>=1.50,<2' 'cryptography>=43,<48' 'psycopg[binary]>=3.2,<4'
+          python -m playwright install --with-deps chromium
+      - name: Verify exact Python to browser governance contract
+        run: python scripts/build_intelligence_governance_contract.py --check
+      - name: Verify static JavaScript parses
+        run: |
+          node --check apps/site/intelligence/governance/data.js
+          node --check apps/site/intelligence/governance/governance.js
+      - name: Check governed intelligence UI at three widths
+        run: python scripts/verify_intelligence_governance_browser.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-03w-intelligence-governance-screenshots
+          path: artifacts/validation/intelligence-governance-*.png
+          if-no-files-found: warn
