@@ -24,6 +24,8 @@ from .disposable_meta_crm import (
     read_private_evidence,
 )
 from .synthetic_growth_autopilot import SyntheticGrowthError
+from .synthetic_meta_lead_federation import inspect_signed_meta_event
+from .synthetic_source_quality import require_disposable_source
 
 ISSUER = "metaautomate-disposable-ci"
 AUDIENCE = "meta-stage-crm-rehearsal"
@@ -159,7 +161,7 @@ class AuthorizedMetaCRM:
         self._actor = verify_actor_token(token, trusted_public_key, now=now)
         self._workspace = self._actor.workspace
         self._conn = conn
-        self._clock = int(time.time()) if now is None else now
+        self._clock_override = now
         scoped_tenant(conn, self._workspace)
 
     @property
@@ -167,7 +169,8 @@ class AuthorizedMetaCRM:
         return self._actor
 
     def _guard(self, action: str) -> str:
-        _require(self._actor.expires_at > self._clock, "Session has expired")
+        current = int(time.time()) if self._clock_override is None else self._clock_override
+        _require(self._actor.expires_at > current, "Session has expired")
         require_actor_access(self._actor, self._workspace, action)
         scoped_tenant(self._conn, self._workspace)
         return self._workspace
@@ -175,9 +178,13 @@ class AuthorizedMetaCRM:
     def tasks(self):
         return list_review_tasks(self._conn, self._guard("read_queue"))
 
-    def ingest(self, inspected: dict) -> int:
-        return store_inspected_events(self._conn, self._guard("ingest_signed_metadata"),
-                                      inspected)
+    def ingest_signed(self, raw: bytes, signature: str, test_app_secret: bytes) -> int:
+        """Verify, validate and ingest without trusting caller-supplied inspection flags."""
+        workspace = self._guard("ingest_signed_metadata")
+        inspected = inspect_signed_meta_event(raw, signature, test_app_secret,
+                                               expected_workspace=workspace)
+        require_disposable_source(inspected, raw, workspace)
+        return store_inspected_events(self._conn, workspace, inspected)
 
     def assign(self, platform: str, event_ref: str, agent: str) -> bool:
         return assign_review_agent(self._conn, self._guard("assign_human"),
