@@ -62,7 +62,7 @@ def test_user_controlled_chat_and_download_never_publishes():
     assert "goal:lastProjectQuestion" in ai
     assert "lastProjectQuestion=text.slice(0,700)" in ai
     assert 'exportChat?.addEventListener("click"' in ai
-    assert 'download="metaautomate-on-device-chat.txt"' in ai
+    assert 'link.download="metaautomate-on-device-chat.txt"' in ai
     assert 'window.location.assign("/creative/#creative-form")' in ai
     assert "AI reply or full chat history is transferred" in read("engage/index.html")
 
