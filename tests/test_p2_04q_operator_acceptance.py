@@ -17,6 +17,7 @@ def test_operator_cli_fails_closed_without_isolation(tmp_path,monkeypatch,capsys
         "--quarantine",str(tmp_path),
         "--owner-public-key","no_trust",
         "--reviewer-public-key","no_trust",
+        "--second-reviewer-public-key","no_trust",
     ])
     assert code==2
     assert "SPEECH ACCEPTANCE HOLD" in capsys.readouterr().err
@@ -38,6 +39,7 @@ def test_operator_cli_requires_real_private_inputs(tmp_path,monkeypatch,capsys):
         "--quarantine",str(tmp_path),
         "--owner-public-key","no_trust",
         "--reviewer-public-key","no_trust",
+        "--second-reviewer-public-key","no_trust",
     ])
     assert code==2
     assert "SPEECH ACCEPTANCE HOLD" in capsys.readouterr().err
