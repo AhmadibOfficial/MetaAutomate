@@ -1,0 +1,57 @@
+name: MetaAutomate P2-04c Offline Creative Engine (source-only)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, feature/p2-04c-offline-creative-generation-worker]
+
+permissions:
+  contents: read
+
+jobs:
+  creative-engine-policy:
+    name: Model approval, offline gating, quarantine and independent safety review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source-only policy dependencies
+        run: |
+          python -m pip install 'pytest>=8,<10' 'pydantic>=2.8,<3' 'cryptography>=43,<48'
+      - name: Test local model and signed human approval boundaries
+        env:
+          PYTHONPATH: apps/api
+        run: |
+          python -m pytest -q tests/test_p2_04c_creative_generation_worker.py tests/test_p2_04c_creative_output_review.py
+      - name: Confirm real inference and video codecs remain OPTIONAL
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src=Path('apps/api/app/creative_local_generation.py').read_text()
+          requirements=Path('apps/api/requirements.txt').read_text()
+          main=Path('apps/api/app/main.py').read_text()
+          assert "local_files_only=True" in src
+          assert "HF_HUB_OFFLINE" in src
+          assert "QUARANTINED_PENDING_INDEPENDENT_SAFETY_REVIEW" in src
+          assert "diffusers" not in requirements
+          assert "creative_local_generation" not in main
+          assert "MAT_CREATIVE_OFFLINE_EXECUTION_ENABLED" in src
+          print("PASS: No model installed in public/private API and no generation route enabled")
+          PY
+      - name: Ensure live creative generation still fails closed without explicit offline environment
+        env:
+          PYTHONPATH: apps/api
+        run: |
+          if python -m app.creative_local_generation \
+            --job /tmp/non-existent-job.json \
+            --authorization /tmp/no-approved-review.json \
+            --model-root /tmp/no-models \
+            --quarantine-root /tmp/no-quarantine; then
+            echo 'FAIL: disabled worker wrongly ran without operational inputs'
+            exit 1
+          fi
+          echo 'PASS: absent model, approvals and execution capability is NO-GO'
