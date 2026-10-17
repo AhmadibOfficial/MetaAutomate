@@ -29,7 +29,7 @@ Prerequisites: Python environment supporting P2-04g and P2-04h, local FFmpeg/FFp
      --video-sha256 <64-character-verified-digest>
    \`\`\`
    Example placeholders above are not executable release authorizations.
-5. Confirm receipt, output SHA-256 and independent ffprobe output. Human specialist must inspect soundtrack mix, voice clarity, captions, final composition, accessibility, safety and rights. Sign a **separate** final approval binding the exact final SHA-256; do not equate the preflight checkboxes with signing.
+5. Confirm receipt, output SHA-256 and independent ffprobe output. Human specialist must inspect soundtrack mix, voice clarity, captions, final composition, accessibility, safety and rights. Sign a **separate** final approval binding the exact final SHA-256, then use `app.creative_cinematic_final_review.inspect_final` to verify the reviewer's Ed25519 signature, independent identity, receipt binding, output digest and review expiry. It produces **HUMAN_REVIEW_CLAIM_RECORDED_PENDING_SEPARATE_RELEASE**, not publication clearance. Do not equate the preflight checkboxes or the signature alone with independent rights authentication.
 6. Keep final media in private quarantine. Public serving, distribution, customer activations and subscriptions remain blocked.
 
 ## Acceptance
@@ -40,7 +40,11 @@ Prerequisites: Python environment supporting P2-04g and P2-04h, local FFmpeg/FFp
 | Synthetic 30s FFmpeg test footage | CI test added; entirely synthetic and not model output |
 | Real AI image and 2–8-second video inference | NOT VERIFIED |
 | Real 30–120s user-relevant cinematic output | NOT VERIFIED |
-| Independently signed final-output review | NOT IMPLEMENTED |
+| Independently signed final-output review validator | Implemented in source; no authentic signed real-output review conducted |
 | Five-minute and feature-film capability | Not implemented |
 
 P2-04g preflight declarations do not by themselves establish that the input assets were licensed or that review occurred. This milestone remains **draft, unmerged, no deployment, no subscriptions, Phase 01 3/9 and Phase 02/03 operational NO-GO**.
+
+## Latest CI limitation
+
+The previous PR #94 head `154466807449b1a719b30c3f0457222940d475bb` passed the main and creative-workbench CI. The subsequent cinematic-render commits triggered multiple GitHub Actions workflow failures whose job records did not include steps, and the job logs could not be retrieved. **Latest source tests and the 30-second synthetic integration fixture are not verified passing in GitHub CI.** Separately, a *2-second local FFmpeg command-only smoke test* (not the repository module) demonstrated muxing video + AAC + mov_text captions successfully. Neither constitutes evidence of genuine model generation, full 30-second pipeline acceptance, or rights clearance.
