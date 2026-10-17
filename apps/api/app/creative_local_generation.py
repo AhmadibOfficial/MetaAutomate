@@ -65,6 +65,8 @@ class Job(BaseModel):
 
     @model_validator(mode="after")
     def bounded_media(self):
+        if self.schema_version!=1:
+            raise ValueError("Unsupported job schema")
         if self.requester_id==self.reviewer_id:
             raise ValueError("Independent human reviewer must differ from requester")
         if any(not x.strip() for x in (self.prompt,self.project_key)):
@@ -258,6 +260,12 @@ def execute(job:Job,auth:Approval,*,model_root:Path,output_root:Path,
             raise GenerationBlocked("Model output is missing or nonregular")
         if path.stat().st_size>100_000_000:
             raise GenerationBlocked("Generated artifact exceeds quarantine cap")
+        with path.open("rb") as generated:
+            header=generated.read(16)
+        if (job.kind=="image" and header[:8]!=b"\x89PNG\r\n\x1a\n") or (
+            job.kind=="video" and header[4:8]!=b"ftyp"
+        ):
+            raise GenerationBlocked("Output media format does not match job")
         path.chmod(0o600)
         content=sha256(path.read_bytes()).hexdigest()
         report={
