@@ -13,6 +13,8 @@
   <script src="/assets/site.js" defer></script>
 <link rel="stylesheet" href="/assets/project-chat.css">
 <script src="/assets/project-chat.js" defer></script>
+<link rel="stylesheet" href="/assets/project-device-ai.css">
+<script src="/assets/project-device-ai.js" defer></script>
   <title>Start a Project — MetaAutomate</title>
 </head><body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -58,6 +60,36 @@
       </div>
       <span class="project-chat-offline">GUIDED INTAKE · NO LIVE AI</span>
     </header>
+    <div class="project-ai-mode-switch">
+      <button id="project-ai-open" class="project-ai-mode-button" type="button" aria-expanded="false" aria-controls="project-ai-experience">Try AI on this device <span aria-hidden="true">✳</span></button>
+      <span class="project-ai-mode-note">Optional experiment · Requires WebGPU and a model download</span>
+    </div>
+    <section id="project-ai-experience" class="project-ai-experience" aria-label="Experimental on-device AI chat" hidden>
+      <div class="project-ai-header">
+        <div><strong>On-device AI · Experimental</strong>
+          <p>Run a small open-weight language model on your own device. No MetaAutomate account, cloud AI server or automatic project submission.</p>
+        </div>
+        <button id="project-ai-close" type="button">Return to guided intake</button>
+      </div>
+      <div id="project-ai-consent" class="project-ai-consent">
+        <p><strong>Before you enable AI:</strong> A WebGPU-compatible browser and sufficient graphics memory are required. Your browser will download model weights and WebLLM software from third-party hosts, potentially hundreds of megabytes. The model and software may be cached on your device.</p>
+        <p>The model runs locally after loading, but this external software has not been independently security-audited by MetaAutomate. Do not enter confidential or regulated information. The AI can make mistakes. Image, video, voice generation, persistent history and live human support are <strong>not</strong> included.</p>
+        <p><a href="https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct" target="_blank" rel="noopener noreferrer">Model and licence information ↗</a> · <a href="https://github.com/mlc-ai/web-llm" target="_blank" rel="noopener noreferrer">WebLLM engine ↗</a></p>
+        <button id="project-ai-load" type="button">Download model and start local AI</button>
+      </div>
+      <p id="project-ai-status" class="project-ai-status" role="status" aria-live="polite">AI is not running. Start it explicitly above.</p>
+      <div id="project-ai-messages" class="project-ai-messages" role="log" aria-label="On-device AI conversation" aria-live="polite" aria-relevant="additions"></div>
+      <div class="project-ai-composer">
+        <label for="project-ai-input">Ask the local AI</label>
+        <textarea id="project-ai-input" rows="3" maxlength="1000" placeholder="Describe the project or ask a follow-up question..." disabled></textarea>
+        <div class="project-ai-actions">
+          <button id="project-ai-reset" type="button">Clear current conversation</button>
+          <button id="project-ai-send" type="button" disabled>Ask AI ↗</button>
+        </div>
+      </div>
+      <p id="project-ai-error" class="project-ai-error" role="alert" hidden></p>
+      <p class="project-ai-footer">Responses are generated on-device when the model is loaded. No responses are guaranteed, and this experimental tool cannot execute project workflows.</p>
+    </section>
     <div class="project-chat-conversation" id="project-chat-messages" role="log" aria-label="Project intake conversation" aria-live="polite" aria-relevant="additions" tabindex="0">
       <div class="project-chat-message project-chat-assistant">
         <span class="project-chat-avatar" aria-hidden="true">✳</span>

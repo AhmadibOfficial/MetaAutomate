@@ -1,0 +1,58 @@
+name: P2-04y Consent-only Browser AI Chat
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [feature/p2-04y-browser-local-ai-optin]
+
+permissions:
+  contents: read
+
+jobs:
+  consent-first-static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Source contracts
+        run: |
+          python -m pip install 'pytest>=8,<10'
+          python -m pytest -q \
+            tests/test_p2_04y_device_ai_static.py \
+            tests/test_p2_04w_project_chat_static.py \
+            tests/test_site_customer_clarity.py
+          node --check apps/site/assets/project-device-ai.js
+
+  consent-browser:
+    needs: consent-first-static
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Chromium for UI acceptance
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Verify desktop and mobile do not load AI without opt-in
+        run: |
+          python -m http.server 18080 --bind 127.0.0.1 --directory apps/site >/tmp/mat-device-ai.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18080/engage/ >/dev/null; then break; fi
+            sleep 1
+          done
+          python scripts/verify_project_device_ai_browser.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-04y-device-ai-consent-previews
+          path: artifacts/validation/device-ai-consent-*.png
+          if-no-files-found: warn
