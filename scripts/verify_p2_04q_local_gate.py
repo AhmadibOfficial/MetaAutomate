@@ -25,6 +25,7 @@ TESTS = (
     "tests/test_p2_04q_operator_acceptance.py",
     "tests/test_p2_04q_review_signing.py",
     "tests/test_p2_04q_runtime_preflight.py",
+    "tests/test_p2_04q_approval_signing.py",
 )
 
 def sha(path: Path) -> str:
