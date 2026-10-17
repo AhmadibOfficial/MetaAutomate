@@ -63,7 +63,8 @@ def validate_job(job: dict) -> dict:
         value = job[name]
         if type(value) is not str or SLUG.fullmatch(value) is None:
             raise AudioAssetHold("Invalid project/asset identity")
-    if job["kind"] not in KINDS or job["use_case"] not in USE_CASES:
+    if (type(job["kind"]) is not str or job["kind"] not in KINDS or
+        type(job["use_case"]) is not str or job["use_case"] not in USE_CASES):
         raise AudioAssetHold("Unknown audio kind or use case")
     prompt = job["prompt"]
     if type(prompt) is not str or not 12 <= len(prompt.strip()) <= 800:
@@ -82,7 +83,8 @@ def validate_job(job: dict) -> dict:
         raise AudioAssetHold("Audio distribution is forbidden")
     likeness = job["voice_likeness"]
     artist = job["artist_reference"]
-    if likeness not in ("none", "consented") or artist not in ("none", "licensed"):
+    if (type(likeness) is not str or likeness not in ("none", "consented") or
+        type(artist) is not str or artist not in ("none", "licensed")):
         raise AudioAssetHold("Voice or artist reference not declared")
     if likeness == "consented":
         if job["kind"] != "speech" or not hash_valid(job["voice_consent_evidence_sha256"]):
