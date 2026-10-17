@@ -17,12 +17,20 @@ from uuid import uuid4
 from app.creative_audio_assets import (
     AudioAssetHold, canonical, sha_file, validate_job, verify_asset,
 )
+from app.creative_speech_authorization import verify_speech_approval
 
 def _file(path: Path, *, max_bytes: int):
     if (not path.is_absolute() or path.is_symlink() or not path.is_file()
         or path.resolve() != path or not 0 < path.stat().st_size <= max_bytes
         or stat.S_IMODE(path.stat().st_mode) & 0o077):
         raise AudioAssetHold("Missing, public, linked or oversized trusted input")
+
+def _engine(path: Path):
+    if (not path.is_absolute() or path.is_symlink() or not path.is_file()
+        or path.resolve() != path or not 0 < path.stat().st_size <= 100_000_000
+        or stat.S_IMODE(path.stat().st_mode) & 0o077
+        or not (stat.S_IMODE(path.stat().st_mode) & stat.S_IXUSR)):
+        raise AudioAssetHold("Private owner-executable pinned speech engine required")
 
 def _directory(path: Path):
     if (not path.is_absolute() or path.is_symlink() or not path.is_dir()
@@ -31,7 +39,9 @@ def _directory(path: Path):
 
 def render_speech(job: dict, *, text_path: Path, model_path: Path,
                   model_config: Path, engine_path: Path,
-                  quarantine_root: Path, runner=None) -> dict:
+                  quarantine_root: Path, runner=None,
+                  authorization: dict | None = None,
+                  owner_public_key: str = "", reviewer_public_key: str = "") -> dict:
     """Local input/weights only. Test injection cannot claim model inference."""
     if (os.environ.get("MAT_SPEECH_OFFLINE_EXECUTION_ENABLED") != "1"
         or os.environ.get("MAT_SPEECH_NETWORK_ISOLATED") != "1"
@@ -45,7 +55,7 @@ def render_speech(job: dict, *, text_path: Path, model_path: Path,
     _file(text_path, max_bytes=8192)
     _file(model_path, max_bytes=2_000_000_000)
     _file(model_config, max_bytes=128_000)
-    _file(engine_path, max_bytes=100_000_000)
+    _engine(engine_path)
     if model_path.suffix != ".onnx" or model_config.name != model_path.name + ".json":
         raise AudioAssetHold("Offline Piper voice needs matching ONNX and JSON")
     if engine_path.name not in {"piper", "piper.exe"}:
@@ -58,6 +68,15 @@ def render_speech(job: dict, *, text_path: Path, model_path: Path,
     requested = job["prompt"]
     if requested != text.strip():
         raise AudioAssetHold("Authorized text must match speech job prompt")
+    signed_approval_sha256 = None
+    if runner is None:
+        if authorization is None:
+            raise AudioAssetHold("Signed owner and independent reviewer authorization required")
+        signed_approval_sha256 = verify_speech_approval(
+            job, authorization, config_sha256=sha_file(model_config),
+            engine_sha256=sha_file(engine_path), text_sha256=sha_file(text_path),
+            owner_public_key=owner_public_key,
+            reviewer_public_key=reviewer_public_key)
     output_dir=quarantine_root/uuid4().hex
     output_dir.mkdir(mode=0o700)
     try:
@@ -102,7 +121,8 @@ def render_speech(job: dict, *, text_path: Path, model_path: Path,
               "text_sha256":sha_file(text_path),"status":status,
               "independently_proven_inference":False,
               "licence_authenticated_by_code":False,
-              "signed_approval_verified_by_code":False,
+              "signed_approval_verified_by_code":signed_approval_sha256 is not None,
+              "signed_approval_sha256":signed_approval_sha256,
               "published":False}
         (output_dir/"evidence.json").write_bytes(canonical(info)+b"\n")
         (output_dir/"evidence.json").chmod(0o600)
