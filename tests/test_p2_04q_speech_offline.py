@@ -16,7 +16,7 @@ def setup(tmp_path, monkeypatch):
     ):
         path=root/name
         path.write_bytes(data)
-        path.chmod(0o600)
+        path.chmod(0o700 if name == "piper" else 0o600)
         files[name]=path
     q=root/"quarantine"
     q.mkdir(mode=0o700)
@@ -90,4 +90,16 @@ def test_symlink_checkpoint_rejected(tmp_path,monkeypatch):
     files["voice.onnx"].rename(files["voice.onnx"].parent/"actual.onnx")
     files["voice.onnx"].symlink_to(files["voice.onnx"].parent/"actual.onnx")
     with pytest.raises(AudioAssetHold,match="linked"):
+        call(files,q,job)
+
+
+def test_nonexecutable_speech_engine_rejected(tmp_path,monkeypatch):
+    files,q,job=setup(tmp_path,monkeypatch)
+    files["piper"].chmod(0o600)
+    with pytest.raises(AudioAssetHold,match="owner-executable"):
+        call(files,q,job)
+
+def test_real_runner_requires_signed_independent_approval(tmp_path,monkeypatch):
+    files,q,job=setup(tmp_path,monkeypatch)
+    with pytest.raises(AudioAssetHold,match="Signed owner"):
         call(files,q,job)
