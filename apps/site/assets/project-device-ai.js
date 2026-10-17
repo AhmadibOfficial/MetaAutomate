@@ -79,7 +79,7 @@
       else load.focus();
     } else open.focus();
   }
-  open.addEventListener("click", () => switchMode(!panel.hidden));
+  open.addEventListener("click", () => switchMode(panel.hidden));
   close.addEventListener("click", () => switchMode(false));
 
   async function checkHardware() {
