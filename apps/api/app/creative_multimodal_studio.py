@@ -144,6 +144,8 @@ def validate_manifest(manifest:dict,asset_root:Path)->dict:
         seconds=scene["duration_seconds"]
         if not _number(seconds,2,15):
             raise StudioHold("Each visual scene must be 2-15 seconds")
+        if type(scene["file"]) is not str:
+            raise StudioHold("Visual scene filename required")
         if scene["file"] in seen:
             raise StudioHold("Duplicate visual source not accepted in first release")
         seen.add(scene["file"])
