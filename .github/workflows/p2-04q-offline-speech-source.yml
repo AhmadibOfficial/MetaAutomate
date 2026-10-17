@@ -1,0 +1,44 @@
+name: MetaAutomate P2-04q Offline Speech Source Checks
+
+on:
+  push:
+    branches: [feature/p2-04q-offline-speech-worker]
+  pull_request:
+    branches: [feature/p2-04p-creative-audio-assets]
+
+permissions:
+  contents: read
+
+jobs:
+  offline-speech-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install policy-only test dependencies
+        run: python -m pip install 'pytest>=8,<10' 'cryptography>=43,<48'
+      - name: Run speech source policy and independent signature checks
+        run: |
+          python -m pytest -q \
+            tests/test_p2_04p_creative_audio_assets.py \
+            tests/test_p2_04q_speech_offline.py \
+            tests/test_p2_04q_speech_authorization.py \
+            tests/test_p2_04q_speech_final_review.py \
+            tests/test_p2_04q_native_audio.py
+      - name: Verify real generation remains optional and not publicly exposed
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          worker = Path('apps/api/app/creative_speech_offline.py').read_text()
+          api = Path('apps/api/app/main.py').read_text()
+          assert 'verify_speech_approval' in worker
+          assert 'MAT_SPEECH_OFFLINE_EXECUTION_ENABLED' in worker
+          assert 'TEST_ONLY_FAKE_RUNNER_NOT_AI' in worker
+          assert 'creative_speech_offline' not in api
+          print('PASS: source tests do not invoke real models or expose public inference')
+          PY
