@@ -168,3 +168,23 @@ def test_no_voice_card_means_hold(tmp_path):
         validate_materials(job, model=args["model"], config=args["config"],
                            model_card=args["model_card"], rights=args["rights"],
                            consent=None, binary=args["binary"])
+
+def test_mismatched_checkpoint_language_rejected(tmp_path):
+    job, approval, args = fixture(tmp_path)
+    args["config"].write_text('{"audio":{"sample_rate":22050},'
+                              '"language":{"code":"fr_FR"}}')
+    with pytest.raises(SpeechHold, match="language disagrees"):
+        validate_materials(
+            job, model=args["model"], config=args["config"],
+            model_card=args["model_card"], rights=args["rights"],
+            consent=None, binary=args["binary"])
+
+def test_config_with_finite_float_parameters_is_valid(tmp_path):
+    job, approval, args = fixture(tmp_path)
+    args["config"].write_text('{"audio":{"sample_rate":22050},'
+                              '"inference":{"length_scale":1.05}}')
+    evidence = validate_materials(
+        job, model=args["model"], config=args["config"],
+        model_card=args["model_card"], rights=args["rights"],
+        consent=None, binary=args["binary"])
+    assert evidence["expected_sample_rate"] == 22050
