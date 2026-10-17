@@ -16,6 +16,10 @@
   const input = byId("project-ai-input");
   const send = byId("project-ai-send");
   const reset = byId("project-ai-reset");
+  const exportChat = byId("project-ai-export");
+  const creativeHandoff = byId("project-ai-creative-handoff");
+  const creativeFormat = byId("project-ai-creative-format");
+  const creativeNote = byId("project-ai-creative-note");
   const error = byId("project-ai-error");
   const guided = ["project-chat-messages","project-chat-suggestions",
                   "project-chat-summary"].map(byId);
@@ -40,6 +44,7 @@
   let loading = false;
   let answering = false;
   let turns = [];
+  let lastProjectQuestion = "";
   const setStatus = value => { status.textContent = value; };
   const setError = value => {
     error.textContent = value;
@@ -49,6 +54,8 @@
     input.disabled = !ready;
     send.disabled = !ready || answering;
     load.disabled = loading || !!engine;
+    if (creativeHandoff) creativeHandoff.disabled = !engine || answering || lastProjectQuestion.length < 20;
+    if (exportChat) exportChat.disabled = !turns.length || answering;
   };
 
   function addMessage(role, message) {
@@ -164,6 +171,7 @@
         throw new Error("The model returned no readable text.");
       }
       const bounded=reply.trim().slice(0,2600);
+      lastProjectQuestion=text.slice(0,700);
       turns=[...limited,{role:"assistant",content:bounded}].slice(-8);
       addMessage("assistant",bounded);
       setStatus("On-device AI response completed. Verify important information independently.");
@@ -186,12 +194,51 @@
   reset.addEventListener("click",()=>{
     if(answering) return;
     turns=[];
+    lastProjectQuestion="";
+    if (creativeHandoff) creativeHandoff.disabled=true;
+    if (exportChat) exportChat.disabled=true;
     feed.replaceChildren();
     setError("");
     setStatus(engine
       ? "Conversation cleared from page memory. Local model remains loaded."
       : "No AI is running. Start the model to begin.");
     if(engine) input.focus();
+  });
+  exportChat?.addEventListener("click", () => {
+    if (!turns.length || answering) return;
+    // Explicit download only: model cache is separate from conversation memory.
+    const lines=[
+      "METAAUTOMATE / ON-DEVICE AI CONVERSATION",
+      "Experimental model output. Review all statements independently.",
+      "No conversation was uploaded or stored in a MetaAutomate account.",
+      "",
+      ...turns.map(turn=>(turn.role==="user"?"YOU":"ON-DEVICE AI")+
+        "\n"+turn.content+"\n")
+    ];
+    const blob=new Blob([lines.join("\n")],{type:"text/plain;charset=utf-8"});
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement("a");
+    link.href=url;
+    link.download="metaautomate-on-device-chat.txt";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(()=>URL.revokeObjectURL(url),1000);
+    if (creativeNote) creativeNote.textContent=
+      "A copy of the recent conversation was downloaded to your device. Nothing was sent.";
+  });
+  creativeHandoff?.addEventListener("click", () => {
+    if (!engine || answering || lastProjectQuestion.length<20) return;
+    const adapter=window.MetaAutomateCreativeHandoff;
+    if (!adapter?.save?.({
+      kind:creativeFormat?.value,source:"device_ai",
+      goal:lastProjectQuestion,audience:""
+    })) {
+      if(creativeNote) creativeNote.textContent =
+        "The one-time local transfer was blocked. Copy your idea and open Creative Workbench instead.";
+      return;
+    }
+    window.location.assign("/creative/#creative-form");
   });
   // No hidden initialization or network request occurs until the user chooses
   // "Download model and start local AI".
