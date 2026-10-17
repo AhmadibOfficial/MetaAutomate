@@ -64,3 +64,7 @@
 @media(prefers-reduced-motion:reduce){.project-chat *{scroll-behavior:auto!important;transition:none!important}}
 
 .project-chat-alternative .subhero h2{font-size:clamp(36px,5.4vw,72px);line-height:1.12;margin:0 0 25px;color:#fff}
+
+.project-chat-summary-actions select{border:1px solid #c6d6ea;border-radius:9px;padding:10px 11px;font:inherit;font-size:.8rem;color:#204f81;background:#fff}
+.project-chat-handoff-label{font-size:.76rem;font-weight:750;color:#315175}
+.project-chat-summary-actions select:focus-visible{outline:3px solid #1c69c4;outline-offset:2px}
