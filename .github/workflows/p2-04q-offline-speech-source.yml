@@ -33,6 +33,7 @@ jobs:
             tests/test_p2_04q_operator_acceptance.py \
             tests/test_p2_04q_review_signing.py \
             tests/test_p2_04q_runtime_preflight.py \
+            tests/test_p2_04q_approval_signing.py \
             tests/test_p2_04q_local_gate.py
       - name: Verify real generation remains optional and not publicly exposed
         run: |
