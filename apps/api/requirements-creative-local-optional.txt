@@ -1,0 +1,14 @@
+# OPTIONAL research worker only. NOT installed in public website or private API.
+# Install separately after GPU, model licence and offline containment approval.
+# Specific working versions/model architecture and code/weights must be
+# independently security-reviewed and locked by an owner-signed manifest.
+torch>=2.3,<3
+diffusers>=0.32,<1
+transformers>=4.44,<6
+accelerate>=0.33,<2
+safetensors>=0.4,<1
+imageio>=2.35,<3
+imageio-ffmpeg>=0.5,<1
+Pillow>=10.3,<13
+cryptography>=43,<48
+pydantic>=2.8,<3
