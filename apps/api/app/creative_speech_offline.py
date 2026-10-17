@@ -85,6 +85,10 @@ def render_speech(job: dict, *, text_path: Path, model_path: Path,
             runner(text,model_path,model_config,target)
             mode="TEST_ONLY_FAKE_RUNNER_NOT_AI"
         else:
+            # Verify the actual Linux namespace; environment flags alone
+            # cannot prove that no external network interface is reachable.
+            from app.creative_speech_runtime_preflight import kernel_network_evidence
+            kernel_network_evidence()
             # Must run in an independently network-denied container/process.
             # Piper version/CLI is operator-pinned. No package or voice retrieval.
             cmd=[str(engine_path),"--model",str(model_path),
