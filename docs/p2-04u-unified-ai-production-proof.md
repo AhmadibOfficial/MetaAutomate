@@ -99,3 +99,22 @@ The P2-04u GitHub Actions source workflow run \`39005461061\` failed **with
 \`steps: null\`**, consistent with infrastructure issue #100; it did not
 establish failing Python assertions or a successful test run. All source
 milestones therefore remain review-only, not releasable.
+
+
+### Video checkpoint licensing blocker found during research
+
+The commonly referenced \`ali-vilab/text-to-video-ms-1.7b\`
+(\`TextToVideoSDPipeline\`) model card describes its use as research-oriented
+and its model-details section lists **CC BY-NC-ND**. Its YAML header displays
+\`cc-by-nc-4.0\`, which is inconsistent but also **noncommercial**. Neither
+version establishes permission to use the model weights in a paid or
+customer-facing MetaAutomate creative generation product. The Apache-2.0
+licence of the *ModelScope code library* is a different licence and does
+not override the model checkpoint's terms.
+
+Do **not** automatically select or download this model as MetaAutomate's
+commercial film-generation engine. A separate checkpoint with demonstrated
+commercial rights, safety obligations and a compatible offline pipeline must
+be reviewed before authentic AI video acceptance.
+
+Source: https://huggingface.co/ali-vilab/text-to-video-ms-1.7b
