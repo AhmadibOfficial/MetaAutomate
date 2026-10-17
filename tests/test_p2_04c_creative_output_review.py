@@ -83,7 +83,7 @@ def test_a_failed_review_holds_media_without_creating_public_release(tmp_path,ed
 
 @pytest.mark.parametrize("edit",[
     {"job_sha256":"b"*64},{"output_sha256":"e"*64},
-    {"expires_at":"2026-10-17T03:00:00Z"},
+    {"expires_at":"2026-10-17T00:00:00Z"},
     {"issued_at":"2026-10-17T00:01:00Z"},
 ])
 def test_wrong_job_media_and_expired_approval_are_denied(tmp_path,edit):
