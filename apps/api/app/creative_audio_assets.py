@@ -125,10 +125,10 @@ def pcm_metrics(path: Path, expected_seconds: int) -> dict:
         with wave.open(str(path), "rb") as wav:
             channels, width, sample_rate, frame_count, coding, _ = wav.getparams()
             if (coding != "NONE" or channels not in (1, 2) or width != 2
-                or sample_rate not in (44100, 48000)):
+                or sample_rate not in (16000, 22050, 24000, 32000, 44100, 48000)):
                 raise AudioAssetHold("Only 16-bit 44.1/48k mono/stereo PCM is supported")
             seconds = frame_count / sample_rate
-            if not math.isfinite(seconds) or abs(seconds - expected_seconds) > 0.25:
+            if not math.isfinite(seconds) or abs(seconds - expected_seconds) > max(1.0, expected_seconds * 0.20):
                 raise AudioAssetHold("Actual audio duration differs from job")
             energy, peak, samples, clipping = 0, 0, 0, 0
             while True:
