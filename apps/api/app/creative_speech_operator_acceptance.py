@@ -14,6 +14,7 @@ import sys
 
 from app.creative_audio_assets import AudioAssetHold
 from app.creative_speech_offline import render_speech
+from app.creative_speech_runtime_preflight import verify_operator_preflight
 
 def private_json(path:Path)->dict:
     if (not path.is_absolute() or path.is_symlink() or not path.is_file()
@@ -28,6 +29,11 @@ def private_json(path:Path)->dict:
 def main(argv=None)->int:
     parser=argparse.ArgumentParser(
         description="Strictly authorised OFFLINE speech acceptance; no model downloads")
+    parser.add_argument("--repo-root",type=Path,required=True)
+    parser.add_argument("--expected-commit",required=True)
+    parser.add_argument("--license-evidence",type=Path,required=True)
+    parser.add_argument("--rights-evidence",type=Path,required=True)
+    parser.add_argument("--consent-evidence",type=Path)
     parser.add_argument("--job",type=Path,required=True)
     parser.add_argument("--authorization",type=Path,required=True)
     parser.add_argument("--text",type=Path,required=True)
@@ -45,6 +51,16 @@ def main(argv=None)->int:
         job=private_json(args.job)
         approval=private_json(args.authorization)
         model_config=Path(str(args.voice_onnx)+".json")
+        preflight=verify_operator_preflight(
+            repo_root=args.repo_root, expected_commit=args.expected_commit,
+            job=job, authorization=approval,
+            voice_model=args.voice_onnx, voice_config=model_config,
+            engine=args.piper_bin, script=args.text,
+            license_evidence=args.license_evidence,
+            rights_evidence=args.rights_evidence,
+            consent_evidence=args.consent_evidence,
+            owner_public_key=args.owner_public_key,
+            reviewer_public_key=args.reviewer_public_key)
         receipt=render_speech(
             job,
             text_path=args.text,
@@ -65,6 +81,7 @@ def main(argv=None)->int:
         return 2
     print(json.dumps({
         "status":"OUTPUT_CREATED_PENDING_INDEPENDENT_POST_REVIEW",
+        "preflight":preflight,
         "receipt":receipt["receipt"],
         "config_sha256":receipt["config_sha256"],
         "engine_sha256":receipt["engine_sha256"],
