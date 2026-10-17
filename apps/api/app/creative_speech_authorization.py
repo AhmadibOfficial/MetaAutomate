@@ -46,6 +46,7 @@ def _utc(text):
 def verify_speech_approval(job:dict, approval:dict, *, config_sha256:str,
                            engine_sha256:str, text_sha256:str,
                            owner_public_key:str, reviewer_public_key:str,
+                           second_reviewer_public_key:str|None=None,
                            now:datetime|None=None) -> str:
     plan=validate_job(job)
     if type(approval) is not dict or set(approval)!=_FIELDS:
@@ -69,19 +70,25 @@ def verify_speech_approval(job:dict, approval:dict, *, config_sha256:str,
     if any(type(approval.get(k)) is not type(v) or approval.get(k)!=v
            for k,v in expected.items()):
         raise AudioAssetHold("Approval does not match job, model, text or evidence")
-    if type(approval["signatures"]) is not list or len(approval["signatures"])!=2:
-        raise AudioAssetHold("Owner and independent reviewer signatures required")
+    required_roles=(["OWNER","REVIEWER_1","REVIEWER_2"]
+                    if second_reviewer_public_key is not None
+                    else ["OWNER","REVIEWER"])
+    if (type(approval["signatures"]) is not list
+        or len(approval["signatures"])!=len(required_roles)):
+        raise AudioAssetHold("Required owner/reviewer signatures missing")
     signatures=approval["signatures"]
-    if [entry.get("role") for entry in signatures if type(entry) is dict]!=["OWNER","REVIEWER"]:
-        raise AudioAssetHold("Two ordered independent roles required")
+    if [entry.get("role") for entry in signatures if type(entry) is dict]!=required_roles:
+        raise AudioAssetHold("Ordered distinct owner/reviewer roles required")
     issued, expires=_utc(approval["issued_at"]),_utc(approval["expires_at"])
     current=now or datetime.now(timezone.utc)
     if (current.tzinfo is None or not issued<=current.astimezone(timezone.utc)<expires
         or not timedelta(minutes=1)<=expires-issued<=timedelta(minutes=30)):
         raise AudioAssetHold("Missing current short-lived speech authorization")
     keys=[_b64(owner_public_key,32),_b64(reviewer_public_key,32)]
-    if keys[0]==keys[1]:
-        raise AudioAssetHold("Reviewer key must differ from owner key")
+    if second_reviewer_public_key is not None:
+        keys.append(_b64(second_reviewer_public_key,32))
+    if len(set(keys))!=len(keys):
+        raise AudioAssetHold("All reviewer keys must differ from owner and each other")
     payload=canonical({k:v for k,v in approval.items() if k!="signatures"})
     for key, sig in zip(keys,signatures):
         if type(sig) is not dict or set(sig)!={"role","signature"}:
