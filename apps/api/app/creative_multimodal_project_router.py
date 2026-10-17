@@ -59,8 +59,8 @@ def plan(request:dict)->dict:
         or any(type(v) is not str or v not in ALLOWED_OUTPUTS for v in outputs)
         or len(set(outputs))!=len(outputs)):
         raise StudioHold("Select images, narrated_video or both")
-    idea=_text(request["idea"],20,1500,"Creative concept")
-    style=_text(request["visual_style"],6,300,"Artistic style")
+    idea=_text(request["idea"],20,450,"Creative concept")
+    style=_text(request["visual_style"],6,120,"Artistic style")
     ratio=request["aspect_ratio"]
     if type(ratio) is not str or ratio not in RATIOS:
         raise StudioHold("Unsupported source visual aspect ratio")
@@ -78,8 +78,9 @@ def plan(request:dict)->dict:
         or not want_video and (scene_count!=0 or seconds!=0)):
         raise StudioHold("Requested media counts disagree with output types")
     runtime=scene_count*seconds
-    if want_video and (not 2<=seconds<=15 or not 30<=runtime<=120):
-        raise StudioHold("First narrated production requires 30-120s total, 2-15s shots")
+    if want_video and (type(seconds) is not int or not 2<=seconds<=8
+                       or not 30<=runtime<=120):
+        raise StudioHold("Current short-clip worker supports 2-8 integer-second shots; total 30-120s")
     language=request["voice_language"]
     if type(language) is not str or LANG.fullmatch(language) is None:
         raise StudioHold("Invalid narration language")
