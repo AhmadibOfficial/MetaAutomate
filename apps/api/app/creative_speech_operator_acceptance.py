@@ -43,7 +43,9 @@ def main(argv=None)->int:
     parser.add_argument("--owner-public-key",required=True,
                         help="URL-safe Ed25519 public key, externally pinned")
     parser.add_argument("--reviewer-public-key",required=True,
-                        help="Different URL-safe Ed25519 public key, externally pinned")
+                        help="First registered reviewer Ed25519 public key")
+    parser.add_argument("--second-reviewer-public-key",required=True,
+                        help="Second independent reviewer Ed25519 public key")
     args=parser.parse_args(argv)
     try:
         if os.environ.get("MAT_SPEECH_OPERATOR_ISOLATION_EVIDENCE_CONFIRMED")!="1":
@@ -60,7 +62,8 @@ def main(argv=None)->int:
             rights_evidence=args.rights_evidence,
             consent_evidence=args.consent_evidence,
             owner_public_key=args.owner_public_key,
-            reviewer_public_key=args.reviewer_public_key)
+            reviewer_public_key=args.reviewer_public_key,
+            second_reviewer_public_key=args.second_reviewer_public_key)
         receipt=render_speech(
             job,
             text_path=args.text,
