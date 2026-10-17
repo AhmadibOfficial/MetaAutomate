@@ -78,7 +78,7 @@ def verify_speech_approval(job:dict, approval:dict, *, config_sha256:str,
         raise AudioAssetHold("Required owner/reviewer signatures missing")
     signatures=approval["signatures"]
     if [entry.get("role") for entry in signatures if type(entry) is dict]!=required_roles:
-        raise AudioAssetHold("Ordered distinct owner/reviewer roles required")
+        raise AudioAssetHold("ordered distinct owner/reviewer roles required")
     issued, expires=_utc(approval["issued_at"]),_utc(approval["expires_at"])
     current=now or datetime.now(timezone.utc)
     if (current.tzinfo is None or not issued<=current.astimezone(timezone.utc)<expires
