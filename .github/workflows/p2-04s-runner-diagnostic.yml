@@ -5,6 +5,10 @@ on:
     branches:
       - feature/p2-04s-marketing-creative-studio-handoff
 
+  pull_request:
+    branches:
+      - feature/p2-04r-ai-marketing-content-workflows
+
 permissions:
   contents: read
 
