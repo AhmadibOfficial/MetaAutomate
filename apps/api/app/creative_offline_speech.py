@@ -115,6 +115,13 @@ def validate_materials(job: dict, *, model: Path, config: Path, model_card: Path
         or descriptor["audio"]["sample_rate"] not in
         (16000, 22050, 24000, 32000, 44100, 48000)):
         raise SpeechHold("Missing supported Piper audio sample rate")
+    # If the checkpoint declares a language, it must agree with the job.
+    language = descriptor.get("language")
+    if type(language) is dict and type(language.get("code")) is str:
+        checkpoint_lang = language["code"].split("_")[0].split("-")[0].lower()
+        job_lang = job["language"].split("-")[0].lower()
+        if checkpoint_lang != job_lang:
+            raise SpeechHold("Job language disagrees with voice checkpoint")
     return {
         "job_sha256": plan["job_sha256"],
         "config_sha256": sha_file(config),
