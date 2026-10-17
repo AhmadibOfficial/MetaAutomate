@@ -81,6 +81,7 @@
     // Invalid URL metadata never prevents local project intake.
   }
 
+  const initialService = service;
   const advanced = document.getElementById("project-chat-alternative");
   function openStructuredLink() {
     if (advanced && window.location.hash === "#brief-form") {
@@ -224,7 +225,7 @@
     answerIndex = 0;
     answers = {};
     currentBrief = "";
-    service = "Still exploring";
+    service = initialService;
     summary.hidden = true;
     email.href = "mailto:" + BUSINESS_EMAIL + "?subject=MetaAutomate%20%7C%20Project%20inquiry";
     input.disabled = false;
