@@ -73,10 +73,12 @@ def fixture(tmp_path, monkeypatch):
     }
     owner=Ed25519PrivateKey.generate()
     reviewer=Ed25519PrivateKey.generate()
+    reviewer_two=Ed25519PrivateKey.generate()
     payload=canonical(approvals)
     approvals["signatures"]=[
         {"role":"OWNER","signature":b64(owner.sign(payload))},
-        {"role":"REVIEWER","signature":b64(reviewer.sign(payload))},
+        {"role":"REVIEWER_1","signature":b64(reviewer.sign(payload))},
+        {"role":"REVIEWER_2","signature":b64(reviewer_two.sign(payload))},
     ]
     def public(k):
         return b64(k.public_key().public_bytes(Encoding.Raw,PublicFormat.Raw))
@@ -95,6 +97,7 @@ def fixture(tmp_path, monkeypatch):
         "rights_evidence":paths["rights.txt"],
         "consent_evidence":None,
         "owner_public_key":public(owner),"reviewer_public_key":public(reviewer),
+        "second_reviewer_public_key":public(reviewer_two),
     }
     return args
 
@@ -167,3 +170,16 @@ def test_network_kernel_rejects_root(tmp_path):
         pytest.skip("Linux only")
     with pytest.raises(AudioAssetHold,match="non-root"):
         gate.kernel_network_evidence(uid=0)
+
+
+def test_owner_and_two_reviewers_required(tmp_path,monkeypatch):
+    args=fixture(tmp_path,monkeypatch)
+    args["authorization"]["signatures"].pop()
+    with pytest.raises(AudioAssetHold,match="Required owner/reviewer signatures"):
+        gate.verify_operator_preflight(**args)
+
+def test_duplicate_second_reviewer_key_rejected(tmp_path,monkeypatch):
+    args=fixture(tmp_path,monkeypatch)
+    args["second_reviewer_public_key"]=args["reviewer_public_key"]
+    with pytest.raises(AudioAssetHold,match="keys must differ"):
+        gate.verify_operator_preflight(**args)
