@@ -154,3 +154,18 @@ def test_synthetic_full_hd_video_with_voice_and_captions(tmp_path,monkeypatch):
     output=list(quarantine.glob("*/finished.mp4"))
     assert len(output)==1
     assert digest_file(output[0])==receipt["final_sha256"]
+
+
+def test_native_piper_22050_pcm_voice_is_supported(tmp_path):
+    root,manifest=fixture(tmp_path)
+    audio=root/"narration.wav"
+    with wave.open(str(audio),"wb") as wav:
+        wav.setnchannels(1)
+        wav.setsampwidth(2)
+        wav.setframerate(22050)
+        wav.writeframes(b"\x01\x00"*(22050*32))
+    audio.chmod(0o600)
+    manifest["voice"]["sha256"]=digest_file(audio)
+    checked=validate_manifest(manifest,root)
+    assert checked["voice_meta"]["sample_rate"]==22050
+    assert checked["voice_meta"]["duration_seconds"]==pytest.approx(32)
