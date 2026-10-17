@@ -16,6 +16,7 @@ import subprocess
 import sys
 
 from app.creative_multimodal_studio import StudioHold
+from app.creative_voice_quality import require_technically_ready_narration, VoiceQualityHold
 from app.creative_multimodal_provenance import (
     verify_source_bundle, render_with_source_proofs,
 )
@@ -61,6 +62,16 @@ def _pinned_checkout(root: Path, sha: str) -> None:
     if head.stdout.strip() != sha or dirty.stdout.strip():
         raise StudioHold("Source revision differs from clean approved source")
 
+def _private_script(path:Path)->str:
+    if (not path.is_absolute() or path.is_symlink() or not path.is_file()
+        or path.resolve()!=path or not 1<=path.stat().st_size<=8192
+        or stat.S_IMODE(path.stat().st_mode)&0o077):
+        raise StudioHold("Private original script or recognition transcript required")
+    try:
+        return path.read_text(encoding="utf-8").strip()
+    except UnicodeError as exc:
+        raise StudioHold("Invalid human-reviewed narration text") from exc
+
 def main(argv: list[str] | None = None) -> int:
     parser=argparse.ArgumentParser(description="Private multimodal production evidence gate")
     parser.add_argument("--repo-root",type=Path,required=True)
@@ -70,6 +81,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--trusted-reviewer-keys",type=Path,required=True)
     parser.add_argument("--assets",type=Path,required=True)
     parser.add_argument("--quarantine",type=Path,required=True)
+    parser.add_argument("--approved-script",type=Path)
+    parser.add_argument("--recognized-transcript",type=Path)
     parser.add_argument("--render",action="store_true",
                         help="Explicit local offline finishing after evidence verification")
     args=parser.parse_args(argv)
@@ -78,11 +91,24 @@ def main(argv: list[str] | None = None) -> int:
         manifest=_read_private_json(args.manifest,65536)
         evidence=_read_private_json(args.source_evidence)
         keys=_read_private_json(args.trusted_reviewer_keys,65536)
-        result=(render_with_source_proofs(
-            manifest,args.assets,args.quarantine,evidence,reviewer_keys=keys)
-            if args.render else
-            verify_source_bundle(
-                manifest,args.assets,evidence,reviewer_keys=keys))
+        if args.render:
+            if args.approved_script is None or args.recognized_transcript is None:
+                raise StudioHold("Rendering requires a reviewed script and separately checked transcript")
+            # Verify source receipt signatures before trusting the filename.
+            verify_source_bundle(manifest,args.assets,evidence,reviewer_keys=keys)
+            script=_private_script(args.approved_script)
+            transcript=_private_script(args.recognized_transcript)
+            voice_file=manifest["voice"]["file"]
+            if type(voice_file) is not str:
+                raise StudioHold("Invalid voice source filename")
+            voice_qa=require_technically_ready_narration(
+                args.assets/voice_file,script,transcript=transcript)
+            result=render_with_source_proofs(
+                manifest,args.assets,args.quarantine,evidence,reviewer_keys=keys)
+            result["narration_technical_quality"]=voice_qa
+        else:
+            result=verify_source_bundle(
+                manifest,args.assets,evidence,reviewer_keys=keys)
     except (StudioHold,OSError,ValueError,subprocess.SubprocessError) as exc:
         print("MULTIMODAL PRODUCTION HOLD: "+str(exc),file=sys.stderr)
         return 2
