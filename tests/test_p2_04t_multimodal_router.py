@@ -56,6 +56,8 @@ def test_long_voice_script_is_chunked_without_text_loss():
     ("image_count",100),
     ("scene_count",26),
     ("scene_seconds",20),
+    ("scene_seconds",9),
+    ("scene_seconds",2.5),
     ("visual_style",""),
     ("narration_script","hi"),
     ("distribution_authorized",True),
