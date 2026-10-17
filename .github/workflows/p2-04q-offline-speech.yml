@@ -1,0 +1,46 @@
+name: MetaAutomate P2-04q Offline Speech Contract (source-only)
+
+on:
+  pull_request:
+    branches: [main, feature/p2-04p-creative-audio-assets]
+  push:
+    branches: [feature/p2-04q-offline-piper-speech]
+
+permissions:
+  contents: read
+
+jobs:
+  speech-policy:
+    name: Speech job, model evidence and signed human review
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install policy-test dependencies only
+        run: python -m pip install 'pytest>=8,<10' 'pydantic>=2.8,<3' 'cryptography>=43,<48'
+      - name: Run local signed-approval and evidence tests
+        env:
+          PYTHONPATH: apps/api
+        run: |
+          python -m pytest -q \
+            tests/test_p2_04p_creative_audio_assets.py \
+            tests/test_p2_04q_offline_speech.py \
+            tests/test_p2_04q_speech_review.py
+      - name: Assert no remote model downloads or API activation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          worker = Path("apps/api/app/creative_offline_speech.py").read_text()
+          main = Path("apps/api/app/main.py").read_text()
+          assert "MAT_CREATIVE_SPEECH_OFFLINE_ENABLED" in worker
+          assert "MAT_CREATIVE_NETWORK_ISOLATED" in worker
+          assert "QUARANTINED_PENDING_INDEPENDENT_REVIEW" in worker
+          assert "download_voices" not in worker
+          assert "http://" not in worker and "https://" not in worker
+          assert "creative_offline_speech" not in main
+          assert "independently_verified_model_inference" in worker
+          print("PASS: no voice weights, hosted inference or enabled speech generation endpoint")
+          PY
