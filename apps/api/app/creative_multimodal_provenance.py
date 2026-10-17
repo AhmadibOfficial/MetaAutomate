@@ -90,6 +90,12 @@ def _verify_attestation(attestation: dict, receipt: dict, kind: str,
     for key, value in expected.items():
         if type(attestation.get(key)) is not type(value) or attestation.get(key) != value:
             raise StudioHold("Provenance binding does not match its input receipt")
+    if (receipt.get("output_sha256") != media_sha or
+        type(receipt.get("output_sha256")) is not str):
+        raise StudioHold("Source receipt output SHA differs from actual production asset")
+    if kind != "speech" and receipt.get("output_bytes") is not None:
+        if type(receipt["output_bytes"]) is not int or receipt["output_bytes"] <= 0:
+            raise StudioHold("Invalid source receipt media size")
     for key in ("source_job_sha256", "model_sha256",
                 "authorization_sha256", "observed_execution_record_sha256"):
         _sha(attestation.get(key), key)
