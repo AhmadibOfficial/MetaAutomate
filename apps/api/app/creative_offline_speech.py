@@ -93,12 +93,28 @@ def validate_materials(job: dict, *, model: Path, config: Path, model_card: Path
     elif consent is not None:
         raise SpeechHold("Unnecessary consent document supplied")
     # JSON parsing is for format validation, NOT a licence decision.
+    # Piper voice JSON normally contains finite floating-point inference
+    # defaults: the stricter signed-job JSON reader would reject those.
     try:
-        descriptor = read_json(config)
-    except Exception as exc:
+        def reject_duplicates(pairs):
+            output = {}
+            for key, value in pairs:
+                if key in output:
+                    raise SpeechHold("Duplicate Piper config key")
+                output[key] = value
+            return output
+        def reject_nonfinite(_):
+            raise SpeechHold("Non-finite Piper model config value")
+        descriptor = json.loads(
+            config.read_text(encoding="utf-8"),
+            object_pairs_hook=reject_duplicates, parse_constant=reject_nonfinite)
+    except (ValueError, UnicodeError, RecursionError) as exc:
         raise SpeechHold("Invalid ONNX voice configuration") from exc
-    if not isinstance(descriptor, dict) or "audio" not in descriptor:
-        raise SpeechHold("Missing Piper audio model descriptor")
+    if (type(descriptor) is not dict or type(descriptor.get("audio")) is not dict
+        or type(descriptor["audio"].get("sample_rate")) is not int
+        or descriptor["audio"]["sample_rate"] not in
+        (16000, 22050, 24000, 32000, 44100, 48000)):
+        raise SpeechHold("Missing supported Piper audio sample rate")
     return {
         "job_sha256": plan["job_sha256"],
         "config_sha256": sha_file(config),
