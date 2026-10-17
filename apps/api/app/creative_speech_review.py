@@ -13,7 +13,7 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, model_validator
 
-from app.creative_local_generation import _b64, _time
+from app.creative_local_generation import _b64, _time, read_json, GenerationBlocked
 from app.creative_audio_assets import canonical, private_wav, sha_file
 from app.creative_offline_speech import SpeechHold
 
@@ -93,3 +93,28 @@ def inspect_audio_review(job: dict, receipt: dict, review: SpeechReview,
         "licence_legality_verified_by_software": False,
         "distribution_authorized": False, "published": False,
     }
+
+def main(argv=None) -> int:
+    import argparse
+    import json
+    import os
+    import sys
+    parser = argparse.ArgumentParser(description="Verify independent private speech review")
+    for name in ("job", "receipt", "review", "audio"):
+        parser.add_argument("--"+name, type=Path, required=True)
+    args = parser.parse_args(argv)
+    try:
+        outcome = inspect_audio_review(
+            read_json(args.job), read_json(args.receipt),
+            SpeechReview.model_validate(read_json(args.review)),
+            args.audio,
+            os.environ.get("MAT_CREATIVE_SPEECH_FINAL_REVIEW_VERIFY_KEY", ""),
+        )
+    except (SpeechHold, GenerationBlocked, ValueError, OSError) as exc:
+        print("Signed speech review HOLD: " + str(exc), file=sys.stderr)
+        return 2
+    print(json.dumps(outcome, sort_keys=True))
+    return 0
+
+if __name__ == "__main__":
+    raise SystemExit(main())
