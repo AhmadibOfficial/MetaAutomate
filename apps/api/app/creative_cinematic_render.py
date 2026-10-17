@@ -209,7 +209,6 @@ def render(manifest: dict, asset_root: Path, quarantine_root: Path,
                 subprocess.run(command, check=True, capture_output=True, timeout=300)
             except (OSError, subprocess.SubprocessError) as exc:
                 raise CinematicHold("Bounded offline FFmpeg render failed") from exc
-            _locked_file(output, maximum=1_000_000_000) if False else None
             if output.is_symlink() or not output.is_file() or output.stat().st_size > 1_000_000_000:
                 raise CinematicHold("Renderer produced unsafe media")
             os.chmod(output, 0o600)
