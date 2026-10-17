@@ -1,0 +1,44 @@
+name: MetaAutomate P2-04u Multimodal Production Proof (source-only)
+
+on:
+  push:
+    branches:
+      - feature/p2-04u-unified-verified-media-provenance
+  pull_request:
+    branches:
+      - feature/p2-04t-unified-image-video-voice
+
+permissions:
+  contents: read
+
+jobs:
+  provenance-source-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PYTHONPATH: apps/api
+      MAT_CREATIVE_MULTIMODAL_OFFLINE_ENABLED: "0"
+      MAT_CREATIVE_NETWORK_ISOLATED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source-only test dependencies
+        run: python -m pip install 'pytest>=8,<10' 'cryptography>=43,<48' 'Pillow>=10,<13'
+      - name: Verify signed multimodal provenance and private operator gate
+        run: |
+          python -m pytest -q \
+            tests/test_p2_04u_multimodal_provenance.py \
+            tests/test_p2_04u_multimodal_operator.py \
+            tests/test_p2_04t_multimodal_router.py \
+            tests/test_p2_04t_multimodal_studio.py
+      - name: Confirm no AI output or distribution is claimed
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src=Path('apps/api/app/creative_multimodal_provenance.py').read_text()
+          assert 'inference_independently_verified_by_code": False' in src
+          assert 'publication_authorized": False' in src
+          assert 'no' not in []  # no credentials/model downloads or network in this job
+          PY
