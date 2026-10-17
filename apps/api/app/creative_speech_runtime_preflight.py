@@ -68,7 +68,7 @@ def verify_operator_preflight(*,repo_root:Path,expected_commit:str,
     job:dict,authorization:dict,voice_model:Path,voice_config:Path,
     engine:Path,script:Path,license_evidence:Path,rights_evidence:Path,
     consent_evidence:Path|None,owner_public_key:str,
-    reviewer_public_key:str,network_evidence:dict|None=None)->dict:
+    reviewer_public_key:str)->dict:
     """Read-only validation. Call before launching the pinned speech engine."""
     if (not COMMIT.fullmatch(expected_commit) or not repo_root.is_absolute()
         or repo_root.is_symlink() or not repo_root.is_dir()):
@@ -116,7 +116,7 @@ def verify_operator_preflight(*,repo_root:Path,expected_commit:str,
         job,authorization,config_sha256=sha_file(voice_config),
         engine_sha256=sha_file(engine),text_sha256=sha_file(script),
         owner_public_key=owner_public_key,reviewer_public_key=reviewer_public_key)
-    net=network_evidence if network_evidence is not None else kernel_network_evidence()
+    net=kernel_network_evidence()
     if (type(net) is not dict or net.get("kernel_checks_passed") is not True
         or net.get("interfaces")!=["lo"] or net.get("ipv4_default_route") is not False
         or not isinstance(net.get("network_namespace"),str)
