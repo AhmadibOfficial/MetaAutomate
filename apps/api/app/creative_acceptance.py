@@ -70,6 +70,8 @@ def verify(folder: Path, expected_kind: str) -> dict:
             if not 256 <= width <= 768 or not 256 <= height <= 768:
                 raise GenerationBlocked("Image dimensions out of bounds")
             metadata = {"width": width, "height": height, "format": "PNG"}
+        except ImportError as e:
+            raise GenerationBlocked("Pillow unavailable for PNG validation") from e
         except (OSError, ValueError) as e:
             raise GenerationBlocked("Invalid PNG bitstream") from e
     else:
