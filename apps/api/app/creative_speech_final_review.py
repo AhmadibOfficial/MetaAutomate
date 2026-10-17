@@ -10,7 +10,7 @@ from pathlib import Path
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
-from app.creative_audio_assets import AudioAssetHold, canonical, sha_file, hash_valid, private_wav
+from app.creative_audio_assets import AudioAssetHold, canonical, sha_file, hash_valid, private_wav, validate_job
 from app.creative_speech_authorization import _b64, _utc
 
 FIELDS={
@@ -31,6 +31,9 @@ def verify_speech_review(job:dict,receipt:dict,review:dict,output:Path,*,
         or receipt.get("state")!="QUARANTINED_PENDING_INDEPENDENT_REVIEW"
         or receipt.get("published") is not False or receipt.get("distribution_authorized") is not False):
         raise AudioAssetHold("Only quarantined operator-attested model output can be reviewed")
+    plan=validate_job(job)
+    if receipt.get("job_sha256") != plan["job_sha256"]:
+        raise AudioAssetHold("Receipt is not bound to exact speech job")
     expected={
         "asset_id":job.get("asset_id"),
         "job_sha256":receipt.get("job_sha256"),
