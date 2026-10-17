@@ -73,3 +73,14 @@ A passing preflight returns only \`RUNTIME_PREFLIGHT_CLAIMS_VERIFIED_NO_INFERENC
 MetaAutomate GitHub Actions have repeatedly failed prior to job steps, including a one-command diagnostic (issue #100). Targeted source tests for this change are added to \`.github/workflows/p2-04q-offline-speech-source.yml\` and to \`scripts/verify_p2_04q_local_gate.py\`. They must run on an **actual** pinned private checkout and may provide source-test evidence, but they do not satisfy GitHub required checks or prove a real licensed neural recording.
 
 No new subscriptions, paid cloud instance, credential provisioning, public API, customer data, deployment or publishing is authorized.
+
+
+## Producing the three independent signed records
+
+The helper \`app.creative_speech_approval_signing.sign_next(packet, role=..., key_path=..., trusted_public_keys=...)\` signs **one** approval packet in three separate, ordered human interactions. It accepts only three independently enrolled distinct public keys and enforces the precise sequence \`OWNER\` → \`REVIEWER_1\` → \`REVIEWER_2\`. Each person signs the *same* canonical payload, and any modification after the first signature invalidates subsequent verification.
+
+A packet is prepared by an authorized operator only **after actual licence, voice/consent, script and model/engine inspection**, with exact \`job_sha256\`, \`model_checkpoint_sha256\`, \`model_config_sha256\`, \`engine_sha256\`, \`text_sha256\`, and actual SHA-256 digests of licence/rights/consent records. The approved 30-minute time window and the four human-review assertions must be entered deliberately by the human operators, not autocompleted. Production ignores unsigned or incompletely signed packets.
+
+Each signer keeps their Ed25519 private key in their own **0600 offline PEM file**. Keys must not be committed to GitHub, shared in chat, embedded in content prompts, copied to marketing tooling, or issued automatically. A different private key is required for each reviewer, and the matching independently registered public keys must be supplied to the operator CLI. In source-only tests, synthetic keys and flags are *never* evidence that real individuals reviewed anything.
+
+Even after three signatures, the final WAV has its own separately signed post-output listening and rights review, and **both gates remain required**. The software cannot independently verify the reviewers' real-world identity, licence validity, native speech quality, or future publication permission.
