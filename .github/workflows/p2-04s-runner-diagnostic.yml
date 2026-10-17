@@ -1,0 +1,37 @@
+name: MetaAutomate P2-04s Runner Diagnostic and Source Gate
+
+on:
+  push:
+    branches:
+      - feature/p2-04s-marketing-creative-studio-handoff
+
+  pull_request:
+    branches:
+      - feature/p2-04r-ai-marketing-content-workflows
+
+permissions:
+  contents: read
+
+jobs:
+  runner-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Prove a GitHub-hosted runner actually executed a step
+        run: echo "RUNNER_STEP_EXECUTED"
+
+  marketing-handoff-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install standalone source-test runner
+        run: python -m pip install 'pytest>=8,<10'
+      - name: Run marketing and narration integration tests
+        run: |
+          python -m pytest -q             tests/test_p2_04r_marketing_content_workbench.py             tests/test_p2_04s_marketing_creative_handoff.py
