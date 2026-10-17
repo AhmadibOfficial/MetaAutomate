@@ -1,6 +1,7 @@
 /* P2-04w — Guided project intake, not a live language model.
  * Browser memory only. No fetch, WebSocket, remote generation, auto-send,
- * localStorage/sessionStorage, HTML injection or retained conversation.
+ * localStorage, hidden storage, HTML injection or retained conversation.
+ * One-time same-tab handoff is allowed ONLY by explicit user action.
  */
 (() => {
   "use strict";
@@ -273,6 +274,21 @@
     });
   });
 
+  document.getElementById("project-chat-creative")?.addEventListener("click", () => {
+    if (!currentBrief || answerIndex !== QUESTIONS.length) return;
+    const adapter = window.MetaAutomateCreativeHandoff;
+    const format = document.getElementById("project-chat-creative-format")?.value;
+    const combined = sanitizeText((answers.idea || "") +
+      "\nDesired outcome: " + (answers.outcome || "")).slice(0,700);
+    if (!adapter?.save?.({
+      kind:format, source:"guided", goal:combined,
+      audience:sanitizeText(answers.audience || "").slice(0,100)
+    })) {
+      copied.textContent = "Unable to transfer in this browser tab. Please copy the brief and open Creative Workbench manually.";
+      return;
+    }
+    window.location.assign("/creative/#creative-form");
+  });
   document.getElementById("project-chat-copy")?.addEventListener("click", async () => {
     if (!currentBrief) return;
     try {
