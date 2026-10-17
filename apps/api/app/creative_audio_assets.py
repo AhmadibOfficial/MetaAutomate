@@ -118,17 +118,20 @@ def private_wav(path: Path) -> None:
     if directory.is_symlink() or stat.S_IMODE(directory.stat().st_mode) & 0o077:
         raise AudioAssetHold("Private quarantine directory required")
 
-def pcm_metrics(path: Path, expected_seconds: int) -> dict:
+def pcm_metrics(path: Path, expected_seconds: int, *, speech: bool = False) -> dict:
     """Inspect actual 16-bit PCM samples, including unexpectedly silent output."""
     private_wav(path)
     try:
         with wave.open(str(path), "rb") as wav:
             channels, width, sample_rate, frame_count, coding, _ = wav.getparams()
             if (coding != "NONE" or channels not in (1, 2) or width != 2
-                or sample_rate not in (44100, 48000)):
+                or sample_rate not in ((22050, 44100, 48000) if speech else (44100, 48000))):
                 raise AudioAssetHold("Only 16-bit 44.1/48k mono/stereo PCM is supported")
             seconds = frame_count / sample_rate
-            if not math.isfinite(seconds) or abs(seconds - expected_seconds) > 0.25:
+            if not math.isfinite(seconds) or (
+                not (0.2 <= seconds <= min(600, max(6, expected_seconds * 2.5)))
+                if speech else abs(seconds - expected_seconds) > 0.25
+            ):
                 raise AudioAssetHold("Actual audio duration differs from job")
             energy, peak, samples, clipping = 0, 0, 0, 0
             while True:
@@ -181,7 +184,7 @@ def verify_asset(job: dict, receipt: dict, output: Path) -> dict:
         receipt["output_bytes"] != output.stat().st_size or
         sha_file(output) != receipt["output_sha256"]):
         raise AudioAssetHold("Output file integrity mismatch")
-    metrics = pcm_metrics(output, job["target_seconds"])
+    metrics = pcm_metrics(output, job["target_seconds"], speech=job["kind"] == "speech")
     return {
         "schema_version": 1, "asset_id": job["asset_id"], "kind": job["kind"],
         "output_sha256": receipt["output_sha256"],
