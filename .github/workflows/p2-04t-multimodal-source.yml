@@ -1,0 +1,43 @@
+name: MetaAutomate P2-04t Unified Multimodal Studio (offline source)
+
+on:
+  push:
+    branches:
+      - feature/p2-04t-unified-image-video-voice
+  pull_request:
+    branches:
+      - feature/p2-04d-verified-media-acceptance
+
+permissions:
+  contents: read
+
+jobs:
+  creative-multimodal-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install standalone source-test dependencies
+        run: python -m pip install "pytest>=8,<10" "Pillow>=10,<13"
+      - name: Run image, narrated video, provenance and safety contract tests
+        run: |
+          python -m pytest -q \
+            tests/test_p2_04t_multimodal_router.py \
+            tests/test_p2_04t_multimodal_studio.py
+      - name: Verify publication and real inference remain blocked
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          source = Path("apps/api/app/creative_multimodal_studio.py").read_text()
+          planner = Path("apps/api/app/creative_multimodal_project_router.py").read_text()
+          assert 'QUARANTINED_PENDING_INDEPENDENT_FINAL_REVIEW' in source
+          assert '"published":False' in source
+          assert 'PLAN_ONLY_NOT_GENERATED' in planner
+          assert 'source_model_inference_proven":False' in planner
+          print("PASS: source planner and rendering are not published AI inference")
+          PY
