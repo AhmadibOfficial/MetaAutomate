@@ -19,10 +19,11 @@ import re
 import shutil
 import stat
 import subprocess
+import wave
 from tempfile import TemporaryDirectory
 from uuid import uuid4
 
-from app.creative_cinematic_render import validate_srt, validate_wav, _probe, _streams, _duration
+from app.creative_cinematic_render import validate_srt, _probe, _streams, _duration
 
 SHA = re.compile(r"^[a-f0-9]{64}$")
 ID = re.compile(r"^[a-z][a-z0-9_-]{7,63}$")
@@ -86,6 +87,22 @@ def _run(argv:list[str],*,timeout:int=240,cwd:Path|None=None)->None:
         subprocess.run(argv,cwd=cwd,check=True,capture_output=True,timeout=timeout)
     except (OSError,subprocess.SubprocessError) as exc:
         raise StudioHold("Local FFmpeg composition failed") from exc
+
+def _validate_speech_pcm(path:Path, declared_seconds:float)->dict:
+    """Accept native 22.05kHz Piper WAV or 44.1/48kHz PCM16 voice."""
+    try:
+        with wave.open(str(path),"rb") as wav:
+            channels,width,rate,frames,compression,_=wav.getparams()
+            if (compression!="NONE" or channels not in (1,2) or width!=2
+                or rate not in (22050,44100,48000) or frames<1):
+                raise StudioHold("Unsupported PCM16 narration format")
+            seconds=frames/rate
+            if abs(seconds-declared_seconds)>0.2:
+                raise StudioHold("Speech WAV duration differs from manifest")
+            return {"channels":channels,"sample_rate":rate,
+                    "duration_seconds":seconds}
+    except (OSError,wave.Error,EOFError) as exc:
+        raise StudioHold("Invalid narration WAV bitstream") from exc
 
 def _visual_probe(path:Path,kind:str,seconds:float)->dict:
     if kind=="image":
@@ -172,7 +189,7 @@ def validate_manifest(manifest:dict,asset_root:Path)->dict:
         raise StudioHold("Narration timing is outside the film")
     voice_path=_asset(asset_root,voice["file"],voice["sha256"],".wav",130_000_000)
     try:
-        voice_meta=validate_wav(voice_path,float(length))
+        voice_meta=_validate_speech_pcm(voice_path,float(length))
     except (ValueError,OSError) as exc:
         raise StudioHold("Speech WAV does not match declared PCM/timing") from exc
     captions=manifest["captions"]
