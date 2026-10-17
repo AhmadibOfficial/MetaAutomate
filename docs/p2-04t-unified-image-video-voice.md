@@ -70,3 +70,7 @@ No user media or external subscriptions were activated. PR #94 and PR #97 remain
 ## Verification note
 
 The actual FFmpeg command pattern (not the full MetaAutomate repository module) was exercised on a separate local synthetic 1-second image/WAV/SRT sample. FFprobe showed one 1920×1080@30fps H.264 stream, one AAC audio stream and one `mov_text` subtitle stream. This verifies technical feasibility of FFmpeg muxing, **not** the full 30–120-second project test and **not** neural image/video/voice generation. The latest targeted PR CI failed, consistent with the unresolved zero-step GitHub Actions runner infrastructure incident #100. No passing exact-commit repository tests can be claimed.
+
+## Current generation-worker compatibility
+
+The project router enforces <=450 characters for an idea and <=120 for the visual-style direction so composed generation prompts fit the currently allowlisted worker's 700-character prompt field. Requested native AI clip jobs are limited to **2–8 integer seconds** (16–64 frames at 8 fps). The video editor can *hold* an already-licensed still or clip in a 2–15-second scene, but that edit is not proof of native 15-second neural video generation. There is no existing universal model registry, so requests for styles, resolutions or modalities unsupported by reviewed local models must remain in a capability/pending state, not be fabricated as generated outputs.
