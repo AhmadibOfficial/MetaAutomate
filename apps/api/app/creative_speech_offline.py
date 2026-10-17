@@ -41,7 +41,8 @@ def render_speech(job: dict, *, text_path: Path, model_path: Path,
                   model_config: Path, engine_path: Path,
                   quarantine_root: Path, runner=None,
                   authorization: dict | None = None,
-                  owner_public_key: str = "", reviewer_public_key: str = "") -> dict:
+                  owner_public_key: str = "", reviewer_public_key: str = "",
+                  second_reviewer_public_key: str | None = None) -> dict:
     """Local input/weights only. Test injection cannot claim model inference."""
     if (os.environ.get("MAT_SPEECH_OFFLINE_EXECUTION_ENABLED") != "1"
         or os.environ.get("MAT_SPEECH_NETWORK_ISOLATED") != "1"
@@ -76,7 +77,8 @@ def render_speech(job: dict, *, text_path: Path, model_path: Path,
             job, authorization, config_sha256=sha_file(model_config),
             engine_sha256=sha_file(engine_path), text_sha256=sha_file(text_path),
             owner_public_key=owner_public_key,
-            reviewer_public_key=reviewer_public_key)
+            reviewer_public_key=reviewer_public_key,
+            second_reviewer_public_key=second_reviewer_public_key)
     output_dir=quarantine_root/uuid4().hex
     output_dir.mkdir(mode=0o700)
     try:
