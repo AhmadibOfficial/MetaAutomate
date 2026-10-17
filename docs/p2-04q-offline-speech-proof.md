@@ -63,3 +63,66 @@ The Piper `en_US-libritts-high` model card documents **CC BY 4.0 training data**
 The maintained `OHF-Voice/piper1-gpl` v1.3.0 changed the Python synthesis API and command-line interface. The P2-04q adapter currently assumes an older executable calling convention (`--model`, `--config`, `--output_file` plus stdin). It must NOT be pointed at an arbitrary current Piper binary or deployed based on the `piper` filename alone. An approved, exact version/binary SHA and offline CLI smoke test are prerequisites. A future implementation should select a versioned adapter, verify a CLI invocation under actual pinned runtime and record GPL compliance plus model/voice-specific permission before any genuine voice proof is marked accepted.
 
 Official engine release notes: https://github.com/OHF-Voice/piper1-gpl/releases
+
+
+## Reproducible local source-test evidence (GitHub Actions blocked)
+
+A new **source-only** executable recipe is included at
+\`scripts/verify_p2_04q_local_gate.py\`. It is appropriate for an authorized
+developer checkout (such as the Kali workstation), and does **not** run Piper,
+download any model, sign a review, override release requirements or replace
+GitHub's required branch-protection checks.
+
+Example (replace the expected SHA with the precise reviewed GitHub PR #97 head,
+not an arbitrary local HEAD):
+
+\`\`\`bash
+cd ~/MetaAutomate
+git fetch origin feature/p2-04q-offline-speech-worker
+git checkout feature/p2-04q-offline-speech-worker
+mkdir -m 700 -p "$HOME/.local/share/metaautomate/speech-evidence"
+PYTHONPATH=apps/api python scripts/verify_p2_04q_local_gate.py \
+  --repo-root "$PWD" \
+  --expected-sha "<EXACT_REVIEWED_40_CHARACTER_COMMIT_SHA>" \
+  --evidence-dir "$HOME/.local/share/metaautomate/speech-evidence"
+\`\`\`
+
+Prerequisites: locally installed pytest, cryptography and standard Python.
+The gate enforces a matching exact clean Git checkout; invokes only the seven
+source-test files with speech-gate activation environment variables stripped;
+stores 0600 log/JSON evidence in a 0700 directory; captures test-file hashes,
+Python version and platform; and always reports
+\`real_piper_inference_verified: false\`,
+\`signed_human_review_observed: false\`, and
+\`github_required_checks_satisfied: false\`.
+Any missing test or failed assertion returns exit code 2. The runner harness
+was separately exercised on a disposable test-fixture Git repository; this
+does **not** mean the real private MetaAutomate source suite has passed.
+
+A separate local eSpeak smoke WAV may confirm 22.05kHz/PCM writing without
+demonstrating neural inference. Do not call an eSpeak sample Piper evidence or
+use it to clear a voice model's separate licensing gate.
+
+### GitHub Actions incident record
+
+Repository issue #100 contains direct evidence: even the dedicated one-line
+\`echo RUNNER_STEP_EXECUTED\` Actions job failed with no steps on two attempts.
+Recent P2-04q runs likewise failed with no steps and unavailable log blobs.
+Root cause remains unknown; private-repo Actions quota, account trust controls,
+runner provisioning and GitHub incident status require owner-side
+verification. Do not add payment information or override branch protection
+automatically.
+
+### Neural voice model stage — still pending
+
+The specific \`en_US-libritts-high\` candidate is a ~137MB ONNX model hosted
+under the rhasspy/piper-voices catalogue; download only when its speaker and
+dataset rights, model card, required attribution, engine license and execution
+environment have been independently reviewed. Stage the model in a private
+offline host, pin exact version/SHA and run one short original narration.
+Ensure the reviewed Piper CLI version matches the adapter's
+\`--model/--config/--output_file\` invocation. A model directory listing or
+software license does not alone certify voice identity or commercial usage.
+
+**Acceptance remains HOLD** until the real neural WAV, observed process,
+independent signature, waveform and listener-quality review all exist.
