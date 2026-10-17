@@ -8,7 +8,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 import pytest
 
-from app.creative_audio_assets import AudioAssetHold, canonical, sha_file
+from app.creative_audio_assets import AudioAssetHold, canonical, sha_file, validate_job
 from app.creative_speech_final_review import verify_speech_review
 
 def b64(data):
@@ -23,16 +23,26 @@ def sample(tmp_path):
         f.writeframes(b"\x01\x00"*22050)
     wav.chmod(0o600)
     digest=sha_file(wav)
-    job={"asset_id":"voice_sample","model_license_evidence_sha256":"a"*64,
-         "voice_consent_evidence_sha256":None}
+    job={
+        "schema_version":1,"project_id":"voice_project","asset_id":"voice_sample",
+        "kind":"speech","use_case":"film",
+        "prompt":"An original educational documentary narration.",
+        "style_direction":"Warm clear English narrator","target_seconds":1,
+        "language":"en","model_checkpoint_sha256":"e"*64,
+        "model_license_evidence_sha256":"a"*64,
+        "content_rights_evidence_sha256":"f"*64,
+        "authorization_sha256":"1"*64,"voice_likeness":"none",
+        "voice_consent_evidence_sha256":None,"artist_reference":"none",
+        "artist_rights_evidence_sha256":None,"distribution_authorized":False}
+    job_hash=validate_job(job)["job_sha256"]
     receipt={
-        "job_sha256":"b"*64,"output_sha256":digest,
+        "job_sha256":job_hash,"output_sha256":digest,
         "generation_mode":"OPERATOR_ATTESTED_LOCAL_MODEL",
         "state":"QUARANTINED_PENDING_INDEPENDENT_REVIEW",
         "published":False,"distribution_authorized":False}
     now=datetime.now(timezone.utc).replace(microsecond=0)
     review={
-        "schema_version":1,"asset_id":"voice_sample","job_sha256":"b"*64,
+        "schema_version":1,"asset_id":"voice_sample","job_sha256":job_hash,
         "output_sha256":digest,"producer_id":"producer_1",
         "reviewer_id":"reviewer_2","licence_evidence_sha256":"a"*64,
         "consent_evidence_sha256":None,"safety_report_sha256":"c"*64,
