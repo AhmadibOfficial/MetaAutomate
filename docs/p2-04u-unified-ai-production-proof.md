@@ -70,3 +70,32 @@ The key registry must have been maintained outside the producer's control. Evide
 This PR is stacked on **draft PR #101**, itself stacked on **draft PR #94**. Speech source dependency **draft PR #97** is stacked on **draft PR #95**, which remains separate and unmerged. This proof gate consumes the externally generated speech receipt rather than importing the unmerged speech module. Do not merge only this stacked integration to main while its prerequisites are unverified.
 
 No DigitalOcean/Render changes, installed checkpoints, subscription payments, social publishing, network downloads, customer activation, production customer data or deployment.
+
+
+## Independent 32-second **non-neural** technical media sample — 17 Oct 2026
+
+A separate local FFmpeg + Pillow + eSpeak command-only smoke production
+created a 32.000-second MP4 from **four manually designed static image
+storyboards**, four eSpeak speech clips and four SRT cues.
+
+- Filename: \`metaautomate_32s_technical_production_demo.mp4\`
+- SHA-256: \`9d79a127e9fd30a0fe6d6682664ddcad42df46495ca967d733420823169856a0\`
+- File bytes: \`925023\`
+- Verified by local ffprobe: H.264 1920×1080 30/1 fps, AAC stereo 48 kHz,
+  and one \`mov_text\` subtitle stream.
+- The visual frames explicitly state **TECHNICAL DEMO • SYNTHETIC VISUALS •
+  ESPEAK NON-NEURAL VOICE**.
+- The rendered file and JSON technical receipt were delivered privately to
+  the requester as conversation artifacts; not committed as a public
+  portfolio/video release.
+
+**This was NOT a run of the full P2-04u repository module.** It does not
+satisfy image Diffusers checkpoint inference, short video model inference,
+Piper neural synthesis, model licensing, independent human voice listening,
+real process proof or final media signed review. It demonstrates a working
+offline multi-track video/audio/subtitle command pattern only.
+
+The P2-04u GitHub Actions source workflow run \`39005461061\` failed **with
+\`steps: null\`**, consistent with infrastructure issue #100; it did not
+establish failing Python assertions or a successful test run. All source
+milestones therefore remain review-only, not releasable.
