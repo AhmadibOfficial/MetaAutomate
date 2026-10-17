@@ -240,7 +240,11 @@ def render(manifest:dict,asset_root:Path,quarantine_root:Path)->dict:
                   "-protocol_whitelist","file","-i",str(concat),
                   "-c","copy","-y",str(silent)],cwd=tmp,timeout=240)
             voice_start=round(float(manifest["voice"]["start_seconds"])*1000)
-            mix=(f"[1:a:0]aresample=48000,"
+            # Improve spoken-audio audibility without implying speech
+            # intelligibility, naturalness or neural inference. A separate
+            # voice QA + human listening gate is mandatory at the operator.
+            mix=(f"[1:a:0]highpass=f=70,lowpass=f=8500,"
+                 "loudnorm=I=-16:TP=-1.5:LRA=9,aresample=48000,"
                  "aformat=sample_fmts=fltp:channel_layouts=stereo,"
                  f"adelay={voice_start}|{voice_start},apad,"
                  f"atrim=duration={valid['runtime']:.3f}[a]")
