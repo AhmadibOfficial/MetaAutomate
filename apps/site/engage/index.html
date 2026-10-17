@@ -3,7 +3,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#050e23">
-  <meta name="description" content="Define a technology project with MetaAutomate. Build a private, shareable brief for AI, digital product, cybersecurity, cloud, data or experience work.">
+  <meta name="description" content="Start with a conversation. Describe your project, explore its goals, and prepare a private brief for MetaAutomate without sharing information automatically.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Project Brief — MetaAutomate">
   <meta property="og:description" content="Define a technology project with MetaAutomate. Build a private, shareable brief for AI, digital product, cybersecurity, cloud, data or experience work.">
@@ -11,7 +11,9 @@
   <link rel="icon" type="image/webp" href="/assets/metaautomate-mark.webp">
   <link rel="stylesheet" href="/assets/site.css">
   <script src="/assets/site.js" defer></script>
-  <title>Project Brief — MetaAutomate</title>
+<link rel="stylesheet" href="/assets/project-chat.css">
+<script src="/assets/project-chat.js" defer></script>
+  <title>Start a Project — MetaAutomate</title>
 </head><body>
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="utility-bar"><div class="shell"><span class="utility-symbol">✦</span><span>Intelligence · Creation · Automation</span><span class="utility-aside">Global ambition. Purpose-led engineering.</span></div></div>
@@ -34,7 +36,74 @@
   </div>
 </header>
   <main id="main">
-<section class="subhero engage-hero"><div class="shell subhero-inner"><div><span class="eyebrow eyebrow-dark">METAAUTOMATE / BEGIN WITH THE PROBLEM</span><h1>Tell us your business challenge.<br><em>Explore the value together.</em></h1><p>Whether you're exploring an investment in AI, better operations or a more secure product, start with the client experience and business outcome you want to improve.</p></div><div class="brief-hero-mark" aria-hidden="true"><span>01</span><i></i><span>02</span><i></i><span>03</span></div></div></section>
+<section class="project-chat" aria-labelledby="project-chat-title">
+  <aside class="project-chat-side" aria-label="Project workspace">
+    <div class="project-chat-side-title"><span class="project-chat-star" aria-hidden="true">✳</span><span>PROJECT WORKSPACE</span></div>
+    <button class="project-chat-new" id="project-chat-new" type="button">＋ New project</button>
+    <p class="project-chat-label">EXPLORE A DIRECTION</p>
+    <div class="project-chat-templates" aria-label="Project starting points">
+      <button type="button" data-project-template="creative">Image, video and voice studio</button>
+      <button type="button" data-project-template="automation">Business workflow automation</button>
+      <button type="button" data-project-template="product">Digital product or mobile app</button>
+      <button type="button" data-project-template="experience">Product design and UX</button>
+      <button type="button" data-project-template="security">Application security</button>
+    </div>
+    <div class="project-chat-side-footer"><strong>Privacy by design</strong><p>This is a browser-only guided project intake, not a connected AI chat. No conversation is saved or transmitted by this page.</p></div>
+  </aside>
+  <div class="project-chat-main">
+    <header class="project-chat-top">
+      <div><span class="project-chat-kicker">METAAUTOMATE / START A PROJECT</span>
+        <h1 id="project-chat-title">What are you looking to create?</h1>
+        <p>Tell us the idea in your own words. We’ll help you structure a useful project brief, one question at a time.</p>
+      </div>
+      <span class="project-chat-offline">GUIDED INTAKE · NO LIVE AI</span>
+    </header>
+    <div class="project-chat-conversation" id="project-chat-messages" role="log" aria-label="Project intake conversation" aria-live="polite" aria-relevant="additions" tabindex="0">
+      <div class="project-chat-message project-chat-assistant">
+        <span class="project-chat-avatar" aria-hidden="true">✳</span>
+        <div class="project-chat-bubble"><strong>MetaAutomate Project Guide</strong>
+          <p>Welcome. I can help you organize a project idea for our team to review. What problem would you like to solve, or what would you like to build?</p>
+          <p class="project-chat-hint">This guide follows a fixed question flow. It does not generate images, execute AI models, or send enquiries.</p>
+        </div>
+      </div>
+    </div>
+    <div class="project-chat-action-area">
+      <div class="project-chat-prompt-chips" id="project-chat-suggestions" aria-label="Example project ideas">
+        <button type="button" data-project-template="creative">Create AI visuals and narrated videos</button>
+        <button type="button" data-project-template="automation">Automate repetitive business work</button>
+        <button type="button" data-project-template="experience">Improve an app's user experience</button>
+      </div>
+      <div class="project-chat-composer" aria-label="Project description composer">
+        <label class="project-chat-input-label" for="project-chat-input">Your reply</label>
+        <textarea id="project-chat-input" rows="2" maxlength="1800" placeholder="Describe your project idea..." aria-describedby="project-chat-keyboard" required></textarea>
+        <div class="project-chat-composer-actions">
+          <span id="project-chat-progress" role="status">Step 1 of 5 · Project idea</span>
+          <div class="project-chat-controls">
+            <button id="project-chat-edit" type="button" hidden>Edit previous</button>
+            <button id="project-chat-send" type="button" aria-label="Send reply to local project guide">Send ↗</button>
+          </div>
+        </div>
+      </div>
+      <p id="project-chat-keyboard" class="project-chat-footnote">Enter to continue · Shift+Enter for a new line. Please avoid passwords, payment details or confidential data.</p>
+      <p id="project-chat-notice" class="project-chat-notice" role="alert" hidden></p>
+    </div>
+    <section class="project-chat-summary" id="project-chat-summary" aria-labelledby="project-chat-summary-title" hidden>
+      <div class="project-chat-summary-header"><span>YOUR PROJECT BRIEF</span><h2 id="project-chat-summary-title" tabindex="-1">Ready to share when you decide.</h2><p>Your answers were organized locally. Review the draft first—nothing has been sent or saved to MetaAutomate.</p></div>
+      <pre id="project-chat-summary-text" tabindex="0"></pre>
+      <div class="project-chat-summary-actions">
+        <a id="project-chat-email" href="mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Project%20inquiry">Open email draft ↗</a>
+        <button id="project-chat-copy" type="button">Copy brief</button>
+        <button id="project-chat-download" type="button">Download .txt</button>
+      </div>
+      <p id="project-chat-share-note" class="project-chat-footnote">Your own email app handles sending. No message is submitted by this website.</p>
+      <p id="project-chat-copy-status" role="status" aria-live="polite"></p>
+    </section>
+  </div>
+</section>
+<details class="project-chat-alternative" id="project-chat-alternative">
+  <summary>Prefer a structured project form? Open the original enquiry form</summary>
+
+<section class="subhero engage-hero"><div class="shell subhero-inner"><div><span class="eyebrow eyebrow-dark">METAAUTOMATE / BEGIN WITH THE PROBLEM</span><h2>Tell us your business challenge.<br><em>Explore the value together.</em></h2><p>Whether you're exploring an investment in AI, better operations or a more secure product, start with the client experience and business outcome you want to improve.</p></div><div class="brief-hero-mark" aria-hidden="true"><span>01</span><i></i><span>02</span><i></i><span>03</span></div></div></section>
 <section class="section brief-section">
  <div class="shell brief-layout">
   <aside class="brief-aside"><span class="eyebrow">THE FIRST CONVERSATION</span><h2>Clarity before<br><em>complexity.</em></h2><p>A good client partnership begins with your challenge, the value at stake and what a better experience would look like.</p><div class="brief-shortcut"><p><strong>Just have a quick question?</strong> Email us directly—no form or download required. Your email app handles sending.</p><a class="action action-primary" href="mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Business%20inquiry">Email a project question <span aria-hidden="true">↗</span></a></div><div class="brief-aside-list"><div><span>01</span><strong>Describe the challenge</strong><small>What needs to change?</small></div><div><span>02</span><strong>Describe the value</strong><small>What would success look like?</small></div><div><span>03</span><strong>Set the context</strong><small>What constraints matter?</small></div></div><p class="brief-privacy"><span aria-hidden="true">◇</span> Your project brief stays in this browser unless you choose to copy, download or send it through your own email app. The website does not store or submit your details.</p>
@@ -64,6 +133,7 @@
  </div>
  <div class="shell brief-contact"><span>PLEASE NOTE</span><p>Creating a brief does not submit an inquiry or guarantee an engagement. To contact MetaAutomate, deliberately open the email draft and send it from your own email account. Do not include passwords, payment details or confidential data in initial inquiries.</p></div>
 </section>
+</details>
 </main>
   <footer class="site-footer">
   <div class="shell">
