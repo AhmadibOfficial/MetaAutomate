@@ -54,7 +54,7 @@ def validate(manifest, root):
         if type(shot)!=dict or set(shot)!={"file","sha256","rights_evidence_sha256","human_approved","duration_seconds"}:
             raise CompositionBlocked("Invalid shot schema")
         filename=shot["file"]
-        if not isinstance(filename,str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,70}\\.mp4",filename):
+        if not isinstance(filename,str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,70}\.mp4",filename):
             raise CompositionBlocked("Unsafe shot file name")
         if shot["human_approved"] is not True or not all(
             isinstance(shot[k],str) and SHA.fullmatch(shot[k])
@@ -99,7 +99,7 @@ def compose(manifest,asset_root,quarantine_root):
             subprocess.run(command,check=True,timeout=240,capture_output=True)
             segments.append(segment)
         concat=tmp/"list.txt"
-        concat.write_text("".join("file '%s'\\n"%p.name for p in segments))
+        concat.write_text("".join("file '%s'\n"%p.name for p in segments))
         output=tmp/"final.mp4"
         subprocess.run(["ffmpeg","-nostdin","-hide_banner","-loglevel","error",
             "-f","concat","-safe","1","-protocol_whitelist","file",
