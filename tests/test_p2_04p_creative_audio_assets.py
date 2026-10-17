@@ -17,7 +17,7 @@ def make_job(kind="speech"):
         "schema_version": 1, "project_id": "sample_project",
         "asset_id": "sample_asset", "kind": kind, "use_case": "film",
         "prompt": "Create an original and clearly narrated scene for a film.",
-        "target_seconds": 1, "language": "en",
+        "target_seconds": 1, "language": "en", "style_direction": "Warm cinematic voice",
         "model_checkpoint_sha256": "1"*64,
         "model_license_evidence_sha256": "2"*64,
         "content_rights_evidence_sha256": "3"*64,
@@ -108,6 +108,7 @@ def test_symlink_wav_rejected(tmp_path):
     ("model_checkpoint_sha256", "not-a-sha"),
     ("language", "../../../etc"),
     ("prompt", "hi"),
+    ("style_direction", ""),
 ])
 def test_unauthorized_or_invalid_job_rejected(field,value):
     job=make_job()
