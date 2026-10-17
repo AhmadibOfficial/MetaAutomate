@@ -85,17 +85,21 @@ def approved_local_model_config(env:dict[str,str]|None=None)->tuple[int,str,str]
         cfg.get("MAT_PRIVATE_CHAT_HUMAN_POLICY_REVIEWED")!="1"):
         raise HTTPException(503,"Authenticated private AI project chat is not enabled")
     url=cfg.get("MAT_PRIVATE_CHAT_LOCAL_ENDPOINT","")
-    parts=urlsplit(url)
+    try:
+        parts=urlsplit(url)
+        endpoint_port=parts.port
+    except ValueError:
+        raise HTTPException(503,"Invalid private model endpoint") from None
     if (parts.scheme!="http" or parts.hostname!="127.0.0.1" or
         parts.path!="/v1/chat/completions" or parts.username or parts.password
-        or parts.query or parts.fragment or not 1025<= (parts.port or 0) <=65535
-        or parts.netloc!=f"127.0.0.1:{parts.port}"):
+        or parts.query or parts.fragment or not 1025 <= (endpoint_port or 0) <= 65535
+        or parts.netloc!=f"127.0.0.1:{endpoint_port}"):
         raise HTTPException(503,"A pinned loopback-only model endpoint is required")
     model=cfg.get("MAT_PRIVATE_CHAT_APPROVED_MODEL","")
     digest=cfg.get("MAT_PRIVATE_CHAT_MODEL_SHA256","")
     if (not MODEL_RE.fullmatch(model) or not DIGEST_RE.fullmatch(digest)):
         raise HTTPException(503,"Model identity or pinned checkpoint digest missing")
-    return parts.port,model,digest
+    return endpoint_port,model,digest
 
 def local_model_reply(request:ReplyRequest, *,port:int,model:str,
                       connector=http.client.HTTPConnection)->str:
@@ -122,7 +126,7 @@ def local_model_reply(request:ReplyRequest, *,port:int,model:str,
         if len(body)>15000:
             raise HTTPException(502,"Private model response exceeded limit")
         response=json.loads(body)
-    except (OSError,TimeoutError,json.JSONDecodeError,ValueError):
+    except (OSError,TimeoutError,json.JSONDecodeError,ValueError,http.client.HTTPException):
         raise HTTPException(503,"Private model service unavailable") from None
     finally:
         connection.close()
