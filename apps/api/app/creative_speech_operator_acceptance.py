@@ -74,6 +74,7 @@ def main(argv=None)->int:
             authorization=approval,
             owner_public_key=args.owner_public_key,
             reviewer_public_key=args.reviewer_public_key,
+            second_reviewer_public_key=args.second_reviewer_public_key,
         )
     except (AudioAssetHold,OSError,ValueError,json.JSONDecodeError) as exc:
         print("SPEECH ACCEPTANCE HOLD: "+str(exc),file=sys.stderr)
