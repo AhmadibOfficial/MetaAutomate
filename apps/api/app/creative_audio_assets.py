@@ -26,7 +26,7 @@ USE_CASES = {"film", "advertisement", "campaign", "social", "audiobook", "podcas
 MAX_WAV = 130_000_000
 FIELDS = {
     "schema_version", "project_id", "asset_id", "kind", "use_case",
-    "prompt", "target_seconds", "language",
+    "prompt", "target_seconds", "language", "style_direction",
     "model_checkpoint_sha256", "model_license_evidence_sha256",
     "content_rights_evidence_sha256", "authorization_sha256",
     "voice_likeness", "voice_consent_evidence_sha256",
@@ -69,6 +69,9 @@ def validate_job(job: dict) -> dict:
     prompt = job["prompt"]
     if type(prompt) is not str or not 12 <= len(prompt.strip()) <= 800:
         raise AudioAssetHold("Prompt must be bounded and meaningful")
+    style = job["style_direction"]
+    if type(style) is not str or not 3 <= len(style.strip()) <= 200:
+        raise AudioAssetHold("Missing bounded voice, genre or sound style direction")
     duration = job["target_seconds"]
     if type(duration) is not int or not 1 <= duration <= 600:
         raise AudioAssetHold("Audio duration must be 1-600 seconds")
