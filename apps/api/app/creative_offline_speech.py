@@ -120,6 +120,7 @@ def validate_materials(job: dict, *, model: Path, config: Path, model_card: Path
         "config_sha256": sha_file(config),
         "binary_sha256": sha_file(binary),
         "model_sha256": sha_file(model),
+        "expected_sample_rate": descriptor["audio"]["sample_rate"],
     }
 
 def approve(job: dict, approval: SignedApproval, material: dict, *,
@@ -203,12 +204,24 @@ def generate(job: dict, approval: SignedApproval, *, model: Path, config: Path,
             "state": "QUARANTINED_PENDING_INDEPENDENT_REVIEW",
             "published": False, "distribution_authorized": False,
         }
+        # Verify that trusted model/binary/evidence files remained unchanged.
+        if (sha_file(model) != material["model_sha256"] or
+            sha_file(config) != material["config_sha256"] or
+            sha_file(binary) != material["binary_sha256"] or
+            sha_file(model_card) != job["model_license_evidence_sha256"] or
+            sha_file(rights) != job["content_rights_evidence_sha256"] or
+            (consent is not None and
+             sha_file(consent) != job["voice_consent_evidence_sha256"])):
+            raise SpeechHold("Signed inference inputs changed during execution")
         evidence = verify_asset(job, receipt, output)
+        if evidence["media"]["sample_rate"] != material["expected_sample_rate"]:
+            raise SpeechHold("WAV sample rate disagrees with signed model config")
         path = folder / "receipt.json"
         path.write_bytes(canonical(receipt) + b"\n")
         path.chmod(0o600)
         run = {
             "schema_version": 1, "job_sha256": material["job_sha256"],
+            "private_quarantine_receipt_id": folder.name,
             "signed_approval_payload_sha256": approval_hash,
             "model_checkpoint_sha256": material["model_sha256"],
             "model_config_sha256": material["config_sha256"],
