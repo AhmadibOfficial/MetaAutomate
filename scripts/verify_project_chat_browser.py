@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """P2-04w desktop/mobile chat project discovery, no model or network calls."""
 from pathlib import Path
+import re
 
 from playwright.sync_api import expect, sync_playwright
 
@@ -42,8 +43,8 @@ def main():
             expect(page.locator("#brief-form")).to_be_hidden()
             # User remains in control: example only fills composer, no auto submit.
             page.locator("#project-chat-suggestions [data-project-template=creative]").click()
-            expect(page.locator("#project-chat-input")).to_contain_text(
-                "original visuals and narrated video")
+            expect(page.locator("#project-chat-input")).to_have_value(
+                re.compile("original visuals and narrated video"))
             expect(page.locator("#project-chat-progress")).to_contain_text("Step 1")
             page.locator("#project-chat-send").click()
             expect(page.locator("#project-chat-progress")).to_contain_text("Step 2 of 5")
@@ -71,9 +72,9 @@ def main():
             expect(page.locator("#project-chat-summary-text")).to_contain_text(
                 "PROJECT DISCOVERY BRIEF")
             expect(page.locator("#project-chat-summary-text")).to_contain_text(
-                "No information was automatically transmitted")
+                "Nothing was automatically transmitted")
             expect(page.locator("#project-chat-email")).to_have_attribute(
-                "href",__import__("re").compile(r"^mailto:metaautomating@gmail\.com"))
+                "href",re.compile(r"^mailto:metaautomating@gmail\.com"))
             with page.expect_download() as dl:
                 page.locator("#project-chat-download").click()
             download = dl.value
