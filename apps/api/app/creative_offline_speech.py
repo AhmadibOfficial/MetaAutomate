@@ -24,7 +24,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt
 
 from app.creative_audio_assets import AudioAssetHold, canonical, sha_file, validate_job, verify_asset
-from app.creative_local_generation import _b64, _time, read_json
+from app.creative_local_generation import _b64, _time, read_json, GenerationBlocked
 
 class SpeechHold(ValueError):
     pass
@@ -271,7 +271,7 @@ def main(argv=None) -> int:
             owner_key=os.environ.get("MAT_CREATIVE_OWNER_VERIFY_KEY", ""),
             reviewer_key=os.environ.get("MAT_CREATIVE_REVIEWER_VERIFY_KEY", ""),
         )
-    except (SpeechHold, AudioAssetHold, ValueError, OSError) as exc:
+    except (SpeechHold, AudioAssetHold, GenerationBlocked, ValueError, OSError) as exc:
         print("Speech generation HOLD: " + str(exc), file=sys.stderr)
         return 2
     print(json.dumps(run, sort_keys=True))
