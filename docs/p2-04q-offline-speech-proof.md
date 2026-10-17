@@ -57,3 +57,9 @@ The Piper `en_US-libritts-high` model card documents **CC BY 4.0 training data**
 6. Independent signed output review bound to the final WAV and transcript evidence, with **NO** distribution authorization.
 
 **Acceptance decision: NOT VERIFIED** until all six records exist. No live API, customer activation, subscriptions or publication; Phase 01 remains 3/9 and Phase 02/03 remain operational NO-GO.
+
+## Engine compatibility blocker (verified from upstream release notes)
+
+The maintained `OHF-Voice/piper1-gpl` v1.3.0 changed the Python synthesis API and command-line interface. The P2-04q adapter currently assumes an older executable calling convention (`--model`, `--config`, `--output_file` plus stdin). It must NOT be pointed at an arbitrary current Piper binary or deployed based on the `piper` filename alone. An approved, exact version/binary SHA and offline CLI smoke test are prerequisites. A future implementation should select a versioned adapter, verify a CLI invocation under actual pinned runtime and record GPL compliance plus model/voice-specific permission before any genuine voice proof is marked accepted.
+
+Official engine release notes: https://github.com/OHF-Voice/piper1-gpl/releases
