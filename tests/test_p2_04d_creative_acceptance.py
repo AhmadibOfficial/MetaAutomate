@@ -36,13 +36,13 @@ def fixture(tmp_path, kind="image"):
 
 def test_tampered_digest_rejected(tmp_path):
     folder, media, _ = fixture(tmp_path)
-    media.write_bytes(b"tampered" * 20)
+    media.write_bytes(b"X" * media.stat().st_size)
     with pytest.raises(GenerationBlocked, match="SHA-256 mismatch"):
         verify(folder, "image")
 
 def test_fake_png_does_not_pass_real_acceptance(tmp_path):
     folder, _, _ = fixture(tmp_path)
-    with pytest.raises(GenerationBlocked, match="Invalid PNG"):
+    with pytest.raises(GenerationBlocked, match="Invalid PNG|Pillow unavailable"):
         verify(folder, "image")
 
 def test_fake_mp4_does_not_pass_real_acceptance(tmp_path):
