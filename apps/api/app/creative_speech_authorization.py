@@ -69,7 +69,7 @@ def verify_speech_approval(job:dict, approval:dict, *, config_sha256:str,
     if any(type(approval.get(k)) is not type(v) or approval.get(k)!=v
            for k,v in expected.items()):
         raise AudioAssetHold("Approval does not match job, model, text or evidence")
-    if len(approval["signatures"])!=2:
+    if type(approval["signatures"]) is not list or len(approval["signatures"])!=2:
         raise AudioAssetHold("Owner and independent reviewer signatures required")
     signatures=approval["signatures"]
     if [entry.get("role") for entry in signatures if type(entry) is dict]!=["OWNER","REVIEWER"]:
