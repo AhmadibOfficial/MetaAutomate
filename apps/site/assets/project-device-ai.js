@@ -20,6 +20,8 @@
   const guided = ["project-chat-messages","project-chat-suggestions",
                   "project-chat-summary"].map(byId);
   const actionArea = document.querySelector(".project-chat-action-area");
+  const legacyStatus = document.querySelector(".project-chat-offline");
+  let guidedSummaryVisible = false;
   const modelId = "Qwen2.5-0.5B-Instruct-q4f32_1-MLC";
   // Pin the library version; WebLLM's prebuilt config resolves the matching
   // model library and weights. This is still third-party, unaudited client code.
@@ -61,15 +63,17 @@
     feed.scrollTop = feed.scrollHeight;
   }
   function switchMode(show) {
+    if (show) guidedSummaryVisible = Boolean(guided[2] && !guided[2].hidden);
     panel.hidden = !show;
     open.setAttribute("aria-expanded",String(show));
     open.textContent = show ? "AI on this device · Experiment" : "Try AI on this device ✳";
-    for(const el of guided) if(el) {
-      if(el.id==="project-chat-summary" && el.hidden && !show) continue;
-      // Do not unhide an unfinished summary while returning to guided intake.
-      if(el.id!=="project-chat-summary") el.hidden=show;
-    }
-    if(actionArea) actionArea.hidden=show;
+    if(guided[0]) guided[0].hidden = show;
+    if(guided[1]) guided[1].hidden = show;
+    if(guided[2]) guided[2].hidden = show || !guidedSummaryVisible;
+    if(actionArea) actionArea.hidden = show;
+    if(legacyStatus) legacyStatus.textContent = show
+      ? "OPTIONAL ON-DEVICE AI · EXPERIMENTAL"
+      : "GUIDED INTAKE · NO LIVE AI";
     if(show) {
       if(engine) input.focus();
       else load.focus();
