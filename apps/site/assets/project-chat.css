@@ -64,3 +64,5 @@
 @media(prefers-reduced-motion:reduce){.project-chat *{scroll-behavior:auto!important;transition:none!important}}
 
 .project-chat-alternative .subhero h2{font-size:clamp(36px,5.4vw,72px);line-height:1.12;margin:0 0 25px;color:#fff}
+
+.project-action-shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px}.project-action-shortcuts a{display:block;border:1px solid #b5c9df;border-radius:11px;padding:12px 9px;background:#fff;color:#174c84;font-size:.8rem;font-weight:800;text-align:center;text-decoration:none;line-height:1.35}.project-action-shortcuts a:hover{background:#e9f2fc}.project-action-shortcuts a:focus-visible{outline:3px solid #1c69c4;outline-offset:2px}@media(max-width:900px){.project-action-shortcuts{grid-column:1/-1;grid-row:2}}@media(max-width:620px){.project-action-shortcuts a{padding:10px 6px;font-size:.74rem}}
