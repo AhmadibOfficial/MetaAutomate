@@ -32,6 +32,7 @@ jobs:
           node --check apps/site/assets/project-device-ai.js
           node --check apps/site/assets/creative.js
           node --check apps/site/assets/creative-maker.js
+          node --check apps/site/assets/creative-video.js
       - name: Validate HTML markup with standard parser
         run: |
           python - <<'PY'
