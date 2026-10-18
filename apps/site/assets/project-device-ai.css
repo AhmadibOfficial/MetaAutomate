@@ -33,7 +33,3 @@
 .project-ai-mode-button:focus-visible,.project-ai-experience button:focus-visible,.project-ai-experience a:focus-visible{outline:3px solid #2973c0;outline-offset:2px}
 @media(max-width:620px){.project-ai-mode-switch{gap:7px}.project-ai-header{flex-direction:column;gap:10px}.project-ai-consent{padding:13px}.project-ai-messages{min-height:120px}.project-ai-experience{min-height:380px}}
 @media(prefers-reduced-motion:reduce){.project-ai-experience *{scroll-behavior:auto!important;transition:none!important}}
-
-.project-ai-actions{flex-wrap:wrap;align-items:center}
-.project-ai-actions select{border:1px solid #cbdbea;border-radius:9px;padding:9px 10px;font:inherit;font-size:.78rem;color:#254b77;background:#fff}
-.project-ai-actions select:focus-visible{outline:3px solid #2973c0;outline-offset:2px}
