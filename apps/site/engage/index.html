@@ -78,12 +78,20 @@
         <button id="project-ai-load" type="button">Download model and start local AI</button>
       </div>
       <p id="project-ai-status" class="project-ai-status" role="status" aria-live="polite">AI is not running. Start it explicitly above.</p>
+      <div class="project-ai-quick-tasks" aria-label="Useful AI writing tasks">
+        <button type="button" data-ai-task="product">Product description</button>
+        <button type="button" data-ai-task="marketing">Marketing message</button>
+        <button type="button" data-ai-task="workflow">Business workflow</button>
+        <button type="button" data-ai-task="video">Video script</button>
+      </div>
       <div id="project-ai-messages" class="project-ai-messages" role="log" aria-label="On-device AI conversation" aria-live="polite" aria-relevant="additions"></div>
       <div class="project-ai-composer">
         <label for="project-ai-input">Ask the local AI</label>
         <textarea id="project-ai-input" rows="3" maxlength="1000" placeholder="Describe the project or ask a follow-up question..." disabled></textarea>
         <div class="project-ai-actions">
           <button id="project-ai-reset" type="button">Clear current conversation</button>
+          <button id="project-ai-copy" type="button" disabled>Copy latest answer</button>
+          <a class="project-ai-create-link" href="/creative/#instant-design">Create a graphic ↗</a>
           <button id="project-ai-send" type="button" disabled>Ask AI ↗</button>
         </div>
       </div>
@@ -95,7 +103,7 @@
         <span class="project-chat-avatar" aria-hidden="true">✳</span>
         <div class="project-chat-bubble"><strong>MetaAutomate Project Guide</strong>
           <p>Welcome. I can help you organize a project idea for our team to review. What problem would you like to solve, or what would you like to build?</p>
-          <p class="project-chat-hint">This guide follows a fixed question flow. It does not generate images, execute AI models, or send enquiries.</p>
+          <p class="project-chat-hint">This guided form asks set questions. For on-device AI text responses, choose the AI option above.</p>
         </div>
       </div>
     </div>
