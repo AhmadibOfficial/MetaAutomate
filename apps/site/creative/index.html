@@ -76,7 +76,7 @@
            <button type="button" id="maker-download" disabled>Download PNG ↗</button>
          </div>
          <p id="maker-status" role="status" aria-live="polite">Preview your original graphic below.</p>
-         <p class="maker-fineprint">Original typography and geometric artwork only. No stock images, generative model, uploads or automatic publishing.</p>
+         <p class="maker-fineprint">Original typography and geometric artwork. No uploads or automatic publishing; AI-generated imagery requires a separate model.</p>
        </form>
        <div class="maker-preview"><div class="maker-frame"><canvas id="maker-canvas" width="1080" height="1080" aria-label="Generated graphic preview" role="img"></canvas></div><p id="maker-meta">Square social image · 1080 × 1080 PNG</p></div>
      </div>
@@ -89,6 +89,7 @@
       <div class="video-maker-input">
         <label for="video-maker-audio">Your recorded narration (MP3 or WAV, 30–120 seconds)</label>
         <input id="video-maker-audio" type="file" accept="audio/wav,audio/x-wav,audio/mpeg,.wav,.mp3" required>
+        <audio id="video-maker-audio-preview" controls preload="metadata" hidden aria-label="Listen to your chosen narration before export"></audio>
         <p>Choose a recording with permission to use every included voice. The recording stays in your browser.</p>
       </div>
       <div class="video-maker-input">
