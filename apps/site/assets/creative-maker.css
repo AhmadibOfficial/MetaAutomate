@@ -20,3 +20,23 @@
 #maker-meta{font-size:.79rem;color:#5d718a;font-weight:650;margin:16px 0 0}
 @media(max-width:860px){.maker-layout{grid-template-columns:1fr}.maker-preview{order:-1}.maker-frame{max-height:460px}#maker-canvas{max-height:440px}}
 @media(max-width:620px){.creative-maker{padding:38px 0 48px}.maker-controls{padding:19px;border-radius:14px}.maker-preview{padding:15px;border-radius:14px}.maker-frame{min-height:220px;max-height:370px}#maker-canvas{max-height:360px}}
+
+/* Voice-backed narrated WebM creator — genuine browser task execution. */
+.creative-video-maker{padding:58px 0 66px;background:#fff;color:#17314a}
+.video-maker-controls{display:flex;flex-wrap:wrap;gap:20px;align-items:end;padding:23px 27px;border:1px solid #d9e6f3;border-radius:18px;background:#f7faff}
+.video-maker-input{display:flex;flex:1 1 280px;flex-direction:column;gap:9px}
+.video-maker-input label{font-weight:760;color:#274e72;font-size:.87rem}
+.video-maker-input input,.video-maker-input select{width:100%;font:inherit;color:#173a5e;padding:11px 12px;border:1px solid #c2d2e3;background:#fff;border-radius:10px}
+.video-maker-input p{font-size:.76rem;line-height:1.55;color:#5a718a;margin:0}
+.video-maker-rights{display:flex;flex:1 1 100%;gap:10px;align-items:flex-start;font-weight:600;color:#3d5874;font-size:.84rem;line-height:1.55}
+.video-maker-rights input{width:18px;height:18px;flex:none;margin-top:3px}
+.video-maker-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.video-maker-actions button,.video-maker-download{font:inherit;font-size:.86rem;cursor:pointer;font-weight:760;color:#fff;background:#165697;border:1px solid #165697;border-radius:10px;padding:13px 16px;text-decoration:none}
+.video-maker-actions a{font-size:.82rem;color:#245a92;text-decoration:underline}
+.video-maker-actions button:disabled{opacity:.55;cursor:not-allowed}
+#video-maker-status{flex:1 1 100%;font-size:.79rem;color:#3b698c;line-height:1.6;margin:0}
+#video-maker-preview{max-width:min(100%,900px);width:100%;margin:25px auto 16px;display:block;border-radius:12px;background:#071627}
+#video-maker-preview[hidden],.video-maker-download[hidden]{display:none!important}
+.video-maker-download{display:inline-flex;margin:3px 0}
+.video-maker-controls :focus-visible{outline:3px solid #2973c0;outline-offset:2px}
+@media(max-width:620px){.creative-video-maker{padding:38px 0 50px}.video-maker-controls{padding:16px;border-radius:13px;gap:15px}}
