@@ -15,6 +15,7 @@
 <script src="/assets/creative.js" defer></script>
 <link rel="stylesheet" href="/assets/creative-maker.css">
 <script src="/assets/creative-maker.js" defer></script>
+<script src="/assets/creative-video.js" defer></script>
 <title>Creative Workbench — MetaAutomate</title>
 </head><body>
 <a class="skip-link" href="#main">Skip to content</a>  <div class="utility-bar"><div class="shell"><span class="utility-symbol">✦</span><span>Intelligence · Creation · Automation</span><span class="utility-aside">Global ambition. Purpose-led engineering.</span></div></div>
@@ -80,6 +81,30 @@
        <div class="maker-preview"><div class="maker-frame"><canvas id="maker-canvas" width="1080" height="1080" aria-label="Generated graphic preview" role="img"></canvas></div><p id="maker-meta">Square social image · 1080 × 1080 PNG</p></div>
      </div>
    </div>
+ </section>
+ <section class="creative-video-maker" id="instant-video" aria-labelledby="video-maker-title">
+  <div class="shell">
+    <div class="maker-heading"><span class="eyebrow">CREATE / NARRATED VIDEO</span><h2 id="video-maker-title">Turn your graphic into a narrated video.</h2><p>Use your own clear voice recording with a moving version of the graphic above. Export a video you can play and share.</p></div>
+    <form id="video-maker-form" class="video-maker-controls">
+      <div class="video-maker-input">
+        <label for="video-maker-audio">Your recorded narration (MP3 or WAV, 30–120 seconds)</label>
+        <input id="video-maker-audio" type="file" accept="audio/wav,audio/x-wav,audio/mpeg,.wav,.mp3" required>
+        <p>Choose a recording with permission to use every included voice. The recording stays in your browser.</p>
+      </div>
+      <div class="video-maker-input">
+        <label for="video-maker-format">Video format</label>
+        <select id="video-maker-format"><option value="wide">Widescreen · 1280 × 720</option><option value="story">Vertical · 720 × 1280</option></select>
+      </div>
+      <label class="video-maker-rights" for="video-maker-rights"><input id="video-maker-rights" type="checkbox" required> I own this recording or have permission to use every voice in it.</label>
+      <div class="video-maker-actions">
+        <button type="submit" id="video-maker-run">Make narrated WebM video ↗</button>
+        <a href="#instant-design">Edit graphic first ↑</a>
+      </div>
+      <p id="video-maker-status" role="status" aria-live="polite">Choose narration audio, then create the video. Chrome or another WebM-compatible browser is recommended.</p>
+    </form>
+    <video id="video-maker-preview" controls preload="none" playsinline hidden aria-label="Generated narrated video preview"></video>
+    <a id="video-maker-download" class="video-maker-download" hidden download="metaautomate-narrated-video.webm">Download narrated video ↓</a>
+  </div>
  </section>
  <section class="creative-section" id="creative-form" aria-labelledby="creative-form-title">
   <div class="shell creative-grid">
