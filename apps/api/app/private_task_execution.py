@@ -20,6 +20,7 @@ from uuid import UUID
 from xml.sax.saxutils import escape as xml_escape
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Response
+from psycopg.types.json import Jsonb
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
 
 from app.authn import TenantSession, get_tenant_session, require_role
@@ -267,7 +268,7 @@ def create_task(
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'COMPLETED',now()+interval '7 days') "
             "RETURNING *",
             (org,actor,key,payload.task_type,fingerprint,output_digest,mime,
-             filename,len(artifact),artifact,json.dumps(metadata)),
+             filename,len(artifact),artifact,Jsonb(metadata)),
         )
         return _public_record(cur.fetchone())
 
