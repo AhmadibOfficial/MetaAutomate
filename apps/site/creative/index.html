@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#050e23">
-<meta name="description" content="MetaAutomate Creative Workbench: plan rights-aware image concepts and short videos with human review in a private browser-only prototype.">
+<meta name="description" content="Create and download original branded image designs immediately, and scope larger video projects with MetaAutomate Creative Workbench.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Creative Workbench — MetaAutomate">
 <meta property="og:description" content="Plan image and video production briefs with rights, consent and human review—without claims of live media generation.">
@@ -12,8 +12,10 @@
 <link rel="stylesheet" href="/assets/site.css">
 <link rel="stylesheet" href="/assets/creative.css">
 <script src="/assets/site.js" defer></script>
-<script src="/assets/creative-handoff.js" defer></script>
 <script src="/assets/creative.js" defer></script>
+<link rel="stylesheet" href="/assets/creative-maker.css">
+<script src="/assets/creative-maker.js" defer></script>
+<script src="/assets/creative-video.js" defer></script>
 <title>Creative Workbench — MetaAutomate</title>
 </head><body>
 <a class="skip-link" href="#main">Skip to content</a>  <div class="utility-bar"><div class="shell"><span class="utility-symbol">✦</span><span>Intelligence · Creation · Automation</span><span class="utility-aside">Global ambition. Purpose-led engineering.</span></div></div>
@@ -42,27 +44,80 @@
    <div>
     <span class="eyebrow">METAAUTOMATE / 02 CAPABILITY / CREATIVE ENGINEERING</span>
     <h1>Creative ideas deserve<br><em>a responsible workflow.</em></h1>
-    <p class="creative-intro">Plan image concepts and short-form video production with clear rights declarations, human review and useful deliverables—without confusing a brief with finished AI media.</p>
-    <div class="creative-hero-links"><a class="action action-primary" href="#creative-form">Prepare a creative brief <span aria-hidden="true">↗</span></a><a class="creative-text-link" href="/services/#experience">Explore Product Design &amp; Experience ↗</a></div>
+    <p class="creative-intro">Create original business graphics and download high-resolution PNG files directly. For complex AI-generated images, videos and neural voiceovers, production access remains under development.</p>
+    <div class="creative-hero-links"><a class="action action-primary" href="#instant-design">Create an image <span aria-hidden="true">↗</span></a><a class="creative-text-link" href="/services/#experience">Explore Product Design &amp; Experience ↗</a></div>
    </div>
    <div class="creative-hero-panel" aria-label="Creative workflow stages">
-    <p class="creative-mini-label">HOW IT WORKS / NO PROVIDER CALLS</p>
-    <ol><li><span>01</span>Define the audience and outcome</li><li><span>02</span>Record rights and consent</li><li><span>03</span>Prepare scene or visual direction</li><li><span>04</span>Hand off to a human reviewer</li></ol>
-    <div class="creative-pilot-note"><strong>PLANNING PROTOTYPE</strong><span>Runs entirely in your browser. No media is generated, uploaded, saved to our servers or published.</span></div>
+    <p class="creative-mini-label">AVAILABLE NOW / IN YOUR BROWSER</p>
+    <ol><li><span>01</span>Choose a social, story or widescreen format</li><li><span>02</span>Enter a headline and supporting message</li><li><span>03</span>Preview your original graphic</li><li><span>04</span>Download the finished PNG image</li></ol>
+    <div class="creative-pilot-note"><strong>WORKING IMAGE CREATOR</strong><span>Creates original graphic layouts locally. This is a design tool, not neural image/video generation.</span></div>
    </div>
   </div>
  </section>
+ <section class="creative-maker" id="instant-design" aria-labelledby="maker-title">
+   <div class="shell">
+     <div class="maker-heading"><span class="eyebrow">CREATE / ORIGINAL GRAPHICS</span><h2 id="maker-title">Make a graphic. Download it.</h2><p>Design a polished announcement, educational card, promotion or video thumbnail in seconds. Export a real image file, not a planning document.</p></div>
+     <div class="maker-layout">
+       <form id="maker-form" class="maker-controls" novalidate>
+         <label for="maker-format">Image size</label>
+         <select id="maker-format"><option value="square">Square · 1080 × 1080</option><option value="story">Vertical · 1080 × 1920</option><option value="wide">Widescreen · 1920 × 1080</option></select>
+         <label for="maker-theme">Look and feel</label>
+         <select id="maker-theme"><option value="white">White · Editorial</option><option value="navy">Navy · Professional</option><option value="blue">Blue · Modern</option></select>
+         <label for="maker-brand">Brand / creator</label>
+         <input id="maker-brand" type="text" minlength="2" maxlength="45" value="MetaAutomate" required>
+         <label for="maker-title-input">Main message</label>
+         <textarea id="maker-title-input" rows="3" minlength="8" maxlength="130" required>Better systems. Better business.</textarea>
+         <label for="maker-subtitle">Supporting message</label>
+         <textarea id="maker-subtitle" rows="3" maxlength="190">Turn everyday business challenges into more effective ways of working.</textarea>
+         <label for="maker-action">Optional action line</label>
+         <input id="maker-action" type="text" maxlength="65" value="Build what matters">
+         <div class="maker-actions">
+           <button type="submit" id="maker-preview">Update image preview</button>
+           <button type="button" id="maker-download" disabled>Download PNG ↗</button>
+         </div>
+         <p id="maker-status" role="status" aria-live="polite">Preview your original graphic below.</p>
+         <p class="maker-fineprint">Original typography and geometric artwork. No uploads or automatic publishing; AI-generated imagery requires a separate model.</p>
+       </form>
+       <div class="maker-preview"><div class="maker-frame"><canvas id="maker-canvas" width="1080" height="1080" aria-label="Generated graphic preview" role="img"></canvas></div><p id="maker-meta">Square social image · 1080 × 1080 PNG</p></div>
+     </div>
+   </div>
+ </section>
+ <section class="creative-video-maker" id="instant-video" aria-labelledby="video-maker-title">
+  <div class="shell">
+    <div class="maker-heading"><span class="eyebrow">CREATE / NARRATED VIDEO</span><h2 id="video-maker-title">Turn your graphic into a narrated video.</h2><p>Use your own clear voice recording with a moving version of the graphic above. Export a video you can play and share.</p></div>
+    <form id="video-maker-form" class="video-maker-controls">
+      <div class="video-maker-input">
+        <label for="video-maker-audio">Your recorded narration (MP3 or WAV, 30–120 seconds)</label>
+        <input id="video-maker-audio" type="file" accept="audio/wav,audio/x-wav,audio/mpeg,.wav,.mp3" required>
+        <audio id="video-maker-audio-preview" controls preload="metadata" hidden aria-label="Listen to your chosen narration before export"></audio>
+        <p>Choose a recording with permission to use every included voice. The recording stays in your browser.</p>
+      </div>
+      <div class="video-maker-input">
+        <label for="video-maker-format">Video format</label>
+        <select id="video-maker-format"><option value="wide">Widescreen · 1280 × 720</option><option value="story">Vertical · 720 × 1280</option></select>
+      </div>
+      <label class="video-maker-rights" for="video-maker-rights"><input id="video-maker-rights" type="checkbox" required> I own this recording or have permission to use every voice in it.</label>
+      <div class="video-maker-actions">
+        <button type="submit" id="video-maker-run">Make narrated WebM video ↗</button>
+        <a href="#instant-design">Edit graphic first ↑</a>
+      </div>
+      <p id="video-maker-status" role="status" aria-live="polite">Choose narration audio, then create the video. Chrome or another WebM-compatible browser is recommended.</p>
+    </form>
+    <video id="video-maker-preview" controls preload="none" playsinline hidden aria-label="Generated narrated video preview"></video>
+    <a id="video-maker-download" class="video-maker-download" hidden download="metaautomate-narrated-video.webm">Download narrated video ↓</a>
+  </div>
+ </section>
+ <details class="creative-advanced-planning"><summary>Custom project requirements and rights review</summary>
  <section class="creative-section" id="creative-form" aria-labelledby="creative-form-title">
   <div class="shell creative-grid">
    <div class="creative-steps">
     <span class="eyebrow">PRODUCTION / BRIEF WORKSPACE</span>
-    <h2 id="creative-form-title">Turn the idea into an accountable production plan.</h2>
-    <p>Describe the intended business outcome before choosing image or video. This prototype organizes your choices locally so a production team can review them before any model, asset or platform is used.</p>
+    <h2 id="creative-form-title">Need a larger production? Scope it.</h2>
+    <p>For detailed video productions, record goals, rights and review responsibilities before work begins.</p>
     <div class="creative-detail"><strong>Rights come first.</strong> An ownership or licence selection is a <em>self-declared claim</em>, not independent proof. Permission must be checked by the eventual reviewer.</div>
     <div class="creative-detail"><strong>Human control stays visible.</strong> A named reviewer is a handoff, not an authenticated approval. This page never authorizes generation, payment or publishing.</div>
    </div>
    <div class="creative-form-panel">
-    <div id="creative-import-notice" class="creative-detail" role="status" aria-live="polite" hidden></div>
     <form id="creative-brief-form" novalidate>
      <div class="creative-section-tag">01 / PROJECT DIRECTION</div>
      <div class="creative-two">
@@ -93,9 +148,10 @@
     <div class="creative-output-top"><div><span class="eyebrow">03 / REVIEW PACKAGE</span><h2 id="creative-output-title">Your production brief</h2><p>Prepared locally for creative direction and independent rights review. No media file has been generated.</p></div><div id="creative-outcome" class="creative-outcome" role="status" aria-live="polite"></div></div>
     <div class="creative-output-grid"><section class="creative-plan-card"><h3>Creative structure</h3><div id="creative-structure" class="creative-plan-content"></div></section><section class="creative-plan-card"><h3>Required human review</h3><ul id="creative-checks" class="creative-checks"></ul></section></div>
     <div class="creative-output-actions"><button type="button" id="creative-export" class="action action-primary">Download review brief (text) <span aria-hidden="true">↓</span></button><a href="/engage/?service=Product%20Design%20%26%20Experience" class="creative-text-link">Discuss a design project ↗</a></div>
-    <p class="creative-output-caption" id="creative-report-note">Export is a planning record, not permission to generate or distribute content.</p>
+    <p class="creative-output-caption" id="creative-report-note">This brief is for human review; it is not a generated video or production authorization.</p>
   </div>
  </section>
+ </details>
 </main>  <footer class="site-footer">
   <div class="shell">
     <div class="footer-major">

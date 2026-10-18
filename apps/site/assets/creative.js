@@ -1,7 +1,7 @@
 /* MetaAutomate Creative Workbench
  * Browser-only planning: NO image/video generation, no uploads, no fetch,
- * no automatic session storage; explicit one-time local handoff may be consumed.
- * No external provider, autopublish, payment, model execution or uploads.
+ * no persistent storage, external provider, auto-publish or payments.
+ * No generative model execution or uploads.
  * All untrusted user-entered text is inserted with textContent ONLY.
  */
 (() => {
@@ -47,25 +47,6 @@
   }
   kind.addEventListener("change", updateFormat);
   updateFormat();
-
-  // Only an explicitly chosen, ten-minute same-tab handoff can fill fields.
-  // Consume-once: never restore the full conversation or AI-generated claims.
-  const incoming = window.MetaAutomateCreativeHandoff?.consume?.();
-  if (incoming) {
-    const goalField=form.elements.namedItem("goal");
-    const audienceField=form.elements.namedItem("audience");
-    if (goalField) goalField.value=incoming.goal;
-    if (audienceField) audienceField.value=incoming.audience;
-    kind.value=incoming.kind;
-    updateFormat();
-    const notice=document.getElementById("creative-import-notice");
-    if (notice) {
-      notice.hidden=false;
-      notice.textContent="Project idea transferred locally from Start a Project. "+
-        "Review the goal and audience. Rights, consent and human approval "+
-        "have NOT been established. No AI media was generated.";
-    }
-  }
 
   form.addEventListener("reset", () => {
     output.hidden = true;

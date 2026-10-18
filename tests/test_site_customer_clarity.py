@@ -91,7 +91,7 @@ def test_nine_capability_cards_are_scoped_and_link_to_real_disciplines():
     structure = page("index.html")
     assert html.count('class="capability-card') == 9
     for name in (
-        "AI Agents &amp; Orchestration", "Image &amp; Video Generation",
+        "AI Agents &amp; Orchestration", "Image Studio &amp; Video Projects",
         "Social Media Automation", "Software Engineering",
         "Cybersecurity &amp; QA", "Data Analysis &amp; Research",
         "Cloud &amp; DevOps", "Business Automation",

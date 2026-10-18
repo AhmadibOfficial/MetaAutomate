@@ -1,0 +1,49 @@
+/* P2-050: working Creative Studio graphics maker. Original, accessible. */
+.creative-maker{padding:64px 0 78px;background:#f6f9fe;color:#18344f}
+.maker-heading{max-width:790px;margin-bottom:31px}
+.maker-heading h2{color:#153250;font-size:clamp(2rem,3.5vw,3.6rem);letter-spacing:-.045em;margin:13px 0;line-height:1.15}
+.maker-heading p{color:#50667c;line-height:1.7;max-width:70ch}
+.maker-layout{display:grid;grid-template-columns:minmax(310px,.75fr) minmax(0,1fr);gap:35px;align-items:start}
+.maker-controls{background:white;box-shadow:0 10px 40px rgba(20,55,95,.07);border:1px solid #d9e4ef;border-radius:20px;padding:27px;display:flex;flex-direction:column;gap:12px}
+.maker-controls label{font-size:.83rem;font-weight:750;color:#294b6a;margin-top:7px}
+.maker-controls :is(input,textarea,select){width:100%;font:inherit;font-size:.94rem;color:#142d48;line-height:1.55;padding:12px 14px;border:1px solid #bccddd;border-radius:11px;background:#fff;resize:vertical}
+.maker-controls :is(input,textarea,select):focus-visible,.maker-actions button:focus-visible{outline:3px solid #2672c2;outline-offset:2px}
+.maker-actions{display:flex;flex-wrap:wrap;gap:11px;margin-top:13px}
+.maker-actions button{cursor:pointer;font-size:.86rem;font-weight:750;padding:13px 17px;border-radius:11px;border:1px solid #cbdceb;color:#225484;background:#fff}
+#maker-download{color:#fff;background:#1b5aa0;border-color:#1b5aa0}
+.maker-actions button:disabled{opacity:.55;cursor:not-allowed}
+#maker-status{margin:5px 0 0;color:#2c6289;font-size:.82rem;line-height:1.5}
+.maker-fineprint{font-size:.75rem;line-height:1.7;color:#63758a}
+.maker-preview{align-self:stretch;text-align:center;background:#e9f0f9;border:1px solid #dae6f1;border-radius:20px;padding:clamp(15px,3vw,35px)}
+.maker-frame{max-height:660px;display:flex;align-items:center;justify-content:center;min-height:280px;overflow:hidden}
+#maker-canvas{display:block;max-width:100%;max-height:650px;width:auto;height:auto;box-shadow:0 18px 49px rgba(21,57,101,.16)}
+#maker-meta{font-size:.79rem;color:#5d718a;font-weight:650;margin:16px 0 0}
+@media(max-width:860px){.maker-layout{grid-template-columns:1fr}.maker-preview{order:-1}.maker-frame{max-height:460px}#maker-canvas{max-height:440px}}
+@media(max-width:620px){.creative-maker{padding:38px 0 48px}.maker-controls{padding:19px;border-radius:14px}.maker-preview{padding:15px;border-radius:14px}.maker-frame{min-height:220px;max-height:370px}#maker-canvas{max-height:360px}}
+
+/* Voice-backed narrated WebM creator — genuine browser task execution. */
+.creative-video-maker{padding:58px 0 66px;background:#fff;color:#17314a}
+.video-maker-controls{display:flex;flex-wrap:wrap;gap:20px;align-items:end;padding:23px 27px;border:1px solid #d9e6f3;border-radius:18px;background:#f7faff}
+.video-maker-input{display:flex;flex:1 1 280px;flex-direction:column;gap:9px}
+.video-maker-input label{font-weight:760;color:#274e72;font-size:.87rem}
+.video-maker-input input,.video-maker-input select{width:100%;font:inherit;color:#173a5e;padding:11px 12px;border:1px solid #c2d2e3;background:#fff;border-radius:10px}
+.video-maker-input p{font-size:.76rem;line-height:1.55;color:#5a718a;margin:0}
+.video-maker-rights{display:flex;flex:1 1 100%;gap:10px;align-items:flex-start;font-weight:600;color:#3d5874;font-size:.84rem;line-height:1.55}
+.video-maker-rights input{width:18px;height:18px;flex:none;margin-top:3px}
+.video-maker-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.video-maker-actions button,.video-maker-download{font:inherit;font-size:.86rem;cursor:pointer;font-weight:760;color:#fff;background:#165697;border:1px solid #165697;border-radius:10px;padding:13px 16px;text-decoration:none}
+.video-maker-actions a{font-size:.82rem;color:#245a92;text-decoration:underline}
+.video-maker-actions button:disabled{opacity:.55;cursor:not-allowed}
+#video-maker-status{flex:1 1 100%;font-size:.79rem;color:#3b698c;line-height:1.6;margin:0}
+#video-maker-preview{max-width:min(100%,900px);width:100%;margin:25px auto 16px;display:block;border-radius:12px;background:#071627}
+#video-maker-preview[hidden],.video-maker-download[hidden]{display:none!important}
+.video-maker-download{display:inline-flex;margin:3px 0}
+.video-maker-controls :focus-visible{outline:3px solid #2973c0;outline-offset:2px}
+@media(max-width:620px){.creative-video-maker{padding:38px 0 50px}.video-maker-controls{padding:16px;border-radius:13px;gap:15px}}
+
+.creative-advanced-planning{border-top:1px solid #d9e4ef;background:#fff}
+.creative-advanced-planning>summary{cursor:pointer;padding:20px clamp(20px,5vw,90px);font-weight:770;color:#245787;background:#f0f6fc;outline-offset:2px}
+.creative-advanced-planning>summary:focus-visible{outline:3px solid #2973c0}
+.creative-advanced-planning:not([open]){padding-bottom:0}
+#video-maker-audio-preview{display:block;width:100%;max-width:450px;height:45px}
+#video-maker-audio-preview[hidden]{display:none!important}

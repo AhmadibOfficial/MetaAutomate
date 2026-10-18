@@ -12,7 +12,6 @@
   <link rel="stylesheet" href="/assets/site.css">
   <script src="/assets/site.js" defer></script>
 <link rel="stylesheet" href="/assets/project-chat.css">
-<script src="/assets/creative-handoff.js" defer></script>
 <script src="/assets/project-chat.js" defer></script>
 <link rel="stylesheet" href="/assets/project-device-ai.css">
 <script src="/assets/project-device-ai.js" defer></script>
@@ -51,7 +50,7 @@
       <button type="button" data-project-template="experience">Product design and UX</button>
       <button type="button" data-project-template="security">Application security</button>
     </div>
-    <div class="project-chat-side-footer"><strong>Privacy by design</strong><p>The guided intake stays in memory only. If you explicitly continue to Creative Workbench, a limited project summary is temporarily saved in this browser tab and removed after transfer; it is never submitted automatically.</p></div>
+    <div class="project-chat-side-footer"><strong>Privacy by design</strong><p>The guided intake stays only in this tab while you work. It is not submitted or saved automatically.</p></div>
   </aside>
   <div class="project-chat-main">
     <header class="project-chat-top">
@@ -79,20 +78,24 @@
         <button id="project-ai-load" type="button">Download model and start local AI</button>
       </div>
       <p id="project-ai-status" class="project-ai-status" role="status" aria-live="polite">AI is not running. Start it explicitly above.</p>
+      <div class="project-ai-quick-tasks" aria-label="Useful AI writing tasks">
+        <button type="button" data-ai-task="product">Product description</button>
+        <button type="button" data-ai-task="marketing">Marketing message</button>
+        <button type="button" data-ai-task="workflow">Business workflow</button>
+        <button type="button" data-ai-task="video">Video script</button>
+      </div>
       <div id="project-ai-messages" class="project-ai-messages" role="log" aria-label="On-device AI conversation" aria-live="polite" aria-relevant="additions"></div>
       <div class="project-ai-composer">
         <label for="project-ai-input">Ask the local AI</label>
         <textarea id="project-ai-input" rows="3" maxlength="1000" placeholder="Describe the project or ask a follow-up question..." disabled></textarea>
         <div class="project-ai-actions">
           <button id="project-ai-reset" type="button">Clear current conversation</button>
-          <button id="project-ai-export" type="button" disabled>Download conversation</button>
-          <select id="project-ai-creative-format" aria-label="Creative Workbench format"><option value="video">Video plan</option><option value="image">Image plan</option></select>
-          <button id="project-ai-creative-handoff" type="button" disabled>Plan visuals ↗</button>
+          <button id="project-ai-copy" type="button" disabled>Copy latest answer</button>
+          <a class="project-ai-create-link" href="/creative/#instant-design">Create a graphic ↗</a>
           <button id="project-ai-send" type="button" disabled>Ask AI ↗</button>
         </div>
       </div>
       <p id="project-ai-error" class="project-ai-error" role="alert" hidden></p>
-      <p id="project-ai-creative-note" class="project-ai-footer" role="status" aria-live="polite">“Plan visuals” transfers only your latest question to the Creative Workbench in this tab, after you choose it. No AI reply or full chat history is transferred.</p>
       <p class="project-ai-footer">Responses are generated on-device when the model is loaded. No responses are guaranteed, and this experimental tool cannot execute project workflows.</p>
     </section>
     <div class="project-chat-conversation" id="project-chat-messages" role="log" aria-label="Project intake conversation" aria-live="polite" aria-relevant="additions" tabindex="0">
@@ -100,7 +103,7 @@
         <span class="project-chat-avatar" aria-hidden="true">✳</span>
         <div class="project-chat-bubble"><strong>MetaAutomate Project Guide</strong>
           <p>Welcome. I can help you organize a project idea for our team to review. What problem would you like to solve, or what would you like to build?</p>
-          <p class="project-chat-hint">This guide follows a fixed question flow. It does not generate images, execute AI models, or send enquiries.</p>
+          <p class="project-chat-hint">This guided form asks set questions. For on-device AI text responses, choose the AI option above.</p>
         </div>
       </div>
     </div>
@@ -130,13 +133,10 @@
       <div class="project-chat-summary-actions">
         <a id="project-chat-email" href="mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Project%20inquiry">Open email draft ↗</a>
         <button id="project-chat-copy" type="button">Copy brief</button>
-        <label class="project-chat-handoff-label" for="project-chat-creative-format">Visual plan</label>
-        <select id="project-chat-creative-format" aria-label="Creative project format"><option value="video">Video</option><option value="image">Image</option></select>
-        <button id="project-chat-creative" type="button">Continue in Creative Workbench ↗</button>
-        <button id="project-chat-download" type="button">Download .txt</button>
+        <button id="project-chat-download" type="button">Download project brief</button>
+        <a href="/creative/#instant-design">Create an image ↗</a>
       </div>
       <p id="project-chat-share-note" class="project-chat-footnote">Your own email app handles sending. No message is submitted by this website.</p>
-      <p class="project-chat-footnote">“Continue in Creative Workbench” temporarily passes only the selected idea, outcome and audience within this browser tab. It never submits the project or approves media rights.</p>
       <p id="project-chat-copy-status" role="status" aria-live="polite"></p>
     </section>
   </div>
