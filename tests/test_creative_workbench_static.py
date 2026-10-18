@@ -38,14 +38,14 @@ def test_new_creative_workbench_has_all_real_destinations_and_right_brand():
     assert "/creative/" in sp.links
     assert "/services/#experience" in cp.links
     assert "/engage/?service=Product%20Design%20%26%20Experience" in cp.links
-    assert "Image &amp; Video Generation" in home
-    assert "Try the Creative Workbench (browser-only demo)" in services
-    assert "PLANNING PROTOTYPE" in creative
-    assert "No media is generated, uploaded, saved to our servers or published" in creative
+    assert "Image Studio &amp; Video Projects" in home
+    assert "Create a branded image now" in services
+    assert "WORKING IMAGE CREATOR" in creative
+    assert "Create original business graphics" in creative
     assert "Independent" not in creative or "Human" in creative
     assert "/assets/metaautomate-mark.webp" in creative
     assert set(cp.form_ids)=={"creative-brief-form"}
-    assert {"/assets/site.js","/assets/creative.js"}<=set(cp.scripts)
+    assert {"/assets/site.js","/assets/creative.js","/assets/creative-maker.js"}<=set(cp.scripts)
     assert len(cp.ids)==len(re.findall(r'\bid="([^"]+)"',creative)), "Repeated HTML ID"
     for key in ("creative-kind","creative-goal","creative-rights","creative-likeness",
                 "creative-proof","creative-reviewer","creative-duration",
