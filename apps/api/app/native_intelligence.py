@@ -38,6 +38,7 @@ MAX_CONTEXT = 1000
 MAX_SEARCH_HITS = 5
 MEMORY_TTL = 3600
 MEMORY_TURNS = 6
+MAX_SESSIONS = 128
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS native_knowledge (
@@ -180,6 +181,10 @@ class NativeIntelligence:
         key=(tenant,actor,session)
         if self.clock()-self._last_seen.get(key,0)>MEMORY_TTL:
             self._sessions.pop(key,None)
+        if key not in self._sessions and len(self._sessions)>=MAX_SESSIONS:
+            oldest=min(self._last_seen,key=self._last_seen.get)
+            self._sessions.pop(oldest,None)
+            self._last_seen.pop(oldest,None)
         self._last_seen[key]=self.clock()
         return self._sessions.setdefault(key,deque(maxlen=MEMORY_TURNS))
 
