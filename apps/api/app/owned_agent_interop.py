@@ -108,7 +108,7 @@ def a2a_task_view(runtime:Runtime,tenant:str,run_id:str)->dict:
         "QUEUED":"submitted","RUNNING":"working",
         "COMPLETED":"completed",
         "AWAITING_APPROVAL":"input-required",
-        "APPROVED_NOT_EXECUTED":"completed",
+        "APPROVED_NOT_EXECUTED":"input-required",
         "REJECTED":"rejected","FAILED":"failed",
     }
     return {
