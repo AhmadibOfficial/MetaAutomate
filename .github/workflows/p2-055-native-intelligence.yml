@@ -1,0 +1,78 @@
+name: P2-055 Native Intelligence Acceptance
+
+on:
+  push:
+    branches: [feature/p2-055-native-intelligence]
+  pull_request:
+    branches: [feature/p2-054-owned-multiagent-runtime]
+
+permissions:
+  contents: read
+
+jobs:
+  native-intelligence-offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      MAT_LOCAL_MODEL_ENABLED: "0"
+      MAT_GLOBAL_AI_ENABLED: "0"
+      WORKSPACE_AUTH_MODE: dev_key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile owned native intelligence
+        run: |
+          python -m compileall -q \
+            apps/api/app/native_intelligence.py \
+            scripts/start_native_model.py \
+            scripts/run_native_intelligence_demo.py \
+            tests/test_p2_055_native_intelligence.py \
+            tests/test_p2_055_model_admission.py
+      - name: Run native and earlier multi-agent suites without dependencies
+        run: |
+          PYTHONPATH=apps/api python -m unittest discover \
+            -s tests -p 'test_p2_054_*.py' -v
+          PYTHONPATH=apps/api python -m unittest discover \
+            -s tests -p 'test_p2_055_*.py' -v
+      - name: Actual local end-to-end native retrieval and four-agent demo
+        run: |
+          DIRECTORY="$(mktemp -d)"
+          chmod 700 "$DIRECTORY"
+          trap 'rm -rf "$DIRECTORY"' EXIT
+          python scripts/run_native_intelligence_demo.py \
+            --workdir "$DIRECTORY" --out "$DIRECTORY/output.json" \
+            > "$DIRECTORY/receipt.json"
+          python - "$DIRECTORY/output.json" "$DIRECTORY/receipt.json" <<'PY'
+          import json,sys
+          with open(sys.argv[1],encoding="utf-8") as file:
+              data=json.load(file)
+          with open(sys.argv[2],encoding="utf-8") as file:
+              receipt=json.load(file)
+          workflow=data["workflow"]
+          assert receipt["evidence_verified"] is True
+          assert workflow["run"]["state"]=="COMPLETED"
+          assert workflow["run"]["outputs"]["inventory"]["rows"][0]["reorder_units"]==13
+          assert workflow["run"]["outputs"]["business"]["estimated_replenishment_minor"]==1625000
+          assert workflow["run"]["outputs"]["verifier"]["verification"]=="PASS"
+          assert data["question"]["sources"]
+          assert data["paid_api_calls"]==0
+          assert data["external_actions_executed"] is False
+          print("PASS: actual native local full-text retrieval and four agents, zero paid calls")
+          PY
+      - name: Guard against hidden provider or customer activation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          source=Path("apps/api/app/native_intelligence.py").read_text()
+          launcher=Path("scripts/start_native_model.py").read_text()
+          assert "PrivateKnowledge" in source
+          assert "EVIDENCE_ONLY" in source
+          assert "configured_model" in source
+          assert "maxlen=MEMORY_TURNS" in source
+          assert "os.execv" in launcher
+          assert "127.0.0.1" in launcher
+          assert "HTTPConnection" not in source
+          print("No public AI backend or paid model API activated")
+          PY
