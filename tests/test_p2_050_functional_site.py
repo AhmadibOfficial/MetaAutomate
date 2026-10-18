@@ -103,3 +103,14 @@ def test_ai_tasks_produce_copyable_results_without_conversation_download():
     assert "taskButtons.forEach(button" in script
     assert 'href="/creative/#instant-design"' in html
     assert "sessionStorage" not in script
+
+def test_product_homepage_launches_working_tools_first():
+    html=read("index.html")
+    assert 'class="product-tools shell"' in html
+    assert html.index('class="product-tools shell"') < html.index('id="solutions"')
+    assert 'href="/creative/#instant-design"' in html
+    assert 'href="/creative/#instant-video"' in html
+    assert "Create a PNG image" in html
+    assert "Make a narrated video" in html
+    assert 'href="/engage/"' in html
+    assert 'href="/assets/product-tools.css"' in html
