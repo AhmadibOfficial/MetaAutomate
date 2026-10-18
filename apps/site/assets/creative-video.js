@@ -7,12 +7,12 @@
   const $=id=>document.getElementById(id);
   const form=$("video-maker-form");
   if(!form)return;
-  const audioInput=$("video-maker-audio"),rights=$("video-maker-rights");
+  const audioInput=$("video-maker-audio"),audioPreview=$("video-maker-audio-preview"),rights=$("video-maker-rights");
   const size=$("video-maker-format"),run=$("video-maker-run");
   const status=$("video-maker-status"),preview=$("video-maker-preview");
   const link=$("video-maker-download"),poster=$("maker-canvas");
   const DIMENSIONS={wide:[1280,720],story:[720,1280]};
-  let busy=false,generatedURL=null;
+  let busy=false,generatedURL=null,previewURL=null;
   function message(text){status.textContent=text;}
   function cleanupPrevious(){
     if(generatedURL){URL.revokeObjectURL(generatedURL);generatedURL=null;}
@@ -130,9 +130,24 @@
       busy=false;run.disabled=false;
     }
   }
+  audioInput.addEventListener("change",()=>{
+    if(previewURL){URL.revokeObjectURL(previewURL);previewURL=null;}
+    audioPreview.pause();audioPreview.removeAttribute("src");
+    const file=audioInput.files?.[0];
+    if(file && file.size<=18_000_000){
+      previewURL=URL.createObjectURL(file);
+      audioPreview.src=previewURL;
+      audioPreview.hidden=false;
+      message("Listen to your narration. The video will be created only after you select Make narrated WebM video.");
+    }else{
+      audioPreview.hidden=true;
+      if(file)message("Please choose a narration file under 18 MB.");
+    }
+  });
   form.addEventListener("submit",produce);
   // File is never submitted; decoded and encoded only inside this page.
   window.addEventListener("pagehide",()=>{
     if(generatedURL)URL.revokeObjectURL(generatedURL);
+    if(previewURL)URL.revokeObjectURL(previewURL);
   });
 })();
