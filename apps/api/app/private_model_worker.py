@@ -9,9 +9,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import http.client
+from hashlib import sha256
 import json
 import os
+from pathlib import Path
 import re
+import stat
 from urllib.parse import urlsplit
 
 from fastapi import HTTPException
@@ -53,6 +56,25 @@ def _runtime_isolation()->bool:
     except (AttributeError,OSError,ValueError):
         return False
 
+def _verify_checkpoint(filepath:str,expected_digest:str)->bool:
+    """Hash a private, regular local GGUF file: config claim alone is insufficient."""
+    if not filepath or len(filepath)>600:
+        return False
+    path=Path(filepath)
+    try:
+        if (not path.is_absolute() or path.is_symlink() or not path.is_file()
+            or path.resolve()!=path or path.suffix.lower()!=".gguf"
+            or not 64<=path.stat().st_size<=12_000_000_000
+            or stat.S_IMODE(path.stat().st_mode)&0o077):
+            return False
+        digest=sha256()
+        with path.open("rb") as handle:
+            for block in iter(lambda:handle.read(1024*1024),b""):
+                digest.update(block)
+        return digest.hexdigest()==expected_digest
+    except (OSError,ValueError):
+        return False
+
 def configured_model(env:dict|None=None,*,isolation_probe=None)->LocalModel:
     cfg=os.environ if env is None else env
     if not all(cfg.get(v)=="1" for v in (
@@ -75,6 +97,8 @@ def configured_model(env:dict|None=None,*,isolation_probe=None)->LocalModel:
     digest=cfg.get("MAT_LOCAL_MODEL_CHECKPOINT_SHA256","")
     if not MODEL.fullmatch(model) or not SHA.fullmatch(digest):
         raise HTTPException(503,"Model label and checkpoint digest required")
+    if not _verify_checkpoint(cfg.get("MAT_LOCAL_MODEL_CHECKPOINT_FILE",""),digest):
+        raise HTTPException(503,"Approved local GGUF checkpoint not present or checksum mismatched")
     checker=_runtime_isolation if isolation_probe is None else isolation_probe
     if not checker():
         raise HTTPException(503,"Local model process has not passed kernel isolation checks")
