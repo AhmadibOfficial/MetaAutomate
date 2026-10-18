@@ -3,7 +3,10 @@
 Tests use stdlib unittest + a temporary SQLite DB; no accounts, model,
 paid provider, external network, or customer data are accessed.
 """
+import json
 import sqlite3
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -216,6 +219,30 @@ class OwnedRuntimeAcceptance(unittest.TestCase):
                        "WHERE run_id=? AND id=(SELECT min(id) FROM evidence WHERE run_id=?)",
                        (job,job))
         self.assertFalse(self.runtime.verify_evidence(self.tenant,job)["verified"])
+
+    def test_local_cli_generates_actual_durable_artifact_and_enforces_consent(self):
+        script=Path(__file__).resolve().parents[1]/"scripts"/"run_owned_multiagent_demo.py"
+        report=Path(self.dir.name)/"report.json"
+        cmd=[sys.executable,str(script),"--db",str(self.db),
+             "--tenant","demo_cli","--request-key","cli-20261018-unique",
+             "--output",str(report)]
+        first=subprocess.run(cmd,capture_output=True,text=True,check=True)
+        receipt=json.loads(first.stdout)
+        self.assertEqual(receipt["state"],"COMPLETED")
+        self.assertEqual(receipt["agents_completed"],4)
+        self.assertTrue(receipt["evidence_chain_valid"])
+        self.assertEqual(receipt["paid_provider_calls"],0)
+        data=json.loads(report.read_text())
+        self.assertEqual(data["run"]["outputs"]["verifier"]["verification"],"PASS")
+        second=subprocess.run(cmd,capture_output=True,text=True,check=True)
+        self.assertEqual(json.loads(second.stdout)["run_id"],receipt["run_id"])
+        user_input=Path(self.dir.name)/"user.json"
+        user_input.write_text(json.dumps(self.payload))
+        unauthorized=subprocess.run(
+            cmd+["--input-json",str(user_input)],
+            capture_output=True,text=True)
+        self.assertNotEqual(unauthorized.returncode,0)
+        self.assertIn("--authorized-data",unauthorized.stderr)
 
     def test_interop_markers_do_not_claim_full_protocol_support(self):
         manifest=engine.agent_manifest()
