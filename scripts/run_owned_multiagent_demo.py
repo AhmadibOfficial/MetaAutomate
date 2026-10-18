@@ -6,6 +6,7 @@ represent a customer's actual inventory, revenue or business outcome.
 """
 import argparse
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -22,9 +23,24 @@ def main(argv=None)->int:
     p.add_argument("--requested-action",choices=[
         "NONE","PUBLISH_CAMPAIGN","ORDER_STOCK"],default="NONE")
     p.add_argument("--output",help="Optional local JSON result file")
+    p.add_argument("--input-json",help="Optional user-authorized business input file")
+    p.add_argument("--authorized-data",action="store_true",
+                   help="Confirm permission to process supplied non-demo data on private disk")
     args=p.parse_args(argv)
-    payload=demo_payload()
-    payload["requested_external_action"]=args.requested_action
+    os.umask(0o077)  # local SQLite, -wal, -shm and exported data are owner-only.
+    if args.input_json and not args.authorized_data:
+        p.error("--authorized-data is required before using non-demo records")
+    if args.input_json:
+        path=Path(args.input_json)
+        raw=path.read_bytes()
+        if len(raw)>25000:
+            p.error("Input JSON exceeds the 25 KB limit")
+        payload=json.loads(raw)
+        if args.requested_action!="NONE":
+            payload["requested_external_action"]=args.requested_action
+    else:
+        payload=demo_payload()
+        payload["requested_external_action"]=args.requested_action
     engine=Runtime(args.db)
     job=engine.submit(args.tenant,args.request_key,payload,
                       actor=args.actor,budget=6)
