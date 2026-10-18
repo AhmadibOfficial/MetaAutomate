@@ -175,6 +175,19 @@ class OwnedRuntimeAcceptance(unittest.TestCase):
         finally:
             engine.AGENTS["creative"]=original
 
+    def test_competing_workers_cannot_claim_same_active_task(self):
+        job=self.submit()
+        competing=engine.Runtime(self.db,now=lambda:self.clock[0])
+        first=self.runtime.claim(self.tenant)
+        self.assertEqual(first["run_id"],job)
+        self.assertIsNone(competing.claim(self.tenant))
+        result,sha=self.runtime._run_agent(first)
+        self.runtime._settle(first,result,sha,None)
+        second=competing.claim(self.tenant)
+        self.assertEqual(second["seq"],1)
+        self.assertNotEqual(first["claim_id"],second["claim_id"])
+        self.assertIsNone(self.runtime.claim(self.tenant))
+
     def test_expired_worker_lease_reclaims_task_and_rejects_stale_result(self):
         job=self.submit()
         old=self.runtime.claim(self.tenant)
