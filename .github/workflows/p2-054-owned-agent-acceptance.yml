@@ -1,0 +1,74 @@
+name: P2-054 First-Party Agent Runtime Acceptance
+
+on:
+  push:
+    branches: [feature/p2-054-owned-multiagent-runtime]
+  pull_request:
+    branches: [feature/p2-052-tenant-task-execution]
+
+permissions:
+  contents: read
+
+jobs:
+  owned-agent-unit-and-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      MAT_GLOBAL_AI_ENABLED: "0"
+      MAT_LOCAL_MODEL_ENABLED: "0"
+      MAT_PRIVATE_TASKS_ENABLED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Python syntax
+        run: |
+          python -m compileall -q \
+            apps/api/app/owned_multiagent_runtime.py \
+            apps/api/app/owned_agent_interop.py \
+            scripts/run_owned_multiagent_demo.py \
+            tests/test_p2_054_owned_multiagent.py \
+            tests/test_p2_054_agent_interop.py
+      - name: Standard-library integration acceptance
+        run: |
+          PYTHONPATH=apps/api python -m unittest discover \
+            -s tests -p 'test_p2_054_*.py' -v
+      - name: Execute genuine four-agent workflow and inspect evidence
+        run: |
+          TMPDIR="$(mktemp -d)"
+          trap 'rm -rf "$TMPDIR"' EXIT
+          python scripts/run_owned_multiagent_demo.py \
+            --db "$TMPDIR/agent-runs.sqlite3" \
+            --output "$TMPDIR/completed.json" \
+            > "$TMPDIR/receipt.json"
+          python - "$TMPDIR/completed.json" "$TMPDIR/receipt.json" <<'PY'
+          import json
+          import sys
+          with open(sys.argv[1],encoding="utf-8") as handle:
+              data=json.load(handle)
+          with open(sys.argv[2],encoding="utf-8") as handle:
+              receipt=json.load(handle)
+          run=data["run"]
+          assert run["state"]=="COMPLETED"
+          assert run["outputs"]["inventory"]["rows"][0]["reorder_units"]==13
+          assert run["outputs"]["business"]["estimated_replenishment_minor"]==1625000
+          assert run["outputs"]["verifier"]["verification"]=="PASS"
+          assert data["evidence_chain"]["verified"]
+          assert run["spent_units"]==6
+          assert receipt["paid_provider_calls"]==0
+          assert all(x["state"]=="DONE" for x in run["stage_status"])
+          print("P2-054 verified: four actual agent executions, all evidence valid, zero provider cost.")
+          PY
+      - name: Ensure no paid provider dependency
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          code=Path("apps/api/app/owned_multiagent_runtime.py").read_text()
+          assert "sqlite3" in code
+          assert "http.client" not in code
+          assert "subprocess" not in code
+          assert "AGENT_ORDER" in code
+          assert "APPROVED_NOT_EXECUTED" in code
+          print("No paid third-party model or external action invoked by runtime.")
+          PY
