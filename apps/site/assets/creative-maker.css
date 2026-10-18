@@ -1,0 +1,22 @@
+/* P2-050: working Creative Studio graphics maker. Original, accessible. */
+.creative-maker{padding:64px 0 78px;background:#f6f9fe;color:#18344f}
+.maker-heading{max-width:790px;margin-bottom:31px}
+.maker-heading h2{color:#153250;font-size:clamp(2rem,3.5vw,3.6rem);letter-spacing:-.045em;margin:13px 0;line-height:1.15}
+.maker-heading p{color:#50667c;line-height:1.7;max-width:70ch}
+.maker-layout{display:grid;grid-template-columns:minmax(310px,.75fr) minmax(0,1fr);gap:35px;align-items:start}
+.maker-controls{background:white;box-shadow:0 10px 40px rgba(20,55,95,.07);border:1px solid #d9e4ef;border-radius:20px;padding:27px;display:flex;flex-direction:column;gap:12px}
+.maker-controls label{font-size:.83rem;font-weight:750;color:#294b6a;margin-top:7px}
+.maker-controls :is(input,textarea,select){width:100%;font:inherit;font-size:.94rem;color:#142d48;line-height:1.55;padding:12px 14px;border:1px solid #bccddd;border-radius:11px;background:#fff;resize:vertical}
+.maker-controls :is(input,textarea,select):focus-visible,.maker-actions button:focus-visible{outline:3px solid #2672c2;outline-offset:2px}
+.maker-actions{display:flex;flex-wrap:wrap;gap:11px;margin-top:13px}
+.maker-actions button{cursor:pointer;font-size:.86rem;font-weight:750;padding:13px 17px;border-radius:11px;border:1px solid #cbdceb;color:#225484;background:#fff}
+#maker-download{color:#fff;background:#1b5aa0;border-color:#1b5aa0}
+.maker-actions button:disabled{opacity:.55;cursor:not-allowed}
+#maker-status{margin:5px 0 0;color:#2c6289;font-size:.82rem;line-height:1.5}
+.maker-fineprint{font-size:.75rem;line-height:1.7;color:#63758a}
+.maker-preview{align-self:stretch;text-align:center;background:#e9f0f9;border:1px solid #dae6f1;border-radius:20px;padding:clamp(15px,3vw,35px)}
+.maker-frame{max-height:660px;display:flex;align-items:center;justify-content:center;min-height:280px;overflow:hidden}
+#maker-canvas{display:block;max-width:100%;max-height:650px;width:auto;height:auto;box-shadow:0 18px 49px rgba(21,57,101,.16)}
+#maker-meta{font-size:.79rem;color:#5d718a;font-weight:650;margin:16px 0 0}
+@media(max-width:860px){.maker-layout{grid-template-columns:1fr}.maker-preview{order:-1}.maker-frame{max-height:460px}#maker-canvas{max-height:440px}}
+@media(max-width:620px){.creative-maker{padding:38px 0 48px}.maker-controls{padding:19px;border-radius:14px}.maker-preview{padding:15px;border-radius:14px}.maker-frame{min-height:220px;max-height:370px}#maker-canvas{max-height:360px}}
