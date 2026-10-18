@@ -9,9 +9,11 @@ from app.owned_agent_interop import (
     private_mcp_dispatch,a2a_task_view,catalog
 )
 
-META={"io.modelcontextprotocol/clientInfo":{
-    "name":"MetaAutomate local test caller","version":"1.0.0"
-}}
+META={"io.modelcontextprotocol/protocolVersion":"2026-07-28",
+      "io.modelcontextprotocol/clientCapabilities":{},
+      "io.modelcontextprotocol/clientInfo":{
+          "name":"MetaAutomate local test caller","version":"1.0.0"
+      }}
 
 class Interop(unittest.TestCase):
     def setUp(self):
