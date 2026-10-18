@@ -39,6 +39,7 @@ def main():
             )
             expect(page.locator(".brand img").first).to_be_visible()
             expect(page.locator(".brand img").first).to_have_js_property("complete",True)
+            page.locator(".creative-advanced-planning summary").click()
             expect(page.locator("#creative-output")).to_be_hidden()
             expect(page.locator("#creative-video-control")).to_be_hidden()
             expect(page.locator("#creative-kind")).to_have_value("image")
