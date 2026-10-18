@@ -1,0 +1,47 @@
+name: P2-053 Global Model Protocol Adapters (source-only)
+
+on:
+  push:
+    branches: [feature/p2-053-global-llm-adapters]
+  pull_request:
+    branches: [feature/p2-052-tenant-task-execution]
+
+permissions:
+  contents: read
+
+jobs:
+  provider-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      WORKSPACE_AUTH_MODE: dev_key
+      MAT_GLOBAL_AI_ENABLED: "0"
+      MAT_GLOBAL_AI_EGRESS_APPROVED: "0"
+      MAT_GLOBAL_AI_ALLOWED_PROVIDERS: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded offline test dependencies
+        run: |
+          python -m pip install 'pytest>=8,<10' 'fastapi>=0.115,<1' 'pydantic>=2,<3'
+      - name: Compile all adapters and simulate six provider protocols
+        run: |
+          python -m compileall -q apps/api/app/private_global_models.py
+          PYTHONPATH=apps/api python -m pytest -q tests/test_p2_053_global_models.py
+      - name: Ensure no client-side credential or arbitrary provider URL path
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          source=Path('apps/api/app/private_global_models.py').read_text()
+          assert 'http.client.HTTPSConnection' in source
+          assert 'external_transfer_approved is not True' in source
+          assert 'spend_reservation_verified is not True' in source
+          for host in ('api.openai.com','api.anthropic.com',
+              'generativelanguage.googleapis.com','api.mistral.ai',
+              'api.deepseek.com','dashscope-intl.aliyuncs.com'):
+              assert host in source, host
+          assert 'No arbitrary base URL' in source
+          print('Source-only worldwide adapter protocol tests, no external charges')
+          PY
