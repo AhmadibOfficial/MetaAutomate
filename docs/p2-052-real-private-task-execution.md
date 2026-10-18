@@ -72,7 +72,7 @@ Expected verified computation: reorder quantity 13; stock value 875000 minor uni
 }
 \`\`\`
 
-The local model adapter uses only \`127.0.0.1:<port>/v1/chat/completions\`, strict timeout/size limits, pinned configured checkpoint digest, and no model tools or remote URL. A kernel check requires an unprivileged Linux no-egress network namespace containing only \`lo\`, but this check is not an independent cryptographic isolation attestation. An environment-provided digest does not prove the loaded checkpoint is identical; the operator must produce external measured process evidence.
+The local model adapter uses only \`127.0.0.1:<port>/v1/chat/completions\`, strict timeout/size limits, pinned configured checkpoint digest plus streaming SHA-256 of an owner-only GGUF file before inference, and no model tools or remote URL. A kernel check requires an unprivileged Linux no-egress network namespace containing only \`lo\`, but this check is not an independent cryptographic isolation attestation. An environment-provided digest is not enough: the adapter now hashes real owner-only GGUF bytes and checks the expected digest on each request. Even that does not prove the running model process loaded the file, so independent process attestation remains required.
 
 ## Admission prerequisites for an actual staging deployment
 
@@ -101,6 +101,7 @@ MAT_LOCAL_MODEL_ISOLATION_APPROVED=1
 MAT_LOCAL_MODEL_URL=http://127.0.0.1:11434/v1/chat/completions
 MAT_LOCAL_MODEL_ID=<exact-reviewed-identifier>
 MAT_LOCAL_MODEL_CHECKPOINT_SHA256=<64-digit-hash>
+MAT_LOCAL_MODEL_CHECKPOINT_FILE=/private/model/approved.gguf
 \`\`\`
 
 No customer accounts, permanent chat history, video/image/speech inference or public API integration are claimed complete by this milestone. The public Render service remains a **static website**; the private task API is an independently gated deployment.
