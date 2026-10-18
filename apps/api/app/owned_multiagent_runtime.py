@@ -18,7 +18,7 @@ import json
 import re
 import sqlite3
 import time
-from contextlib import contextmanager
+from contextlib import contextmanager, closing
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -63,7 +63,8 @@ def validate(tenant:str,key:str,payload:dict,budget:int)->dict:
     if (type(payload["currency"]) is not str or
         not CURRENCY_RE.fullmatch(payload["currency"])):
         raise ValueError("Three-letter currency code required")
-    if payload["requested_external_action"] not in ALLOWED_ACTIONS:
+    if (type(payload["requested_external_action"]) is not str or
+        payload["requested_external_action"] not in ALLOWED_ACTIONS):
         raise ValueError("Unapproved action class")
     items=payload["items"]
     if type(items) is not list or not 1<=len(items)<=80:
@@ -130,17 +131,45 @@ def creative_agent(p:dict,context:dict)->dict:
 def verifier_agent(p:dict,context:dict)->dict:
     inv=context["inventory"]
     biz=context["business"]
-    expected=inventory_agent(p,{})
-    if inv!=expected:
+    # Separate recomputation directly from untrusted input, not from the
+    # inventory-agent implementation. This catches corrupt upstream artifacts.
+    expected_rows=[]
+    for item in p["items"]:
+        units=max(0,item["reorder_at"]-item["on_hand"])
+        expected_rows.append({
+            "sku":item["sku"],"label":item["label"],
+            "on_hand":item["on_hand"],"reorder_units":units,
+            "purchase_estimate_minor":units*item["unit_cost_minor"],
+            "stock_value_minor":item["on_hand"]*item["unit_cost_minor"],
+        })
+    if (inv.get("rows")!=expected_rows or
+        inv.get("items_count")!=len(p["items"]) or
+        inv.get("currency")!=p["currency"]):
         raise ValueError("Independent inventory recomputation disagrees")
-    if biz["estimated_replenishment_minor"]!=sum(
-        x["purchase_estimate_minor"] for x in inv["rows"]
-    ) or biz["existing_stock_minor"]!=sum(
-        x["stock_value_minor"] for x in inv["rows"]
-    ):
-        raise ValueError("Independent business totals disagree")
-    if context["creative"]["publication_authorized"] is not False:
-        raise ValueError("Unapproved creative publication")
+    expected_priorities=sorted(
+        (row for row in expected_rows if row["reorder_units"]>0),
+        key=lambda row:(-row["purchase_estimate_minor"],row["sku"]),
+    )
+    expected_business={
+        "reorder_skus":len(expected_priorities),
+        "estimated_replenishment_minor":sum(row["purchase_estimate_minor"]
+                                           for row in expected_rows),
+        "existing_stock_minor":sum(row["stock_value_minor"]
+                                   for row in expected_rows),
+        "priority_skus":[row["sku"] for row in expected_priorities[:3]],
+        "currency":p["currency"],
+        "financial_figures_independently_verified":False,
+    }
+    if biz!=expected_business:
+        raise ValueError("Independent business recomputation disagrees")
+    creative=context["creative"]
+    if (type(creative) is not dict or
+        creative.get("publication_authorized") is not False or
+        creative.get("model_generated") is not False or
+        creative.get("audience")!=p["audience"] or
+        type(creative.get("draft_message")) is not str or
+        not creative["draft_message"].startswith("Inventory update:")):
+        raise ValueError("Creative draft is not a permitted local output")
     return {
         "verification":"PASS",
         "method":"INDEPENDENT_DETERMINISTIC_RECOMPUTATION",
@@ -194,7 +223,7 @@ class Runtime:
         self.path=str(path)
         self.now=now if now is not None else time.time
         Path(self.path).parent.mkdir(parents=True,exist_ok=True)
-        with self.connect() as db:
+        with closing(self.connect()) as db:
             db.executescript(SCHEMA)
 
     def connect(self):
