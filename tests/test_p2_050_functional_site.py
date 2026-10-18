@@ -63,3 +63,30 @@ def test_duplicate_html_ids_not_added():
     for name in ("engage/index.html","creative/index.html"):
         ids=re.findall(r'\bid="([^"]+)"',read(name))
         assert len(ids)==len(set(ids)),name
+
+def test_narrated_video_generator_is_a_real_browser_encoding_task():
+    html=read("creative/index.html")
+    js=read("assets/creative-video.js")
+    assert 'id="video-maker-form"' in html
+    assert 'id="video-maker-audio"' in html
+    assert 'id="video-maker-audio-preview"' in html
+    assert 'id="video-maker-rights"' in html
+    assert 'id="video-maker-preview"' in html
+    assert 'id="video-maker-download"' in html
+    assert 'src="/assets/creative-video.js"' in html
+    assert "canvas.captureStream(24)" in js
+    assert "new MediaRecorder(stream" in js
+    assert "new AudioContext()" in js
+    assert "decodeAudioData(await file.arrayBuffer())" in js
+    assert "audioOut.stream.getAudioTracks()" in js
+    assert "media.ondataavailable" in js
+    assert "media.onstop" in js
+    assert 'mimeType:codec' in js
+    assert 'link.download="metaautomate-narrated-"+size.value+".webm"' in js
+    assert 'decoded.duration<29.95 || decoded.duration>120.05' in js
+    assert "audioUsable(decoded)" in js
+    assert "rights.checked" in js
+    assert "getUserMedia" not in js
+    for x in ("fetch(", "localStorage", "sessionStorage", "XMLHttpRequest",
+              "sendBeacon(", "innerHTML"):
+        assert x not in js
