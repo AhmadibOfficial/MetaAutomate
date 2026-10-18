@@ -15,7 +15,23 @@ python scripts/run_owned_multiagent_demo.py \
   --output /tmp/metautomate-p2-054-report.json
 \`\`\`
 
-The command submits and processes a durable four-agent business task, verifies the evidence chain, checks the final numerical verification receipt, and prints a SHA-256 of the result JSON. Restarting the process and reusing its request key returns the same workflow ID without duplicate execution.
+The command submits and processes a durable four-agent business task, verifies the evidence chain, checks the final numerical verification receipt, and prints a SHA-256 of the result JSON.
+
+To process a user-authorized **local** JSON inventory document instead of fictional fixture data, use the same schema returned by \`demo_payload()\`, provide the file path, and explicitly declare the data permission:
+
+\`\`\`bash
+python scripts/run_owned_multiagent_demo.py \
+  --db /private/metautomate/authorized-run.sqlite3 \
+  --input-json /private/metautomate/inventory.json \
+  --authorized-data \
+  --tenant authorized_project \
+  --actor authorized_owner \
+  --request-key private-demo-20261018-001 \
+  --output /private/metautomate/result.json
+\`\`\`
+
+The CLI applies an owner-only 0077 process umask for files it creates; this is **not encryption**. Do not process confidential or regulated customer records until encryption, retention, identity and secure hosting are independently reviewed. Use pseudonymous aggregate inventory data first.
+ Restarting the process and reusing its request key returns the same workflow ID without duplicate execution.
 
 ### Agents that perform real work
 
