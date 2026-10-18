@@ -59,6 +59,8 @@ def private_mcp_dispatch(
         return _err(ident,-32602,"Invalid params")
     meta=params.get("_meta")
     if (type(meta) is not dict or
+        meta.get("io.modelcontextprotocol/protocolVersion")!="2026-07-28" or
+        type(meta.get("io.modelcontextprotocol/clientCapabilities")) is not dict or
         type(meta.get("io.modelcontextprotocol/clientInfo")) is not dict or
         not meta.get("io.modelcontextprotocol/clientInfo",{}).get("name")):
         return _err(ident,-32602,"Client metadata required")
