@@ -77,6 +77,15 @@ if os.environ.get("MAT_PILOT_OUTCOMES_ENABLED") == "1":
     verify_private_pilot_admission()
     pilot_outcomes_router.dependencies.append(Depends(require_private_pilot_admission))
     app.include_router(pilot_outcomes_router)
+# Genuine bounded artifact computation. This route is private, OIDC-only
+# and disabled until separate database, encryption, retention and admission
+# checks are verified. Never bind to the public static Render site.
+if os.environ.get("MAT_PRIVATE_TASKS_ENABLED") == "1":
+    if _mode != "oidc" or os.environ.get("MAT_TASK_STORAGE_APPROVED") != "1":
+        raise RuntimeError("Private task execution requires approved OIDC staging and storage")
+    from app.private_task_execution import router as private_task_router
+    app.include_router(private_task_router)
+
 if _mode == "dev_key":
     app.include_router(synthetic_inventory_router)
     app.include_router(synthetic_inventory_import_router)
@@ -94,7 +103,7 @@ async def workspace_security_headers(request, call_next):
         "object-src 'none'; base-uri 'none'; "
         "form-action 'self'; frame-ancestors 'none'"
     )
-    if request.url.path.startswith(("/v1/workspace", "/v1/objective-operations", "/v1/assessments", "/v1/amboy", "/v1/domain-integrations", "/v1/pilot-outcomes")):
+    if request.url.path.startswith(("/v1/workspace", "/v1/objective-operations", "/v1/assessments", "/v1/amboy", "/v1/domain-integrations", "/v1/pilot-outcomes", "/v1/private-tasks")):
         response.headers["Cache-Control"] = "no-store"
     return response
 
