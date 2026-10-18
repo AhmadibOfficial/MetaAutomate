@@ -5,7 +5,6 @@ mandatory cross-border data approval and durable spend reservation before
 a network socket can be constructed.
 """
 import json
-from dataclasses import replace
 import pytest
 from fastapi import HTTPException
 from app.private_global_models import (
@@ -80,9 +79,10 @@ class HTTPSStub:
         assert path.startswith(spec.path)
         assert "http" not in path
         assert headers["Content-Type"]=="application/json"
-        assert headers.get("Authorization","")=="Bearer "+FAKE_KEY \
-            if self.scenario not in ("ANTHROPIC","GOOGLE") \
-            else "Authorization" not in headers
+        if self.scenario in ("ANTHROPIC","GOOGLE"):
+            assert "Authorization" not in headers
+        else:
+            assert headers.get("Authorization")=="Bearer "+FAKE_KEY
         if self.scenario=="ANTHROPIC":
             assert headers["x-api-key"]==FAKE_KEY
             assert headers["anthropic-version"]=="2023-06-01"
