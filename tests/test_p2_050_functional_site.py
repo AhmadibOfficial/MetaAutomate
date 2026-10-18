@@ -90,3 +90,16 @@ def test_narrated_video_generator_is_a_real_browser_encoding_task():
     for x in ("fetch(", "localStorage", "sessionStorage", "XMLHttpRequest",
               "sendBeacon(", "innerHTML"):
         assert x not in js
+
+def test_ai_tasks_produce_copyable_results_without_conversation_download():
+    html=read("engage/index.html")
+    script=read("assets/project-device-ai.js")
+    assert 'id="project-ai-copy"' in html
+    assert "project-ai-export" not in html
+    for label in ("product", "marketing", "workflow", "video"):
+        assert f'data-ai-task="{label}"' in html
+    assert 'navigator.clipboard.writeText(lastAnswer)' in script
+    assert "const TASKS = Object.freeze(" in script
+    assert "taskButtons.forEach(button" in script
+    assert 'href="/creative/#instant-design"' in html
+    assert "sessionStorage" not in script
