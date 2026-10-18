@@ -1,5 +1,6 @@
 """P2-052: actual text model call is local-only, uninstalled in these tests."""
 import json
+from hashlib import sha256
 import pytest
 from fastapi import HTTPException
 
@@ -22,13 +23,23 @@ def test_no_private_model_enabled_by_default():
         configured_model({},isolation_probe=lambda:True)
     assert e.value.status_code==503
 
-def test_runtime_requires_real_kernel_guard():
+def test_runtime_requires_real_kernel_guard(tmp_path):
+    checkpoint=tmp_path/"approved.gguf"
+    checkpoint.write_bytes(b"approved fixture GGUF data " * 10)
+    checkpoint.chmod(0o600)
+    settings=config()
+    settings["MAT_LOCAL_MODEL_CHECKPOINT_FILE"]=str(checkpoint)
+    settings["MAT_LOCAL_MODEL_CHECKPOINT_SHA256"]=sha256(checkpoint.read_bytes()).hexdigest()
     with pytest.raises(HTTPException) as e:
-        configured_model(config(),isolation_probe=lambda:False)
+        configured_model(settings,isolation_probe=lambda:False)
     assert e.value.status_code==503
-    cfg=configured_model(config(),isolation_probe=lambda:True)
+    cfg=configured_model(settings,isolation_probe=lambda:True)
     assert cfg.port==11434
-    assert cfg.digest=="b"*64
+    assert cfg.digest==settings["MAT_LOCAL_MODEL_CHECKPOINT_SHA256"]
+    checkpoint.write_bytes(b"tampered local model")
+    with pytest.raises(HTTPException) as e:
+        configured_model(settings,isolation_probe=lambda:True)
+    assert e.value.status_code==503
 
 @pytest.mark.parametrize("address",[
     "https://remote-model.example/v1/chat/completions",
