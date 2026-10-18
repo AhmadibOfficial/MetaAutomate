@@ -40,3 +40,10 @@
 .video-maker-download{display:inline-flex;margin:3px 0}
 .video-maker-controls :focus-visible{outline:3px solid #2973c0;outline-offset:2px}
 @media(max-width:620px){.creative-video-maker{padding:38px 0 50px}.video-maker-controls{padding:16px;border-radius:13px;gap:15px}}
+
+.creative-advanced-planning{border-top:1px solid #d9e4ef;background:#fff}
+.creative-advanced-planning>summary{cursor:pointer;padding:20px clamp(20px,5vw,90px);font-weight:770;color:#245787;background:#f0f6fc;outline-offset:2px}
+.creative-advanced-planning>summary:focus-visible{outline:3px solid #2973c0}
+.creative-advanced-planning:not([open]){padding-bottom:0}
+#video-maker-audio-preview{display:block;width:100%;max-width:450px;height:45px}
+#video-maker-audio-preview[hidden]{display:none!important}
