@@ -16,6 +16,14 @@
   const input = byId("project-ai-input");
   const send = byId("project-ai-send");
   const reset = byId("project-ai-reset");
+  const copyResult = byId("project-ai-copy");
+  const taskButtons = [...document.querySelectorAll("[data-ai-task]")];
+  const TASKS = Object.freeze({
+    product:"Help me write a clear, accurate product description. First ask me for the product, main benefit, price (if relevant), and ideal buyer. Do not invent product claims.",
+    marketing:"Help create a persuasive but factual marketing message for my business. Ask me what I sell, who the audience is, and the desired action.",
+    workflow:"Help design an actionable business workflow. Ask about the task, available resources and current bottleneck, then propose concrete steps.",
+    video:"Help draft a 30–120 second educational video script with narration and visual scenes. First ask me for the topic, audience and takeaway."
+  });
   const error = byId("project-ai-error");
   const guided = ["project-chat-messages","project-chat-suggestions",
                   "project-chat-summary"].map(byId);
@@ -40,6 +48,7 @@
   let loading = false;
   let answering = false;
   let turns = [];
+  let lastAnswer = "";
   const setStatus = value => { status.textContent = value; };
   const setError = value => {
     error.textContent = value;
@@ -49,6 +58,8 @@
     input.disabled = !ready;
     send.disabled = !ready || answering;
     load.disabled = loading || !!engine;
+    if(copyResult) copyResult.disabled = !lastAnswer;
+    taskButtons.forEach(button => {button.disabled = !ready;});
   };
 
   function addMessage(role, message) {
@@ -166,6 +177,8 @@
       const bounded=reply.trim().slice(0,2600);
       turns=[...limited,{role:"assistant",content:bounded}].slice(-8);
       addMessage("assistant",bounded);
+      lastAnswer=bounded;
+      if(copyResult) copyResult.disabled=false;
       setStatus("On-device AI response completed. Verify important information independently.");
     } catch {
       addMessage("assistant","The on-device model could not finish this reply. Please try again or use the guided project form.");
@@ -186,12 +199,31 @@
   reset.addEventListener("click",()=>{
     if(answering) return;
     turns=[];
+    lastAnswer="";
+    if(copyResult) copyResult.disabled=true;
     feed.replaceChildren();
     setError("");
     setStatus(engine
       ? "Conversation cleared from page memory. Local model remains loaded."
       : "No AI is running. Start the model to begin.");
     if(engine) input.focus();
+  });
+  taskButtons.forEach(button => button.addEventListener("click",()=>{
+    if(!engine || answering)return;
+    const prompt=TASKS[button.dataset.aiTask];
+    if(!prompt)return;
+    input.value=prompt;
+    input.focus();
+    setStatus("Ready to ask the local AI. You can edit the prompt before sending.");
+  }));
+  copyResult?.addEventListener("click",async()=>{
+    if(!lastAnswer)return;
+    try{
+      await navigator.clipboard.writeText(lastAnswer);
+      setStatus("Latest answer copied. Review it before using or publishing.");
+    }catch{
+      setStatus("Clipboard unavailable. Select the answer text and copy it manually.");
+    }
   });
   // No hidden initialization or network request occurs until the user chooses
   // "Download model and start local AI".
