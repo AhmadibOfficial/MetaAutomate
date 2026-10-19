@@ -1,0 +1,338 @@
+/* P2-056 — Immersive MetaAutomate project workspace.
+   Dark conversation-first layout. No ChatGPT branding or hidden provider calls. */
+body.project-immersive-page{
+  background:#08090b;color:#edf0f4;color-scheme:dark;
+}
+.project-immersive-page .utility-bar,.project-immersive-page .site-header,
+.project-immersive-page .site-footer{display:none}
+.project-immersive-page #main{min-height:100svh}
+.project-immersive-page .skip-link{background:#22252b;color:#fff}
+.project-immersive-page .project-chat{
+  --pc-border:#26272b;--pc-ink:#ededf0;--pc-muted:#a1a1aa;
+  background:#08090b;color:#f0f0f1;
+  margin:0;max-width:none;border:0;border-radius:0;box-shadow:none;
+  min-height:100svh;grid-template-columns:276px minmax(0,1fr);
+  overflow:visible
+}
+.project-immersive-page .project-chat-side{
+  position:sticky;top:0;height:100svh;overflow-y:auto;
+  border-right:1px solid #222326;background:#090a0c;
+  padding:19px 10px 22px;gap:12px;z-index:20;
+}
+.project-immersive-page .project-chat-side-title{
+  display:flex;align-items:center;gap:10px;margin:1px 7px 6px;padding:6px;
+  color:#f3f3f6;text-decoration:none;font-size:1.16rem;letter-spacing:-.035em;font-weight:720
+}
+.project-immersive-page .project-chat-side-title img{
+  width:30px;height:30px;object-fit:contain;border-radius:9px
+}
+.project-immersive-page .workspace-chevron{margin-left:auto;color:#a2a5b0;font-size:16px}
+.project-immersive-page .workspace-side-search{padding:0 4px}
+.project-immersive-page .workspace-side-search label{
+  position:absolute;width:1px;height:1px;clip:rect(0,0,0,0);overflow:hidden
+}
+.project-immersive-page .workspace-side-search input{
+  width:100%;height:38px;padding:8px 11px;border-radius:10px;
+  border:1px solid #25272e;background:#141518;color:#f6f6f8;font-size:.79rem;
+  outline:0
+}
+.project-immersive-page .workspace-side-search input::placeholder{color:#9a9ca5}
+.project-immersive-page .workspace-side-search input:focus-visible{
+  outline:2px solid #347fe7;outline-offset:1px
+}
+.project-immersive-page .workspace-side-search p{padding:2px 8px;color:#a9acb5;font-size:.75rem;margin:5px 0}
+.project-immersive-page .project-chat-new{
+  border:0;background:#202124;border-radius:11px;color:#f4f4f7;
+  padding:12px 14px;font-size:.88rem;font-weight:550
+}
+.project-immersive-page .project-chat-new:hover,
+.project-immersive-page .project-chat-new:focus-visible{background:#2b2d31}
+.project-immersive-page .project-action-shortcuts{
+  grid-template-columns:1fr 1fr;gap:7px;padding:0 2px;margin:1px 0 4px
+}
+.project-immersive-page .project-action-shortcuts a{
+  background:#16181d;color:#c9dafe;border:1px solid #2b3038;
+  padding:10px 5px;border-radius:10px;font-weight:620;font-size:.73rem
+}
+.project-immersive-page .project-action-shortcuts a:hover{
+  background:#1d2738;border-color:#3878c9
+}
+.project-immersive-page .project-chat-label{
+  color:#868b95;font-size:.66rem;letter-spacing:.09em;padding:13px 10px 0
+}
+.project-immersive-page .project-chat-templates{gap:3px}
+.project-immersive-page .project-chat-templates button{
+  background:transparent;color:#c0c2c8;border:0;text-align:left;
+  border-radius:9px;font-size:.81rem;padding:10px 11px;line-height:1.45
+}
+.project-immersive-page .project-chat-templates button:hover,
+.project-immersive-page .project-chat-templates button:focus-visible{
+  background:#1c1d20;color:#fff
+}
+.project-immersive-page .workspace-side-links{
+  display:grid;gap:2px;border-top:1px solid #222329;margin:7px 6px 0;padding-top:13px
+}
+.project-immersive-page .workspace-side-links a{
+  display:flex;gap:12px;align-items:center;font-size:.81rem;color:#b9bdc5;
+  padding:11px 10px;border-radius:9px
+}
+.project-immersive-page .workspace-side-links a:hover{background:#1b1d22;color:#fff}
+.project-immersive-page .project-chat-side-footer{
+  border-top:1px solid #23262c;margin-top:auto;padding:17px 11px 2px
+}
+.project-immersive-page .project-chat-side-footer strong{font-size:.76rem;color:#b6caff}
+.project-immersive-page .project-chat-side-footer p{color:#8c929f;font-size:.7rem;line-height:1.65}
+.project-immersive-page .project-chat-main{
+  min-width:0;min-height:100svh;padding:8px clamp(22px,4vw,65px) 30px;
+  max-width:1110px;width:100%;margin:auto;display:flex;flex-direction:column;
+}
+.project-immersive-page .workspace-headbar{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  min-height:53px;flex:none
+}
+.project-immersive-page .workspace-mode-switch{
+  display:flex;align-items:center;background:#171719;border:1px solid #202124;
+  padding:3px;border-radius:999px;width:min(226px,95%);gap:4px
+}
+.project-immersive-page .workspace-mode-switch button{
+  min-height:35px;flex:1;color:#aeb1bb;background:transparent;border:0;border-radius:999px;
+  font-weight:570;font-size:.79rem
+}
+.project-immersive-page .workspace-mode-switch button[aria-pressed="true"]{
+  background:#28292c;color:#f6f7f8;box-shadow:0 1px 5px #0006
+}
+.project-immersive-page .workspace-website-link{
+  position:absolute;right:0;top:12px;font-size:.75rem;color:#989da7
+}
+.project-immersive-page .workspace-website-link:hover{color:#fff}
+.project-immersive-page .project-chat-top{
+  border:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:0;min-height:180px;padding:16px 0 6px;
+  text-align:center;flex:none
+}
+.project-immersive-page .project-chat-top h1{
+  font-weight:520;letter-spacing:-.045em;line-height:1.14;
+  font-size:clamp(1.9rem,3vw,2.55rem);color:#f0f1f4;margin:10px 0 8px
+}
+.project-immersive-page .project-chat-kicker{
+  color:#8c96a5;letter-spacing:.17em;font-weight:650;font-size:.61rem
+}
+.project-immersive-page .project-chat-top p{
+  font-size:.88rem;color:#979ba7;margin:auto;max-width:680px
+}
+.project-immersive-page .project-chat-offline{
+  color:#99a6be;border:1px solid #303645;background:#131821;
+  border-radius:20px;font-size:.59rem;letter-spacing:.075em;
+  margin:12px 0 0;padding:7px 10px
+}
+.project-immersive-page .project-ai-mode-switch{
+  justify-content:center;flex-wrap:wrap;gap:10px;margin:5px 0 12px
+}
+.project-immersive-page .project-ai-mode-button{
+  color:#b8d4ff;background:#182030;border:1px solid #303d59;
+  border-radius:26px;padding:9px 14px
+}
+.project-immersive-page .project-ai-mode-button:hover{background:#223451}
+.project-immersive-page .project-ai-mode-note{font-size:.73rem;color:#979cab}
+.project-immersive-page .project-chat-conversation{
+  flex:1;min-height:130px;max-height:38svh;padding:16px clamp(0px,3vw,60px);
+  scrollbar-color:#343943 transparent
+}
+.project-immersive-page .project-chat-message{max-width:780px}
+.project-immersive-page .project-chat-avatar{
+  background:#182c49;color:#a7c7ff;font-size:1.2rem;border-radius:50%
+}
+.project-immersive-page .project-chat-bubble{color:#d4d6dc;font-size:.87rem}
+.project-immersive-page .project-chat-bubble strong{color:#bdc9dd;font-size:.76rem}
+.project-immersive-page .project-chat-bubble .project-chat-hint{color:#858d9c}
+.project-immersive-page .project-chat-user .project-chat-bubble{
+  background:#242528;color:#f3f3f6;border:1px solid #34363b;border-radius:18px 18px 4px 18px
+}
+.project-immersive-page .project-chat-action-area{
+  max-width:820px;width:100%;margin:0 auto 12px
+}
+.project-immersive-page .project-chat-prompt-chips{margin:8px 0 17px}
+.project-immersive-page .project-chat-prompt-chips button{
+  color:#c0c3ca;background:#141518;border:1px solid #303136;
+  font-weight:500;letter-spacing:0;font-size:.73rem
+}
+.project-immersive-page .project-chat-prompt-chips button:hover{
+  background:#202329;color:#fff;border-color:#4f79b0
+}
+.project-immersive-page .project-chat-composer{
+  background:#1f2022;border:1px solid #303135;color:#f3f3f5;
+  box-shadow:0 10px 34px #0004;border-radius:25px;padding:13px 16px 11px
+}
+.project-immersive-page .project-chat-input-label,
+.project-immersive-page .project-ai-composer label{
+  font-size:.67rem;color:#a3a7b1;font-weight:500
+}
+.project-immersive-page .project-chat-composer textarea{
+  min-height:50px;color:#fff;background:transparent;font-size:.94rem
+}
+.project-immersive-page .project-chat-composer textarea::placeholder{color:#a4a5aa}
+.project-immersive-page .project-chat-composer-actions{border-top:1px solid #303236}
+.project-immersive-page #project-chat-progress{color:#9296a0}
+.project-immersive-page .project-chat-controls button{
+  background:#2c2e33;border:0;color:#e2e6ee
+}
+.project-immersive-page .project-chat-controls #project-chat-send,
+.project-immersive-page #project-ai-send{background:#346fda;border:0;color:#fff}
+.project-immersive-page .project-chat-footnote{color:#9296a2;font-size:.69rem}
+.project-immersive-page .project-chat-notice{color:#ffa5a5}
+.project-immersive-page .project-chat-summary{
+  color:#e3e7ed;background:#13161c;border:1px solid #2b3544;border-radius:16px;
+  max-height:42svh;overflow:auto
+}
+.project-immersive-page .project-chat-summary-header h2{color:#f4f5f8}
+.project-immersive-page .project-chat-summary-header p{color:#a1adbe}
+.project-immersive-page #project-chat-summary-text{
+  background:#0e1013;color:#e6e9f0;border-color:#343a45
+}
+.project-immersive-page .project-chat-summary-actions a,
+.project-immersive-page .project-chat-summary-actions button{
+  color:#e3eaf8;background:#243045;border-color:#354967
+}
+.project-immersive-page #project-chat-email{background:#346fda;border:0}
+.project-immersive-page #project-chat-copy-status{color:#a3cdff}
+.project-immersive-page .project-ai-experience{
+  color:#dce0e9;min-height:330px;max-width:850px;width:100%;margin:0 auto;
+  padding-top:7px
+}
+.project-immersive-page .project-ai-header strong{color:#d4e2fb}
+.project-immersive-page .project-ai-header p{color:#aab0bd}
+.project-immersive-page .project-ai-header button,
+.project-immersive-page .project-ai-actions button,
+.project-immersive-page .project-ai-create-link{
+  color:#dbe3f1;background:#22262e;border:1px solid #394051
+}
+.project-immersive-page .project-ai-consent{
+  background:#151a23;border-color:#344052
+}
+.project-immersive-page .project-ai-consent p{color:#b3bfce}
+.project-immersive-page .project-ai-consent a{color:#91c3ff}
+.project-immersive-page #project-ai-load{background:#326bd2;border-color:#326bd2}
+.project-immersive-page .project-ai-status{
+  color:#a9c3eb;background:#142033;border:1px solid #223452
+}
+.project-immersive-page .project-ai-messages{
+  max-height:35svh;scrollbar-color:#394253 transparent
+}
+.project-immersive-page .project-ai-message{
+  background:#181d25;border-color:#283344
+}
+.project-immersive-page .project-ai-message strong{color:#b4cfff}
+.project-immersive-page .project-ai-message p{color:#e2e8ef}
+.project-immersive-page .project-ai-user{background:#262932}
+.project-immersive-page .project-ai-composer{background:#202124;border-color:#34383d}
+.project-immersive-page .project-ai-composer textarea,
+.project-immersive-page .project-ai-composer textarea:disabled{
+  color:#f5f5f7;background:transparent
+}
+.project-immersive-page .project-ai-quick-tasks button{
+  color:#bcd4fd;background:#1a2537;border-color:#35435a
+}
+.project-immersive-page .project-ai-footer{color:#939ba9}
+.project-immersive-page .project-ai-error{color:#ffc2be;background:#371d21}
+.project-immersive-page .project-chat-alternative{
+  background:#111316;border-color:#2b3036;color:#e0e4ec;
+  margin:0 auto 30px;max-width:1260px
+}
+.project-immersive-page .project-chat-alternative>summary{color:#c0d4f3;background:#151b24}
+.project-immersive-page .project-chat-alternative[open]>summary{background:#202c3d}
+.project-immersive-page .workspace-work-panel{
+  width:min(820px,100%);margin:5px auto 30px;padding:12px 5px 24px;
+  flex:1;color:#f4f5f7
+}
+.project-immersive-page .workspace-work-panel[hidden]{display:none!important}
+.project-immersive-page .workspace-work-intro{text-align:center;margin-bottom:23px}
+.project-immersive-page .workspace-work-intro span{
+  color:#95b9f5;font-size:.65rem;letter-spacing:.13em;font-weight:720
+}
+.project-immersive-page .workspace-work-intro h2{
+  font-size:clamp(1.4rem,2.3vw,2rem);font-weight:550;letter-spacing:-.035em;margin:8px 0 12px
+}
+.project-immersive-page .workspace-work-intro p{color:#999eaa;font-size:.85rem}
+.project-immersive-page .workspace-work-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px
+}
+.project-immersive-page .workspace-work-grid a,
+.project-immersive-page .workspace-work-grid button{
+  position:relative;display:flex;flex-direction:column;align-items:flex-start;
+  min-height:146px;text-align:left;padding:22px 21px;
+  border:1px solid #2e3239;border-radius:17px;background:#17191e;color:#f1f3f7;
+  text-decoration:none;gap:8px;font:inherit;cursor:pointer
+}
+.project-immersive-page .workspace-work-grid a:hover,
+.project-immersive-page .workspace-work-grid button:hover{
+  background:#1c2431;border-color:#5c86c2
+}
+.project-immersive-page .workspace-work-grid strong{font-size:1rem;font-weight:620}
+.project-immersive-page .workspace-work-grid small{font-size:.77rem;color:#a1a9b9;line-height:1.52}
+.project-immersive-page .workspace-work-icon{color:#a9c7ff;font-size:1.35rem}
+.project-immersive-page .workspace-work-arrow{position:absolute;right:20px;top:21px;color:#b7c5da}
+.project-immersive-page .workspace-work-boundary{
+  margin:20px 0;color:#8f98a9;font-size:.73rem;text-align:center
+}
+.project-immersive-page[data-workspace-mode="work"] .project-ai-mode-switch,
+.project-immersive-page[data-workspace-mode="work"] .project-ai-experience,
+.project-immersive-page[data-workspace-mode="work"] .project-chat-conversation,
+.project-immersive-page[data-workspace-mode="work"] .project-chat-action-area,
+.project-immersive-page[data-workspace-mode="work"] .project-chat-summary{display:none!important}
+.project-immersive-page[data-workspace-mode="work"] .project-chat-top{min-height:145px}
+.project-immersive-page .workspace-mobile-menu,.project-immersive-page .workspace-menu-backdrop{display:none}
+.project-immersive-page :is(button,a,input,textarea,select):focus-visible{
+  outline:3px solid #669ffb;outline-offset:2px
+}
+@media(max-width:980px){
+  .project-immersive-page .project-chat{grid-template-columns:234px minmax(0,1fr)}
+  .project-immersive-page .project-chat-side{display:flex;padding:14px 8px}
+  .project-immersive-page .project-chat-main{padding-inline:22px}
+  .project-immersive-page .project-chat-templates{display:flex;flex-direction:column}
+  .project-immersive-page .project-chat-label{display:block}
+  .project-immersive-page .project-action-shortcuts{grid-column:auto;grid-row:auto}
+}
+@media(max-width:740px){
+  .project-immersive-page .project-chat{display:block;min-height:100svh}
+  .project-immersive-page .project-chat-side{
+    display:flex;position:fixed;left:0;top:0;bottom:0;height:100svh;
+    width:min(290px,84vw);z-index:102;transform:translateX(-105%);
+    transition:transform .18s ease;box-shadow:18px 0 45px #0008;
+  }
+  .project-immersive-page .project-chat-side.is-open{transform:translateX(0)}
+  .project-immersive-page .workspace-mobile-menu{
+    display:flex;position:fixed;left:10px;top:9px;z-index:79;align-items:center;
+    gap:7px;padding:10px;border-radius:12px;border:1px solid #32343a;
+    background:#1a1c21;color:#f1f2f7;font-size:.76rem
+  }
+  .project-immersive-page .workspace-menu-backdrop:not([hidden]){
+    display:block;position:fixed;inset:0;background:#0009;border:0;
+    z-index:100;border-radius:0
+  }
+  .project-immersive-page .project-chat-main{
+    max-width:none;padding:5px 16px 22px;min-height:100svh
+  }
+  .project-immersive-page .workspace-headbar{padding-left:54px}
+  .project-immersive-page .workspace-website-link{display:none}
+  .project-immersive-page .project-chat-top{min-height:160px}
+  .project-immersive-page .project-chat-top h1{font-size:1.85rem}
+  .project-immersive-page .project-chat-conversation{max-height:38svh}
+  .project-immersive-page .project-chat-side-footer{display:block}
+  .project-immersive-page .project-action-shortcuts{display:grid;grid-template-columns:1fr 1fr}
+  .project-immersive-page .project-chat-templates{display:flex;flex-direction:column}
+}
+@media(max-width:440px){
+  .project-immersive-page .project-chat-main{padding-inline:12px}
+  .project-immersive-page .project-chat-top h1{font-size:1.55rem}
+  .project-immersive-page .project-chat-top{min-height:140px}
+  .project-immersive-page .project-chat-prompt-chips{justify-content:flex-start}
+  .project-immersive-page .project-chat-prompt-chips button{font-size:.68rem;padding:8px 10px}
+  .project-immersive-page .project-chat-conversation{max-height:37svh}
+  .project-immersive-page .workspace-work-grid{grid-template-columns:1fr}
+  .project-immersive-page .workspace-work-grid a,
+  .project-immersive-page .workspace-work-grid button{min-height:110px}
+  .project-immersive-page .project-chat-summary-actions{gap:8px}
+}
+@media(prefers-reduced-motion:reduce){
+  .project-immersive-page .project-chat-side{transition:none}
+}

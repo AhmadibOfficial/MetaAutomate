@@ -33,7 +33,7 @@ def test_conversation_is_primary_but_original_form_is_preserved():
     html = (SITE / "engage" / "index.html").read_text()
     p = Structure()
     p.feed(html)
-    assert 'What are you looking to create?' in html
+    assert 'What would you like to build today?' in html
     assert html.index('class="project-chat"') < html.index('id="brief-form"')
     assert p.forms == ["brief-form"], "Existing local email enquiry must remain usable"
     assert p.details >= 1
@@ -49,7 +49,7 @@ def test_conversation_is_primary_but_original_form_is_preserved():
         assert node in p.ids
     assert 'role="log"' in html
     assert 'aria-live="polite"' in html
-    assert "GUIDED INTAKE · NO LIVE AI" in html
+    assert "GUIDED CHAT · PRIVATE BY DEFAULT" in html
     assert "Nothing is sent" in html or "nothing has been sent" in html
     assert 'data-project-template="creative"' in html
     assert "metaautomating@gmail.com" in html

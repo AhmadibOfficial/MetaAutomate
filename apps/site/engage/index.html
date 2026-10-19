@@ -2,10 +2,10 @@
 <html lang="en"><head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#050e23">
+  <meta name="theme-color" content="#08090c">
   <meta name="description" content="Start with a conversation. Describe your project, explore its goals, and prepare a private brief for MetaAutomate without sharing information automatically.">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Project Brief — MetaAutomate">
+  <meta property="og:title" content="Start a Project — MetaAutomate">
   <meta property="og:description" content="Define a technology project with MetaAutomate. Build a private, shareable brief for AI, digital product, cybersecurity, cloud, data or experience work.">
   <meta name="color-scheme" content="dark light">
   <link rel="icon" type="image/webp" href="/assets/metaautomate-mark.webp">
@@ -14,9 +14,11 @@
 <link rel="stylesheet" href="/assets/project-chat.css">
 <script src="/assets/project-chat.js" defer></script>
 <link rel="stylesheet" href="/assets/project-device-ai.css">
+<link rel="stylesheet" href="/assets/project-workspace-dark.css">
 <script src="/assets/project-device-ai.js" defer></script>
+<script src="/assets/project-workspace-dark.js" defer></script>
   <title>Start a Project — MetaAutomate</title>
-</head><body>
+</head><body class="project-immersive-page" data-workspace-mode="chat">
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="utility-bar"><div class="shell"><span class="utility-symbol">✦</span><span>Intelligence · Creation · Automation</span><span class="utility-aside">Global ambition. Purpose-led engineering.</span></div></div>
   <header class="site-header" id="top">
@@ -39,11 +41,14 @@
 </header>
   <main id="main">
 <section class="project-chat" aria-labelledby="project-chat-title">
-  <aside class="project-chat-side" aria-label="Project workspace">
-    <div class="project-chat-side-title"><span class="project-chat-star" aria-hidden="true">✳</span><span>PROJECT WORKSPACE</span></div>
+  <button type="button" class="workspace-mobile-menu" id="workspace-mobile-menu" aria-controls="project-workspace-side" aria-expanded="false">☰ <span>Menu</span></button>
+  <button type="button" class="workspace-menu-backdrop" id="workspace-menu-backdrop" aria-label="Close workspace menu" hidden></button>
+  <aside class="project-chat-side" id="project-workspace-side" aria-label="Project workspace">
+    <a href="/" class="project-chat-side-title" aria-label="MetaAutomate homepage"><img src="/assets/metaautomate-mark.webp" width="30" height="30" alt=""><span>MetaAutomate</span><span class="workspace-chevron" aria-hidden="true">⌄</span></a>
+    <div class="workspace-side-search"><label for="workspace-search-input">Search starting points</label><input id="workspace-search-input" type="search" placeholder="Search project ideas…" autocomplete="off" maxlength="70"><p id="workspace-search-empty" role="status" hidden>No matching starting points.</p></div>
     <nav class="project-action-shortcuts" aria-label="Create immediately"><a href="/creative/#instant-design">Create image <span aria-hidden="true">↗</span></a><a href="/creative/#instant-video">Create video <span aria-hidden="true">↗</span></a></nav>
     <button class="project-chat-new" id="project-chat-new" type="button">＋ New project</button>
-    <p class="project-chat-label">OR PLAN A PROJECT</p>
+    <p class="project-chat-label">EXPLORE PROJECTS</p>
     <div class="project-chat-templates" aria-label="Project starting points">
       <button type="button" data-project-template="creative">Image or video project</button>
       <button type="button" data-project-template="automation">Business workflow automation</button>
@@ -51,16 +56,34 @@
       <button type="button" data-project-template="experience">Product design and UX</button>
       <button type="button" data-project-template="security">Application security</button>
     </div>
-    <div class="project-chat-side-footer"><strong>Privacy by design</strong><p>The guided intake stays only in this tab while you work. It is not submitted or saved automatically.</p></div>
+    <div class="workspace-side-links" aria-label="Workspace destinations"><a href="/creative/#instant-design">◈ <span>Image creator</span></a><a href="/creative/#instant-video">▷ <span>Video creator</span></a><a href="/services/">⌘ <span>Explore services</span></a><a href="/">↗ <span>Back to website</span></a></div>
+    <div class="project-chat-side-footer"><strong>Private by default</strong><p>Your guided answers stay on this page unless you choose to share them. AI model downloads require separate consent.</p></div>
   </aside>
   <div class="project-chat-main">
+    <div class="workspace-headbar">
+      <div class="workspace-mode-switch" role="group" aria-label="Choose workspace mode">
+        <button id="workspace-mode-chat" type="button" aria-pressed="true">Chat</button>
+        <button id="workspace-mode-work" type="button" aria-pressed="false">Work</button>
+      </div>
+      <a class="workspace-website-link" href="/" aria-label="MetaAutomate website home">MetaAutomate <span aria-hidden="true">↗</span></a>
+    </div>
     <header class="project-chat-top">
       <div><span class="project-chat-kicker">METAAUTOMATE / START A PROJECT</span>
-        <h1 id="project-chat-title">What are you looking to create?</h1>
-        <p>Describe your project, or create an image or narrated video now.</p>
+        <h1 id="project-chat-title" tabindex="-1">What would you like to build today?</h1>
+        <p id="workspace-intro">Describe your project, explore an idea, or start creating now.</p>
       </div>
-      <span class="project-chat-offline">GUIDED INTAKE · NO LIVE AI</span>
+      <span class="project-chat-offline">GUIDED CHAT · PRIVATE BY DEFAULT</span>
     </header>
+    <section class="workspace-work-panel" id="workspace-work-panel" aria-label="Work tools" hidden>
+      <div class="workspace-work-intro"><span>YOUR WORKSPACE</span><h2>Move from an idea to a deliverable.</h2><p>Choose a tool that produces something you can use. All files are created in your browser.</p></div>
+      <div class="workspace-work-grid">
+        <a href="/creative/#instant-design"><span class="workspace-work-icon" aria-hidden="true">◈</span><strong>Create an image</strong><small>Generate a downloadable branded PNG</small><span class="workspace-work-arrow" aria-hidden="true">↗</span></a>
+        <a href="/creative/#instant-video"><span class="workspace-work-icon" aria-hidden="true">▷</span><strong>Create a video</strong><small>Assemble a WebM video with your own narration</small><span class="workspace-work-arrow" aria-hidden="true">↗</span></a>
+        <button id="workspace-work-brief" type="button"><span class="workspace-work-icon" aria-hidden="true">✎</span><strong>Prepare a project brief</strong><small>Organize goals, scope, timeline and constraints</small><span class="workspace-work-arrow" aria-hidden="true">↗</span></button>
+        <button id="workspace-work-ai" type="button"><span class="workspace-work-icon" aria-hidden="true">✳</span><strong>Explore with local AI</strong><small>Opt-in WebGPU text model on supported devices</small><span class="workspace-work-arrow" aria-hidden="true">↗</span></button>
+      </div>
+      <p class="workspace-work-boundary">Cloud AI agents, customer accounts, stored project history and automated external actions are not yet connected.</p>
+    </section>
     <div class="project-ai-mode-switch">
       <button id="project-ai-open" class="project-ai-mode-button" type="button" aria-expanded="false" aria-controls="project-ai-experience">Try AI on this device <span aria-hidden="true">✳</span></button>
       <span class="project-ai-mode-note">Optional experiment · Requires WebGPU and a model download</span>
@@ -103,8 +126,8 @@
       <div class="project-chat-message project-chat-assistant">
         <span class="project-chat-avatar" aria-hidden="true">✳</span>
         <div class="project-chat-bubble"><strong>MetaAutomate Project Guide</strong>
-          <p>Welcome. I can help you organize a project idea for our team to review. What problem would you like to solve, or what would you like to build?</p>
-          <p class="project-chat-hint">This guided form asks set questions. For on-device AI text responses, choose the AI option above.</p>
+          <p>What would you like to build? Describe your idea and I’ll help you organize the requirements.</p>
+          <p class="project-chat-hint">Guided project discovery · Choose the on-device AI option for generated replies.</p>
         </div>
       </div>
     </div>
