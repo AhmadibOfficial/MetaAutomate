@@ -420,3 +420,44 @@ body.project-immersive-page{
 @media(prefers-reduced-motion:reduce){
   .project-immersive-page .workspace-work-grid :is(a,button){transform:none!important}
 }
+
+
+/* P2-058 follow-up: give all four official colors purposeful, visible roles. */
+.project-immersive-page .project-chat-top h1{
+  text-shadow:0 2px 22px #00a7ed14;
+}
+.project-immersive-page .workspace-headbar::after{
+  content:"";position:absolute;bottom:0;left:0;right:0;height:2px;
+  pointer-events:none;
+  background:linear-gradient(90deg,var(--ma-midnight) 0%,var(--ma-blue) 35%,var(--ma-silver) 75%,var(--ma-gold) 100%);
+}
+.project-immersive-page .project-chat-new,
+.project-immersive-page #project-chat-send,
+.project-immersive-page #project-ai-send{
+  transition:background-color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+.project-immersive-page .project-chat-new:hover,
+.project-immersive-page #project-chat-send:hover,
+.project-immersive-page #project-ai-send:hover{
+  box-shadow:0 4px 19px #00a7ed38;
+}
+.project-immersive-page :is(.project-chat-templates button,.workspace-side-links a)[aria-current="page"]{
+  color:var(--ma-silver);
+  background:#123255;
+  border-inline-start:3px solid var(--ma-gold);
+}
+.project-immersive-page :is(button,a,input,textarea):focus-visible{
+  outline:3px solid var(--ma-gold);
+  outline-offset:3px;
+}
+.project-immersive-page .project-chat-composer{
+  border-bottom:3px solid var(--ma-blue);
+}
+.project-immersive-page .project-chat-summary{
+  border-top:3px solid var(--ma-gold);
+}
+@media (prefers-reduced-motion:reduce){
+  .project-immersive-page .project-chat-new,
+  .project-immersive-page #project-chat-send,
+  .project-immersive-page #project-ai-send{transition:none}
+}
