@@ -1,7 +1,6 @@
-/* P2-056: responsive, functional project workspace shell.
- * Existing guided intake, optional WebGPU AI and existing creators remain
- * separate verified components. No fabricated accounts, chat history, or
- * server tasks. No storage, remote requests, hidden file transfer.
+/* P2-057 MetaAutomate blue workspace.
+ * Navigation is hideable on every screen; project data is never persisted here.
+ * Existing intake and opt-in browser AI operate independently.
  */
 (() => {
   "use strict";
@@ -13,11 +12,29 @@
   const heading=document.getElementById("project-chat-title");
   const intro=document.getElementById("workspace-intro");
   const aside=document.getElementById("project-workspace-side");
-  const mobileToggle=document.getElementById("workspace-mobile-menu");
+  const menu=document.getElementById("workspace-sidebar-toggle");
   const backdrop=document.getElementById("workspace-menu-backdrop");
   const search=document.getElementById("workspace-search-input");
   const searchEmpty=document.getElementById("workspace-search-empty");
-  if(!main||!chat||!work||!workPanel||!heading||!intro)return;
+  if(!main||!chat||!work||!workPanel||!heading||!intro||!aside||!menu)return;
+
+  const onMobile=()=>window.matchMedia("(max-width:740px)").matches;
+  let menuOpen=!onMobile();
+
+  function updateSidebar(open,focus=false){
+    menuOpen=Boolean(open);
+    // Restore focus BEFORE hiding the active navigation control.
+    if(!menuOpen&&aside.contains(document.activeElement))menu.focus();
+    aside.hidden=!menuOpen;
+    body.dataset.sidebar=menuOpen?"open":"closed";
+    menu.setAttribute("aria-expanded",String(menuOpen));
+    menu.setAttribute("aria-label",menuOpen?"Hide navigation":"Show navigation");
+    menu.title=menuOpen?"Hide navigation":"Show navigation";
+    if(backdrop)backdrop.hidden=!(onMobile()&&menuOpen);
+    body.classList.toggle("workspace-drawer-open",onMobile()&&menuOpen);
+    if(menuOpen&&focus)search?.focus();
+    if(!menuOpen&&focus)menu.focus();
+  }
 
   function setMode(mode,focus=false){
     const isWork=mode==="work";
@@ -29,68 +46,55 @@
       ?"What would you like to create today?"
       :"What would you like to build today?";
     intro.textContent=isWork
-      ?"Choose a working tool and make something useful."
-      :"Describe your project, explore an idea, or start creating now.";
+      ?"Choose a tool and start creating."
+      :"Describe your idea. We’ll help you shape it.";
+    if(onMobile())updateSidebar(false);
     if(focus)heading.focus({preventScroll:true});
-    closeMenu();
-  }
-  function closeMenu(){
-    if(!aside||!mobileToggle||!backdrop)return;
-    aside.classList.remove("is-open");
-    mobileToggle.setAttribute("aria-expanded","false");
-    backdrop.hidden=true;
-  }
-  function openMenu(){
-    if(!aside||!mobileToggle||!backdrop)return;
-    aside.classList.add("is-open");
-    mobileToggle.setAttribute("aria-expanded","true");
-    backdrop.hidden=false;
-    search?.focus();
   }
   chat.addEventListener("click",()=>setMode("chat",true));
   work.addEventListener("click",()=>setMode("work",true));
+  menu.addEventListener("click",()=>updateSidebar(!menuOpen,true));
+  backdrop?.addEventListener("click",()=>updateSidebar(false,true));
+  window.addEventListener("resize",()=>{
+    const mobile=onMobile();
+    if(mobile&&menuOpen)updateSidebar(false);
+    else if(!mobile&&body.classList.contains("workspace-drawer-open")){
+      updateSidebar(true);
+    }
+  });
+
   document.getElementById("workspace-work-brief")?.addEventListener("click",()=>{
     setMode("chat");
-    const input=document.getElementById("project-chat-input");
-    const aiPanel=document.getElementById("project-ai-experience");
-    if(aiPanel&&!aiPanel.hidden)document.getElementById("project-ai-close")?.click();
-    input?.focus();
+    const panel=document.getElementById("project-ai-experience");
+    if(panel&&!panel.hidden)document.getElementById("project-ai-close")?.click();
+    document.getElementById("project-chat-input")?.focus();
   });
   document.getElementById("workspace-work-ai")?.addEventListener("click",()=>{
     setMode("chat");
     const panel=document.getElementById("project-ai-experience");
     if(panel?.hidden)document.getElementById("project-ai-open")?.click();
     if(panel?.hidden===false){
-      const load=document.getElementById("project-ai-load");
       const input=document.getElementById("project-ai-input");
-      if(input&&!input.disabled) input.focus();
-      else load?.focus();
+      if(input&&!input.disabled)input.focus();
+      else document.getElementById("project-ai-load")?.focus();
     }
   });
   document.getElementById("project-chat-new")?.addEventListener("click",()=>{
     setMode("chat");
-    closeMenu();
+    if(onMobile())updateSidebar(false);
   });
-
-  mobileToggle?.addEventListener("click",()=>{
-    aside?.classList.contains("is-open")?closeMenu():openMenu();
-  });
-  backdrop?.addEventListener("click",()=>{
-    closeMenu();
-    mobileToggle?.focus();
-  });
-  aside?.querySelectorAll("a").forEach(a=>a.addEventListener("click",closeMenu));
-  aside?.querySelectorAll("[data-project-template]").forEach(button=>
+  aside.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{
+    if(onMobile())updateSidebar(false);
+  }));
+  aside.querySelectorAll("[data-project-template]").forEach(button=>
     button.addEventListener("click",()=>{
       setMode("chat");
-      const aiPanel=document.getElementById("project-ai-experience");
-      if(aiPanel&&!aiPanel.hidden)document.getElementById("project-ai-close")?.click();
-      closeMenu();
+      const panel=document.getElementById("project-ai-experience");
+      if(panel&&!panel.hidden)document.getElementById("project-ai-close")?.click();
+      if(onMobile())updateSidebar(false);
     })
   );
 
-  // Search only visible, shipped starting points; not user conversations.
-  // Never imply that project history or a server-side library is available.
   const starters=[...document.querySelectorAll(".project-chat-templates [data-project-template]")];
   function filterStarters(value){
     const query=String(value||"").toLocaleLowerCase().trim().slice(0,70);
@@ -104,17 +108,18 @@
   }
   search?.addEventListener("input",()=>filterStarters(search.value));
   document.addEventListener("keydown",event=>{
-    if(event.key==="Escape"&&aside?.classList.contains("is-open")){
-      closeMenu();
-      mobileToggle?.focus();
+    if(event.key==="Escape"&&onMobile()&&menuOpen){
+      event.preventDefault();
+      updateSidebar(false,true);
     }
     if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){
       event.preventDefault();
-      if(window.matchMedia("(max-width:740px)").matches)openMenu();
+      if(!menuOpen)updateSidebar(true);
       search?.focus();
     }
   });
-  // Safe query mode; no arbitrary redirects or untrusted template fields.
+
+  updateSidebar(!onMobile());
   try{
     const mode=new URLSearchParams(location.search).get("mode");
     if(mode==="work")setMode("work");

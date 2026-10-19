@@ -60,7 +60,7 @@ def test_homepage_communicates_customer_offer_and_has_real_destinations():
     assert 'class="section proof-section"' not in html
     assert html.count('class="social-card social-') == 2
     assert html.count('class="footer-social-link"') == 8
-    assert "/engage/#brief-form" in p.refs
+    assert "/engage/#project-chat-input" in p.refs
     assert "#solutions" in p.refs
     assert "/services/#ai" in p.refs
     assert "/services/#data" in p.refs
@@ -170,43 +170,47 @@ def test_workspace_example_is_truthful_fiction_not_a_fake_product_screenshot():
     assert 'aria-pressed="true"' in html
 
 
-def test_all_four_pages_keep_brand_and_navigate_to_website_solution_path():
+def test_brand_and_navigation_match_marketing_and_focused_project_pages():
     for p in ("index.html", "services/index.html",
               "company/index.html", "engage/index.html"):
         html = (SITE / p).read_text()
         structure = page(p)
         assert "/assets/metaautomate-mark.webp" in html
-        assert "/#solutions" in structure.refs
-        assert "/#workspace-demo" in structure.refs
         assert "/services/" in structure.refs
-        assert "/company/" in structure.refs
-        assert "/engage/" in structure.refs
-        assert "Always HALAL" in html
+        if p == "engage/index.html":
+            assert "/" in structure.refs
+            assert "/creative/" in structure.refs
+            assert 'id="workspace-sidebar-toggle"' in html
+            assert 'id="brief-form"' not in html
+            assert "Always HALAL" not in html
+        else:
+            assert "/#solutions" in structure.refs
+            assert "/#workspace-demo" in structure.refs
+            assert "/company/" in structure.refs
+            assert "/engage/" in structure.refs
+            assert "Always HALAL" in html
         assert any(img.get("src") == "/assets/metaautomate-mark.webp"
                    for img in structure.images)
         for resource in structure.scripts:
             assert resource.get("src", "").startswith("/assets/")
 
 
-def test_enquiry_is_email_draft_no_submission_or_external_form_action():
+def test_project_chat_replaces_old_enquiry_with_local_mail_draft():
     html = (SITE / "engage/index.html").read_text()
     structure = page("engage/index.html")
-    assert "Email a project question" in html
-    assert "Tell us your business challenge" in html
-    assert "value at stake" in html
-    assert "What business challenge are you tackling?" in html
-    assert "What value would a successful outcome create?" in html
-    assert "investment in AI" in html
-    assert "No account, automatic submission or server storage." in html
-    assert len(structure.forms) == 1
-    assert structure.forms[0].get("id") == "brief-form"
-    assert not structure.forms[0].get("action")
-    assert structure.forms[0].get("method", "").lower() != "post"
+    assert "What would you like to build today?" in html
+    assert "Tell me your project idea." in html
+    assert 'id="project-chat-input"' in html
+    assert 'id="project-chat-summary"' in html
+    assert 'id="project-chat-email"' in html
+    assert 'id="workspace-sidebar-toggle"' in html
+    assert 'id="brief-form"' not in html
+    assert "Prefer a structured project form?" not in html
+    assert not structure.forms
     assert any(x.startswith("mailto:metaautomating@gmail.com")
                for x in structure.refs)
-    assert "Nothing is sent until" in html or "Nothing is sent" in html
-    assert "Do not include passwords" in html
-
+    assert "Nothing is sent" in html
+    assert "confidential" in html.lower()
 
 
 def test_company_roadmap_does_not_misrepresent_source_as_live_execution():

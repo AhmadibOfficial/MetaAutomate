@@ -84,7 +84,7 @@
     if(actionArea) actionArea.hidden = show;
     if(legacyStatus) legacyStatus.textContent = show
       ? "OPTIONAL ON-DEVICE AI · EXPERIMENTAL"
-      : "GUIDED CHAT · PRIVATE BY DEFAULT";
+      : "Guided chat";
     if(show) {
       if(engine) input.focus();
       else load.focus();

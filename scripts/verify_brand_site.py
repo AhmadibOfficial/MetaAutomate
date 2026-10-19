@@ -250,89 +250,26 @@ def main():
         assert_no_horizontal_overflow(page, "desktop company")
         page.screenshot(path=str(ART/"metaautomate-global-company-desktop.png"), full_page=True)
 
-        # Privacy-first enquiry: short direct email + optional generated mailto brief.
-        page.goto(BASE+"/engage/", wait_until="networkidle")
-        assert_text_contrast(page, ".brief-shortcut .action-primary")
-        expect(page.get_by_role("heading", level=1)).to_contain_text("Tell us your business challenge")
-        quick_email = page.get_by_role("link", name="Email a project question")
-        expect(quick_email).to_have_attribute(
-            "href", "mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Business%20inquiry"
-        )
-        expect(page.locator(".brief-title")).to_contain_text("No account, automatic submission")
-        expect(page.locator("#brief-form")).to_have_attribute("novalidate", "")
-        expect(page.locator("#brief-form")).not_to_have_attribute("action", "https://example.com")
-        expect(page.locator("#brief-form")).not_to_have_attribute("method", "post")
-        page.locator("#brief-form button[type=submit]").click()
-        expect(page.locator("#brief-error")).to_be_visible()
-        expect(page.locator("#brief-result")).to_be_hidden()
-        page.locator("#brief-service").select_option(label="Cybersecurity & Quality")
-        page.locator("#brief-stage").select_option(label="Existing product or system")
-        page.locator("#brief-problem").fill(
-            "We need an authorized API security review for our business application."
-        )
-        page.locator("#brief-outcome").fill(
-            "A prioritized assessment report that identifies material risk."
-        )
-        page.locator("#brief-constraints").fill(
-            "Only test our authorized staging environment. No third-party assets."
-        )
-        page.locator("#brief-form button[type=submit]").click()
-        expect(page.locator("#brief-result")).to_be_visible()
-        expect(page.locator("#brief-output")).to_contain_text(
-            "Cybersecurity & Quality"
-        )
-        expect(page.locator("#brief-output")).to_contain_text(
-            "No information was transmitted"
-        )
-        # The owner-provided address opens a draft, not an automatic submission.
-        direct_email = page.locator(".brief-direct-contact a")
-        expect(direct_email).to_have_attribute(
-            "href", "mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Business%20inquiry"
-        )
-        draft_link = page.locator("#brief-email")
-        expect(draft_link).to_be_visible()
-        href = draft_link.get_attribute("href")
-        assert href.startswith("mailto:metaautomating@gmail.com?")
-        assert len(href) <= 1850, len(href)
-        parts = urlsplit(href)
-        assert parts.path == "metaautomating@gmail.com"
-        draft = parse_qs(parts.query)
-        assert draft["subject"] == ["MetaAutomate | Project discovery inquiry"]
-        assert "Cybersecurity & Quality" in draft["body"][0]
-        assert "We need an authorized API security review" in draft["body"][0]
-        assert chr(10) in draft["body"][0]
-        assert (chr(92) + "n") not in draft["body"][0], "Use real newlines in the draft"
-        expect(page.locator("#brief-email-note")).to_contain_text("Nothing has been sent")
-
-        # Large briefs must be exportable in full and email drafts remain bounded.
-        page.locator("#brief-problem").fill("A" * 1700)
-        page.locator("#brief-outcome").fill("B" * 1150)
-        page.locator("#brief-form button[type=submit]").click()
-        long_href = draft_link.get_attribute("href")
-        assert len(long_href) <= 1850, len(long_href)
-        long_body = parse_qs(urlsplit(long_href).query)["body"][0]
-        assert "Remaining details omitted" in long_body
-        assert "A" * 1700 in page.locator("#brief-output").inner_text()
-        expect(page.locator("#brief-email-note")).to_contain_text("abbreviated")
-        # Restore a short brief before capturing the normal project inquiry UI.
-        page.locator("#brief-problem").fill(
-            "We need an authorized API security review for our business application."
-        )
-        page.locator("#brief-outcome").fill(
-            "A prioritized assessment report that identifies material risk."
-        )
-        page.locator("#brief-form button[type=submit]").click()
-        expect(page.locator("#brief-email-note")).to_contain_text("Nothing has been sent")
-
-        page.evaluate("() => { if (document.activeElement) document.activeElement.blur(); window.scrollTo(0, 0); }")
-        page.wait_for_timeout(180)
-        page.screenshot(path=str(ART/"metaautomate-global-project-brief.png"), full_page=True)
-        with page.expect_download() as download:
-            page.locator("#brief-download").click()
-        assert download.value.suggested_filename == "metaautomate-project-brief.txt"
-        page.locator("#brief-form button[type=reset]").click()
-        expect(page.locator("#brief-result")).to_be_hidden()
-        assert_no_horizontal_overflow(page, "desktop brief")
+        # Blue Start a Project experience replaces the removed structured form.
+        page.goto(BASE+"/engage/",wait_until="networkidle")
+        expect(page.get_by_role("heading",level=1)).to_have_text(
+            "What would you like to build today?")
+        assert page.locator("#brief-form").count()==0
+        expect(page.locator("#project-chat-input")).to_be_visible()
+        toggle=page.locator("#workspace-sidebar-toggle")
+        expect(toggle).to_have_attribute("aria-expanded","true")
+        toggle.click()
+        expect(page.locator("#project-workspace-side")).to_be_hidden()
+        toggle.click()
+        expect(page.locator("#project-workspace-side")).to_be_visible()
+        page.locator("#project-chat-suggestions [data-project-template=creative]").click()
+        page.locator("#project-chat-send").click()
+        expect(page.locator("#project-chat-progress")).to_contain_text("Step 2 of 5")
+        expect(page.locator("#project-chat-email")).to_have_attribute(
+            "href", "mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Project%20inquiry")
+        page.screenshot(path=str(ART/"metaautomate-global-project-chat-blue.png"),
+                        full_page=True)
+        assert_no_horizontal_overflow(page,"blue project chat")
 
         # Mobile: navigation and all four pages, 390px and narrower 360px.
         for width in (390, 360):
@@ -349,14 +286,27 @@ def main():
             mpage.on("pageerror", lambda error: page_errors.append(str(error)))
             for path in ("/","/services/","/company/","/engage/"):
                 mpage.goto(BASE+path,wait_until="networkidle")
-                inspect_asset(mpage)
+                if path=="/engage/":
+                    expect(mpage.locator("#workspace-sidebar-toggle")).to_be_visible()
+                    expect(mpage.locator("#project-chat-input")).to_be_visible()
+                    assert mpage.locator("#brief-form").count()==0
+                    logo=mpage.locator(".project-chat-side-title img")
+                    assert logo.evaluate(
+                        "(img) => img.complete && img.naturalWidth > 0"
+                    )
+                    mpage.locator("#workspace-sidebar-toggle").click()
+                    expect(mpage.locator("#project-workspace-side")).to_be_visible()
+                    mpage.keyboard.press("Escape")
+                    expect(mpage.locator("#project-workspace-side")).to_be_hidden()
+                else:
+                    inspect_asset(mpage)
+                    expect(mpage.locator(".footer-contact-email")).to_have_count(1)
+                    social_links = mpage.locator(".footer-social-link")
+                    expect(social_links).to_have_count(8)
+                    assert sorted(social_links.evaluate_all(
+                        "(links) => links.map(link => link.href)"
+                    )) == sorted(expected_socials.values())
                 assert_no_horizontal_overflow(mpage, f"mobile {width} {path}")
-                expect(mpage.locator(".footer-contact-email")).to_have_count(1)
-                social_links = mpage.locator(".footer-social-link")
-                expect(social_links).to_have_count(8)
-                assert sorted(social_links.evaluate_all(
-                    "(links) => links.map(link => link.href)"
-                )) == sorted(expected_socials.values())
                 if path == "/":
                     expect(mpage.locator(".social-card")).to_have_count(2)
                     expect(mpage.locator(".clarity-card")).to_have_count(3)
@@ -415,7 +365,7 @@ def main():
         assert not bad_requests, f"Unexpected third-party HTTP requests: {bad_requests}"
         assert not page_errors, f"Browser JavaScript errors: {page_errors}"
         browser.close()
-    print("PASS: business value-led hero, early synthetic walkthrough, condensed mobile, tablet 768, mobile 390/360, privacy-first enquiries, secure branding and no external requests")
+    print("PASS: business value-led hero, early synthetic walkthrough, condensed mobile, tablet 768, mobile 390/360, blue project workspace, secure branding and no external requests")
 
 
 if __name__=="__main__":

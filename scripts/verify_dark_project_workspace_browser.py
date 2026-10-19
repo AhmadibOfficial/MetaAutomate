@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""P2-056: browser acceptance of real dark Chat/Work interface.
+"""P2-057: browser acceptance of blue Chat/Work workspace and hideable navigation.
 
 No external model download: check opt-in panel and consent only.
 """
@@ -33,9 +33,21 @@ def main():
             expect(page.get_by_role("heading",
                 name="What would you like to build today?")).to_be_visible()
             expect(page.locator("#project-chat-messages")).to_be_visible()
-            assert page.evaluate(
-                "() => getComputedStyle(document.body).backgroundColor"
-            )=="rgb(8, 9, 11)"
+            assert "gradient" in page.evaluate(
+                "() => getComputedStyle(document.body).backgroundImage"
+            )
+            assert page.locator("#brief-form").count()==0
+            assert page.locator("#project-chat-alternative").count()==0
+            # Desktop and tablet both support collapse/expand via top navigation.
+            if width>740:
+                toggle=page.locator("#workspace-sidebar-toggle")
+                expect(toggle).to_have_attribute("aria-expanded","true")
+                toggle.click()
+                expect(page.locator("#project-workspace-side")).to_be_hidden()
+                expect(toggle).to_have_attribute("aria-expanded","false")
+                toggle.click()
+                expect(page.locator("#project-workspace-side")).to_be_visible()
+                expect(toggle).to_have_attribute("aria-expanded","true")
             assert not external,"No external request permitted on page load"
             page.locator("#workspace-mode-work").click()
             expect(page.locator("#workspace-work-panel")).to_be_visible()
@@ -68,8 +80,8 @@ def main():
             page.locator("#project-ai-close").click()
             expect(page.locator("#project-chat-messages")).to_be_visible()
             if width<741:
-                page.locator("#workspace-mobile-menu").click()
-                expect(page.locator("#workspace-mobile-menu")).to_have_attribute(
+                page.locator("#workspace-sidebar-toggle").click()
+                expect(page.locator("#workspace-sidebar-toggle")).to_have_attribute(
                     "aria-expanded","true")
                 page.locator("#workspace-search-input").fill("security")
                 expect(page.locator(
@@ -79,7 +91,7 @@ def main():
                     ".project-chat-templates [data-project-template=product]"
                 )).to_be_hidden()
                 page.keyboard.press("Escape")
-                expect(page.locator("#workspace-mobile-menu")).to_have_attribute(
+                expect(page.locator("#workspace-sidebar-toggle")).to_have_attribute(
                     "aria-expanded","false")
             else:
                 page.locator("#workspace-search-input").fill("automation")
@@ -90,7 +102,7 @@ def main():
             dims=page.evaluate(
                 "() => ({screen:innerWidth,page:document.documentElement.scrollWidth})")
             assert dims["page"]<=dims["screen"]+1,dims
-            page.screenshot(path=str(OUT/f"project-workspace-dark-{name}.png"),
+            page.screenshot(path=str(OUT/f"project-workspace-blue-{name}.png"),
                             full_page=True)
             # The existing creative tool routes remain navigable.
             image_page=page.goto(BASE+"/creative/#instant-design")

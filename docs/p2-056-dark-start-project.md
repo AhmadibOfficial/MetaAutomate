@@ -1,3 +1,5 @@
+> Superseded for the public website by [P2-057 Blue Workspace](p2-057-blue-workspace-navigation.md): the old structured form, black theme and unused marketing chrome were removed. This file remains as historical implementation evidence, not a description of the current live page.
+
 # P2-056 — MetaAutomate Start a Project: Dark Chat / Work Workspace
 
 ## Delivered website interface

@@ -29,17 +29,18 @@ class Structure(HTMLParser):
         if tag == "details":
             self.details += 1
 
-def test_conversation_is_primary_but_original_form_is_preserved():
+def test_conversation_is_primary_and_old_enquiry_form_is_removed():
     html = (SITE / "engage" / "index.html").read_text()
     p = Structure()
     p.feed(html)
     assert 'What would you like to build today?' in html
-    assert html.index('class="project-chat"') < html.index('id="brief-form"')
-    assert p.forms == ["brief-form"], "Existing local email enquiry must remain usable"
-    assert p.details >= 1
+    assert p.forms == [], "Only the conversation-led experience remains"
+    assert p.details == 0
+    assert 'id="project-chat-alternative"' not in html
+    assert 'id="brief-form"' not in html
     assert len(p.ids) == len(set(p.ids)), "Duplicate DOM ID"
     assert "/assets/project-chat.js" in p.scripts
-    assert "/assets/site.js" in p.scripts
+    assert "/assets/project-workspace-dark.js" in p.scripts
     for node in (
         "project-chat-messages","project-chat-input","project-chat-send",
         "project-chat-new","project-chat-progress","project-chat-summary",
@@ -49,11 +50,11 @@ def test_conversation_is_primary_but_original_form_is_preserved():
         assert node in p.ids
     assert 'role="log"' in html
     assert 'aria-live="polite"' in html
-    assert "GUIDED CHAT · PRIVATE BY DEFAULT" in html
+    assert "Guided chat" in html
     assert "Nothing is sent" in html or "nothing has been sent" in html
     assert 'data-project-template="creative"' in html
     assert "metaautomating@gmail.com" in html
-    assert "What business challenge are you tackling?" in html
+    assert "What would you like to build today?" in html
 
 def test_local_chat_never_claims_model_execution_or_stores_user_conversations():
     js = (SITE / "assets" / "project-chat.js").read_text()
@@ -88,6 +89,6 @@ def test_service_shortcuts_remain_known_existing_disciplines():
                   "Cybersecurity & Quality"):
         assert label in js
     assert '/engage/' in (SITE / "services" / "index.html").read_text()
-    assert 'id="brief-form"' in html
-    assert 'id="project-chat-alternative"' in html
-    assert 'window.location.hash === "#brief-form"' in js
+    assert 'id="workspace-sidebar-toggle"' in html
+    assert 'id="brief-form"' not in html
+    assert "openStructuredLink" not in js

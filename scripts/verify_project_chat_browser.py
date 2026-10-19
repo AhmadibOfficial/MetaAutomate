@@ -40,7 +40,7 @@ def main():
             expect(page.locator("#project-chat-messages")).to_be_visible()
             expect(page.locator("#project-chat-summary")).to_be_hidden()
             expect(page.locator("#project-chat-progress")).to_contain_text("Step 1 of 5")
-            expect(page.locator("#brief-form")).to_be_hidden()
+            assert page.locator("#brief-form").count() == 0
             # User remains in control: example only fills composer, no auto submit.
             page.locator("#project-chat-suggestions [data-project-template=creative]").click()
             expect(page.locator("#project-chat-input")).to_have_value(
@@ -88,11 +88,11 @@ def main():
             page.locator("#project-chat-new").click()
             expect(page.locator("#project-chat-summary")).to_be_hidden()
             expect(page.locator("#project-chat-progress")).to_contain_text("Step 1 of 5")
-            # Old deep link and service pre-selection remain accessible.
-            page.goto(BASE+"/engage/?service=Product%20Design%20%26%20Experience#brief-form")
-            expect(page.locator("#brief-form")).to_be_visible()
-            expect(page.locator("#brief-service")).to_have_value(
-                "Product Design & Experience")
+            # Old form is removed; service links now open the active chat.
+            page.goto(BASE+"/engage/?service=Product%20Design%20%26%20Experience#project-chat-input")
+            assert page.locator("#brief-form").count() == 0
+            expect(page.locator("#project-chat-input")).to_be_visible()
+            expect(page.locator("#project-chat-progress")).to_contain_text("Step 1")
             ctx.close()
         browser.close()
     assert not errors,errors

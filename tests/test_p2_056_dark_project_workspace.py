@@ -1,4 +1,4 @@
-"""P2-056 — dark Chat/Work project experience static contracts."""
+"""P2-057 — MetaAutomate blue Chat/Work experience and legacy form removal."""
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -26,9 +26,9 @@ def test_immersive_workspace_preserves_real_tools_and_guided_intake():
     for needed in (
         "workspace-mode-chat","workspace-mode-work","workspace-work-panel",
         "workspace-work-brief","workspace-work-ai","workspace-search-input",
-        "workspace-mobile-menu","workspace-menu-backdrop",
+        "workspace-sidebar-toggle","workspace-menu-backdrop",
         "project-chat-new","project-chat-input","project-chat-messages",
-        "project-chat-summary","project-ai-open","project-ai-experience","brief-form",
+        "project-chat-summary","project-ai-open","project-ai-experience",
     ):
         assert needed in page.ids,needed
     assert "What would you like to build today?" in HTML
@@ -36,11 +36,11 @@ def test_immersive_workspace_preserves_real_tools_and_guided_intake():
     assert 'aria-pressed="true">Chat</button>' in HTML
     assert 'aria-pressed="false">Work</button>' in HTML
     assert 'aria-label="Choose workspace mode"' in HTML
-    assert "GUIDED CHAT · PRIVATE BY DEFAULT" in HTML
+    assert "Guided chat" in HTML
     assert "/creative/#instant-design" in page.links
     assert "/creative/#instant-video" in page.links
     assert "/services/" in page.links
-    for script in ("/assets/site.js","/assets/project-chat.js",
+    for script in ("/assets/project-chat.js",
                    "/assets/project-device-ai.js","/assets/project-workspace-dark.js"):
         assert script in page.scripts
     assert page.scripts.index("/assets/project-chat.js") < page.scripts.index("/assets/project-workspace-dark.js")
@@ -68,10 +68,13 @@ def test_switcher_controls_actually_switch_and_preserve_ai_consent():
     ):
         assert forbidden not in JS,forbidden
     assert "Download model and start local AI" in HTML
-    assert "Requires WebGPU" in HTML
-    assert "customer accounts" in HTML.lower()
+    assert "WebGPU" in HTML
+    assert "id=\"brief-form\"" not in HTML
+    assert "project-chat-alternative" not in HTML
+    assert "Prefer a structured project form?" not in HTML
+    assert "id=\"workspace-sidebar-toggle\"" in HTML
 
-def test_dark_theme_is_scoped_responsive_and_accessible():
+def test_blue_theme_is_scoped_responsive_and_accessible():
     assert "body.project-immersive-page" in CSS
     assert ".project-immersive-page .project-chat" in CSS
     assert 'data-workspace-mode="work"' in CSS
@@ -83,4 +86,7 @@ def test_dark_theme_is_scoped_responsive_and_accessible():
     assert "prefers-reduced-motion" in CSS
     assert ":focus-visible" in CSS
     assert "display:none!important" in CSS
-    assert "#08090b" in CSS
+    assert "#082d68" in CSS
+    assert ".workspace-sidebar-toggle" in CSS
+    assert 'data-sidebar="closed"' in CSS
+    assert 'font-family:"Plus Jakarta Sans"' in CSS
