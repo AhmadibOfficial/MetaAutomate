@@ -373,7 +373,7 @@ body.project-immersive-page{
   display:inline-flex;align-items:center;gap:10px;justify-content:center;
   background:#164785;color:#edf7ff;border:1px solid #3879b9;
   border-radius:12px;padding:10px 12px;min-height:42px;
-  font:600 .83rem/1.2 inherit;cursor:pointer;
+  font-size:.83rem;font-weight:600;line-height:1.2;font-family:inherit;cursor:pointer;
 }
 .project-immersive-page .workspace-sidebar-toggle:hover,
 .project-immersive-page .workspace-sidebar-toggle[aria-expanded="false"]{
