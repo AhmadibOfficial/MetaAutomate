@@ -170,18 +170,25 @@ def test_workspace_example_is_truthful_fiction_not_a_fake_product_screenshot():
     assert 'aria-pressed="true"' in html
 
 
-def test_all_four_pages_keep_brand_and_navigate_to_website_solution_path():
+def test_brand_and_navigation_match_marketing_and_focused_project_pages():
     for p in ("index.html", "services/index.html",
               "company/index.html", "engage/index.html"):
         html = (SITE / p).read_text()
         structure = page(p)
         assert "/assets/metaautomate-mark.webp" in html
-        assert "/#solutions" in structure.refs
-        assert "/#workspace-demo" in structure.refs
         assert "/services/" in structure.refs
-        assert "/company/" in structure.refs
-        assert "/engage/" in structure.refs
-        assert "Always HALAL" in html
+        if p == "engage/index.html":
+            assert "/" in structure.refs
+            assert "/creative/" in structure.refs
+            assert 'id="workspace-sidebar-toggle"' in html
+            assert 'id="brief-form"' not in html
+            assert "Always HALAL" not in html
+        else:
+            assert "/#solutions" in structure.refs
+            assert "/#workspace-demo" in structure.refs
+            assert "/company/" in structure.refs
+            assert "/engage/" in structure.refs
+            assert "Always HALAL" in html
         assert any(img.get("src") == "/assets/metaautomate-mark.webp"
                    for img in structure.images)
         for resource in structure.scripts:
