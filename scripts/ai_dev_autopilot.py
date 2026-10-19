@@ -39,17 +39,24 @@ def git(*args: str, root: Path = ROOT) -> str:
     return result.stdout.strip()
 
 
-def require_clean_main(root: Path = ROOT) -> None:
-    if git("branch", "--show-current", root=root) != "main":
-        raise DevelopmentGateError("Start from main, not another branch")
+def require_clean_checkout(root: Path = ROOT, *, require_main: bool = False) -> None:
+    branch = git("branch", "--show-current", root=root)
+    if require_main and branch != "main":
+        raise DevelopmentGateError("Applying changes requires main, not another branch")
+    if not branch:
+        raise DevelopmentGateError("Detached HEAD is not supported")
     if git("status", "--porcelain", root=root):
-        raise DevelopmentGateError("Refusing to modify a non-clean worktree")
+        raise DevelopmentGateError("Refusing to operate on a non-clean worktree")
     origin = git("remote", "get-url", "origin", root=root)
     approved = {"https://github.com/AhmadibOfficial/MetaAutomate.git",
                 "https://github.com/AhmadibOfficial/MetaAutomate",
                 "git@github.com:AhmadibOfficial/MetaAutomate.git"}
     if origin not in approved:
-        raise DevelopmentGateError("Unexpected Git remote: refusing to publish")
+        raise DevelopmentGateError("Unexpected Git remote: refusing to operate")
+
+
+def require_clean_main(root: Path = ROOT) -> None:
+    require_clean_checkout(root, require_main=True)
 
 
 def target_file(relative: str, root: Path = ROOT) -> Path:
@@ -187,9 +194,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--draft-pr", action="store_true", help="Also push and open a draft PR")
     args = p.parse_args(argv)
     try:
-        require_clean_main()
         if args.draft_pr and not args.apply:
             raise DevelopmentGateError("--draft-pr requires --apply")
+        if args.apply:
+            require_clean_main()
+        else:
+            require_clean_checkout()
         result = propose(args.task, args.file, args.model)
         print(result["diff"][:30_000])
         if len(result["diff"]) > 30_000:
