@@ -7,7 +7,7 @@ JS=(ROOT/"assets/project-device-ai.js").read_text()
 CSS=(ROOT/"assets/project-device-ai.css").read_text()
 
 def test_guided_chat_kept_as_fallback():
-    assert 'id="brief-form"' in HTML
+    assert 'id="brief-form"' not in HTML
     assert 'id="project-chat-messages"' in HTML
     assert 'id="project-chat-send"' in HTML
     assert 'id="project-ai-experience"' in HTML
