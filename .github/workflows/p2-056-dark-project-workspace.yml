@@ -1,8 +1,8 @@
-name: P2-057 Blue Start a Project Workspace
+name: P2-058 Four-Color Project Workspace
 
 on:
   push:
-    branches: [feature/p2-056-dark-project-workspace, feature/p2-057-blue-project-navigation]
+    branches: [feature/p2-056-dark-project-workspace, feature/p2-057-blue-project-navigation, feature/p2-058-four-brand-color-workspace]
   pull_request:
     branches: [main]
 
@@ -24,6 +24,7 @@ jobs:
           python -m pytest -q \
             tests/test_p2_056_dark_project_workspace.py \
             tests/test_p2_057_blue_navigation.py \
+            tests/test_p2_058_brand_palette.py \
             tests/test_p2_04w_project_chat_static.py \
             tests/test_p2_04y_device_ai_static.py \
             tests/test_p2_051_direct_creation.py \
@@ -60,6 +61,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: p2-057-blue-workspace-screenshots
-          path: artifacts/validation/project-workspace-blue-*.png
+          name: p2-058-four-brand-colors-screenshots
+          path: artifacts/validation/project-workspace-brand-*.png
           if-no-files-found: warn

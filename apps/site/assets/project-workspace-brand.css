@@ -1,0 +1,422 @@
+/* P2-058 | MetaAutomate signature four-color visual system.
+   Brand authority: docs/brand/GLOBAL_EXPERIENCE_V2.md and assets/site.css.
+   Midnight #040D20 · Electric blue #00A7ED · Silver #DCE6F1 · Gold #EFB94F.
+   Deep Navy #071932 is a tonal extension of Midnight, not a fifth accent.
+   Never fetch remote fonts. Keep the original navigation and functional tools.
+*/
+body.project-immersive-page{
+  --ma-midnight:#040D20;
+  --ma-blue:#00A7ED;
+  --ma-silver:#DCE6F1;
+  --ma-gold:#EFB94F;
+  --ma-deep:#071932;
+  --ma-ink:#0A2546;
+  --ma-ink-subtle:#415976;
+  --ma-border:#244465;
+  --ma-soft-silver:#eff4fa;
+  --ma-hover-blue:#6edbff;
+  --ma-serif:Georgia,"Times New Roman",serif;
+  --ma-font:Inter,"Segoe UI",ui-sans-serif,system-ui,-apple-system,Arial,sans-serif;
+  font-family:var(--ma-font);
+  color:var(--ma-silver);
+  background:var(--ma-midnight);
+  color-scheme:dark;
+}
+.project-immersive-page #main{
+  background:radial-gradient(ellipse at 77% 12%,#0b3054 0%,transparent 47%),
+             linear-gradient(145deg,var(--ma-midnight) 5%,var(--ma-deep) 77%,#092041 100%);
+}
+.project-immersive-page .project-chat{
+  --pc-border:#244465;
+  --pc-ink:var(--ma-silver);
+  --pc-muted:#bdcfe0;
+  --pc-accent:var(--ma-blue);
+  background:transparent;
+  color:var(--ma-silver);
+}
+.project-immersive-page .project-chat-side{
+  background:linear-gradient(175deg,var(--ma-deep) 0%,var(--ma-midnight) 94%);
+  border-right:1px solid #244465;
+  box-shadow:5px 0 32px #00000019;
+  position:sticky;
+}
+.project-immersive-page .project-chat-side::before{
+  content:"";
+  display:block;
+  height:3px;
+  position:absolute;
+  top:0;left:10px;right:10px;
+  background:linear-gradient(90deg,var(--ma-blue) 0%,
+      var(--ma-blue) 64%,var(--ma-silver) 64%,var(--ma-silver) 84%,
+      var(--ma-gold) 84%,var(--ma-gold) 100%);
+  border-radius:0 0 3px 3px;
+  pointer-events:none;
+}
+.project-immersive-page .project-chat-side-title{
+  color:var(--ma-silver);
+  font-size:1.25rem;
+  letter-spacing:-.035em;
+  font-weight:740;
+}
+.project-immersive-page .project-chat-side-title img{
+  padding:3px;
+  background:var(--ma-midnight);
+  border:1px solid #a9b6c8;
+  box-shadow:0 0 0 2px #efb94f24;
+}
+.project-immersive-page .workspace-side-search input{
+  background:#0d2947;
+  color:var(--ma-silver);
+  border:1px solid #49617a;
+}
+.project-immersive-page .workspace-side-search input::placeholder{
+  color:#b4c7d8;
+}
+.project-immersive-page .workspace-side-search p{color:#c3d2e0}
+.project-immersive-page .project-chat-new{
+  border:1px solid var(--ma-blue);
+  background:var(--ma-blue);
+  color:var(--ma-midnight);
+  font-weight:740;
+  box-shadow:0 5px 18px #00a7ed1f;
+}
+.project-immersive-page .project-chat-new:is(:hover,:focus-visible){
+  background:var(--ma-hover-blue);
+  color:var(--ma-midnight);
+}
+.project-immersive-page .project-chat-label{
+  color:var(--ma-gold);
+  font-size:.68rem;
+  font-weight:820;
+  letter-spacing:.13em;
+}
+.project-immersive-page .project-chat-templates button{
+  color:var(--ma-silver);
+  font-size:.88rem;
+  font-weight:570;
+}
+.project-immersive-page .project-chat-templates button:is(:hover,:focus-visible){
+  background:#123255;color:#fff;
+}
+.project-immersive-page .project-action-shortcuts a{
+  border-color:#405c7b;
+  background:#123052;
+  color:var(--ma-silver);
+  font-size:.77rem;
+}
+.project-immersive-page .project-action-shortcuts a:is(:hover,:focus-visible){
+  border-color:var(--ma-blue);
+  background:#183b60;
+  color:#fff;
+}
+.project-immersive-page .workspace-side-links{
+  border-color:#45617d;
+}
+.project-immersive-page .workspace-side-links a{
+  color:#c5d3e1;
+}
+.project-immersive-page .workspace-side-links a:hover{
+  background:#123052;
+  color:var(--ma-silver);
+}
+.project-immersive-page .workspace-headbar{
+  border-bottom:1px solid #47608050;
+}
+.project-immersive-page .workspace-sidebar-toggle{
+  color:var(--ma-silver);
+  background:#0e2e50;
+  border-color:#45617c;
+}
+.project-immersive-page .workspace-sidebar-toggle:is(:hover,:focus-visible),
+.project-immersive-page .workspace-sidebar-toggle[aria-expanded="false"]{
+  color:var(--ma-midnight);
+  background:var(--ma-silver);
+  border-color:var(--ma-silver);
+}
+.project-immersive-page .workspace-mode-switch{
+  background:#0c2746;
+  border:1px solid #3d5876;
+}
+.project-immersive-page .workspace-mode-switch button{
+  color:var(--ma-silver);
+}
+.project-immersive-page .workspace-mode-switch button[aria-pressed="true"]{
+  background:var(--ma-blue);
+  color:var(--ma-midnight);
+  box-shadow:0 3px 16px #00a7ed23;
+}
+.project-immersive-page .workspace-website-link{
+  color:var(--ma-silver);
+}
+.project-immersive-page .workspace-website-link span{
+  color:var(--ma-gold);
+}
+.project-immersive-page .project-chat-top h1{
+  color:var(--ma-silver);
+  font-weight:690;
+  letter-spacing:-.05em;
+  text-wrap:balance;
+}
+.project-immersive-page .project-chat-top h1::after{
+  content:"";
+  display:block;
+  width:54px;height:3px;
+  border-radius:8px;
+  background:var(--ma-gold);
+  margin:13px auto 0;
+}
+.project-immersive-page .project-chat-top p{
+  color:#c4d6e7;
+}
+.project-immersive-page .project-chat-offline{
+  color:var(--ma-silver);
+  background:#0e294b;
+  border-color:#415c78;
+}
+.project-immersive-page .project-chat-offline::before{
+  content:"";
+  display:inline-block;
+  width:6px;height:6px;
+  border-radius:50%;
+  background:var(--ma-gold);
+  vertical-align:middle;
+  margin-right:9px;
+}
+.project-immersive-page .project-ai-mode-button{
+  background:#103a5e;
+  color:var(--ma-silver);
+  border-color:#3b7395;
+}
+.project-immersive-page .project-ai-mode-button:is(:hover,:focus-visible){
+  color:var(--ma-midnight);
+  background:var(--ma-silver);
+}
+.project-immersive-page .project-ai-mode-note,
+.project-immersive-page .project-chat-footnote{
+  color:#c0d2e5;
+}
+.project-immersive-page .project-chat-bubble{
+  color:var(--ma-silver);
+}
+.project-immersive-page .project-chat-bubble strong{
+  color:var(--ma-gold);
+}
+.project-immersive-page .project-chat-avatar{
+  background:var(--ma-blue);
+  color:var(--ma-midnight);
+}
+.project-immersive-page .project-chat-user .project-chat-bubble{
+  background:var(--ma-silver);
+  border:1px solid #fff;
+  color:var(--ma-ink);
+  box-shadow:0 8px 22px #00000020;
+}
+.project-immersive-page .project-chat-prompt-chips button{
+  background:#0d2948;
+  border:1px solid #4d6c8b;
+  color:var(--ma-silver);
+}
+.project-immersive-page .project-chat-prompt-chips button:is(:hover,:focus-visible){
+  border-color:var(--ma-gold);
+  background:#173958;
+  color:#fff;
+}
+.project-immersive-page .project-chat-composer,
+.project-immersive-page .project-ai-composer{
+  background:var(--ma-silver);
+  border:1px solid #f8fbff;
+  color:var(--ma-ink);
+  box-shadow:0 22px 52px #00000046,0 0 0 1px #dce6f120;
+  border-radius:22px;
+}
+.project-immersive-page .project-chat-composer:focus-within,
+.project-immersive-page .project-ai-composer:focus-within{
+  box-shadow:0 19px 51px #00000041,0 0 0 3px var(--ma-gold);
+}
+.project-immersive-page .project-chat-input-label,
+.project-immersive-page .project-ai-composer label{
+  color:var(--ma-ink);
+  font-weight:780;
+}
+.project-immersive-page .project-chat-composer textarea,
+.project-immersive-page .project-ai-composer textarea{
+  color:var(--ma-ink);
+  background:transparent;
+}
+.project-immersive-page .project-chat-composer textarea::placeholder,
+.project-immersive-page .project-ai-composer textarea::placeholder{
+  color:#4f647e;
+  opacity:1;
+}
+.project-immersive-page .project-chat-composer-actions{
+  border-color:#9aaec3;
+}
+.project-immersive-page #project-chat-progress{
+  color:var(--ma-ink-subtle);
+}
+.project-immersive-page .project-chat-controls button{
+  background:#f4f7fb;
+  color:var(--ma-ink);
+  border:1px solid #9eb4c9;
+}
+.project-immersive-page .project-chat-controls #project-chat-send,
+.project-immersive-page #project-ai-send{
+  color:var(--ma-midnight);
+  background:var(--ma-blue);
+  border-color:var(--ma-blue);
+  font-weight:790;
+}
+.project-immersive-page .project-chat-controls #project-chat-send:hover,
+.project-immersive-page #project-ai-send:hover{
+  background:#68dbff;
+  border-color:#68dbff;
+}
+.project-immersive-page .project-chat-summary{
+  color:var(--ma-silver);
+  background:#0c2949;
+  border:1px solid #48617d;
+}
+.project-immersive-page .project-chat-summary-header span{
+  color:var(--ma-gold);
+}
+.project-immersive-page .project-chat-summary-header h2{
+  color:var(--ma-silver);
+}
+.project-immersive-page #project-chat-summary-text{
+  background:var(--ma-silver);
+  border:1px solid #c2d1e1;
+  color:var(--ma-ink);
+}
+.project-immersive-page .project-chat-summary-actions :is(a,button){
+  background:var(--ma-silver);
+  border:1px solid var(--ma-silver);
+  color:var(--ma-ink);
+}
+.project-immersive-page #project-chat-email{
+  color:var(--ma-midnight);
+  background:var(--ma-blue);
+  border-color:var(--ma-blue);
+}
+.project-immersive-page .workspace-work-intro h2{
+  color:var(--ma-silver);
+}
+.project-immersive-page .workspace-work-grid a,
+.project-immersive-page .workspace-work-grid button{
+  color:var(--ma-midnight);
+  background:var(--ma-silver);
+  border:1px solid #f9fcff;
+  box-shadow:0 14px 27px #0000002a;
+  overflow:hidden;
+}
+.project-immersive-page .workspace-work-grid a::before,
+.project-immersive-page .workspace-work-grid button::before{
+  content:"";position:absolute;top:0;left:0;
+  width:100%;height:4px;
+  background:linear-gradient(90deg,var(--ma-blue) 0%,var(--ma-blue) 76%,var(--ma-gold) 76%);
+}
+.project-immersive-page .workspace-work-grid a:is(:hover,:focus-visible),
+.project-immersive-page .workspace-work-grid button:is(:hover,:focus-visible){
+  background:#f5f9fd;
+  border-color:var(--ma-gold);
+  color:var(--ma-midnight);
+  transform:translateY(-2px);
+}
+.project-immersive-page .workspace-work-grid strong{
+  color:var(--ma-midnight);
+}
+.project-immersive-page .workspace-work-grid small{
+  color:#3d5573;
+}
+.project-immersive-page .workspace-work-icon{
+  color:#006fa9;
+}
+.project-immersive-page .workspace-work-arrow{
+  color:#896019;
+}
+.project-immersive-page .project-ai-header strong{
+  color:var(--ma-gold);
+}
+.project-immersive-page .project-ai-header button,
+.project-immersive-page .project-ai-actions button,
+.project-immersive-page .project-ai-create-link{
+  background:#103153;
+  border:1px solid #4c6887;
+  color:var(--ma-silver);
+}
+.project-immersive-page .project-ai-consent{
+  background:#102c4d;
+  border:1px solid #3d5c79;
+}
+.project-immersive-page .project-ai-consent p{
+  color:var(--ma-silver);
+}
+.project-immersive-page .project-ai-consent a{
+  color:#73d9ff;
+}
+.project-immersive-page #project-ai-load{
+  color:var(--ma-midnight);
+  background:var(--ma-gold);
+  border:1px solid var(--ma-gold);
+  font-weight:770;
+}
+.project-immersive-page #project-ai-load:hover{
+  background:#ffe1a1;
+}
+.project-immersive-page .project-ai-status{
+  background:#0e2f50;
+  border:1px solid #476581;
+  color:var(--ma-silver);
+}
+.project-immersive-page .project-ai-message{
+  background:#0e2c4c;
+  border:1px solid #395979;
+}
+.project-immersive-page .project-ai-message strong{
+  color:var(--ma-gold);
+}
+.project-immersive-page .project-ai-message p{
+  color:var(--ma-silver);
+}
+.project-immersive-page .project-ai-user{
+  background:#183957;
+}
+.project-immersive-page .project-ai-quick-tasks button{
+  background:#103655;
+  color:var(--ma-silver);
+  border-color:#496780;
+}
+.project-immersive-page .project-ai-composer textarea:disabled{
+  color:#566f88;
+  background:transparent;
+}
+.project-immersive-page .project-chat-notice,
+.project-immersive-page .project-ai-error{
+  color:#ffe0cf;
+}
+.project-immersive-page :is(a,button,input,textarea,select):focus-visible{
+  outline:3px solid var(--ma-gold);
+  outline-offset:3px;
+}
+.project-immersive-page .skip-link{
+  background:var(--ma-gold);
+  color:var(--ma-midnight);
+}
+@media(max-width:740px){
+  .project-immersive-page .project-chat-side{
+    position:fixed;
+    background:var(--ma-deep);
+  }
+  .project-immersive-page .workspace-menu-backdrop:not([hidden]){
+    background:#040d20bf;
+  }
+  .project-immersive-page .workspace-work-grid a,
+  .project-immersive-page .workspace-work-grid button{
+    transform:none;
+  }
+  .project-immersive-page .project-chat-composer{
+    padding:12px 13px 10px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .project-immersive-page .workspace-work-grid :is(a,button){transform:none!important}
+}
