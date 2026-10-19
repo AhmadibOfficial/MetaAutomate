@@ -40,7 +40,7 @@ def test_conversation_is_primary_and_old_enquiry_form_is_removed():
     assert 'id="brief-form"' not in html
     assert len(p.ids) == len(set(p.ids)), "Duplicate DOM ID"
     assert "/assets/project-chat.js" in p.scripts
-    assert "/assets/site.js" in p.scripts
+    assert "/assets/project-workspace-dark.js" in p.scripts
     for node in (
         "project-chat-messages","project-chat-input","project-chat-send",
         "project-chat-new","project-chat-progress","project-chat-summary",
