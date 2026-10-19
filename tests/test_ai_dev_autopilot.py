@@ -149,3 +149,24 @@ def test_reject_symlinked_parent_within_repo(tmp_path):
     (root / "apps/site/assets/shortcut").symlink_to(other, target_is_directory=True)
     with pytest.raises(agent.DevelopmentGateError, match="Symlinked"):
         agent.target_file("apps/site/assets/shortcut/foreign.css", root)
+
+
+def test_preview_checkout_accepts_clean_review_branch():
+    trusted_origin = "https://github.com/AhmadibOfficial/MetaAutomate"
+    with patch.object(agent, "git", side_effect=[
+        "feature/p2-059-local-ai-development-autopilot", "", trusted_origin
+    ]) as git_call:
+        agent.require_clean_checkout()
+        assert git_call.call_count == 3
+
+
+def test_preview_refuses_detached_head():
+    with patch.object(agent, "git", return_value=""):
+        with pytest.raises(agent.DevelopmentGateError, match="Detached"):
+            agent.require_clean_checkout()
+
+
+def test_apply_still_refuses_review_branch():
+    with patch.object(agent, "git", return_value="feature/p2-059-local-ai-development-autopilot"):
+        with pytest.raises(agent.DevelopmentGateError, match="requires main"):
+            agent.require_clean_main()
