@@ -36,7 +36,7 @@ def main():
             assert response.status == 200
             expect(page).to_have_title("Start a Project — MetaAutomate")
             expect(page.get_by_role("heading",
-                                    name="What are you looking to create?")).to_be_visible()
+                                    name="What would you like to build today?")).to_be_visible()
             expect(page.locator("#project-chat-messages")).to_be_visible()
             expect(page.locator("#project-chat-summary")).to_be_hidden()
             expect(page.locator("#project-chat-progress")).to_contain_text("Step 1 of 5")
