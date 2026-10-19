@@ -105,7 +105,7 @@ def validate_generation(raw: str, original: str, suffix: str) -> tuple[str, str]
 def propose(task: str, file_path: str, model: str, root: Path = ROOT) -> dict:
     if not isinstance(task, str) or not 12 <= len(task) <= 1000:
         raise DevelopmentGateError("Task must contain 12-1000 characters")
-    if not re.fullmatch(r"[A-Za-z0-9_.:/-]{2,100}", model):
+    if not re.fullmatch(r"[A-Za-z0-9_.:-]{2,100}", model):
         raise DevelopmentGateError("Invalid local model name")
     path = target_file(file_path, root=root)
     original = path.read_text(encoding="utf-8")
