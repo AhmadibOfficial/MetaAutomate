@@ -25,7 +25,22 @@ git pull --ff-only
 git status --short
 ```
 
-The repository must be **clean**, on `main`, with `origin` pointing exactly at `AhmadibOfficial/MetaAutomate`. If Ollama is not running on `127.0.0.1:11434`, the command fails closed. Do not paste secrets or customer information into task descriptions or files processed by the model.
+For **read-only preview**, the repository may be on the unmerged P2-059 feature branch. For **--apply** and **--draft-pr**, the repository must be clean and on `main`. In every mode, `origin` must point exactly at `AhmadibOfficial/MetaAutomate`. If Ollama is not running on `127.0.0.1:11434`, the command fails closed. Do not paste secrets or customer information into task descriptions or files processed by the model.
+
+### Preview from the unmerged P2-059 PR (available before release)
+
+```bash
+cd ~/MetaAutomate
+git status --short
+git fetch origin feature/p2-059-local-ai-development-autopilot
+git switch --track origin/feature/p2-059-local-ai-development-autopilot
+python3 -m pytest -q tests/test_ai_dev_autopilot.py
+python3 scripts/ai_dev_autopilot.py \
+  --task "Improve the keyboard focus styling while retaining our four brand colors" \
+  --file apps/site/assets/project-workspace-brand.css
+```
+
+If that branch is already present locally, use `git switch feature/p2-059-local-ai-development-autopilot` rather than recreating its tracking configuration. This is strictly a no-write preview; do not add `--apply` on the feature branch. This code must still pass GitHub CI and independent review before merge/release.
 
 ### Preview (no repository writes)
 
