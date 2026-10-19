@@ -1,8 +1,8 @@
-name: P2-056 Dark Start a Project Workspace
+name: P2-057 Blue Start a Project Workspace
 
 on:
   push:
-    branches: [feature/p2-056-dark-project-workspace]
+    branches: [feature/p2-056-dark-project-workspace, feature/p2-057-blue-project-navigation]
   pull_request:
     branches: [main]
 
@@ -23,6 +23,7 @@ jobs:
           python -m pip install 'pytest>=8,<10'
           python -m pytest -q \
             tests/test_p2_056_dark_project_workspace.py \
+            tests/test_p2_057_blue_navigation.py \
             tests/test_p2_04w_project_chat_static.py \
             tests/test_p2_04y_device_ai_static.py \
             tests/test_p2_051_direct_creation.py \
@@ -59,6 +60,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: p2-056-dark-workspace-screenshots
-          path: artifacts/validation/project-workspace-dark-*.png
+          name: p2-057-blue-workspace-screenshots
+          path: artifacts/validation/project-workspace-blue-*.png
           if-no-files-found: warn
