@@ -56,10 +56,10 @@ def test_menu_can_hide_or_show_sidebar_and_keyboard_remains_usable():
                    "sessionStorage","localStorage","sendBeacon("):
         assert unsafe not in js,unsafe
 
-def test_brand_blue_font_and_old_site_deep_links():
+def test_brand_palette_font_and_old_site_deep_links():
     css=(SITE/"assets/project-workspace-dark.css").read_text()
     html=(SITE/"engage/index.html").read_text()
-    assert 'content="#0b3471"' in html
+    assert 'content="#040D20"' in html
     assert "#08090b" not in css
     assert '#082d68' in css
     assert '#072554' in css
