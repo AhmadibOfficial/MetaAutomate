@@ -1,0 +1,64 @@
+name: P2-056 Dark Start a Project Workspace
+
+on:
+  push:
+    branches: [feature/p2-056-dark-project-workspace]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  workspace-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Static and compatibility checks
+        run: |
+          python -m pip install 'pytest>=8,<10'
+          python -m pytest -q \
+            tests/test_p2_056_dark_project_workspace.py \
+            tests/test_p2_04w_project_chat_static.py \
+            tests/test_p2_04y_device_ai_static.py \
+            tests/test_p2_051_direct_creation.py \
+            tests/test_site_customer_clarity.py
+          node --check apps/site/assets/project-workspace-dark.js
+          node --check apps/site/assets/project-chat.js
+          node --check apps/site/assets/project-device-ai.js
+
+  workspace-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    needs: workspace-source
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install actual browser
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Run desktop tablet and mobile workspace walkthrough
+        run: |
+          python -m http.server 18080 --bind 127.0.0.1 --directory apps/site >/tmp/project-workspace.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:18080/engage/ >/dev/null && break
+            sleep 1
+          done
+          python scripts/verify_dark_project_workspace_browser.py
+          python scripts/verify_project_chat_browser.py
+          python scripts/verify_project_device_ai_browser.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-056-dark-workspace-screenshots
+          path: artifacts/validation/project-workspace-dark-*.png
+          if-no-files-found: warn
