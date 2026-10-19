@@ -60,11 +60,12 @@ python3 scripts/ai_dev_autopilot.py \
   --apply --draft-pr
 ```
 
-The command publishes the branch and opens a **draft** PR. Running this command is an explicit developer authorization to send the proposed code to GitHub. It must *not* be used for unattended high-risk code, confidential source, or generated code which has not been assessed for CI execution risk.
+For this first milestone, **automatic draft PR publishing is permitted only for CSS files**. Python, JavaScript and HTML changes can be previewed or committed locally, but publishing them requires separate human review and verified isolated CI. The command publishes an allowed CSS branch and opens a **draft** PR. Running this command is an explicit developer authorization to send the proposed code to GitHub. It must *not* be used for unattended high-risk code, confidential source, or generated code which has not been assessed for CI execution risk.
 
 ## Scope and guardrails
 
 - **Allowlisted existing files only:** `apps/site/assets/`, `apps/site/engage/`, `apps/api/app/`, extensions `.css`, `.html`, `.js`, `.py`. No new files, arbitrary filesystem paths or symlinks.
+- **No executable-code auto-publication:** generated Python, JavaScript and HTML cannot use `--draft-pr` until isolated CI and independent security review are established.
 - **Never touches:** `.github/`, migrations, deployments, secrets, registry gates, cloud resources, CI configuration or security policies. Model output cannot choose command arguments or paths.
 - **Local inference:** fixed loopback Ollama endpoint, proxies disabled, JSON response with only `summary` and `content`, bounded input/output sizes, explicit file hash consistency.
 - **Safe defaults:** preview only. A clean `main` checkout and authorized remote are required, and `--draft-pr` additionally requires `--apply`.
