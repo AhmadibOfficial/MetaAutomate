@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""P2-057: browser acceptance of blue Chat/Work workspace and hideable navigation.
+"""P2-058: four official brand colors with verified Chat/Work and hideable navigation.
 
 No external model download: check opt-in panel and consent only.
 """
@@ -33,9 +33,27 @@ def main():
             expect(page.get_by_role("heading",
                 name="What would you like to build today?")).to_be_visible()
             expect(page.locator("#project-chat-messages")).to_be_visible()
-            assert "gradient" in page.evaluate(
-                "() => getComputedStyle(document.body).backgroundImage"
-            )
+            colors=page.evaluate("""() => {
+              const css=(selector,pseudo) =>
+                getComputedStyle(document.querySelector(selector),pseudo);
+              return {
+                midnight:css("body").getPropertyValue("--ma-midnight").trim(),
+                blue:css("body").getPropertyValue("--ma-blue").trim(),
+                silver:css("body").getPropertyValue("--ma-silver").trim(),
+                gold:css("body").getPropertyValue("--ma-gold").trim(),
+                composer:css(".project-chat-composer").backgroundColor,
+                send:css("#project-chat-send").backgroundColor,
+                headingAccent:css("#project-chat-title","::after").backgroundColor,
+                background:css("#main").backgroundImage,
+              };
+            }""")
+            assert (colors["midnight"],colors["blue"],
+                    colors["silver"],colors["gold"])==(
+                      "#040D20","#00A7ED","#DCE6F1","#EFB94F"),colors
+            assert colors["composer"]=="rgb(220, 230, 241)",colors
+            assert colors["send"]=="rgb(0, 167, 237)",colors
+            assert colors["headingAccent"]=="rgb(239, 185, 79)",colors
+            assert "gradient" in colors["background"],colors
             assert page.locator("#brief-form").count()==0
             assert page.locator("#project-chat-alternative").count()==0
             # Desktop and tablet both support collapse/expand via top navigation.
@@ -102,7 +120,7 @@ def main():
             dims=page.evaluate(
                 "() => ({screen:innerWidth,page:document.documentElement.scrollWidth})")
             assert dims["page"]<=dims["screen"]+1,dims
-            page.screenshot(path=str(OUT/f"project-workspace-blue-{name}.png"),
+            page.screenshot(path=str(OUT/f"project-workspace-brand-{name}.png"),
                             full_page=True)
             # The existing creative tool routes remain navigable.
             image_page=page.goto(BASE+"/creative/#instant-design")
