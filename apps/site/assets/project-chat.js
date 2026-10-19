@@ -82,15 +82,6 @@
   }
 
   const initialService = service;
-  const advanced = document.getElementById("project-chat-alternative");
-  function openStructuredLink() {
-    if (advanced && window.location.hash === "#brief-form") {
-      advanced.open = true;
-    }
-  }
-  openStructuredLink();
-  window.addEventListener("hashchange", openStructuredLink);
-
   function message(who, content) {
     const outer = document.createElement("div");
     outer.className = "project-chat-message project-chat-" + who;
