@@ -124,3 +124,18 @@ def test_reject_bad_model_name_and_task(tmp_path):
         agent.propose("short", "apps/site/assets/site.css", "qwen", root)
     with pytest.raises(agent.DevelopmentGateError):
         agent.propose("Valid task description", "apps/site/assets/site.css", "https://server.local", root)
+
+
+def test_refuse_automatic_pr_for_executable_generated_code(tmp_path):
+    root, _ = workspace(tmp_path)
+    py = root / "apps/api/app/sample.py"
+    py.parent.mkdir(parents=True)
+    py.write_text("value = 1\n")
+    proposal = {"path": "apps/api/app/sample.py", "content": "value = 2\n",
+                "summary": "Improve source", "source_sha256": agent.sha256(py.read_bytes()).hexdigest()}
+    with patch.object(agent, "require_clean_main"):
+        with patch.object(agent, "git") as git_call:
+            with pytest.raises(agent.DevelopmentGateError, match="CSS-only"):
+                agent.apply_proposal(proposal, "Improve source", root=root, publish=True)
+            git_call.assert_not_called()
+    assert py.read_text() == "value = 1\n"
