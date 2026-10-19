@@ -158,8 +158,12 @@ body.project-immersive-page{
   text-wrap:balance;
 }
 .project-immersive-page .project-chat-top h1::after{
-  content:".";
-  color:var(--ma-gold);
+  content:"";
+  display:block;
+  width:54px;height:3px;
+  border-radius:8px;
+  background:var(--ma-gold);
+  margin:13px auto 0;
 }
 .project-immersive-page .project-chat-top p{
   color:#c4d6e7;
@@ -399,6 +403,7 @@ body.project-immersive-page{
 }
 @media(max-width:740px){
   .project-immersive-page .project-chat-side{
+    position:fixed;
     background:var(--ma-deep);
   }
   .project-immersive-page .workspace-menu-backdrop:not([hidden]){
