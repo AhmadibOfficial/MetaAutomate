@@ -62,6 +62,11 @@ def target_file(relative: str, root: Path = ROOT) -> Path:
             posix.suffix not in ALLOWED_SUFFIXES):
         raise DevelopmentGateError("File outside the reviewed application source allowlist")
     candidate = root / relative
+    ancestor = root
+    for piece in posix.parts:
+        ancestor = ancestor / piece
+        if ancestor.is_symlink():
+            raise DevelopmentGateError("Symlinked source ancestors are forbidden")
     if candidate.is_symlink() or not candidate.is_file():
         raise DevelopmentGateError("Only existing, regular, non-symlink files may change")
     if not candidate.resolve().is_relative_to(root.resolve()):
