@@ -60,7 +60,7 @@ def test_homepage_communicates_customer_offer_and_has_real_destinations():
     assert 'class="section proof-section"' not in html
     assert html.count('class="social-card social-') == 2
     assert html.count('class="footer-social-link"') == 8
-    assert "/engage/#brief-form" in p.refs
+    assert "/engage/#project-chat-input" in p.refs
     assert "#solutions" in p.refs
     assert "/services/#ai" in p.refs
     assert "/services/#data" in p.refs
