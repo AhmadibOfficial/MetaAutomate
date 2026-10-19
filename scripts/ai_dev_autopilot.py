@@ -148,6 +148,8 @@ def apply_proposal(result: dict, task: str, *, root: Path = ROOT,
     path = target_file(result["path"], root=root)
     if sha256(path.read_bytes()).hexdigest() != result["source_sha256"]:
         raise DevelopmentGateError("Source changed after AI proposal; regenerate it")
+    if publish and path.suffix != ".css":
+        raise DevelopmentGateError("Automatic draft PR publishing is CSS-only until isolated CI is verified")
     slug = re.sub(r"[^a-z0-9]+", "-", task.lower()).strip("-")[:38].strip("-") or "change"
     branch = f"ai-dev/{slug}-{uuid4().hex[:8]}"
     git("switch", "-c", branch, root=root)
