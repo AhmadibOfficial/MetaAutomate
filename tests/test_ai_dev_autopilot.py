@@ -139,3 +139,13 @@ def test_refuse_automatic_pr_for_executable_generated_code(tmp_path):
                 agent.apply_proposal(proposal, "Improve source", root=root, publish=True)
             git_call.assert_not_called()
     assert py.read_text() == "value = 1\n"
+
+
+def test_reject_symlinked_parent_within_repo(tmp_path):
+    root, _ = workspace(tmp_path)
+    other = root / "apps/api/app"
+    other.mkdir(parents=True)
+    (other / "foreign.css").write_text("safe")
+    (root / "apps/site/assets/shortcut").symlink_to(other, target_is_directory=True)
+    with pytest.raises(agent.DevelopmentGateError, match="Symlinked"):
+        agent.target_file("apps/site/assets/shortcut/foreign.css", root)
