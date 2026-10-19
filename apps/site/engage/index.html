@@ -2,16 +2,15 @@
 <html lang="en"><head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#08090c">
+  <meta name="theme-color" content="#0b3471">
   <meta name="description" content="Start with a conversation. Describe your project, explore its goals, and prepare a private brief for MetaAutomate without sharing information automatically.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Start a Project — MetaAutomate">
   <meta property="og:description" content="Define a technology project with MetaAutomate. Build a private, shareable brief for AI, digital product, cybersecurity, cloud, data or experience work.">
-  <meta name="color-scheme" content="dark light">
+  <meta name="color-scheme" content="dark">
   <link rel="icon" type="image/webp" href="/assets/metaautomate-mark.webp">
   <link rel="stylesheet" href="/assets/site.css">
-  <script src="/assets/site.js" defer></script>
-<link rel="stylesheet" href="/assets/project-chat.css">
+  <link rel="stylesheet" href="/assets/project-chat.css">
 <script src="/assets/project-chat.js" defer></script>
 <link rel="stylesheet" href="/assets/project-device-ai.css">
 <link rel="stylesheet" href="/assets/project-workspace-dark.css">
@@ -20,31 +19,11 @@
   <title>Start a Project — MetaAutomate</title>
 </head><body class="project-immersive-page" data-workspace-mode="chat">
   <a class="skip-link" href="#main">Skip to content</a>
-  <div class="utility-bar"><div class="shell"><span class="utility-symbol">✦</span><span>Intelligence · Creation · Automation</span><span class="utility-aside">Global ambition. Purpose-led engineering.</span></div></div>
-  <header class="site-header" id="top">
-  <div class="shell header-layout">
-    <a class="brand" href="/" aria-label="MetaAutomate, homepage">
-      <img src="/assets/metaautomate-mark.webp" alt="" width="54" height="54">
-      <span class="brand-copy"><strong>Meta<span>Automate</span></strong><small>INTELLIGENCE · CREATION · AUTOMATION</small></span>
-    </a>
-    <button class="menu-button" id="menu-button" aria-controls="site-navigation" aria-expanded="false" aria-label="Open navigation" type="button">
-      <span></span><span></span><span></span>
-    </button>
-    <nav class="site-navigation" id="site-navigation" aria-label="Primary navigation">
-      <a href="/#solutions" >Solutions</a>
-      <a href="/services/" >Services</a>
-      <a href="/#workspace-demo">Workspace example</a>
-      <a href="/company/" >Company</a>
-      <a class="nav-action" href="/engage/" aria-current="page">Start a project <span aria-hidden="true">↗</span></a>
-    </nav>
-  </div>
-</header>
   <main id="main">
 <section class="project-chat" aria-labelledby="project-chat-title">
-  <button type="button" class="workspace-mobile-menu" id="workspace-mobile-menu" aria-controls="project-workspace-side" aria-expanded="false">☰ <span>Menu</span></button>
   <button type="button" class="workspace-menu-backdrop" id="workspace-menu-backdrop" aria-label="Close workspace menu" hidden></button>
   <aside class="project-chat-side" id="project-workspace-side" aria-label="Project workspace">
-    <a href="/" class="project-chat-side-title" aria-label="MetaAutomate homepage"><img src="/assets/metaautomate-mark.webp" width="30" height="30" alt=""><span>MetaAutomate</span><span class="workspace-chevron" aria-hidden="true">⌄</span></a>
+    <a href="/" class="project-chat-side-title" aria-label="MetaAutomate home"><img src="/assets/metaautomate-mark.webp" width="30" height="30" alt=""><span>MetaAutomate</span></a>
     <div class="workspace-side-search"><label for="workspace-search-input">Search starting points</label><input id="workspace-search-input" type="search" placeholder="Search project ideas…" autocomplete="off" maxlength="70"><p id="workspace-search-empty" role="status" hidden>No matching starting points.</p></div>
     <nav class="project-action-shortcuts" aria-label="Create immediately"><a href="/creative/#instant-design">Create image <span aria-hidden="true">↗</span></a><a href="/creative/#instant-video">Create video <span aria-hidden="true">↗</span></a></nav>
     <button class="project-chat-new" id="project-chat-new" type="button">＋ New project</button>
@@ -57,47 +36,46 @@
       <button type="button" data-project-template="security">Application security</button>
     </div>
     <div class="workspace-side-links" aria-label="Workspace destinations"><a href="/creative/#instant-design">◈ <span>Image creator</span></a><a href="/creative/#instant-video">▷ <span>Video creator</span></a><a href="/services/">⌘ <span>Explore services</span></a><a href="/">↗ <span>Back to website</span></a></div>
-    <div class="project-chat-side-footer"><strong>Private by default</strong><p>Your guided answers stay on this page unless you choose to share them. AI model downloads require separate consent.</p></div>
+    
   </aside>
   <div class="project-chat-main">
-    <div class="workspace-headbar">
+    <nav class="workspace-headbar" aria-label="Workspace navigation">
+      <button type="button" class="workspace-sidebar-toggle" id="workspace-sidebar-toggle" aria-controls="project-workspace-side" aria-expanded="true" aria-label="Hide navigation" title="Hide navigation"><span aria-hidden="true">☰</span><span class="workspace-toggle-caption">Menu</span></button>
       <div class="workspace-mode-switch" role="group" aria-label="Choose workspace mode">
         <button id="workspace-mode-chat" type="button" aria-pressed="true">Chat</button>
         <button id="workspace-mode-work" type="button" aria-pressed="false">Work</button>
       </div>
-      <a class="workspace-website-link" href="/" aria-label="MetaAutomate website home">MetaAutomate <span aria-hidden="true">↗</span></a>
-    </div>
+      <a class="workspace-website-link" href="/creative/" aria-label="Open Creative Studio">Creative Studio <span aria-hidden="true">↗</span></a>
+    </nav>
     <header class="project-chat-top">
-      <div><span class="project-chat-kicker">METAAUTOMATE / START A PROJECT</span>
+      <div>
         <h1 id="project-chat-title" tabindex="-1">What would you like to build today?</h1>
-        <p id="workspace-intro">Describe your project, explore an idea, or start creating now.</p>
+        <p id="workspace-intro">Describe your idea. We’ll help you shape it.</p>
       </div>
-      <span class="project-chat-offline">GUIDED CHAT · PRIVATE BY DEFAULT</span>
+      <span class="project-chat-offline">Guided chat</span>
     </header>
     <section class="workspace-work-panel" id="workspace-work-panel" aria-label="Work tools" hidden>
-      <div class="workspace-work-intro"><span>YOUR WORKSPACE</span><h2>Move from an idea to a deliverable.</h2><p>Choose a tool that produces something you can use. All files are created in your browser.</p></div>
+      <div class="workspace-work-intro"><h2>What would you like to make?</h2></div>
       <div class="workspace-work-grid">
         <a href="/creative/#instant-design"><span class="workspace-work-icon" aria-hidden="true">◈</span><strong>Create an image</strong><small>Generate a downloadable branded PNG</small><span class="workspace-work-arrow" aria-hidden="true">↗</span></a>
         <a href="/creative/#instant-video"><span class="workspace-work-icon" aria-hidden="true">▷</span><strong>Create a video</strong><small>Assemble a WebM video with your own narration</small><span class="workspace-work-arrow" aria-hidden="true">↗</span></a>
         <button id="workspace-work-brief" type="button"><span class="workspace-work-icon" aria-hidden="true">✎</span><strong>Prepare a project brief</strong><small>Organize goals, scope, timeline and constraints</small><span class="workspace-work-arrow" aria-hidden="true">↗</span></button>
         <button id="workspace-work-ai" type="button"><span class="workspace-work-icon" aria-hidden="true">✳</span><strong>Explore with local AI</strong><small>Opt-in WebGPU text model on supported devices</small><span class="workspace-work-arrow" aria-hidden="true">↗</span></button>
       </div>
-      <p class="workspace-work-boundary">Cloud AI agents, customer accounts, stored project history and automated external actions are not yet connected.</p>
+      
     </section>
     <div class="project-ai-mode-switch">
       <button id="project-ai-open" class="project-ai-mode-button" type="button" aria-expanded="false" aria-controls="project-ai-experience">Try AI on this device <span aria-hidden="true">✳</span></button>
-      <span class="project-ai-mode-note">Optional experiment · Requires WebGPU and a model download</span>
+      <span class="project-ai-mode-note">Experimental · WebGPU required</span>
     </div>
     <section id="project-ai-experience" class="project-ai-experience" aria-label="Experimental on-device AI chat" hidden>
       <div class="project-ai-header">
-        <div><strong>On-device AI · Experimental</strong>
-          <p>Run a small open-weight language model on your own device. No MetaAutomate account, cloud AI server or automatic project submission.</p>
-        </div>
+        <div><strong>Local AI · Experimental</strong></div>
         <button id="project-ai-close" type="button">Return to guided intake</button>
       </div>
       <div id="project-ai-consent" class="project-ai-consent">
-        <p><strong>Before you enable AI:</strong> A WebGPU-compatible browser and sufficient graphics memory are required. Your browser will download model weights and WebLLM software from third-party hosts, potentially hundreds of megabytes. The model and software may be cached on your device.</p>
-        <p>The model runs locally after loading, but this external software has not been independently security-audited by MetaAutomate. Do not enter confidential or regulated information. The AI can make mistakes. Image, video, voice generation, persistent history and live human support are <strong>not</strong> included.</p>
+        <p><strong>Before enabling:</strong> Requires WebGPU and downloads a large model from external hosts. Software may be cached on this device.</p>
+        <p>Experimental text AI, not independently security-audited. Avoid confidential data. Responses may be incorrect; image/video/voice AI and saved history are not included.</p>
         <p><a href="https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct" target="_blank" rel="noopener noreferrer">Model and licence information ↗</a> · <a href="https://github.com/mlc-ai/web-llm" target="_blank" rel="noopener noreferrer">WebLLM engine ↗</a></p>
         <button id="project-ai-load" type="button">Download model and start local AI</button>
       </div>
@@ -120,14 +98,13 @@
         </div>
       </div>
       <p id="project-ai-error" class="project-ai-error" role="alert" hidden></p>
-      <p class="project-ai-footer">Responses are generated on-device when the model is loaded. No responses are guaranteed, and this experimental tool cannot execute project workflows.</p>
+      
     </section>
     <div class="project-chat-conversation" id="project-chat-messages" role="log" aria-label="Project intake conversation" aria-live="polite" aria-relevant="additions" tabindex="0">
       <div class="project-chat-message project-chat-assistant">
         <span class="project-chat-avatar" aria-hidden="true">✳</span>
         <div class="project-chat-bubble"><strong>MetaAutomate Project Guide</strong>
-          <p>What would you like to build? Describe your idea and I’ll help you organize the requirements.</p>
-          <p class="project-chat-hint">Guided project discovery · Choose the on-device AI option for generated replies.</p>
+          <p>Tell me your project idea.</p>
         </div>
       </div>
     </div>
@@ -148,11 +125,11 @@
           </div>
         </div>
       </div>
-      <p id="project-chat-keyboard" class="project-chat-footnote">Enter to continue · Shift+Enter for a new line. Please avoid passwords, payment details or confidential data.</p>
+      <p id="project-chat-keyboard" class="project-chat-footnote">Enter to continue · Shift+Enter for a new line. Don’t include confidential details.</p>
       <p id="project-chat-notice" class="project-chat-notice" role="alert" hidden></p>
     </div>
     <section class="project-chat-summary" id="project-chat-summary" aria-labelledby="project-chat-summary-title" hidden>
-      <div class="project-chat-summary-header"><span>YOUR PROJECT BRIEF</span><h2 id="project-chat-summary-title" tabindex="-1">Ready to share when you decide.</h2><p>Your answers were organized locally. Review the draft first—nothing has been sent or saved to MetaAutomate.</p></div>
+      <div class="project-chat-summary-header"><span>PROJECT BRIEF</span><h2 id="project-chat-summary-title" tabindex="-1">Your project is ready to review.</h2></div>
       <pre id="project-chat-summary-text" tabindex="0"></pre>
       <div class="project-chat-summary-actions">
         <a id="project-chat-email" href="mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Project%20inquiry">Open email draft ↗</a>
@@ -160,76 +137,11 @@
         <button id="project-chat-download" type="button">Download project brief</button>
         <a href="/creative/#instant-design">Create an image ↗</a>
       </div>
-      <p id="project-chat-share-note" class="project-chat-footnote">Your own email app handles sending. No message is submitted by this website.</p>
+      <p id="project-chat-share-note" class="project-chat-footnote">Nothing is sent until you send the email.</p>
       <p id="project-chat-copy-status" role="status" aria-live="polite"></p>
     </section>
   </div>
 </section>
-<details class="project-chat-alternative" id="project-chat-alternative">
-  <summary>Prefer a structured project form? Open the original enquiry form</summary>
 
-<section class="subhero engage-hero"><div class="shell subhero-inner"><div><span class="eyebrow eyebrow-dark">METAAUTOMATE / BEGIN WITH THE PROBLEM</span><h2>Tell us your business challenge.<br><em>Explore the value together.</em></h2><p>Whether you're exploring an investment in AI, better operations or a more secure product, start with the client experience and business outcome you want to improve.</p></div><div class="brief-hero-mark" aria-hidden="true"><span>01</span><i></i><span>02</span><i></i><span>03</span></div></div></section>
-<section class="section brief-section">
- <div class="shell brief-layout">
-  <aside class="brief-aside"><span class="eyebrow">THE FIRST CONVERSATION</span><h2>Clarity before<br><em>complexity.</em></h2><p>A good client partnership begins with your challenge, the value at stake and what a better experience would look like.</p><div class="brief-shortcut"><p><strong>Just have a quick question?</strong> Email us directly—no form or download required. Your email app handles sending.</p><a class="action action-primary" href="mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Business%20inquiry">Email a project question <span aria-hidden="true">↗</span></a></div><div class="brief-aside-list"><div><span>01</span><strong>Describe the challenge</strong><small>What needs to change?</small></div><div><span>02</span><strong>Describe the value</strong><small>What would success look like?</small></div><div><span>03</span><strong>Set the context</strong><small>What constraints matter?</small></div></div><p class="brief-privacy"><span aria-hidden="true">◇</span> Your project brief stays in this browser unless you choose to copy, download or send it through your own email app. The website does not store or submit your details.</p>
-    <div class="brief-direct-contact"><span>DIRECT BUSINESS CONTACT</span><a href="mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Business%20inquiry">metaautomating@gmail.com<span aria-hidden="true">↗</span></a><p>For technology projects, service inquiries and partnerships. Your own email app handles sending.</p></div></aside>
-  <div class="brief-card">
-   <div class="brief-title"><span>PROJECT DISCOVERY / 001</span><strong>Prepare your project investment conversation</strong><p>Answer a few questions, then open a prepared email or copy your brief. No account, automatic submission or server storage.</p></div>
-   <form id="brief-form" novalidate>
-    <div class="field-row">
-      <div class="field"><label for="brief-service">Service area <em>*</em></label><select id="brief-service" name="service" required><option value="">Choose a discipline</option><option>AI Systems &amp; Automation</option><option>Software &amp; Digital Products</option><option>Cybersecurity &amp; Quality</option><option>Cloud &amp; DevOps</option><option>Data &amp; Decision Intelligence</option><option>Product Design &amp; Experience</option><option>Still exploring</option></select></div>
-      <div class="field"><label for="brief-stage">Project stage <em>*</em></label><select id="brief-stage" name="stage" required><option value="">Select a stage</option><option>Research and discovery</option><option>New initiative or concept</option><option>Existing product or system</option><option>Improvement or modernization</option></select></div>
-    </div>
-    <div class="field"><label for="brief-problem">What business challenge are you tackling? <em>*</em></label><textarea id="brief-problem" name="problem" rows="4" minlength="15" maxlength="1800" required placeholder="Describe the challenge, context, and who it affects…"></textarea><small>Describe the challenge before choosing the technology.</small></div>
-    <div class="field"><label for="brief-outcome">What value would a successful outcome create? <em>*</em></label><textarea id="brief-outcome" name="outcome" rows="3" minlength="10" maxlength="1200" required placeholder="What would be better, faster, safer or possible when this succeeds?"></textarea></div>
-    <div class="field-row"><div class="field"><label for="brief-time">Preferred timeline</label><select id="brief-time" name="timeline"><option>To be discussed</option><option>Within 30 days</option><option>1–3 months</option><option>3–6 months</option><option>6+ months</option></select></div><div class="field"><label for="brief-region">Region or timezone</label><input id="brief-region" name="region" maxlength="100" autocomplete="off" placeholder="e.g. West Africa / UTC+1"></div></div>
-    <div class="field"><label for="brief-constraints">Important constraints <span>(optional)</span></label><textarea id="brief-constraints" name="constraints" rows="3" maxlength="1000" placeholder="Investment range, security, accessibility, regulatory context, integration constraints…"></textarea></div>
-    <div id="brief-error" role="alert" class="form-message" hidden></div>
-    <div class="brief-actions"><button type="submit" class="action action-primary">Prepare my enquiry <span aria-hidden="true">↗</span></button><button type="reset" class="action action-reset">Clear form</button></div>
-   </form>
-   <section id="brief-result" class="brief-result" aria-labelledby="brief-result-title" hidden>
-     <div class="result-heading"><span>YOUR SHAREABLE BRIEF</span><h3 id="brief-result-title" tabindex="-1">Ready for the next conversation.</h3><p>Review your summary, then choose to compose an email, copy the text or download it. Nothing is sent until you send it from your email application.</p></div>
-     <pre id="brief-output" tabindex="0"></pre>
-     <div class="brief-result-actions"><a class="action action-primary" id="brief-email" href="mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Business%20inquiry">Compose email to MetaAutomate <span aria-hidden="true">↗</span></a><button class="action action-quiet light-action" id="brief-copy" type="button">Copy brief <span aria-hidden="true">⧉</span></button><button class="action action-quiet light-action" id="brief-download" type="button">Download .txt <span aria-hidden="true">↓</span></button></div>
-     <p class="brief-email-note" id="brief-email-note">Opens your email application with a draft. Review it and press Send yourself. If the brief is too long for an email link, attach the downloaded .txt file.</p>
-     <p class="copy-status" role="status" aria-live="polite" id="brief-status"></p>
-   </section>
-  </div>
- </div>
- <div class="shell brief-contact"><span>PLEASE NOTE</span><p>Creating a brief does not submit an inquiry or guarantee an engagement. To contact MetaAutomate, deliberately open the email draft and send it from your own email account. Do not include passwords, payment details or confidential data in initial inquiries.</p></div>
-</section>
-</details>
 </main>
-  <footer class="site-footer">
-  <div class="shell">
-    <div class="footer-major">
-      <div>
-        <a class="brand footer-brand" href="/" aria-label="MetaAutomate homepage"><img src="/assets/metaautomate-mark.webp" alt="" width="54" height="54"><span class="brand-copy"><strong>Meta<span>Automate</span></strong><small>TURN YOUR VISION INTO REALITY</small></span></a>
-        <p>Intelligent systems. Distinctive experiences.<br>Technology designed to create value.</p>
-      </div>
-      <div class="footer-linkset"><h3>Explore</h3><a href="/#solutions">Solutions</a><a href="/services/">Services</a><a href="/#workspace-demo">Workspace example</a></div>
-      <div class="footer-linkset"><h3>MetaAutomate</h3><a href="/company/">Our company</a><a href="/company/#values">Our values</a><a href="/engage/">Project brief</a></div>
-      <div class="footer-statement"><span>OUR NORTH STAR</span><strong>Solutions.<br>Convenience.<br><i>Experiences.</i></strong></div>
-    </div>
-    <div class="footer-contact" aria-label="MetaAutomate business inquiries">
-      <div class="footer-contact-copy"><span class="footer-contact-eyebrow">BUSINESS INQUIRIES / GLOBAL</span><p>Technology projects, collaborations and partnerships.</p></div>
-      <a class="footer-contact-email" href="mailto:metaautomating@gmail.com?subject=MetaAutomate%20%7C%20Business%20inquiry">metaautomating@gmail.com <span aria-hidden="true">↗</span></a>
-    </div>
-    <nav class="footer-socials" aria-label="MetaAutomate official social channels">
-      <div class="footer-socials-heading"><span>FOLLOW THE WORK</span><small>Ideas, technology and the people shaping what comes next.</small></div>
-      <div class="footer-socials-links">
-        <a class="footer-social-link" href="https://youtube.com/@MetaAutomate" target="_blank" rel="noopener noreferrer" aria-label="YouTube — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">▶</span>YouTube<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
-        <a class="footer-social-link" href="https://www.linkedin.com/company/meta-automate" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">in</span>LinkedIn<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
-        <a class="footer-social-link" href="https://instagram.com/meta_automate" target="_blank" rel="noopener noreferrer" aria-label="Instagram — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">◎</span>Instagram<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
-        <a class="footer-social-link" href="https://twitter.com/MetaAutomate" target="_blank" rel="noopener noreferrer" aria-label="X / Twitter — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">𝕏</span>X / Twitter<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
-        <a class="footer-social-link" href="https://facebook.com/MetaAutomate" target="_blank" rel="noopener noreferrer" aria-label="Facebook — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">f</span>Facebook<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
-        <a class="footer-social-link" href="https://tiktok.com/@metaautomate" target="_blank" rel="noopener noreferrer" aria-label="TikTok — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">♪</span>TikTok<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
-        <a class="footer-social-link" href="https://whatsapp.com/channel/0029VbDSQMdBqbr1vqRyYR2U" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp Channel — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">WA</span>WhatsApp Channel<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
-        <a class="footer-social-link" href="https://t.me/Meta_Automate" target="_blank" rel="noopener noreferrer" aria-label="Telegram — opens in a new tab"><span class="footer-social-glyph" aria-hidden="true">➤</span>Telegram<span class="footer-social-arrow" aria-hidden="true">↗</span></a>
-      </div>
-    </nav>
-    <div class="footer-minor"><span>© <span data-year>2026</span> MetaAutomate. All rights reserved in the brand identity.</span><span>Built with integrity · Excellence · Innovation · Impact · Always HALAL</span></div>
-  </div>
-</footer>
-  
 </body></html>
