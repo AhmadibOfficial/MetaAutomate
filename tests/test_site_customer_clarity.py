@@ -188,25 +188,22 @@ def test_all_four_pages_keep_brand_and_navigate_to_website_solution_path():
             assert resource.get("src", "").startswith("/assets/")
 
 
-def test_enquiry_is_email_draft_no_submission_or_external_form_action():
+def test_project_chat_replaces_old_enquiry_with_local_mail_draft():
     html = (SITE / "engage/index.html").read_text()
     structure = page("engage/index.html")
-    assert "Email a project question" in html
-    assert "Tell us your business challenge" in html
-    assert "value at stake" in html
-    assert "What business challenge are you tackling?" in html
-    assert "What value would a successful outcome create?" in html
-    assert "investment in AI" in html
-    assert "No account, automatic submission or server storage." in html
-    assert len(structure.forms) == 1
-    assert structure.forms[0].get("id") == "brief-form"
-    assert not structure.forms[0].get("action")
-    assert structure.forms[0].get("method", "").lower() != "post"
+    assert "What would you like to build today?" in html
+    assert "Tell me your project idea." in html
+    assert 'id="project-chat-input"' in html
+    assert 'id="project-chat-summary"' in html
+    assert 'id="project-chat-email"' in html
+    assert 'id="workspace-sidebar-toggle"' in html
+    assert 'id="brief-form"' not in html
+    assert "Prefer a structured project form?" not in html
+    assert not structure.forms
     assert any(x.startswith("mailto:metaautomating@gmail.com")
                for x in structure.refs)
-    assert "Nothing is sent until" in html or "Nothing is sent" in html
-    assert "Do not include passwords" in html
-
+    assert "Nothing is sent" in html
+    assert "confidential" in html.lower()
 
 
 def test_company_roadmap_does_not_misrepresent_source_as_live_execution():
