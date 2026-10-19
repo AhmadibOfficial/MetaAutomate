@@ -286,7 +286,7 @@ body.project-immersive-page{
 }
 @media(max-width:980px){
   .project-immersive-page .project-chat{grid-template-columns:234px minmax(0,1fr)}
-  .project-immersive-page .project-chat-side{padding:14px 8px}
+  .project-immersive-page .project-chat-side{display:flex;padding:14px 8px}
   .project-immersive-page .project-chat-main{padding-inline:22px}
   .project-immersive-page .project-chat-templates{display:flex;flex-direction:column}
   .project-immersive-page .project-chat-label{display:block}
