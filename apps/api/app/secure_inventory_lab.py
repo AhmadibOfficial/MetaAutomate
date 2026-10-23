@@ -59,7 +59,7 @@ def _principal(principal, roles):
 
 
 def _integer(value: str, kind: str, maximum: int) -> int:
-    if not isinstance(value, str) or NATURAL.fullmatch(value) is None:
+    if not isinstance(value, str) or len(value) > 15 or NATURAL.fullmatch(value) is None:
         deny("Invalid integer " + kind)
     number = int(value)
     if number > maximum:
@@ -168,8 +168,8 @@ class SecureInventoryLab:
         self.path = Path(path)
         if not self.path.is_absolute() or self.path.is_symlink():
             deny("Use a non-symlink absolute SQLite file path")
-        if not self.path.parent.is_dir():
-            deny("Data-lab directory does not exist")
+        if not self.path.parent.is_dir() or self.path.parent.is_symlink():
+            deny("Use a real, existing data-lab directory (not a symlink)")
         if self.path.exists() and not self.path.is_file():
             deny("Data-lab path must be a regular file")
         old_mask = os.umask(0o077)
@@ -289,6 +289,10 @@ class SecureInventoryLab:
         items = _unseal(self.key, tenant, str(identifier), row["nonce"], row["encrypted"])
         if len(items) != row["record_count"]:
             deny("Stored document record count altered")
+        with _connect(self.path) as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            self._audit(conn, tenant, str(principal.user_id), "INVENTORY_READ",
+                        str(identifier), current)
         return dict(document_id=str(identifier), records=items,
                     retained_until=row["retained_until"],
                     encrypted_at_rest=True, external_execution_authorized=False)
