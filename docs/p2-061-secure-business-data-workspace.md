@@ -22,6 +22,13 @@ workspace identity and session/CSRF controls.
 - Retention 1–30 days. Expired records cannot be read. An authorized manual
   purge is needed for physical removal, no automatic retention scheduler.
 - Delete is limited to the active SQLite row; backups/snapshots are not erased.
+- The existing private Objective Workspace now includes a locally gated
+  Inventory vault screen. The navigation remains hidden by default and becomes
+  available only if the server advertises the development-only flag. The screen
+  supports authenticated CSV import, document listing, on-demand decrypt/view,
+  explicit deletion and expired-record purge, local HMAC verification, and
+  immediate clearing of decrypted on-screen previews on navigation/logout.
+  This interface is served by the private API app, NOT the public apps/site page.
 - Independent source/consent verification, KMS, key rotation, and PostgreSQL
   forced RLS remain future acceptance gates.
 
@@ -70,7 +77,7 @@ tests use typed fictional principals to test authorization/tenant mechanics.
 
 ## Tests
 
-    python3 -m pytest -q tests/test_p2_061_secure_data_lab.py tests/test_p2_061_data_api_admission.py
+    python3 -m pytest -q tests/test_p2_061_secure_data_lab.py tests/test_p2_061_data_api_admission.py tests/test_p2_061_private_vault_ui.py
     python3 -m compileall -q apps/api/app/secure_inventory_lab.py apps/api/app/secure_data_lab_api.py
 
 The tests cover different tenant IDs, denied read/delete, ciphertext
