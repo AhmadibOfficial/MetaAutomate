@@ -89,7 +89,14 @@ def browser_config():
     mode = auth_mode()
     return {"mode": mode,
             "label": "Organization SSO" if mode == "oidc" else "Local development",
-            "execution_allowed": False}
+            "execution_allowed": False,
+            "local_data_lab_available": (
+                mode == "dev_key"
+                and os.environ.get("MAT_DATA_LAB_ENABLED") == "1"
+                and os.environ.get("MAT_DATA_LAB_ACK") == "LOCAL_REHEARSAL_ONLY"
+                and os.environ.get("WORKSPACE_ORIGIN", "http://127.0.0.1:8000")
+                in ("http://127.0.0.1:8000", "http://localhost:8000")
+            )}
 
 
 @router.post("/login")
