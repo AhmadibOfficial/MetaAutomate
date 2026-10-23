@@ -11,7 +11,7 @@
   };
   const audit = [];
   let records = null, results = null, selected = null, plan = null, approval = null, metrics = null, graphicReady = false;
-  function recordEvent(action) { audit.push({ action, at: new Date().toISOString() }); }
+  function recordEvent(action) { audit.push({ action, at: new Date().toISOString() }); if (audit.length > 200) audit.shift(); }
   function resetDownstream() {
     selected = null; plan = null; approval = null; metrics = null; graphicReady = false;
     el("campaign-project").hidden = true;
@@ -22,6 +22,7 @@
     el("campaign-copy").disabled = true;
     el("campaign-authorize").disabled = true;
     el("campaign-approval-state").textContent = "Not reviewed. No provider publishing is available.";
+    el("campaign-metrics-result").textContent = "No results recorded.";
     el("campaign-post").value = "";
     const canvas = el("campaign-canvas");
     canvas.width = 1; canvas.height = 1;
@@ -85,6 +86,9 @@
       announce("Inventory assessed locally. No data uploaded. Review the recommended inventory before drafting.");
     } catch (error) { formatError(error); }
   });
+  ["campaign-brand", "campaign-channel"].forEach(id => el(id).addEventListener("change", () => {
+    if (plan) { resetDownstream(); announce("Campaign settings changed. Generate a new draft before reviewing."); }
+  }));
   el("campaign-opportunities").addEventListener("change", () => {
     const sku = selectedSku();
     selected = results?.opportunities.find(item => item.sku === sku) || null;
@@ -102,6 +106,7 @@
       selected = results?.opportunities.find(item => item.sku === selectedSku()) || null;
       plan = engine.makeCampaign(selected, el("campaign-brand").value, el("campaign-channel").value);
       approval = metrics = null; graphicReady = false;
+      el("campaign-metrics-result").textContent = "No results recorded.";
       el("campaign-post").value = plan.post;
       el("campaign-reason").textContent = plan.reason + ". " + plan.recommendation;
       el("campaign-video-brief").value = plan.videoBrief;
@@ -126,6 +131,7 @@
     el("campaign-copy").disabled = true;
     el("campaign-confirm").checked = false;
     el("campaign-approval-state").textContent = "Content changed; internal approval must be recorded again.";
+    el("campaign-metrics-result").textContent = "No results recorded.";
     recordEvent("Draft edited — previous internal approval revoked");
   }
   el("campaign-post").addEventListener("input", revokeApproval);
