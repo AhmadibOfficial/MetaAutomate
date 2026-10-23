@@ -117,6 +117,7 @@ if WEB_ROOT.is_dir():
     @app.get("/", include_in_schema=False)
     @app.get("/objectives/{objective_id}", include_in_schema=False)
     @app.get("/assessments", include_in_schema=False)
+    @app.get("/data-lab", include_in_schema=False)
     @app.get("/assessments/{assessment_id}", include_in_schema=False)
     def workspace_app(objective_id: str | None = None):
         return FileResponse(WEB_ROOT / "index.html")
