@@ -307,7 +307,7 @@ class SecureInventoryLab:
             conn.execute("BEGIN IMMEDIATE")
             self._audit(conn, tenant, str(principal.user_id), "INVENTORY_READ",
                         str(identifier), current)
-        return dict(document_id=str(identifier), records=items,
+        return dict(document_id=str(identifier), record_count=len(items), records=items,
                     retained_until=row["retained_until"],
                     encrypted_at_rest=True, external_execution_authorized=False)
 
