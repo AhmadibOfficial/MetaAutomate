@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
 
@@ -43,7 +44,7 @@ def run():
             page.locator("#campaign-brand").fill("MetaAutomate Sample Shop")
             page.locator("#campaign-create").click()
             expect(page.locator("#campaign-project")).to_be_visible()
-            expect(page.locator("#campaign-post")).to_contain_text("Branded Cap")
+            expect(page.locator("#campaign-post")).to_have_value(re.compile("Branded Cap") )
             expect(page.locator("#campaign-approval")).to_be_visible()
             assert page.locator("#campaign-copy").is_disabled()
             expect(page.locator("#campaign-canvas")).to_have_attribute("width", "1080")
