@@ -30,6 +30,7 @@ COLUMNS = ("sku", "name", "stock", "weekly_sales", "unit_price_kobo")
 MAX_BYTES = 64 * 1024
 MAX_ROWS = 200
 MAX_RETENTION_DAYS = 30
+MAX_ACTIVE_DOCUMENTS = 25
 READ_ROLES = frozenset({"OWNER", "ADMIN", "OPERATOR"})
 WRITE_ROLES = frozenset({"OWNER", "ADMIN"})
 DELETE_ROLES = frozenset({"OWNER", "ADMIN"})
@@ -245,6 +246,12 @@ class SecureInventoryLab:
         expiration = now + retention_days * 86400
         with _connect(self.path) as conn:
             conn.execute("BEGIN IMMEDIATE")
+            active_count = conn.execute(
+                "SELECT count(*) FROM inventory_documents WHERE tenant_id=? AND retained_until>?",
+                (tenant, now)
+            ).fetchone()[0]
+            if active_count >= MAX_ACTIVE_DOCUMENTS:
+                deny("Active inventory-document quota reached (25 per tenant)")
             conn.execute(
                 "INSERT INTO inventory_documents VALUES (?,?,?,?,?,?,?,?,?,?)",
                 (doc, tenant, actor, digest, len(items), expiration, now,
