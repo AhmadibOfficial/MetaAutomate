@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#040D20">
+<meta name="color-scheme" content="light">
+<meta name="description" content="MetaAutomate local campaign workbench: import inventory, assess stock signals, prepare creative and social drafts, record review, and measure self-reported campaign activity.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'self' blob: data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<link rel="icon" type="image/webp" href="/assets/metaautomate-mark.webp">
+<link rel="stylesheet" href="/assets/campaign-workbench.css">
+<script defer src="/assets/campaign-engine.js"></script>
+<script defer src="/assets/campaign-workbench.js"></script>
+<title>Campaign Workbench — MetaAutomate | P2-060</title>
+</head>
+<body>
+<a class="skip" href="#main">Skip to campaign workbench</a>
+<header class="topbar">
+  <a class="brand" href="/" aria-label="MetaAutomate home"><img src="/assets/metaautomate-mark.webp" alt="" width="45" height="45"><span>Meta<strong>Automate</strong><small>UNIFIED CAMPAIGN WORKBENCH</small></span></a>
+  <nav aria-label="Workspace links"><a href="/services/#ai">AI Systems</a><a href="/automation/">Business Automation</a><a href="/creative/">Creative Studio</a></nav>
+</header>
+<main id="main">
+<section class="hero">
+ <div class="container">
+  <p class="eyebrow">P2-060 / UNIFIED AI CAPABILITY PLATFORM / DEVELOPMENT PREVIEW</p>
+  <h1>From inventory insights <em>to campaign action.</em></h1>
+  <p class="intro">Bring a real inventory CSV into your browser, identify conservative stock signals, prepare a branded graphic and social/video brief, record an internal review, and measure activity using your own counts.</p>
+  <div class="hero-pills"><span>Locally processed CSV</span><span>No automatic publishing</span><span>No server data retention</span></div>
+ </div>
+</section>
+<div class="container">
+ <div class="notice" role="note"><strong>Real local workflow, not autonomous AI.</strong> This workbench uses deterministic analysis, original browser graphics, and editable drafts. No LLM, external account, customer identity, provider publishing, or verified performance analytics is connected. Data stays in this browser session unless you explicitly download a file.</div>
+ <nav class="steps" aria-label="Campaign workflow phases">
+  <span><b>01</b> Import</span><span><b>02</b> Assess</span><span><b>03</b> Create</span><span><b>04</b> Review</span><span><b>05</b> Measure</span>
+ </nav>
+ <section class="panel" id="import" aria-labelledby="import-title">
+   <div class="sectionhead"><span>01 / INVENTORY DATA</span><h2 id="import-title">Work with your own stock records.</h2><p>CSV only: <code>sku,name,stock,weekly_sales,unit_price_kobo</code>. Prices are integer Nigerian kobo (₦1 = 100 kobo). Maximum 400 items and 128 KB. Do not include personal or confidential information in this public-browser prototype.</p></div>
+   <form id="campaign-import" class="inline-form">
+    <div class="field"><label for="campaign-file">Inventory CSV file</label><input id="campaign-file" type="file" accept=".csv,text/csv" required><small>Processed in your browser. No upload request.</small></div>
+    <button type="submit" class="primary">Analyse inventory</button>
+    <button id="campaign-sample" type="button" class="subtle">Download example CSV</button>
+   </form>
+ </section>
+ <section class="panel" id="campaign-results" aria-labelledby="results-title" hidden>
+   <div class="sectionhead"><span>02 / BUSINESS INTELLIGENCE</span><h2 id="results-title">Find opportunities worth reviewing.</h2><p id="campaign-analysis-note"></p></div>
+   <div class="stats"><div><strong id="campaign-count">0</strong><small>Imported products</small></div><div><strong id="campaign-flagged">0</strong><small>Potential candidates</small></div></div>
+   <p class="muted">Rules flag items with no recorded sales and at least five units in stock, or high stock relative to weekly sales. Sold-out and low-stock items are not promoted. These are prioritization hints, not sales forecasts.</p>
+   <fieldset><legend>Select a stock opportunity</legend><ul id="campaign-opportunities" class="options"></ul></fieldset>
+   <div class="inline-form">
+    <div class="field"><label for="campaign-brand">Business / brand name</label><input id="campaign-brand" type="text" maxlength="70" value="My Business" required autocomplete="off"></div>
+    <div class="field"><label for="campaign-channel">Planned social channel (draft only)</label><select id="campaign-channel"><option>Instagram</option><option>Facebook</option><option>TikTok</option><option>WhatsApp</option><option>Other</option></select></div>
+    <button class="primary" type="button" id="campaign-create" disabled>Prepare campaign draft</button>
+   </div>
+ </section>
+ <section class="panel" id="campaign-project" aria-labelledby="project-title" hidden>
+   <div class="sectionhead"><span>03 / AGENT PLAN · RULES-BASED</span><h2 id="project-title">A campaign, with the reasoning visible.</h2><p id="campaign-reason"></p></div>
+   <label for="campaign-post">Editable social media post</label>
+   <textarea id="campaign-post" rows="8" maxlength="2200"></textarea>
+   <div class="help">The post is not published or submitted. Verify price, product information, consent, terms, and rights before using it.</div>
+   <button type="button" class="subtle" id="campaign-copy" disabled>Copy reviewed social draft</button>
+ </section>
+ <section class="panel" id="campaign-media" aria-labelledby="media-title" hidden>
+   <div class="sectionhead"><span>04 / CREATIVE STUDIO</span><h2 id="media-title">Make a graphic. Prepare a video.</h2><p>An original 1080 × 1080 graphic is rendered locally. The video brief prepares narration and scene planning; the existing Creative Studio can assemble a real 30–120 second narrated WebM from user-supplied licensed audio.</p></div>
+   <div class="media-grid">
+     <div class="media-pane">
+      <h3>Promotional graphic</h3>
+      <canvas id="campaign-canvas" width="1" height="1" aria-label="Promotional graphic preview" role="img"></canvas>
+      <button class="primary" type="button" id="campaign-png">Download original PNG</button>
+      <p class="help">No stock photography or neural image generation is used.</p>
+     </div>
+     <div class="media-pane">
+      <h3>Video production brief</h3>
+      <label for="campaign-video-brief">Review and edit the storyboard</label>
+      <textarea id="campaign-video-brief" rows="12" maxlength="4000"></textarea>
+      <button type="button" class="subtle" id="campaign-video-download">Download video brief</button>
+      <a class="text-link" href="/creative/#video-maker">Open Creative Studio for narrated WebM ↗</a>
+      <p class="help">Video files require a separate user-provided narration and explicit rights confirmation in Creative Studio. This step prepares the video; it does not generate AI footage.</p>
+     </div>
+   </div>
+ </section>
+ <section class="panel" id="campaign-approval" aria-labelledby="approval-title" hidden>
+   <div class="sectionhead"><span>05 / HUMAN REVIEW</span><h2 id="approval-title">Record internal content review.</h2><p>No social publishing connection or production authorization can be granted on this page. This records only that the user reviewed a draft for copying and manual use.</p></div>
+   <label class="check"><input type="checkbox" id="campaign-confirm">I reviewed product claims, prices, creative rights, intended channel and privacy, and understand that no external publishing is connected.</label>
+   <button class="primary" type="button" id="campaign-authorize">Record internal draft review</button>
+   <p id="campaign-approval-state" class="review-state" role="status">Not reviewed. No provider publishing is available.</p>
+ </section>
+ <section class="panel" id="campaign-measure" aria-labelledby="measure-title" hidden>
+   <div class="sectionhead"><span>06 / MEASUREMENT</span><h2 id="measure-title">Measure what you can actually substantiate.</h2><p>After reviewing your draft, you may enter counts you independently observed. These numbers are self-reported and do not establish campaign attribution, profit or revenue.</p></div>
+   <form id="campaign-metric-form">
+    <div class="three-fields">
+      <div class="field"><label for="campaign-impressions">Impressions</label><input type="number" id="campaign-impressions" min="0" max="1000000000" step="1" value="0" required></div>
+      <div class="field"><label for="campaign-clicks">Clicks</label><input type="number" id="campaign-clicks" min="0" max="1000000000" step="1" value="0" required></div>
+      <div class="field"><label for="campaign-orders">Orders from this measured funnel</label><input type="number" id="campaign-orders" min="0" max="1000000000" step="1" value="0" required></div>
+    </div>
+    <div class="field"><label for="campaign-metric-source">Evidence source / note</label><input id="campaign-metric-source" type="text" maxlength="160" placeholder="For example: manually checked platform insights on [date]" autocomplete="off" required></div>
+    <button type="submit" class="primary">Evaluate supplied counts</button>
+   </form>
+   <p id="campaign-metrics-result" class="review-state" aria-live="polite">No results recorded.</p>
+   <button id="campaign-evidence" class="subtle" type="button" disabled>Download campaign review &amp; evidence JSON</button>
+ </section>
+ <p class="status" id="campaign-status" role="status" aria-live="polite">Choose a CSV or download the example file to begin.</p>
+ <footer class="footer"><span>MetaAutomate · Intelligence · Creation · Automation</span><a href="/engage/">Start a project ↗</a><span>Source prototype · No integrations activated</span></footer>
+</div>
+</main>
+</body>
+</html>
