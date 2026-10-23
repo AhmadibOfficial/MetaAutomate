@@ -50,6 +50,7 @@
         <button class="nav-item" id="nav-create" title="New objective" type="button" data-view="create"><span aria-hidden="true">＋</span> New objective</button>
         <button class="nav-item" id="nav-assessment" title="Digital assessment" type="button" data-view="assessment"><span aria-hidden="true">◈</span> Digital assessment</button>
         <button class="nav-item" id="nav-assessment-history" title="Assessment reports" type="button" data-view="assessment-history"><span aria-hidden="true">▤</span> Assessment reports</button>
+        <button class="nav-item" id="nav-data-lab" title="Local encrypted inventory" type="button" data-view="data-lab" hidden><span aria-hidden="true">▣</span> Inventory vault</button>
       </nav>
       <div class="sidebar-grow"></div>
       <div class="guard-card">
@@ -71,6 +72,51 @@
         <div class="topbar-right"><span class="environment-tag"><span class="tiny-pulse"></span> LOCAL DEVELOPMENT</span><div class="avatar small">M</div></div>
       </header>
       <div class="content-inner">
+
+        <section id="data-lab-view" class="app-screen" hidden>
+          <div class="section-heading compact">
+            <div><div class="eyebrow">P2-061 · PRIVATE DATA LAB</div>
+            <h1>Inventory, <em>under your control.</em></h1>
+            <p>Encrypted local rehearsal only. No live customers, model access or external publishing.</p></div>
+            <button class="button subtle" type="button" id="lab-refresh">Refresh</button>
+          </div>
+          <div class="panel form-panel">
+            <div class="panel-step"><span>01</span><div><h2>Import owner-authorized inventory</h2>
+            <p>Only SKU, product name, stock, weekly sales and unit price in kobo. Maximum 64 KB / 200 items.
+            Do not upload personal, confidential or customer-identifying data.</p></div></div>
+            <form id="lab-import-form">
+              <label for="lab-file">Raw UTF-8 CSV</label>
+              <input id="lab-file" type="file" accept=".csv,text/csv" required>
+              <label for="lab-retention">Active retention period</label>
+              <select id="lab-retention" required>
+                <option value="1">1 day</option><option value="7" selected>7 days</option>
+                <option value="14">14 days</option><option value="30">30 days (maximum)</option>
+              </select>
+              <label class="lab-claim"><input id="lab-owner-claim" type="checkbox" required>
+              I am authorized to process this inventory and confirm it contains no personal or sensitive data.
+              This is my own declaration, not independently verified consent.</label>
+              <p class="field-hint">Requires a valid signed-in workspace identity. No upload to Render.</p>
+              <button class="button primary" id="lab-submit" type="submit">Encrypt and store locally</button>
+            </form>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><h2>Encrypted inventory documents</h2>
+              <p>Items are tenant-bound and unreadable after their retention deadline.
+              Physical expiry cleanup is explicit, not scheduled.</p></div></div>
+            <div id="lab-items" class="lab-list" aria-live="polite"></div>
+            <div class="lab-actions">
+              <button id="lab-purge" class="button subtle" type="button">Purge expired documents</button>
+              <button id="lab-audit" class="button subtle" type="button">Verify local audit chain</button>
+            </div>
+            <p id="lab-message" class="field-hint" role="status" aria-live="polite">Local encrypted data lab. Unverified prototype.</p>
+            <div id="lab-detail" class="lab-detail" hidden>
+              <h3>Decrypted inventory — on-screen only</h3>
+              <p class="field-hint">Cleared when you close this panel, sign out or leave this screen.</p>
+              <pre id="lab-preview"></pre>
+              <button class="button subtle" id="lab-close-detail" type="button">Clear preview</button>
+            </div>
+          </div>
+        </section>
 
         <section id="overview-view" class="app-screen">
           <div class="section-heading">
