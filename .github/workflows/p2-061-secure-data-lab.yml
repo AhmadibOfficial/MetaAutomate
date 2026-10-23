@@ -1,0 +1,40 @@
+name: P2-061 Secure Local Data Lab
+
+on:
+  pull_request:
+    paths:
+      - "apps/api/app/secure_inventory_lab.py"
+      - "apps/api/app/secure_data_lab_api.py"
+      - "apps/api/app/main.py"
+      - "tests/test_p2_061_secure_data_lab.py"
+      - "tests/test_p2_061_data_api_admission.py"
+      - ".github/workflows/p2-061-secure-data-lab.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  local-encryption-security:
+    name: Local AES-GCM, tenant and governance negative tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install only test dependencies
+        run: python -m pip install "pytest>=8,<10" "cryptography>=43,<48" "fastapi>=0.115,<1" "psycopg[binary]>=3.2,<4"
+      - name: Compile source without enabling any service
+        run: |
+          python -m py_compile apps/api/app/secure_inventory_lab.py
+          python -m py_compile apps/api/app/secure_data_lab_api.py
+      - name: Validate fictional local encrypted data and API source guards
+        run: |
+          python -m pytest -q tests/test_p2_061_secure_data_lab.py tests/test_p2_061_data_api_admission.py
+      - name: Confirm no deployment or real customer data
+        run: |
+          python -c "import os; assert os.getenv('MAT_DATA_LAB_ENABLED') != '1'"
+          test ! -e /tmp/metaautomate-production-data.sqlite
+          echo "SOURCE TEST ONLY; no provider, deployment, live customer or SQL migration"
