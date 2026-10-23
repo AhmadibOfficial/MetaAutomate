@@ -10,6 +10,7 @@ from __future__ import annotations
 import base64
 import binascii
 import csv
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from hashlib import sha256
 import hmac
@@ -144,14 +145,22 @@ def _mac(key: bytes, tenant: str, payload: dict) -> str:
     return hmac.new(_derive(key, tenant, "audit-hmac-v1"), message, sha256).hexdigest()
 
 
-def _connect(path: Path) -> sqlite3.Connection:
+@contextmanager
+def _connect(path: Path):
     conn = sqlite3.connect(str(path), timeout=5)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA busy_timeout=5000")
-    conn.execute("PRAGMA secure_delete=ON")
-    conn.execute("PRAGMA journal_mode=DELETE")
-    conn.execute("PRAGMA foreign_keys=ON")
-    return conn
+    try:
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA busy_timeout=5000")
+        conn.execute("PRAGMA secure_delete=ON")
+        conn.execute("PRAGMA journal_mode=DELETE")
+        conn.execute("PRAGMA foreign_keys=ON")
+        yield conn
+        conn.commit()
+    except BaseException:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
 class SecureInventoryLab:
@@ -172,9 +181,15 @@ class SecureInventoryLab:
             deny("Use a real, existing data-lab directory (not a symlink)")
         if self.path.exists() and not self.path.is_file():
             deny("Data-lab path must be a regular file")
-        old_mask = os.umask(0o077)
-        try:
-            with _connect(self.path) as conn:
+        # Avoid process-global umask changes in a multi-request API process.
+        # Open a new empty DB with owner-only permissions before SQLite touches it.
+        if not self.path.exists():
+            flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+            if hasattr(os, "O_NOFOLLOW"):
+                flags |= os.O_NOFOLLOW
+            handle = os.open(self.path, flags, 0o600)
+            os.close(handle)
+        with _connect(self.path) as conn:
                 conn.executescript("""
                 CREATE TABLE IF NOT EXISTS inventory_documents(
                     document_id TEXT PRIMARY KEY,
@@ -201,9 +216,8 @@ class SecureInventoryLab:
                     PRIMARY KEY(tenant_id,sequence_number)
                 );
                 """)
-            os.chmod(self.path, 0o600)
-        finally:
-            os.umask(old_mask)
+        if self.path.stat().st_mode & 0o077:
+            deny("Data-lab database permissions must be owner-only (0600)")
 
     @classmethod
     def from_environment(cls):
