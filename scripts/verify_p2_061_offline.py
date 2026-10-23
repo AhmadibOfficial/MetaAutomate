@@ -22,6 +22,7 @@ TEST_FILES = (
     "tests/test_p2_061_secure_data_lab.py",
     "tests/test_p2_061_data_api_admission.py",
     "tests/test_p2_061_private_vault_ui.py",
+    "tests/test_p2_061_offline_runner.py",
 )
 SOURCE_FILES = (
     "apps/api/app/secure_inventory_lab.py",
