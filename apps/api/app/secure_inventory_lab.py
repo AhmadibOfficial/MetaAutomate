@@ -177,8 +177,11 @@ class SecureInventoryLab:
         self.path = Path(path)
         if not self.path.is_absolute() or self.path.is_symlink():
             deny("Use a non-symlink absolute SQLite file path")
-        if not self.path.parent.is_dir() or self.path.parent.is_symlink():
+        if not self.path.parent.is_dir() or any(p.is_symlink() for p in self.path.parents):
             deny("Use a real, existing data-lab directory (not a symlink)")
+        repository_root = Path(__file__).resolve().parents[3]
+        if self.path.resolve(strict=False).is_relative_to(repository_root):
+            deny("Data-lab database must be outside the source repository")
         if self.path.exists() and not self.path.is_file():
             deny("Data-lab path must be a regular file")
         # Avoid process-global umask changes in a multi-request API process.
