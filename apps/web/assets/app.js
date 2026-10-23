@@ -4,7 +4,8 @@
 const state = {session:null, authMode:"dev_key", capabilities:[], objectives:[], objective:null, inFlightKey:null, graph:null,
   assessmentQuestions:null, assessment:null, assessmentInFlightKey:null};
 const $ = id => document.getElementById(id);
-const screens = ["overview","create","detail","assessment","assessment-history","assessment-detail"];
+const screens = ["overview","create","detail","assessment","assessment-history","assessment-detail","data-lab"];
+let localDataLabEnabled = false;
 const sleep = ms => new Promise(resolve => setTimeout(resolve,ms));
 
 function visible(id, show) { $(id).hidden = !show; }
@@ -56,6 +57,7 @@ async function configureSignIn(){
   if(!["dev_key","oidc"].includes(config.mode))throw new Error("Invalid workspace identity mode");
   const sso=config.mode==="oidc";
   state.authMode=config.mode;
+  localDataLabEnabled = config.local_data_lab_available === true;
   $("login-environment-label").textContent=sso?"PRIVATE ORGANIZATION SSO":"PRIVATE DEVELOPMENT WORKSPACE";
   for(const selector of ['#login-form label[for="login-key"]','#login-key','#login-form .field-hint','#login-submit']){
     const node=document.querySelector(selector);
@@ -77,6 +79,7 @@ function updateShell() {
   visible("loading-view",false);
   visible("login-view",!state.session);
   visible("workspace-shell",!!state.session);
+  $("nav-data-lab").hidden = !state.session || !localDataLabEnabled || !["OWNER","ADMIN","OPERATOR"].includes(state.session.role);
   if (!state.session) return;
   $("side-role").textContent = label(state.session.role) + " workspace";
   $("side-org").textContent = "Organization " + state.session.organization_id.slice(0,8);
@@ -87,8 +90,9 @@ function updateShell() {
 }
 function changeView(view, {history=true, path=null}={}) {
   if (!screens.includes(view)) view = "overview";
+  if (view !== "data-lab") clearLabPreview();
   for (const screen of screens) visible(screen+"-view", screen === view);
-  $("topbar-crumb").textContent = {overview:"Overview",create:"New objective",detail:"Objective detail",assessment:"Digital assessment","assessment-history":"Reports","assessment-detail":"Verified report"}[view];
+  $("topbar-crumb").textContent = {overview:"Overview",create:"New objective",detail:"Objective detail",assessment:"Digital assessment","assessment-history":"Reports","assessment-detail":"Verified report","data-lab":"Inventory vault"}[view];
   for (const nav of document.querySelectorAll(".nav-item")) nav.classList.toggle("active",nav.dataset.view === view || (view==="assessment-detail" && nav.dataset.view==="assessment-history"));
   if (history) window.history.pushState({view}, "", path || (view==="overview"?"/":view==="create"?"/?new=1":location.pathname));
   window.scrollTo({top:0,behavior:"instant"});
@@ -504,7 +508,121 @@ function downloadAssessment(){
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
+
+/* P2-061: local, authenticated inventory lab; never available on the public website. */
+function clearLabPreview(){
+  const display=$("lab-detail"),pre=$("lab-preview");
+  if(display)display.hidden=true;
+  if(pre)pre.textContent="";
+}
+function labMessage(value){ $("lab-message").textContent=String(value); }
+async function labRequest(url, options={}){
+  const method=options.method || "GET";
+  const headers={"Accept":"application/json",...(options.headers||{})};
+  if(method!=="GET" && method!=="HEAD")headers["X-CSRF-Token"]=csrfToken();
+  const response=await fetch(url,{credentials:"same-origin",...options,headers});
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok){
+    const err=new Error(typeof result.detail==="string"?result.detail:"Local inventory request failed.");
+    err.status=response.status;throw err;
+  }
+  return result;
+}
+async function dataLabView(){
+  if(!localDataLabEnabled || !state.session)return;
+  changeView("data-lab",{path:"/data-lab"});
+  await loadDataLab();
+}
+async function loadDataLab(){
+  if(!state.session || !localDataLabEnabled)return;
+  const list=$("lab-items");list.replaceChildren();clearLabPreview();
+  try{
+    const reply=await labRequest("/v1/data-lab/inventory");
+    if(!reply.items?.length){
+      list.append(el("p",{text:"No active inventory documents in this organization."}));
+      labMessage("Encrypted rehearsal storage. No production access enabled.");
+      return;
+    }
+    for(const item of reply.items){
+      const row=el("div",{cls:"lab-document"});
+      const details=el("div",{cls:"lab-document-name"});
+      details.append(el("strong",{text:item.record_count+" inventory rows"}),
+        el("small",{text:"Reference: "+item.document_id.slice(0,8)+" · SHA-256: "+item.source_sha256.slice(0,12)+
+              " · Retention deadline: "+new Date(item.retained_until*1000).toLocaleDateString()}));
+      const actions=el("div",{cls:"lab-actions"});
+      const open=el("button",{cls:"button subtle",text:"View inventory"});
+      open.type="button";
+      open.addEventListener("click",()=>viewDataLab(item.document_id));
+      const remove=el("button",{cls:"button danger",text:"Delete"});
+      remove.type="button";
+      remove.disabled=!isReviewer();
+      remove.addEventListener("click",()=>deleteDataLab(item.document_id));
+      actions.append(open,remove);row.append(details,actions);list.append(row);
+    }
+    labMessage(reply.items.length+" encrypted document(s) in this workspace. No cross-tenant listing available.");
+  }catch(err){
+    if(err.status===401){lostSession();return;}
+    labMessage(err.status===404?"Local data lab is disabled.":err.message);
+  }
+}
+async function importDataLab(event){
+  event.preventDefault();
+  if(!localDataLabEnabled || !isReviewer())return labMessage("Owner or admin permission required.");
+  const form=$("lab-import-form"),file=$("lab-file").files?.[0],button=$("lab-submit");
+  if(!form.reportValidity() || !file)return;
+  if(file.size===0 || file.size>65536)return labMessage("Choose a CSV file under 64 KB.");
+  button.disabled=true;clearLabPreview();
+  try{
+    const reply=await labRequest("/v1/data-lab/inventory?retention_days="+encodeURIComponent($("lab-retention").value),{
+      method:"POST",
+      headers:{"Content-Type":"text/csv","X-Inventory-Data-Claim":"OWNER_AUTHORIZED_INVENTORY_NO_PERSONAL_DATA"},
+      body:await file.arrayBuffer()
+    });
+    form.reset();
+    await loadDataLab();
+    labMessage("Encrypted "+reply.record_count+" inventory rows locally. Ownership remains self-declared.");
+  }catch(err){
+    if(err.status===401){lostSession();return;}
+    labMessage(err.message);
+  }finally{button.disabled=false;}
+}
+async function viewDataLab(id){
+  clearLabPreview();
+  try{
+    const result=await labRequest("/v1/data-lab/inventory/"+encodeURIComponent(id));
+    $("lab-preview").textContent=JSON.stringify(result.records,null,2);
+    $("lab-detail").hidden=false;
+    labMessage("Decrypted in your current session. Close the preview after inspection.");
+  }catch(err){
+    if(err.status===401){lostSession();return;}
+    labMessage(err.message);
+  }
+}
+async function deleteDataLab(id){
+  if(!isReviewer())return;
+  if(!window.confirm("Delete this locally stored inventory record? Audit metadata remains; backups cannot be verified deleted."))return;
+  try{
+    await labRequest("/v1/data-lab/inventory/"+encodeURIComponent(id),{method:"DELETE"});
+    await loadDataLab();labMessage("Active encrypted inventory record deleted; audit tombstone retained.");
+  }catch(err){if(err.status===401)lostSession();else labMessage(err.message);}
+}
+async function purgeDataLab(){
+  if(!isReviewer())return labMessage("Owner/admin permission required for purging.");
+  if(!window.confirm("Purge expired inventory records for your organization from this active local store?"))return;
+  try{
+    const report=await labRequest("/v1/data-lab/inventory/purge-expired",{method:"POST"});
+    await loadDataLab();labMessage(report.purged+" expired record(s) removed from active storage only.");
+  }catch(err){if(err.status===401)lostSession();else labMessage(err.message);}
+}
+async function verifyDataLabAudit(){
+  try{
+    const result=await labRequest("/v1/data-lab/audit");
+    labMessage("Local HMAC chain: "+result.events+" events, "+result.integrity+". Not externally anchored.");
+  }catch(err){if(err.status===401)lostSession();else labMessage(err.message);}
+}
+
 function lostSession(){
+  clearLabPreview();
   state.session=null;state.objective=null;state.objectives=[];state.capabilities=[];
   state.assessment=null;state.assessmentQuestions=null;state.assessmentInFlightKey=null;
   updateShell();showToast("Your session expired. Please sign in again.");
@@ -524,6 +642,7 @@ async function enterWorkspace(){
   const assessmentMatch=window.location.pathname.match(/^\/assessments\/([0-9a-f-]{36})$/i);
   if(assessmentMatch)return openAssessment(assessmentMatch[1],{history:false});
   if(window.location.pathname==="/assessments/reports")return assessmentHistoryView();
+  if(window.location.pathname==="/data-lab" && localDataLabEnabled)return dataLabView();
   if(window.location.pathname==="/assessments")return assessmentView();
   const match=window.location.pathname.match(/^\/objectives\/([0-9a-f-]{36})$/i);
   if(match)return openObjective(match[1],{history:false});
@@ -533,6 +652,7 @@ async function enterWorkspace(){
 async function logout(){
   try{await api("/v1/workspace/logout",{method:"POST",body:"{}"});}
   catch(err){if(err.status!==401)showToast(err.message);}
+  clearLabPreview();
   state.session=null;state.capabilities=[];state.objective=null;state.assessment=null;
   state.assessmentQuestions=null;state.assessmentInFlightKey=null;updateShell();
   history.replaceState({view:"login"},"","/");
@@ -542,6 +662,12 @@ async function initialize(){
   $("nav-overview").addEventListener("click",overview);
   $("nav-assessment").addEventListener("click",assessmentView);
   $("nav-assessment-history").addEventListener("click",assessmentHistoryView);
+  $("nav-data-lab").addEventListener("click",dataLabView);
+  $("lab-refresh").addEventListener("click",loadDataLab);
+  $("lab-import-form").addEventListener("submit",importDataLab);
+  $("lab-purge").addEventListener("click",purgeDataLab);
+  $("lab-audit").addEventListener("click",verifyDataLabAudit);
+  $("lab-close-detail").addEventListener("click",clearLabPreview);
   $("assessment-show-history").addEventListener("click",assessmentHistoryView);
   $("assessment-refresh").addEventListener("click",assessmentHistoryView);
   $("assessment-detail-back").addEventListener("click",assessmentHistoryView);

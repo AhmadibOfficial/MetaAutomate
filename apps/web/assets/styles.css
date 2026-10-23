@@ -80,3 +80,26 @@ input,textarea{border:1px solid #dce4f0;border-radius:11px;background:white;padd
   .sidebar-nav .nav-item.active span{color:#ffffff}
   .sidebar-nav .nav-item:focus-visible{outline:2px solid #9dcafe;outline-offset:2px}
 }
+
+
+/* P2-061 private local inventory vault: the four official MetaAutomate accents. */
+#data-lab-view .eyebrow{color:#007fb5}
+#data-lab-view .section-heading h1 em{font-style:normal;color:#007fb5}
+#data-lab-view .panel-step>span{background:#040D20;color:#EFB94F}
+#data-lab-view :is(button,input,select):focus-visible{outline:3px solid #EFB94F;outline-offset:3px}
+#data-lab-view #lab-retention{width:100%;display:block;background:#fff;border:1px solid #c1cddc;border-radius:11px;padding:12px;color:#133450}
+#data-lab-view .lab-claim{display:flex;align-items:start;gap:10px;padding:14px 0;line-height:1.6;font-weight:600;max-width:750px}
+#data-lab-view .lab-claim input{width:18px;height:18px;flex:none;margin:2px 0 0;accent-color:#007fb5}
+#data-lab-view .lab-list{display:grid;gap:10px}
+#data-lab-view .lab-document{display:flex;align-items:center;justify-content:space-between;gap:18px;background:#f7fafe;border:1px solid #dae5ef;border-radius:12px;padding:15px 18px}
+#data-lab-view .lab-document-name{min-width:0;display:flex;flex-direction:column;gap:6px}
+#data-lab-view .lab-document-name strong{font-size:13px;color:#133450}
+#data-lab-view .lab-document-name small{font-size:11px;color:#4f6781;overflow-wrap:anywhere}
+#data-lab-view .lab-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:16px 0}
+#data-lab-view .lab-document .lab-actions{margin:0}
+#data-lab-view .lab-detail{border:1px solid #cadaeb;border-left:3px solid #00A7ED;border-radius:10px;padding:16px;margin-top:24px;background:#f7fbff}
+#data-lab-view .lab-detail h3{color:#102647}
+#data-lab-view .lab-detail pre{font-size:12px;line-height:1.6;max-height:350px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#102647;padding:16px;border-radius:8px;background:#DCE6F1}
+#data-lab-view #lab-message{background:#f8faff;border-left:3px solid #EFB94F;padding:10px 14px;color:#304f6c}
+#nav-data-lab:not([hidden]){border-left:3px solid #EFB94F}
+@media(max-width:760px){#data-lab-view .lab-document{align-items:start;flex-direction:column}#data-lab-view .lab-document .lab-actions{width:100%}}
