@@ -265,3 +265,21 @@ def test_no_production_or_provider_side_effect_imports():
     for disallowed in ("request.client.organization_id", "mat_deploy", "trigger_deploy",
                        "publish_social", "requests.post("):
         assert disallowed not in source + api
+
+
+@pytest.mark.parametrize("column,value", [
+    ("retained_until", 2009999999),
+    ("source_sha256", "f" * 64),
+    ("actor_id", "00000000-0000-4000-8000-000000000001"),
+    ("record_count", 20),
+])
+def test_provenance_and_retention_metadata_authenticated_by_aesgcm(lab, column, value):
+    owner = actor()
+    result = save(lab, owner)
+    doc = result["document_id"]
+    with sqlite3.connect(lab.path) as conn:
+        # Fixed test-controlled column names only; never derived from HTTP input.
+        conn.execute("UPDATE inventory_documents SET " + column + "=? WHERE document_id=?",
+                     (value, doc))
+    with pytest.raises(DataLabError):
+        lab.get_document(owner, UUID(doc), now=2000000001)
