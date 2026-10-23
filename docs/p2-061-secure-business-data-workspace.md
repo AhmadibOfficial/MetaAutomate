@@ -101,3 +101,56 @@ private network topology and independent penetration testing.
 P2-060, P2-061 and the platform's 3/9 foundation status remain operational
 NO-GO. No subscriptions, live integrations, automated AI, production database
 migration, merge, cloud build or deployment have been performed here.
+
+
+## P2-061 local validation while hosted GitHub Actions is billing-blocked
+
+The owner's check-run annotation on 2026-10-23 explicitly says:
+
+    The job was not started because recent account payments have failed
+    or your spending limit needs to be increased.
+
+This indicates the GitHub Actions job did not begin. It does not establish
+that the code or tests failed, and it MUST NOT be converted into a green
+GitHub status in source code or by a substitute workflow. The unrelated
+Ubuntu runner-image migration announcement is only a notice, not proof
+that Ubuntu 26 caused the failure.
+
+A read-only developer-owned local validation runner is available:
+
+    cd ~/MetaAutomate
+    git status --short --branch
+    python3 scripts/verify_p2_061_offline.py
+
+Optional evidence output to a **new path outside the repository**:
+
+    python3 scripts/verify_p2_061_offline.py \
+      --report "$HOME/p2-061-source-evidence.json"
+
+Do not overwrite existing evidence or include private customer records.
+The command will refuse dirty worktrees and missing required files, compile
+Python source entirely in memory, run isolated pytest and Node tests and
+JavaScript syntax checks, compare git status before/after, and output a JSON
+report with commit fingerprint. Source tests run with browser/infrastructure
+activation flags set to OFF. It never installs packages, creates cloud
+resources, merges PRs, deploys, changes billing, or touches databases outside
+test-created disposable fixtures.
+
+A passing report is explicitly marked LOCAL_TESTS_PASS with
+github_ci_verified=false, merge_approved=false and deployment_approved=false.
+Real authenticated browser/API integration and independent hosted CI must
+still run after repository billing/runners are restored. Protect the recorded
+evidence path; it is local source test evidence, not an external attestation.
+
+The development queue is:
+1. Resolve P2-060's independent browser/CI acceptance.
+2. Complete P2-061's local encrypted-lab source/API/browser acceptance.
+3. Have the GitHub account owner repair Actions billing/spending-limit
+   configuration; do not create a workaround to fake checks.
+4. Obtain independent reviewer approval, then separately authorize any
+   merge or private staging deployment.
+5. Only after source gates, design production RLS/KMS/retention revisions
+   as a distinct milestone, keeping customer data disabled.
+
+No nightly validation timer or GitHub Actions runner has been installed on
+the owner's Kali machine by this repository change.
