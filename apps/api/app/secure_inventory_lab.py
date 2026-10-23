@@ -118,15 +118,25 @@ def _derive(key: bytes, tenant: str, kind: str) -> bytes:
                 salt=UUID(tenant).bytes, info=("metautomate-p2-061:" + kind).encode()).derive(key)
 
 
-def _seal(key: bytes, tenant: str, identifier: str, items: list[dict]) -> tuple[bytes, bytes]:
+def _associated_data(tenant: str, identifier: str, digest: str,
+                     count: int, deadline: int, actor: str) -> bytes:
+    # All security-sensitive metadata belongs in authenticated associated data,
+    # not merely in SQLite plaintext columns.
+    return (tenant + ":" + identifier + ":" + digest + ":" + str(count) +
+            ":" + str(deadline) + ":" + actor + ":inventory-v1").encode("ascii")
+
+
+def _seal(key: bytes, tenant: str, identifier: str, items: list[dict],
+          digest: str, deadline: int, actor: str) -> tuple[bytes, bytes]:
     nonce = os.urandom(12)
     payload = json.dumps(items, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
-    aad = (tenant + ":" + identifier + ":inventory-v1").encode("ascii")
+    aad = _associated_data(tenant, identifier, digest, len(items), deadline, actor)
     return nonce, AESGCM(_derive(key, tenant, "inventory-aesgcm-v1")).encrypt(nonce, payload, aad)
 
 
-def _unseal(key: bytes, tenant: str, identifier: str, nonce: bytes, encrypted: bytes) -> list[dict]:
-    aad = (tenant + ":" + identifier + ":inventory-v1").encode("ascii")
+def _unseal(key: bytes, tenant: str, identifier: str, nonce: bytes, encrypted: bytes,
+            digest: str, count: int, deadline: int, actor: str) -> list[dict]:
+    aad = _associated_data(tenant, identifier, digest, count, deadline, actor)
     try:
         decoded = AESGCM(_derive(key, tenant, "inventory-aesgcm-v1")).decrypt(nonce, encrypted, aad)
         records = json.loads(decoded)
@@ -258,9 +268,9 @@ class SecureInventoryLab:
         if type(now) is not int or now < 1:
             deny("Invalid observation time")
         doc = str(uuid4())
-        nonce, encrypted = _seal(self.key, tenant, doc, items)
         digest = sha256(raw).hexdigest()
         expiration = now + retention_days * 86400
+        nonce, encrypted = _seal(self.key, tenant, doc, items, digest, expiration, actor)
         with _connect(self.path) as conn:
             conn.execute("BEGIN IMMEDIATE")
             active_count = conn.execute(
@@ -298,12 +308,14 @@ class SecureInventoryLab:
         current = int(time.time()) if now is None else now
         with _connect(self.path) as conn:
             row = conn.execute(
-                "SELECT nonce,encrypted,record_count,retained_until FROM inventory_documents "
+                "SELECT nonce,encrypted,record_count,retained_until,source_sha256,actor_id FROM inventory_documents "
                 "WHERE tenant_id=? AND document_id=?", (tenant, str(identifier))
             ).fetchone()
         if row is None or row["retained_until"] <= current:
             deny("Document not found or retention expired")
-        items = _unseal(self.key, tenant, str(identifier), row["nonce"], row["encrypted"])
+        items = _unseal(self.key, tenant, str(identifier), row["nonce"], row["encrypted"],
+                        row["source_sha256"], row["record_count"],
+                        row["retained_until"], row["actor_id"])
         if len(items) != row["record_count"]:
             deny("Stored document record count altered")
         with _connect(self.path) as conn:
