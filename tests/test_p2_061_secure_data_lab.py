@@ -63,7 +63,7 @@ def test_authorization_roles_for_import_read_and_deletion(lab):
     record = save(lab, writer)
     doc = UUID(record["document_id"])
     assert len(lab.list_documents(reader, now=2000000001)) == 1
-    assert lab.get_document(reader, doc, now=2000000001)["record_count"] if "record_count" in lab.get_document(reader, doc, now=2000000001) else True
+    assert lab.get_document(reader, doc, now=2000000001)["record_count"] == 2
     with pytest.raises(DataLabError):
         save(lab, reader)
     with pytest.raises(DataLabError):
