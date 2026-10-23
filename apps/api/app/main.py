@@ -81,6 +81,17 @@ if _mode == "dev_key":
     app.include_router(synthetic_inventory_router)
     app.include_router(synthetic_inventory_import_router)
 
+# P2-061: explicit local-only, owner-operated encrypted data rehearsal.
+# Static Render service and the private OIDC service cannot activate this route.
+if os.environ.get("MAT_DATA_LAB_ENABLED") == "1":
+    if (_mode != "dev_key"
+            or os.environ.get("MAT_DATA_LAB_ACK") != "LOCAL_REHEARSAL_ONLY"
+            or os.environ.get("WORKSPACE_ORIGIN", "http://127.0.0.1:8000")
+                not in ("http://127.0.0.1:8000", "http://localhost:8000")):
+        raise RuntimeError("P2-061 data lab requires explicit loopback development configuration")
+    from app.secure_data_lab_api import router as secure_data_lab_router
+    app.include_router(secure_data_lab_router)
+
 
 @app.middleware("http")
 async def workspace_security_headers(request, call_next):
@@ -94,7 +105,7 @@ async def workspace_security_headers(request, call_next):
         "object-src 'none'; base-uri 'none'; "
         "form-action 'self'; frame-ancestors 'none'"
     )
-    if request.url.path.startswith(("/v1/workspace", "/v1/objective-operations", "/v1/assessments", "/v1/amboy", "/v1/domain-integrations", "/v1/pilot-outcomes")):
+    if request.url.path.startswith(("/v1/workspace", "/v1/objective-operations", "/v1/assessments", "/v1/amboy", "/v1/domain-integrations", "/v1/pilot-outcomes", "/v1/data-lab")):
         response.headers["Cache-Control"] = "no-store"
     return response
 
