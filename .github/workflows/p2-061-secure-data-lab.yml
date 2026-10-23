@@ -9,6 +9,8 @@ on:
       - "tests/test_p2_061_secure_data_lab.py"
       - "tests/test_p2_061_data_api_admission.py"
       - "tests/test_p2_061_private_vault_ui.py"
+      - "tests/test_p2_061_offline_runner.py"
+      - "scripts/verify_p2_061_offline.py"
       - "apps/web/index.html"
       - "apps/web/assets/app.js"
       - "apps/web/assets/styles.css"
@@ -30,6 +32,8 @@ jobs:
           python-version: "3.12"
       - name: Install only test dependencies
         run: python -m pip install "pytest>=8,<10" "cryptography>=43,<48" "fastapi>=0.115,<1" "psycopg[binary]>=3.2,<4"
+      - name: Verify source against local offline runner gates
+        run: python scripts/verify_p2_061_offline.py
       - name: Compile source without enabling any service
         run: |
           python -m py_compile apps/api/app/secure_inventory_lab.py
