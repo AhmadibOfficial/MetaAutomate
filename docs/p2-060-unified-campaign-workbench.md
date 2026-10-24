@@ -207,3 +207,31 @@ the browser PASS at `d4eb4b2`; they require their own local Kali
 execution at the new reviewed commit. GitHub Actions billing/spending
 remains blocked, the draft branch is unmerged, Foundation stays 3/9
 verified and **production NO-GO** remains binding.
+
+
+### 2026-10-24 full-page PNG dimension correction
+
+The first evidence-review execution on Kali returned **9 pytest tests
+passed** but blocked on `Invalid PNG dimensions:
+campaign-workbench-mobile.png`. The independent checksum verification of
+the preserved 12 files had already passed; this failure occurs within
+the reviewer's overly restrictive generic **5,000px height limit**.
+Full-page screenshots at a 390px viewport may legitimately exceed that
+height; this is not proof of a corrupted screenshot.
+
+The reviewer now distinguishes fixed 1080×1080 campaign graphics from
+full-page browser screenshots. Screenshots accept up to 40,000px
+height **only if** image width stays within 5,000px, total
+pixels are at most **25 million**, and PNG chunk CRC/structure checks
+succeed. The exact screenshot width must still equal the viewport
+(1440/390/360) and height must be at least 900px. Existing hashes
+and the preserved files must **not** be rewritten. The broader limit
+does not decode pixels or certify screenshot readability.
+
+Three new negative/positive tests exercise a legitimate >5,000px
+mobile screenshot, rejection of excessive height, and rejection of
+excessive total image area. **The revised test suite and archived
+evidence review have not yet been rerun on Kali**. When this gate
+passes, its only verdict remains `DEVELOPER_LOCAL_EVIDENCE_CONSISTENT`;
+visual, screen-reader, independent CI, independent AppSec and production
+approval remain outstanding.
