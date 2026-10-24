@@ -99,3 +99,11 @@ tracking the target's contents; a mere `Path.is_file()` check would follow the
 link and incorrectly accept untracked material. These controls are exercised
 with disposable fixture repositories. They do **not** establish independent
 code review, real customer demand, or release approval.
+
+## Public Qatar market signals — research, NOT MetaAutomate validation (2026-10-24)
+
+- QDB's current Startup Qatar program page lists START funding **up to USD 1.1 million**, disbursed against mutually agreed milestones. START calls for an unmet market need, validated concept, technology roadmap, researched market readiness, business model/monetization, and a committed team. The funding ceiling is not a proposed ask or an eligibility decision. Official source: https://www.qdb.qa/en/financing-and-funding/equity-and-investment/startup-qatar-investment-program
+- On **19 February 2026**, Qatar's Ministry of Communications and Information Technology reported that its **SMEs Go Digital** program had onboarded **173 SMEs**, supported adoption of **30 digital solutions**, and held **94 matchmaking sessions** involving **59 providers**. This indicates ecosystem digitalization activity, **not** MetaAutomate's addressable market size, customer interviews, traction, or a partnership. Official source: https://www.mcit.gov.qa/en/news/mcit-showcases-milestones-of-the-smes-go-digital-program-in-accelerating-sme-digital-transformation/
+- A practical research hypothesis is to interview permissioned Qatar retail/wholesale and inventory-led businesses about the time, costs, and error rates of coordinating stock and marketing content. Interviews, measured baselines, willingness to pay, actual competitors, localization requirements, and Qatar regulatory feasibility are **still missing**. Do not present a TAM/SAM/SOM figure, revenue forecast, or customer count without documented assumptions and evidence.
+
+**Submission remains HOLD.** Public program statistics are contextual research only and cannot substitute for the QDB-required customer/problem validation.
