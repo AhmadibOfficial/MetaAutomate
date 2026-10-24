@@ -141,3 +141,31 @@ def test_source_script_no_network_external_submission_or_payments():
     for forbidden in ("requests.post", "urllib.request", "httpx.post", "webbrowser.open",
                       "subprocess.Popen", "git push", "git merge", "f6s.com/api"):
         assert forbidden not in src
+
+
+def test_symlinked_capability_source_cannot_count_as_committed_evidence(repo, tmp_path):
+    """Git commits symlink paths; external contents are not source proof."""
+    external = tmp_path / "untracked-outside.js"
+    external.write_text("// not a repository source\n")
+    name = qdb.CAPABILITIES["data_research"][0]
+    source = repo / name
+    source.unlink()
+    source.symlink_to(external)
+    git(repo, "add", "-A")
+    git(repo, "commit", "-qm", "Fixture: tracked symlink to outside file")
+    result = qdb.assess(repo)
+    assert result["capabilities"]["data_research"]["source_presence"] == "SOURCE_INCOMPLETE"
+    assert name in result["capabilities"]["data_research"]["missing_source_paths"]
+
+
+def test_symlinked_foundation_record_is_rejected(repo, tmp_path):
+    """A tracked symlink cannot import an external NO-GO record as evidence."""
+    source = repo / qdb.FOUNDATION
+    external = tmp_path / "external-foundation.json"
+    external.write_bytes(source.read_bytes())
+    source.unlink()
+    source.symlink_to(external)
+    git(repo, "add", "-A")
+    git(repo, "commit", "-qm", "Fixture: external Foundation record symlink")
+    with pytest.raises(qdb.ReadinessError, match="symlinked"):
+        qdb.assess(repo)
