@@ -19,7 +19,8 @@ main[tabindex="-1"]:focus{outline-offset:-3px}
 .brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-size:19px;font-weight:550;letter-spacing:-.04em}
 .brand img{border-radius:10px;background:#0c2948}
 .brand strong{color:var(--blue)}
-.brand small{display:block;font-size:9px;letter-spacing:.13em;font-weight:800;color:#bfcfe0}
+.brand span{min-width:0}
+.brand small{display:block;font-size:11px;letter-spacing:.08em;font-weight:800;color:#bfcfe0;overflow-wrap:anywhere}
 .topbar nav{display:flex;gap:18px;font-size:12px;font-weight:700}
 .topbar nav a:hover{color:var(--gold)}
 .hero{background:radial-gradient(circle at 85% 30%,#153957 0%,transparent 43%),var(--navy);color:#fff;padding:70px 0 76px}
