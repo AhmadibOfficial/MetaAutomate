@@ -61,3 +61,29 @@ P2-060d remains **draft and stacked on #124** (itself based on #123 and
 older draft PRs). GitHub Actions billing restrictions, the Foundation
 **3/9 verified** state and production **NO-GO** remain unchanged. No merge,
 deployment, migration, social publication or QDB application submission.
+
+
+## 2026-10-24 — native 19px checkbox geometry correction
+
+Kali at previous exact P2-060d head `4272451` reported **37 passed in
+5.07s** across source tests, followed by
+`REFLOW_AUTOMATION_BLOCKED: AssertionError` on the 19px by 19px
+`#campaign-confirm` checkbox. This was the gate's overly broad 20px
+minimum for every control, not evidence of horizontal document overflow.
+
+The verifier now distinguishes native checkboxes from ordinary controls:
+- Native checkbox must be at least 16 by 16 CSS px.
+- A containing clickable label is **required**; its bounds must be at
+  least 24px wide and 20px high, with no viewport overflow.
+- Other controls retain the >=20 by >=20 basic geometry check.
+- Page overflow and all prior keyboard, synthetic workflow and
+  same-origin no-egress tests remain unchanged.
+- Four new source-only regression cases cover the 19px accepted
+  checkbox, too-small checkbox, deficient clickable label and fail-closed
+  regular button/overflow checks.
+
+The label bounds are only a basic automated pointer target check, not a
+claim of formal WCAG 2.2 2.5.8 target sizing, color contrast or
+screen-reader behavior. **The corrected source and real Chromium tests
+have not yet been rerun on Kali or independently in CI.** Preserve
+the `REFLOW_AUTOMATION_BLOCKED` verdict until that happens.
