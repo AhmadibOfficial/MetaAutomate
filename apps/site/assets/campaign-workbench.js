@@ -24,6 +24,7 @@
     el("campaign-approval-state").textContent = "Not reviewed. No provider publishing is available.";
     el("campaign-metrics-result").textContent = "No results recorded.";
     el("campaign-post").value = "";
+    el("campaign-graphic-description").textContent = "No campaign graphic prepared.";
     const canvas = el("campaign-canvas");
     canvas.width = 1; canvas.height = 1;
   }
@@ -81,6 +82,7 @@
       el("campaign-analysis-note").textContent = results.note;
       listItems(results);
       el("campaign-results").hidden = false;
+      el("results-title").focus();
       el("campaign-create").disabled = !results.opportunities.length;
       recordEvent("Inventory CSV imported: " + records.length + " items");
       announce("Inventory assessed locally. No data uploaded. Review the recommended inventory before drafting.");
@@ -121,6 +123,7 @@
       el("campaign-approval-state").textContent = "Not reviewed. No provider publishing is available.";
       recordEvent("Campaign draft prepared for " + plan.sku);
       drawGraphic();
+      el("project-title").focus();
       announce("Campaign draft and graphic prepared. Review before recording internal approval.");
     } catch (error) { formatError(error); }
   });
@@ -170,6 +173,10 @@
     ctx.fillStyle = "#DCE6F1"; ctx.font = "25px Arial, sans-serif";
     ctx.fillText("ORIGINAL GRAPHIC  ·  PRICE SUBJECT TO CONFIRMATION", 100, 982, 890);
     graphicReady = true;
+    el("campaign-graphic-description").textContent =
+      "Original draft graphic for " + plan.product + " by " + plan.brand +
+      ". Listed price " + engine.currency(plan.priceKobo) +
+      ". Current stock, price, rights and delivery must be verified. Not published.";
     recordEvent("Original PNG artwork rendered locally");
   }
   function download(name, mime, content) {
