@@ -92,7 +92,13 @@ def verify_manifest(files: dict[str, bytes]) -> dict[str, str]:
     return digests
 
 
-def png_dimensions(raw: bytes, name: str) -> tuple[int, int]:
+def png_dimensions(raw: bytes, name: str, *, full_page: bool = False) -> tuple[int, int]:
+    """Read PNG dimensions/CRCs without decompressing potentially hostile pixels.
+
+    Campaign artwork is square and small; browser full-page screenshots may be
+    far taller than their 900px viewport. Bound both total pixels and height.
+    """
+
     require(raw.startswith(PNG_SIGNATURE), "Not a PNG: " + name)
     offset, width, height = len(PNG_SIGNATURE), None, None
     found_idat = False
@@ -111,8 +117,11 @@ def png_dimensions(raw: bytes, name: str) -> tuple[int, int]:
         if first:
             require(typ == b"IHDR" and length == 13, "Missing PNG IHDR: " + name)
             width, height = struct.unpack_from(">II", data)
-            require(1 <= width <= 5000 and 1 <= height <= 5000,
-                    "Invalid PNG dimensions: " + name)
+            max_height = 40000 if full_page else 5000
+            require(1 <= width <= 5000 and 1 <= height <= max_height and
+                    width * height <= 25_000_000,
+                    f"Invalid PNG dimensions: {name} ({width}x{height}; "
+                    f"max-height={max_height}, max-pixels=25000000)")
             first = False
         elif typ == b"IDAT":
             found_idat = True
@@ -223,7 +232,7 @@ def validate(directory: Path) -> dict:
         require(png_dimensions(files[png], png) == (1080, 1080),
                 "Promotional graphic dimensions differ from 1080x1080: " + label)
         screenshot = f"campaign-workbench-{label}.png"
-        size = png_dimensions(files[screenshot], screenshot)
+        size = png_dimensions(files[screenshot], screenshot, full_page=True)
         require(size[0] == width and size[1] >= 900,
                 "Screenshot viewport capture dimensions invalid: " + label)
         brief_file = f"video-brief-{label}.txt"
