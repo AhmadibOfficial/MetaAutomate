@@ -104,11 +104,40 @@ def new_artifact_directory(requested: Path | None = None) -> Path:
     return destination
 
 
+def require_playwright_driver(cli_path: Path) -> None:
+    """Check the Node CLI entrypoint without starting subprocesses or listeners.
+
+    Some Debian/Kali python3-playwright packages import successfully while
+    the separately packaged Node driver is absent. Detect that failure before
+    calling sync_playwright(), which otherwise emits misleading async errors.
+    """
+    if not cli_path.is_file():
+        raise RuntimeError(
+            "Playwright Node driver missing: " + str(cli_path) +
+            ". Browser acceptance NOT RUN. Use an isolated Python venv with "
+            "the official playwright wheel and its matching Chromium; "
+            "do not repair this by changing system Python or GitHub CI."
+        )
+
+
+def ensure_playwright_driver() -> None:
+    try:
+        from playwright._impl._driver import compute_driver_executable
+    except ImportError as exc:
+        raise RuntimeError(
+            "Playwright Node driver metadata unavailable; browser acceptance NOT RUN. "
+            "Use an isolated venv with the official playwright wheel."
+        ) from exc
+    _node_path, cli_path = compute_driver_executable()
+    require_playwright_driver(Path(cli_path))
+
+
 def run(requested_output: Path | None = None) -> Path:
     try:
         from playwright.sync_api import sync_playwright, expect
     except ImportError as exc:
         raise RuntimeError("Playwright Python package is missing; browser acceptance NOT RUN") from exc
+    ensure_playwright_driver()
 
     with serve_local() as base, sync_playwright() as playwright:
         # A missing Chromium installation must fail instead of inventing proof.
