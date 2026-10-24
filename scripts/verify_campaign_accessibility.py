@@ -90,7 +90,11 @@ def exercise_viewport(browser, base: str, label: str, width: int) -> None:
         assert page.get_by_role("group", name="Select a stock opportunity").count() == 1
 
         page.locator("#campaign-brand").fill("Synthetic MetaAutomate Shop")
-        page.locator("#campaign-create").focus()
+        # Move to the Create button by a real keyboard Tab, then assert its
+        # focus-visible outline rather than relying on programmatic focus.
+        page.locator("#campaign-channel").focus()
+        page.keyboard.press("Tab")
+        expect(page.locator("#campaign-create")).to_be_focused()
         focus_outline(page, "#campaign-create", "rgb(4, 13, 32)")
         page.keyboard.press("Enter")
         expect(page.locator("#campaign-project")).to_be_visible()
