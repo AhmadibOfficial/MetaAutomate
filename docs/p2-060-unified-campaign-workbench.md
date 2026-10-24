@@ -70,14 +70,24 @@ disk space and network costs before installing new browser binaries.
 The commands below create a new environment and separate Chromium cache;
 do not overwrite any existing directory.
 
-    VENV="$HOME/.local/share/metautomate-browser-venv"
-    BROWSERS="$HOME/.cache/metautomate-playwright-browsers"
-    test ! -e "$VENV" && test ! -L "$VENV" || { echo "STOP: browser venv already exists"; false; }
-    python3 -m venv "$VENV"
-    "$VENV/bin/python" -m pip install "playwright==1.55.0"
-    PLAYWRIGHT_BROWSERS_PATH="$BROWSERS" "$VENV/bin/python" -m playwright install chromium
-    PLAYWRIGHT_BROWSERS_PATH="$BROWSERS" "$VENV/bin/python" scripts/verify_campaign_workbench_browser.py
-
+    (
+      set -euo pipefail
+      VENV="$HOME/.local/share/metautomate-browser-venv"
+      BROWSERS="$HOME/.cache/metautomate-playwright-browsers"
+      if [ -e "$VENV" ] || [ -L "$VENV" ]; then
+        echo "STOP: browser venv path already exists"
+        exit 1
+      fi
+      if [ -L "$BROWSERS" ]; then
+        echo "STOP: unexpected symlink for browser cache"
+        exit 1
+      fi
+      mkdir -p -- "$HOME/.local/share"
+      python3 -m venv "$VENV"
+      "$VENV/bin/python" -m pip install "playwright==1.55.0"
+      PLAYWRIGHT_BROWSERS_PATH="$BROWSERS" "$VENV/bin/python" -m playwright install chromium
+      PLAYWRIGHT_BROWSERS_PATH="$BROWSERS" "$VENV/bin/python" scripts/verify_campaign_workbench_browser.py
+    )
 These commands are **manual**, not automatically executed by the
 application or CI. A venv setup failure must halt before the browser step.
 If the machine lacks `python3-venv`, has insufficient storage or cannot
