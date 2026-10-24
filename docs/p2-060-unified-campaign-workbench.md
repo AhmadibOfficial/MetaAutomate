@@ -85,9 +85,34 @@ do not overwrite any existing directory.
       mkdir -p -- "$HOME/.local/share"
       python3 -m venv "$VENV"
       "$VENV/bin/python" -m pip install "playwright==1.55.0"
-      PLAYWRIGHT_BROWSERS_PATH="$BROWSERS" "$VENV/bin/python" -m playwright install chromium
+      PLAYWRIGHT_BROWSERS_PATH="$BROWSERS" "$VENV/bin/python" -m playwright install --no-shell chromium
       PLAYWRIGHT_BROWSERS_PATH="$BROWSERS" "$VENV/bin/python" scripts/verify_campaign_workbench_browser.py
     )
+### 2026-10-24: full Chromium present; headless-shell download failed
+
+The isolated wheel and full Chromium 140 (Playwright build 1187) were
+downloaded successfully, but the **separate** 104 MiB headless-shell failed
+after repeated TLS timeouts and DNS errors. The browser verifier now starts
+the version-matched full Chromium via `channel="chromium"` (Playwright's
+official *new headless* mode), which does not require that shell archive.
+See https://playwright.dev/python/docs/browsers .
+
+**Do not reinstall the Python wheel, delete the existing cache or rerun
+`playwright install chromium` without `--no-shell`.** On the existing
+installation, attempt browser verification directly:
+
+    cd ~/MetaAutomate
+    PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q tests/test_p2_060_campaign_workbench.py tests/test_p2_060_browser_harness.py
+    PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/metautomate-playwright-browsers" \
+      "$HOME/.local/share/metautomate-browser-venv/bin/python" \
+      scripts/verify_campaign_workbench_browser.py
+
+If the full Chromium binary cannot launch (e.g., missing OS shared
+libraries), keep browser acceptance **BLOCKED** and inspect its exact
+error first. Do not install system packages, force browser flags,
+bypass CSP, or silently change to another browser. Actual screenshots
+and downloaded evidence are accepted only after the full verifier passes.
+
 These commands are **manual**, not automatically executed by the
 application or CI. A venv setup failure must halt before the browser step.
 If the machine lacks `python3-venv`, has insufficient storage or cannot
