@@ -161,3 +161,49 @@ No customer accounts, PostgreSQL migrations, real media inference, social public
 - P2-064: provable outcome measurement using authenticated sources and comparison methodology.
 
 These are plans, not features claimed live in this milestone.
+
+
+## P2-060b — preserved evidence review, after Chromium acceptance
+
+On 2026-10-24, the repository owner reported a developer-local Playwright
+`DEVELOPER_LOCAL_BROWSER_PASS` at source commit
+`d4eb4b269d2117108617b7d4be2f77d6e2d86473`, plus **15 pytest
+tests passed** and no modified Git files. The verifier generated 12
+synthetic artifacts at 1440/390/360 px.
+
+The owner subsequently copied these 12 artifacts into a separate private
+directory and generated a `SHA256SUMS.txt` manifest. `sha256sum -c`
+reported **all 12 checks OK**. This preserves the local copy; it does
+not prove that a trusted third party witnessed the original browser run.
+
+The offline, read-only artifact consistency validator introduced after that
+test run inspects the *preserved* copy without editing files:
+
+    cd ~/MetaAutomate
+    PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q tests/test_p2_060_evidence_review.py
+    python3 scripts/review_p2_060_browser_evidence.py \
+      --directory "$HOME/.local/share/metautomate-evidence/p2-060b-d4eb4b2-20261024"
+    git status --short --branch
+
+The validator requires precisely 12 expected files plus a non-overwriting
+owner-generated SHA-256 manifest; rejects symlinks, checksum alteration
+and unexpected files; checks PNG signatures/chunk CRCs and dimensions;
+checks exact synthetic fixture/report consistency, safe internal-review
+scope, disclosed self-reported metrics and no claimed publishing/inference.
+No customer data, browser/CDP driver, network, AI, upload, database,
+GitHub CLI or production service is used.
+
+A passing report is only `DEVELOPER_LOCAL_EVIDENCE_CONSISTENT`.
+It **does not** inspect screenshot pixels for aesthetic correctness,
+detect text overlaps or color contrast, perform WCAG keyboard/screen-reader
+testing, attest publisher credentials, establish immutable provenance,
+prove the absence of network traffic independently, verify commercial
+outcomes or replace independent AppSec and CI review. Actual screenshots
+remain on the owner's Kali machine, inaccessible from GitHub-only review
+until the owner deliberately supplies them to an authorized reviewer.
+
+The evidence-review script and its adversarial tests were added **after**
+the browser PASS at `d4eb4b2`; they require their own local Kali
+execution at the new reviewed commit. GitHub Actions billing/spending
+remains blocked, the draft branch is unmerged, Foundation stays 3/9
+verified and **production NO-GO** remains binding.
