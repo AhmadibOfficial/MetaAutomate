@@ -75,6 +75,22 @@ On a clean local MetaAutomate checkout:
 
     python3 scripts/qdb_start_readiness.py
 
+To run a deterministic local Node.js smoke test of the **real committed**
+inventory-to-campaign engine (not customer or browser proof), explicitly opt in
+on a clean, **trusted** checkout with Node.js installed:
+
+    python3 scripts/qdb_start_readiness.py --run-synthetic-demo
+
+This exercises fabricated CSV records, conservative prioritization, safe
+draft text and synthetic funnel-metric arithmetic. If the executable engine
+is missing, symlinked, or fails an assertion, the report is blocked. Passing
+results are labelled `DEVELOPER_LOCAL_SYNTHETIC_PASS` and cannot establish
+independent CI, browser acceptance, a Qatar customer, revenue, AI models,
+deployment, funding eligibility or an authorized release. This invokes local
+checked-out JavaScript, **not a sandbox**; do not run it on untrusted code.
+Default invocation never executes the engine. Existing NO-GO and application
+submission HOLD remain unchanged.
+
 Optionally create a new private report OUTSIDE the Git repository:
 
     python3 scripts/qdb_start_readiness.py --output "$HOME/qdb-start-readiness.json"
