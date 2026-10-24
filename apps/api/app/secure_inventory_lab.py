@@ -306,20 +306,23 @@ class SecureInventoryLab:
         if not isinstance(identifier, UUID):
             deny("Invalid document identifier")
         current = int(time.time()) if now is None else now
+        # Hold one write-serialized transaction across lookup, retention checks,
+        # authentication and the read audit. Otherwise a concurrent DELETE could
+        # commit after the SELECT but before the audit, yielding a stale read.
+        # A failed unseal/audit rolls back without returning decrypted content.
         with _connect(self.path) as conn:
+            conn.execute("BEGIN IMMEDIATE")
             row = conn.execute(
                 "SELECT nonce,encrypted,record_count,retained_until,source_sha256,actor_id FROM inventory_documents "
                 "WHERE tenant_id=? AND document_id=?", (tenant, str(identifier))
             ).fetchone()
-        if row is None or row["retained_until"] <= current:
-            deny("Document not found or retention expired")
-        items = _unseal(self.key, tenant, str(identifier), row["nonce"], row["encrypted"],
-                        row["source_sha256"], row["record_count"],
-                        row["retained_until"], row["actor_id"])
-        if len(items) != row["record_count"]:
-            deny("Stored document record count altered")
-        with _connect(self.path) as conn:
-            conn.execute("BEGIN IMMEDIATE")
+            if row is None or row["retained_until"] <= current:
+                deny("Document not found or retention expired")
+            items = _unseal(self.key, tenant, str(identifier), row["nonce"], row["encrypted"],
+                            row["source_sha256"], row["record_count"],
+                            row["retained_until"], row["actor_id"])
+            if len(items) != row["record_count"]:
+                deny("Stored document record count altered")
             self._audit(conn, tenant, str(principal.user_id), "INVENTORY_READ",
                         str(identifier), current)
         return dict(document_id=str(identifier), record_count=len(items), records=items,
