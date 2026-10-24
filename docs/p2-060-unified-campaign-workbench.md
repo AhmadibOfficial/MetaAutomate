@@ -50,14 +50,104 @@ Users may enter self-reported impressions, clicks and orders with a measurement 
 Run in the existing MetaAutomate repository:
 
     node --test tests/campaign_engine.test.cjs
-    python3 -m pytest -q tests/test_p2_060_campaign_workbench.py
-    python3 -m http.server 18080 --bind 127.0.0.1 --directory apps/site
-
-With a separate terminal and Playwright Chromium installed:
-
+    python3 -m pytest -q tests/test_p2_060_campaign_workbench.py tests/test_p2_060_browser_harness.py
     python3 scripts/verify_campaign_workbench_browser.py
 
-The browser acceptance checks import, prioritization, PNG and video-brief download, creative link, internal approval and its revocation, manually entered metrics, downloaded JSON evidence, zero cross-origin requests, no page errors, and desktop/mobile layout. A source review alone is not a browser acceptance result.
+Playwright for Python and its Chromium browser must already be installed locally.
+
+### Kali Playwright 1.55.0+ds missing-driver recovery (development only)
+
+Kali's Debian-derived `python3-playwright 1.55.0+ds-2` may import
+correctly but lack its separate Node Playwright CLI at
+`/usr/share/nodejs/playwright/cli.js`. This is a **tooling blocker**, not
+an application acceptance failure. The verifier now detects the absent CLI
+before starting the HTTP server and reports `BROWSER_ACCEPTANCE_BLOCKED`.
+
+Use an isolated Python virtualenv **outside the repository** instead of
+`sudo pip`, `--break-system-packages`, deleting old environments or
+altering packages used by theHarvester/wapiti3. Review the available free
+disk space and network costs before installing new browser binaries.
+The commands below create a new environment and separate Chromium cache;
+do not overwrite any existing directory.
+
+    (
+      set -euo pipefail
+      VENV="$HOME/.local/share/metautomate-browser-venv"
+      BROWSERS="$HOME/.cache/metautomate-playwright-browsers"
+      if [ -e "$VENV" ] || [ -L "$VENV" ]; then
+        echo "STOP: browser venv path already exists"
+        exit 1
+      fi
+      if [ -L "$BROWSERS" ]; then
+        echo "STOP: unexpected symlink for browser cache"
+        exit 1
+      fi
+      mkdir -p -- "$HOME/.local/share"
+      python3 -m venv "$VENV"
+      "$VENV/bin/python" -m pip install "playwright==1.55.0"
+      PLAYWRIGHT_BROWSERS_PATH="$BROWSERS" "$VENV/bin/python" -m playwright install --no-shell chromium
+      PLAYWRIGHT_BROWSERS_PATH="$BROWSERS" "$VENV/bin/python" scripts/verify_campaign_workbench_browser.py
+    )
+### 2026-10-24: full Chromium present; headless-shell download failed
+
+The isolated wheel and full Chromium 140 (Playwright build 1187) were
+downloaded successfully, but the **separate** 104 MiB headless-shell failed
+after repeated TLS timeouts and DNS errors. The browser verifier now starts
+the version-matched full Chromium via `channel="chromium"` (Playwright's
+official *new headless* mode), which does not require that shell archive.
+See https://playwright.dev/python/docs/browsers .
+
+**Do not reinstall the Python wheel, delete the existing cache or rerun
+`playwright install chromium` without `--no-shell`.** On the existing
+installation, attempt browser verification directly:
+
+    cd ~/MetaAutomate
+    PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q tests/test_p2_060_campaign_workbench.py tests/test_p2_060_browser_harness.py
+    PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/metautomate-playwright-browsers" \
+      "$HOME/.local/share/metautomate-browser-venv/bin/python" \
+      scripts/verify_campaign_workbench_browser.py
+
+If the full Chromium binary cannot launch (e.g., missing OS shared
+libraries), keep browser acceptance **BLOCKED** and inspect its exact
+error first. Do not install system packages, force browser flags,
+bypass CSP, or silently change to another browser. Actual screenshots
+and downloaded evidence are accepted only after the full verifier passes.
+
+These commands are **manual**, not automatically executed by the
+application or CI. A venv setup failure must halt before the browser step.
+If the machine lacks `python3-venv`, has insufficient storage or cannot
+download Chromium over TLS, record the failure rather than changing system
+packages without a separate review. Playwright's managed Chromium is a
+version-specific download; system Chromium is not automatically an equivalent.
+Leave the operational NO-GO unchanged until the actual browser run passes.
+
+The browser verifier now **self-hosts the trusted static site only on an
+ephemeral 127.0.0.1 port**, rejects requests with unexpected Hosts, HTTP writes,
+static path traversal, and symlink escapes, and blocks off-origin browser
+requests. Do **not** start a separate HTTP server or use production endpoints.
+
+Screenshot, PNG, video-brief and self-reported sample-metric JSON artifacts
+are saved to a newly created private directory outside the Git checkout
+(the command prints its absolute path). A requested location is allowed only
+if it is a new directory outside the repository:
+
+    python3 scripts/verify_campaign_workbench_browser.py --output-dir "$HOME/meta-browser-proof-20261024"
+
+Use fabricated inventory only; browser artifacts are developer-local evidence
+without independent signature, customer consent verification or commercial
+traction. Output from a failing browser verification is **not a PASS** even
+if individual screenshots were saved before the failure.
+
+The browser acceptance checks import, prioritization, PNG and video-brief
+download, creative link, internal approval and its revocation, synthetic
+metrics, downloaded JSON evidence, zero off-origin requests, no page errors,
+and desktop/mobile layout. The source-only harness regression tests do not
+replace real Playwright Chromium execution.
+
+The standalone verifier does not merge or deploy, activate social accounts,
+use public network services, run AI models, upload data, apply migrations or
+make GitHub Actions pass. The operational 3/9 Foundation NO-GO and independent
+release-review gates remain unchanged.
 
 ## Release policy
 
@@ -71,3 +161,77 @@ No customer accounts, PostgreSQL migrations, real media inference, social public
 - P2-064: provable outcome measurement using authenticated sources and comparison methodology.
 
 These are plans, not features claimed live in this milestone.
+
+
+## P2-060b — preserved evidence review, after Chromium acceptance
+
+On 2026-10-24, the repository owner reported a developer-local Playwright
+`DEVELOPER_LOCAL_BROWSER_PASS` at source commit
+`d4eb4b269d2117108617b7d4be2f77d6e2d86473`, plus **15 pytest
+tests passed** and no modified Git files. The verifier generated 12
+synthetic artifacts at 1440/390/360 px.
+
+The owner subsequently copied these 12 artifacts into a separate private
+directory and generated a `SHA256SUMS.txt` manifest. `sha256sum -c`
+reported **all 12 checks OK**. This preserves the local copy; it does
+not prove that a trusted third party witnessed the original browser run.
+
+The offline, read-only artifact consistency validator introduced after that
+test run inspects the *preserved* copy without editing files:
+
+    cd ~/MetaAutomate
+    PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q tests/test_p2_060_evidence_review.py
+    python3 scripts/review_p2_060_browser_evidence.py \
+      --directory "$HOME/.local/share/metautomate-evidence/p2-060b-d4eb4b2-20261024"
+    git status --short --branch
+
+The validator requires precisely 12 expected files plus a non-overwriting
+owner-generated SHA-256 manifest; rejects symlinks, checksum alteration
+and unexpected files; checks PNG signatures/chunk CRCs and dimensions;
+checks exact synthetic fixture/report consistency, safe internal-review
+scope, disclosed self-reported metrics and no claimed publishing/inference.
+No customer data, browser/CDP driver, network, AI, upload, database,
+GitHub CLI or production service is used.
+
+A passing report is only `DEVELOPER_LOCAL_EVIDENCE_CONSISTENT`.
+It **does not** inspect screenshot pixels for aesthetic correctness,
+detect text overlaps or color contrast, perform WCAG keyboard/screen-reader
+testing, attest publisher credentials, establish immutable provenance,
+prove the absence of network traffic independently, verify commercial
+outcomes or replace independent AppSec and CI review. Actual screenshots
+remain on the owner's Kali machine, inaccessible from GitHub-only review
+until the owner deliberately supplies them to an authorized reviewer.
+
+The evidence-review script and its adversarial tests were added **after**
+the browser PASS at `d4eb4b2`; they require their own local Kali
+execution at the new reviewed commit. GitHub Actions billing/spending
+remains blocked, the draft branch is unmerged, Foundation stays 3/9
+verified and **production NO-GO** remains binding.
+
+
+### 2026-10-24 full-page PNG dimension correction
+
+The first evidence-review execution on Kali returned **9 pytest tests
+passed** but blocked on `Invalid PNG dimensions:
+campaign-workbench-mobile.png`. The owner's post-copy checksum verification of
+the preserved 12 files had already passed; this failure occurs within
+the reviewer's overly restrictive generic **5,000px height limit**.
+Full-page screenshots at a 390px viewport may legitimately exceed that
+height; this is not proof of a corrupted screenshot.
+
+The reviewer now distinguishes fixed 1080×1080 campaign graphics from
+full-page browser screenshots. Screenshots accept up to 40,000px
+height **only if** image width stays within 5,000px, total
+pixels are at most **25 million**, and PNG chunk CRC/structure checks
+succeed. The exact screenshot width must still equal the viewport
+(1440/390/360) and height must be at least 900px. Existing hashes
+and the preserved files must **not** be rewritten. The broader limit
+does not decode pixels or certify screenshot readability.
+
+Three new negative/positive tests exercise a legitimate >5,000px
+mobile screenshot, rejection of excessive height, and rejection of
+excessive total image area. **The revised test suite and archived
+evidence review have not yet been rerun on Kali**. When this gate
+passes, its only verdict remains `DEVELOPER_LOCAL_EVIDENCE_CONSISTENT`;
+visual, screen-reader, independent CI, independent AppSec and production
+approval remain outstanding.
