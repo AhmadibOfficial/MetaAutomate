@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -58,6 +59,7 @@ def test_source_index_never_reports_operational_eligibility(repo):
     assert x["independent_ci_verified"] is False
     assert x["investment_requested_usd"] is None
     assert len(x["qdb_start_readiness"]) == 8
+    assert x["synthetic_functional_demo"] == {"status": "NOT_RUN", "independently_verified": False}
 
 
 def test_missing_technical_module_marked_incomplete_not_live(repo):
@@ -169,3 +171,39 @@ def test_symlinked_foundation_record_is_rejected(repo, tmp_path):
     git(repo, "commit", "-qm", "Fixture: external Foundation record symlink")
     with pytest.raises(qdb.ReadinessError, match="symlinked"):
         qdb.assess(repo)
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="Node.js unavailable")
+def test_opt_in_synthetic_campaign_demo_runs_real_committed_engine(repo):
+    """Actual deterministic functionality, but not CI or customer proof."""
+    source = SCRIPT.parents[1] / qdb.CAPABILITIES["data_research"][0]
+    target = repo / qdb.CAPABILITIES["data_research"][0]
+    target.write_bytes(source.read_bytes())
+    git(repo, "add", qdb.CAPABILITIES["data_research"][0])
+    git(repo, "commit", "-qm", "Add genuine engine to synthetic fixture repo")
+    result = qdb.assess(repo, run_synthetic_demo=True)
+    evidence = result["synthetic_functional_demo"]
+    assert evidence["status"] == "DEVELOPER_LOCAL_SYNTHETIC_PASS"
+    assert evidence["independently_verified"] is False
+    assert evidence["browser_e2e_verified"] is False
+    assert evidence["commercial_traction_verified"] is False
+    assert result["release_approved"] is False
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="Node.js unavailable")
+def test_opt_in_synthetic_demo_rejects_placeholder_engine(repo):
+    with pytest.raises(qdb.ReadinessError, match="demonstration failed"):
+        qdb.assess(repo, run_synthetic_demo=True)
+
+
+def test_opt_in_synthetic_demo_rejects_symlinked_engine(repo, tmp_path):
+    path = qdb.CAPABILITIES["data_research"][0]
+    source = repo / path
+    external = tmp_path / "external-engine.js"
+    external.write_text(source.read_text())
+    source.unlink()
+    source.symlink_to(external)
+    git(repo, "add", "-A")
+    git(repo, "commit", "-qm", "Symlinked demo engine fixture")
+    with pytest.raises(qdb.ReadinessError, match="regular committed"):
+        qdb.assess(repo, run_synthetic_demo=True)
