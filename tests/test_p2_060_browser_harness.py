@@ -138,3 +138,20 @@ def test_missing_driver_is_reported_before_static_server_binds(monkeypatch, tmp_
     monkeypatch.setattr(harness, "serve_local", forbidden_server)
     with pytest.raises(RuntimeError, match="Playwright Node driver missing"):
         harness.run()
+
+
+def test_new_headless_launch_uses_full_chromium_not_separate_shell():
+    """Capture launch options without starting any actual browser."""
+    seen = []
+    sentinel = object()
+
+    class FakeChromium:
+        def launch(self, **kwargs):
+            seen.append(kwargs)
+            return sentinel
+
+    class FakePlaywright:
+        chromium = FakeChromium()
+
+    assert harness.launch_full_chromium(FakePlaywright()) is sentinel
+    assert seen == [{"headless": True, "channel": "chromium"}]
