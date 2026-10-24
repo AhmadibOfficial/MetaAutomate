@@ -132,6 +132,16 @@ def ensure_playwright_driver() -> None:
     require_playwright_driver(Path(cli_path))
 
 
+def launch_full_chromium(playwright):
+    """Run the version-matched full browser in new headless mode, not the shell.
+
+    The separate headless-shell archive is optional when the official
+    Playwright full Chromium package is already installed. No system browser,
+    remote CDP endpoint or nonstandard executable path is permitted.
+    """
+    return playwright.chromium.launch(headless=True, channel="chromium")
+
+
 def run(requested_output: Path | None = None) -> Path:
     # Fail before importing the sync API or opening a socket. This also makes
     # the negative preflight test independent of Playwright being installed.
@@ -142,8 +152,9 @@ def run(requested_output: Path | None = None) -> Path:
         raise RuntimeError("Playwright Python package is missing; browser acceptance NOT RUN") from exc
 
     with serve_local() as base, sync_playwright() as playwright:
-        # A missing Chromium installation must fail instead of inventing proof.
-        browser = playwright.chromium.launch(headless=True)
+        # Use the installed full Chromium. Missing binaries/dependencies remain
+        # blocking errors; never fall back to system Chrome or remote browsers.
+        browser = launch_full_chromium(playwright)
         try:
             out = new_artifact_directory(requested_output)
             for label, width in VIEWPORTS:
