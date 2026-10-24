@@ -88,3 +88,14 @@ The resulting report labels any such local test result as **developer-reported a
 ## Submission decision
 
 **Application submission HOLD.** The founder must approve final claims, actual team and financial evidence, legal and Qatar entry requirements, the financing request and live application answers. This development work does not authorize ChatGPT or another agent to submit, impersonate a founder, spend, or sign on behalf of MetaAutomate.
+
+
+### Source-path integrity safeguard
+
+The QDB evidence index now rejects tracked symbolic links for the nine-check
+Foundation record and does not count symlinked capability files as source
+evidence, even when their targets exist. Git can track symlink paths without
+tracking the target's contents; a mere `Path.is_file()` check would follow the
+link and incorrectly accept untracked material. These controls are exercised
+with disposable fixture repositories. They do **not** establish independent
+code review, real customer demand, or release approval.
