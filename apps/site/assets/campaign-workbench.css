@@ -19,7 +19,8 @@ main[tabindex="-1"]:focus{outline-offset:-3px}
 .brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-size:19px;font-weight:550;letter-spacing:-.04em}
 .brand img{border-radius:10px;background:#0c2948}
 .brand strong{color:var(--blue)}
-.brand small{display:block;font-size:9px;letter-spacing:.13em;font-weight:800;color:#bfcfe0}
+.brand span{min-width:0}
+.brand small{display:block;font-size:11px;letter-spacing:.08em;font-weight:800;color:#bfcfe0;overflow-wrap:anywhere}
 .topbar nav{display:flex;gap:18px;font-size:12px;font-weight:700}
 .topbar nav a:hover{color:var(--gold)}
 .hero{background:radial-gradient(circle at 85% 30%,#153957 0%,transparent 43%),var(--navy);color:#fff;padding:70px 0 76px}
@@ -42,7 +43,7 @@ h3{font-size:1.2rem;margin:8px 0 16px}
 .sectionhead p{color:var(--muted);max-width:890px;font-size:14px}
 code{font-family:ui-monospace,Consolas,monospace;font-size:.86em;overflow-wrap:anywhere;background:#eef4fb;padding:3px 5px;border-radius:5px}
 .inline-form{display:flex;align-items:end;gap:13px;flex-wrap:wrap}
-.field{display:flex;flex-direction:column;gap:7px;min-width:200px;flex:1 1 210px}
+.field{display:flex;flex-direction:column;gap:7px;min-width:0;flex:1 1 210px}
 label,legend{font-size:14px;font-weight:730;color:#244363}
 .field small,.help{font-size:12px;line-height:1.55;color:#526b83}
 input[type=file],input[type=text],input[type=number],select,textarea{max-width:100%;padding:11px 12px;border:1px solid #acbdcf;border-radius:9px;color:var(--ink);background:#fff}
@@ -84,4 +85,30 @@ fieldset legend{margin-bottom:10px}
 .footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;color:#576d84;border-top:1px solid var(--line);padding:25px 0 40px;font-size:12px}
 .footer a{color:#006d9d;font-weight:750}
 @media(max-width:760px){.topbar{align-items:start;flex-direction:column}.topbar nav{flex-wrap:wrap}.hero{padding:51px 0 60px}.media-grid,.three-fields{grid-template-columns:1fr}.panel{border-radius:13px}.steps{justify-content:start;gap:13px}.media-pane{padding:14px}}
+/* P2-060d: explicit narrow reflow without hiding important controls.
+   CSS viewport <=640px is a useful 200%-zoom reflow approximation at 1280px;
+   actual browser zoom and assistive technology require separate manual review. */
+:where(.panel,.notice,.media-pane,.campaign-product-option,.sectionhead,
+       .review-state,.footer,.steps,.topbar) {min-width:0}
+:where(.panel,.notice,.media-pane,.campaign-product-option,.review-state,
+       .sectionhead p,.help,.intro,.status,.footer,.topbar nav) {
+  overflow-wrap:anywhere;
+}
+.inline-form > .field,.media-grid > .media-pane,.three-fields > .field{min-width:0}
+button{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+@media(max-width:760px){
+  /* A sticky status banner can obscure focus/controls in a short zoomed window. */
+  .status{position:static}
+  .inline-form{align-items:stretch}
+  .inline-form>.field{flex-basis:100%}
+  .panel button{align-self:start}
+  .media-pane button{max-width:100%}
+}
+@media(max-width:360px){
+  .topbar nav{column-gap:12px;row-gap:10px}
+  .hero{padding-block:40px 46px}
+  .container{width:calc(100% - 28px)}
+  .panel{padding:16px}
+  .media-pane{padding:12px}
+}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
