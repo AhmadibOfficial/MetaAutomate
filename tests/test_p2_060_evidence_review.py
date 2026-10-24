@@ -186,3 +186,41 @@ def test_invalid_manifest_entries_denied(evidence):
         handle.write("0" * 64 + "  ./other.txt\n")
     with pytest.raises(review.EvidenceError, match="12 entries"):
         review.validate(evidence)
+
+
+def test_realistic_tall_mobile_fullpage_screenshot_accepted(evidence):
+    """A full-page screenshot can exceed 5000px without being invalid."""
+    path = evidence / "campaign-workbench-mobile.png"
+    path.write_bytes(png(390, 6001))
+    write_manifest(evidence)
+    assert review.validate(evidence)["status"] == "DEVELOPER_LOCAL_EVIDENCE_CONSISTENT"
+    with pytest.raises(review.EvidenceError, match="Invalid PNG dimensions"):
+        review.png_dimensions(path.read_bytes(), path.name)
+
+
+def test_excessive_screenshot_height_rejected(evidence):
+    """Oversized dimension metadata is rejected before image decompression."""
+    path = evidence / "campaign-workbench-mobile.png"
+    payload = bytearray(png(390, 901))
+    # Preserve valid chunk CRCs while changing only the PNG IHDR height.
+    struct.pack_into(">I", payload, 20, 40001)
+    crc = zlib.crc32(payload[12:29]) & 0xFFFFFFFF
+    struct.pack_into(">I", payload, 29, crc)
+    path.write_bytes(payload)
+    write_manifest(evidence)
+    with pytest.raises(review.EvidenceError, match="Invalid PNG dimensions"):
+        review.validate(evidence)
+
+
+def test_excessive_screenshot_pixel_area_rejected(evidence):
+    """An image below the height cap can still exceed the pixel budget."""
+    path = evidence / "campaign-workbench-desktop.png"
+    payload = bytearray(png(1440, 901))
+    struct.pack_into(">I", payload, 16, 4500)
+    struct.pack_into(">I", payload, 20, 8000)
+    crc = zlib.crc32(payload[12:29]) & 0xFFFFFFFF
+    struct.pack_into(">I", payload, 29, crc)
+    path.write_bytes(payload)
+    write_manifest(evidence)
+    with pytest.raises(review.EvidenceError, match="Invalid PNG dimensions"):
+        review.validate(evidence)
