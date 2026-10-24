@@ -50,14 +50,37 @@ Users may enter self-reported impressions, clicks and orders with a measurement 
 Run in the existing MetaAutomate repository:
 
     node --test tests/campaign_engine.test.cjs
-    python3 -m pytest -q tests/test_p2_060_campaign_workbench.py
-    python3 -m http.server 18080 --bind 127.0.0.1 --directory apps/site
-
-With a separate terminal and Playwright Chromium installed:
-
+    python3 -m pytest -q tests/test_p2_060_campaign_workbench.py tests/test_p2_060_browser_harness.py
     python3 scripts/verify_campaign_workbench_browser.py
 
-The browser acceptance checks import, prioritization, PNG and video-brief download, creative link, internal approval and its revocation, manually entered metrics, downloaded JSON evidence, zero cross-origin requests, no page errors, and desktop/mobile layout. A source review alone is not a browser acceptance result.
+Playwright for Python and its Chromium browser must already be installed locally.
+The browser verifier now **self-hosts the trusted static site only on an
+ephemeral 127.0.0.1 port**, rejects requests with unexpected Hosts, HTTP writes,
+static path traversal, and symlink escapes, and blocks off-origin browser
+requests. Do **not** start a separate HTTP server or use production endpoints.
+
+Screenshot, PNG, video-brief and self-reported sample-metric JSON artifacts
+are saved to a newly created private directory outside the Git checkout
+(the command prints its absolute path). A requested location is allowed only
+if it is a new directory outside the repository:
+
+    python3 scripts/verify_campaign_workbench_browser.py --output-dir "$HOME/meta-browser-proof-20261024"
+
+Use fabricated inventory only; browser artifacts are developer-local evidence
+without independent signature, customer consent verification or commercial
+traction. Output from a failing browser verification is **not a PASS** even
+if individual screenshots were saved before the failure.
+
+The browser acceptance checks import, prioritization, PNG and video-brief
+download, creative link, internal approval and its revocation, synthetic
+metrics, downloaded JSON evidence, zero off-origin requests, no page errors,
+and desktop/mobile layout. The source-only harness regression tests do not
+replace real Playwright Chromium execution.
+
+The standalone verifier does not merge or deploy, activate social accounts,
+use public network services, run AI models, upload data, apply migrations or
+make GitHub Actions pass. The operational 3/9 Foundation NO-GO and independent
+release-review gates remain unchanged.
 
 ## Release policy
 
