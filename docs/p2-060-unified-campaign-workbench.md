@@ -54,6 +54,38 @@ Run in the existing MetaAutomate repository:
     python3 scripts/verify_campaign_workbench_browser.py
 
 Playwright for Python and its Chromium browser must already be installed locally.
+
+### Kali Playwright 1.55.0+ds missing-driver recovery (development only)
+
+Kali's Debian-derived `python3-playwright 1.55.0+ds-2` may import
+correctly but lack its separate Node Playwright CLI at
+`/usr/share/nodejs/playwright/cli.js`. This is a **tooling blocker**, not
+an application acceptance failure. The verifier now detects the absent CLI
+before starting the HTTP server and reports `BROWSER_ACCEPTANCE_BLOCKED`.
+
+Use an isolated Python virtualenv **outside the repository** instead of
+`sudo pip`, `--break-system-packages`, deleting old environments or
+altering packages used by theHarvester/wapiti3. Review the available free
+disk space and network costs before installing new browser binaries.
+The commands below create a new environment and separate Chromium cache;
+do not overwrite any existing directory.
+
+    VENV="$HOME/.local/share/metautomate-browser-venv"
+    BROWSERS="$HOME/.cache/metautomate-playwright-browsers"
+    test ! -e "$VENV" && test ! -L "$VENV" || { echo "STOP: browser venv already exists"; false; }
+    python3 -m venv "$VENV"
+    "$VENV/bin/python" -m pip install "playwright==1.55.0"
+    PLAYWRIGHT_BROWSERS_PATH="$BROWSERS" "$VENV/bin/python" -m playwright install chromium
+    PLAYWRIGHT_BROWSERS_PATH="$BROWSERS" "$VENV/bin/python" scripts/verify_campaign_workbench_browser.py
+
+These commands are **manual**, not automatically executed by the
+application or CI. A venv setup failure must halt before the browser step.
+If the machine lacks `python3-venv`, has insufficient storage or cannot
+download Chromium over TLS, record the failure rather than changing system
+packages without a separate review. Playwright's managed Chromium is a
+version-specific download; system Chromium is not automatically an equivalent.
+Leave the operational NO-GO unchanged until the actual browser run passes.
+
 The browser verifier now **self-hosts the trusted static site only on an
 ephemeral 127.0.0.1 port**, rejects requests with unexpected Hosts, HTTP writes,
 static path traversal, and symlink escapes, and blocks off-origin browser
