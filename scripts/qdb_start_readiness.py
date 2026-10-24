@@ -13,6 +13,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 
@@ -143,7 +144,49 @@ def _local_report(path: Path | None, repo: Path, commit: str) -> dict:
     }
 
 
-def assess(root: Path = ROOT, *, local_report: Path | None = None) -> dict:
+# Optional deterministic synthetic demo: trusted checked-out source only.
+# This is not a secure sandbox for untrusted JavaScript. Nothing runs by default.
+_SYNTHETIC_DEMO_JS = "// Synthetic fixtures only: this is not a customer, CI or deployment test.\nconst assert = require(\"node:assert/strict\");\nconst engine = require(\"./apps/site/assets/campaign-engine.js\");\nconst data = engine.parseCSV([\n  \"sku,name,stock,weekly_sales,unit_price_kobo\",\n  \"SLOW-01,Canvas Tote,18,0,850000\",\n  \"HIGH-02,Blue Scarf,30,5,350000\",\n  \"OUT-03,No Stock,0,0,20000\",\n  \"LOW-04,Almost Gone,2,8,20000\"\n].join(\"\\n\") + \"\\n\");\nassert.equal(data.length, 4);\nconst analysis = engine.analyze(data);\nassert.deepEqual(analysis.opportunities.map(x => x.sku), [\"SLOW-01\", \"HIGH-02\"]);\nconst draft = engine.makeCampaign(analysis.opportunities[0], \"Synthetic Demo Shop\", \"Instagram\");\nassert.match(draft.post, /₦8,500\\.00/);\nassert.match(draft.post, /confirm before ordering/);\nassert.doesNotMatch(draft.post, /free delivery|guaranteed|% off/i);\nassert.throws(() => engine.makeCampaign(data[2], \"Synthetic Demo Shop\", \"Instagram\"), engine.CampaignError);\nassert.throws(() => engine.makeCampaign(data[0], \"Synthetic Demo Shop\", \"Unsupported\"), engine.CampaignError);\nconst metrics = engine.summarizeMetrics({\n  impressions: \"100\", clicks: \"20\", orders: \"3\", sourceNote: \"Synthetic demo numbers only\"\n});\nassert.equal(metrics.clickThroughRatePct, 20);\nassert.equal(metrics.clickToOrderPct, 15);\nassert.equal(metrics.evidence, \"SELF_REPORTED_NOT_INDEPENDENTLY_VERIFIED\");\nassert.equal(Object.hasOwn(metrics, \"revenue\"), false);\nassert.throws(() => engine.summarizeMetrics({\n  impressions: \"10\", clicks: \"11\", orders: \"1\", sourceNote: \"Synthetic invalid funnel\"\n}), engine.CampaignError);\nprocess.stdout.write(\"QDB_SYNTHETIC_DEMO_PASS\\n\");"
+
+
+def _synthetic_demo(root: Path, inventory: set[str], *, enabled: bool) -> dict:
+    if not enabled:
+        return {"status": "NOT_RUN", "independently_verified": False}
+    path = "apps/site/assets/campaign-engine.js"
+    if not _regular_committed_source(root, path, inventory):
+        raise ReadinessError("Synthetic demonstration requires a regular committed campaign engine")
+    node = shutil.which("node")
+    if node is None:
+        raise ReadinessError("Node.js unavailable; synthetic demo was not executed")
+    env = os.environ.copy()
+    env.pop("NODE_OPTIONS", None)
+    env.pop("NODE_PATH", None)
+    try:
+        run = subprocess.run(
+            [node, "-e", _SYNTHETIC_DEMO_JS], cwd=root,
+            stdin=subprocess.DEVNULL, capture_output=True,
+            text=True, timeout=20, check=False, env=env,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise ReadinessError("Synthetic campaign demonstration timed out") from exc
+    if run.returncode != 0 or run.stdout != "QDB_SYNTHETIC_DEMO_PASS\n":
+        raise ReadinessError("Synthetic campaign demonstration failed; no success evidence recorded")
+    return {
+        "status": "DEVELOPER_LOCAL_SYNTHETIC_PASS",
+        "capability": "inventory_to_campaign_decision_engine",
+        "source_path": path,
+        "fixture": "BUILT_IN_SYNTHETIC_INVENTORY_AND_METRICS",
+        "scenario": "CSV import, stock-priority selection, safety guards, draft generation, metric arithmetic",
+        "independently_verified": False,
+        "browser_e2e_verified": False,
+        "real_customer_data_used": False,
+        "commercial_traction_verified": False,
+        "production_release_approved": False,
+        "note": "Node assertions against local committed code, not authenticated browser, live AI, CI or Qatar customer validation",
+    }
+
+
+def assess(root: Path = ROOT, *, local_report: Path | None = None, run_synthetic_demo: bool = False) -> dict:
     root = root.resolve()
     commit, branch, inventory = _source_inventory(root)
     capabilities = {}
@@ -167,6 +210,7 @@ def assess(root: Path = ROOT, *, local_report: Path | None = None) -> dict:
         "capabilities": capabilities,
         "foundation": _foundation(root, inventory),
         "local_validation": _local_report(local_report, root, commit),
+        "synthetic_functional_demo": _synthetic_demo(root, inventory, enabled=run_synthetic_demo),
         "qdb_start_readiness": {
             key: {"status": "EVIDENCE_NOT_IN_THIS_SOURCE_INVENTORY", "needed": description}
             for key, description in START_EVIDENCE
@@ -210,9 +254,10 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--local-test-report", type=Path, help="Existing P2-061 local JSON report outside source checkout")
     p.add_argument("--output", type=Path, help="Create a NEW JSON report outside checkout; never overwrite")
+    p.add_argument("--run-synthetic-demo", action="store_true", help="Opt-in local Node smoke check with synthetic inputs; not browser/CI evidence")
     opts = p.parse_args(argv)
     try:
-        report = assess(local_report=opts.local_test_report)
+        report = assess(local_report=opts.local_test_report, run_synthetic_demo=opts.run_synthetic_demo)
         body = (json.dumps(report, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode()
         if opts.output:
             _write_new(ROOT, opts.output, body)
