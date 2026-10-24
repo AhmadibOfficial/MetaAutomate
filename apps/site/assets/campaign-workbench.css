@@ -8,7 +8,10 @@ a{color:inherit}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
 [hidden]{display:none!important}
-:where(button,a,input,select,textarea):focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+:where(button,a,input,select,textarea):focus-visible{outline:3px solid var(--navy);outline-offset:3px}
+.topbar :is(button,a,input,select,textarea):focus-visible,.hero :is(button,a,input,select,textarea):focus-visible{outline-color:var(--gold)}
+:where(main,h2)[tabindex="-1"]:focus{outline:3px solid var(--navy);outline-offset:4px}
+main[tabindex="-1"]:focus{outline-offset:-3px}
 .container{width:min(1060px,calc(100% - 36px));margin:0 auto}
 .skip{position:fixed;z-index:10;top:-90px;left:15px;padding:12px;background:#fff;border-radius:9px}
 .skip:focus{top:10px}
