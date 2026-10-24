@@ -154,3 +154,29 @@ The development queue is:
 
 No nightly validation timer or GitHub Actions runner has been installed on
 the owner's Kali machine by this repository change.
+
+
+## P2-061b — atomic document read and audit (stacked security patch)
+
+Local inventory reads now begin a SQLite `BEGIN IMMEDIATE` transaction before
+the tenant-scoped lookup. Retention checks, AES-GCM decryption, record-count
+integrity validation and `INVENTORY_READ` audit append occur in the **same
+transaction**. Previously, lookup/decryption and audit used separate SQLite
+connections, allowing an authorized concurrent deletion to commit in between,
+after which a stale read could still return.
+
+Added disposable SQLite regression tests for a concurrent writer attempting
+deletion *during* decryption (immediate `database is locked` required), and for
+a corrupted AAD actor ID (no successful read audit may be appended). These
+tests use only synthetic fixtures in pytest's temporary directory.
+
+Run on the patch branch, without turning on the API or exposing real data:
+
+    PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q tests/test_p2_061_secure_data_lab.py
+
+**Limit:** Write serialization applies only to this local SQLite lab. It is
+not PostgreSQL forced RLS, KMS, identity assurance, production concurrency
+acceptance, automatic retention or independently anchored audit logging.
+Source and tests remain pending local Kali execution, independent CI and
+human review; all operational NO-GO gates remain unchanged.
+
