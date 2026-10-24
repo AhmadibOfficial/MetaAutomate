@@ -25,6 +25,31 @@ CRITICAL = ("#campaign-file", "#campaign-import button[type=submit]",
             "#campaign-evidence")
 
 
+def validate_geometry_data(data: dict, width: int) -> None:
+    """Fail closed on horizontal overflow, missing elements and tiny targets.
+
+    Native checkboxes may be 19x19px without being broken. Check their
+    associated clickable label as well as the native control itself. This
+    is geometry assurance only, not proof of WCAG target-size conformance.
+    """
+    assert data["w"] == width, (width, data)
+    assert data["overflow"] <= data["w"] + 2, (width, data)
+    for row in data["results"]:
+        assert not row.get("missing"), (width, row)
+        assert not row["hidden"], (width, row)
+        assert row["left"] >= -2 and row["right"] <= width + 2, (width, row)
+        if row.get("isCheckbox"):
+            assert row["width"] >= 16 and row["height"] >= 16, (width, row)
+            label = row.get("label")
+            assert isinstance(label, dict), (width, row)
+            assert label["width"] >= 24 and label["height"] >= 20, (width, row)
+            assert label["left"] >= -2 and label["right"] <= width + 2, (width, row)
+        else:
+            assert row["width"] >= 20 and row["height"] >= 20, (width, row)
+        # Native file inputs and textareas may internally scroll; the page
+        # must still have no horizontal overflow.
+
+
 def inspect_geometry(page, width: int, selectors: tuple[str, ...]) -> None:
     data = page.evaluate("""selectors => {
       const w = document.documentElement.clientWidth;
@@ -34,24 +59,22 @@ def inspect_geometry(page, width: int, selectors: tuple[str, ...]) -> None:
         if (!el) return {selector, missing:true};
         const box = el.getBoundingClientRect();
         const cs = getComputedStyle(el);
+        const isCheckbox = el.matches('input[type="checkbox"]');
+        const labelElement = isCheckbox ? el.closest('label') : null;
+        const labelBox = labelElement ? labelElement.getBoundingClientRect() : null;
+        const label = labelBox ? {
+          left:labelBox.left, right:labelBox.right,
+          width:labelBox.width, height:labelBox.height
+        } : null;
         return {
           selector, hidden: cs.display === 'none' || cs.visibility === 'hidden',
           left:box.left, right:box.right, width:box.width,
-          height:box.height, scrollWidth:el.scrollWidth,
-          clientWidth:el.clientWidth,
+          height:box.height, isCheckbox, label
         };
       });
       return {w, overflow, results};
     }""", list(selectors))
-    assert data["w"] == width, (width, data)
-    assert data["overflow"] <= data["w"] + 2, data
-    for row in data["results"]:
-        assert not row.get("missing"), row
-        assert not row["hidden"], row
-        assert row["width"] >= 20 and row["height"] >= 20, row
-        assert row["left"] >= -2 and row["right"] <= width + 2, row
-        # Native file controls and textarea can internally scroll. Check the
-        # actual bounding box rather than banning all internal scrollWidths.
+    validate_geometry_data(data, width)
 
 
 def exercise(browser, base: str, width: int) -> None:
