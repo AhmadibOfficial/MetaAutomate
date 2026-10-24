@@ -68,9 +68,29 @@ def _source_inventory(root: Path) -> tuple[str, str, set[str]]:
     return commit, branch, inventory
 
 
+def _regular_committed_source(root: Path, path: str, inventory: set[str]) -> bool:
+    """Count only regular committed files; never follow source or parent symlinks.
+
+    Git tracks symlinks as paths, and Path.is_file() follows them. Without this
+    guard, a checkout could report source presence or read Foundation evidence
+    from an untracked file outside the repository.
+    """
+    if path not in inventory:
+        return False
+    relative = Path(path)
+    if relative.is_absolute() or not relative.parts or ".." in relative.parts:
+        return False
+    candidate = root
+    for component in relative.parts:
+        candidate = candidate / component
+        if candidate.is_symlink():
+            return False
+    return candidate.is_file()
+
+
 def _foundation(root: Path, inventory: set[str]) -> dict:
-    if FOUNDATION not in inventory:
-        raise ReadinessError("Foundation release evidence not committed")
+    if not _regular_committed_source(root, FOUNDATION, inventory):
+        raise ReadinessError("Foundation evidence missing, symlinked or not a regular committed file")
     with (root / FOUNDATION).open(encoding="utf-8") as file:
         data = json.load(file)
     entries = data.get("checks")
@@ -128,7 +148,7 @@ def assess(root: Path = ROOT, *, local_report: Path | None = None) -> dict:
     commit, branch, inventory = _source_inventory(root)
     capabilities = {}
     for name, paths in CAPABILITIES.items():
-        present = [path for path in paths if path in inventory and (root / path).is_file()]
+        present = [path for path in paths if _regular_committed_source(root, path, inventory)]
         capabilities[name] = {
             "source_presence": "SOURCE_FILES_PRESENT" if len(present) == len(paths) else "SOURCE_INCOMPLETE",
             "committed_source_paths": present,
