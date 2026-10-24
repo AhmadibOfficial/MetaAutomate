@@ -133,11 +133,13 @@ def ensure_playwright_driver() -> None:
 
 
 def run(requested_output: Path | None = None) -> Path:
+    # Fail before importing the sync API or opening a socket. This also makes
+    # the negative preflight test independent of Playwright being installed.
+    ensure_playwright_driver()
     try:
         from playwright.sync_api import sync_playwright, expect
     except ImportError as exc:
         raise RuntimeError("Playwright Python package is missing; browser acceptance NOT RUN") from exc
-    ensure_playwright_driver()
 
     with serve_local() as base, sync_playwright() as playwright:
         # A missing Chromium installation must fail instead of inventing proof.
