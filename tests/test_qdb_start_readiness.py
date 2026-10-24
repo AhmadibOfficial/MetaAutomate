@@ -1,0 +1,143 @@
+"""Offline QDB evidence gate: fixture repos only, no cloud or investor submission."""
+from __future__ import annotations
+
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+import pytest
+
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts/qdb_start_readiness.py"
+spec = importlib.util.spec_from_file_location("qdb_start_readiness", SCRIPT)
+qdb = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(qdb)
+
+
+def git(path, *args):
+    r = subprocess.run(["git", *args], cwd=path, capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+    return r.stdout.strip()
+
+
+@pytest.fixture
+def repo(tmp_path):
+    root = tmp_path / "repo"
+    root.mkdir()
+    git(root, "init", "-q")
+    git(root, "config", "user.email", "tester@example.invalid")
+    git(root, "config", "user.name", "Offline Test")
+    root.joinpath(qdb.FOUNDATION).parent.mkdir(parents=True)
+    payload = {"policy": "NO_GO_UNTIL_ALL_NINE_VERIFIED", "checks": [
+        {"id": f"F{i:02}", "status": "verified" if i <= 3 else "blocked"}
+        for i in range(1, 10)
+    ]}
+    root.joinpath(qdb.FOUNDATION).write_text(json.dumps(payload))
+    for paths in qdb.CAPABILITIES.values():
+        for path in paths:
+            p = root / path
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text("# fixture\n")
+    git(root, "add", ".")
+    git(root, "commit", "-qm", "Fictional offline evidence fixtures")
+    return root
+
+
+def test_source_index_never_reports_operational_eligibility(repo):
+    x = qdb.assess(repo)
+    assert x["foundation"]["verified_count"] == 3
+    assert x["foundation"]["blocked_count"] == 6
+    assert x["foundation"]["status"] == "OPERATIONAL_NO_GO"
+    assert all(v["source_presence"] == "SOURCE_FILES_PRESENT" for v in x["capabilities"].values())
+    assert all(v["publicly_operational"] is False for v in x["capabilities"].values())
+    assert x["eligibility_verified"] is False
+    assert x["revenue_verified"] is False
+    assert x["customer_traction_verified"] is False
+    assert x["application_submitted"] is False
+    assert x["independent_ci_verified"] is False
+    assert x["investment_requested_usd"] is None
+    assert len(x["qdb_start_readiness"]) == 8
+
+
+def test_missing_technical_module_marked_incomplete_not_live(repo):
+    missing = repo / qdb.CAPABILITIES["creative_images_video"][0]
+    missing.unlink()
+    git(repo, "add", "-u")
+    git(repo, "commit", "-qm", "Remove fictional source module")
+    x = qdb.assess(repo)
+    assert x["capabilities"]["creative_images_video"]["source_presence"] == "SOURCE_INCOMPLETE"
+    assert x["capabilities"]["creative_images_video"]["missing_source_paths"]
+
+
+def test_uncommitted_work_refused_without_changing_it(repo):
+    path = repo / qdb.CAPABILITIES["data_research"][0]
+    path.write_text("# in progress\n")
+    before = path.read_bytes()
+    with pytest.raises(qdb.ReadinessError, match="uncommitted"):
+        qdb.assess(repo)
+    assert path.read_bytes() == before
+
+
+def test_missing_foundation_and_bad_policy_fail_closed(repo):
+    f = repo / qdb.FOUNDATION
+    data = json.loads(f.read_text())
+    data["policy"] = "GO"
+    f.write_text(json.dumps(data))
+    git(repo, "add", ".")
+    git(repo, "commit", "-qm", "Bad fixture policy")
+    with pytest.raises(qdb.ReadinessError, match="NO-GO"):
+        qdb.assess(repo)
+
+
+def _local_report(repo, path, **changes):
+    data = {"gate": "LOCAL_SOURCE_CHECK_ONLY", "commit": git(repo, "rev-parse", "HEAD"),
+            "result": "LOCAL_TESTS_PASS", "github_ci_verified": False,
+            "merge_approved": False, "deployment_approved": False}
+    data.update(changes)
+    path.write_text(json.dumps(data))
+    return path
+
+
+def test_local_test_report_is_explicitly_unattested(repo, tmp_path):
+    path = _local_report(repo, tmp_path / "test.json")
+    result = qdb.assess(repo, local_report=path)
+    assert result["local_validation"]["status"] == "DEVELOPER_REPORTED_LOCAL_TESTS_PASS"
+    assert result["local_validation"]["independently_verified"] is False
+    assert result["independent_ci_verified"] is False
+
+
+@pytest.mark.parametrize("alter", [
+    {"commit": "0" * 40},
+    {"github_ci_verified": True},
+    {"merge_approved": True},
+    {"deployment_approved": True},
+    {"result": "EVERYTHING_APPROVED"},
+])
+def test_wrong_commit_or_false_approvals_refused(repo, tmp_path, alter):
+    path = _local_report(repo, tmp_path / "evidence.json", **alter)
+    with pytest.raises(qdb.ReadinessError):
+        qdb.assess(repo, local_report=path)
+
+
+def test_report_inside_repo_refused(repo):
+    with pytest.raises(qdb.ReadinessError):
+        qdb._write_new(repo, repo / "report.json", b"{}")
+    assert not (repo / "report.json").exists()
+
+
+def test_private_new_file_only_no_overwrite(repo, tmp_path):
+    out = tmp_path / "report.json"
+    qdb._write_new(repo, out, b"{}")
+    assert out.read_bytes() == b"{}"
+    assert (out.stat().st_mode & 0o077) == 0
+    with pytest.raises(FileExistsError):
+        qdb._write_new(repo, out, b"changed")
+    assert out.read_bytes() == b"{}"
+
+
+def test_source_script_no_network_external_submission_or_payments():
+    src = SCRIPT.read_text()
+    for forbidden in ("requests.post", "urllib.request", "httpx.post", "webbrowser.open",
+                      "subprocess.Popen", "git push", "git merge", "f6s.com/api"):
+        assert forbidden not in src
