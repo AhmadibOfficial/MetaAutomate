@@ -85,3 +85,34 @@ fieldset legend{margin-bottom:10px}
 .footer a{color:#006d9d;font-weight:750}
 @media(max-width:760px){.topbar{align-items:start;flex-direction:column}.topbar nav{flex-wrap:wrap}.hero{padding:51px 0 60px}.media-grid,.three-fields{grid-template-columns:1fr}.panel{border-radius:13px}.steps{justify-content:start;gap:13px}.media-pane{padding:14px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* P2-060d: viewport reflow under enlarged text / zoom-equivalent CSS widths.
+   Avoid imposing a 200px minimum on form columns below 320px. No sideways
+   document scrolling or clipped action text should be required. */
+.container,.panel,.inline-form,.field,.media-grid,.media-pane,.steps,.topbar,.topbar nav{min-width:0}
+:where(h1,h2,h3,p,small,label,legend,button,a,.status,.review-state){overflow-wrap:anywhere}
+.inline-form>*{max-width:100%}
+@media(max-width:600px){
+ .topbar{padding:14px 18px}
+ .topbar nav{gap:8px 14px}
+ .hero{padding:36px 0 41px}
+ .container{width:calc(100% - 24px)}
+ .panel{padding:16px;margin-bottom:14px}
+ .inline-form{align-items:stretch;gap:12px}
+ .inline-form>.field{flex:1 1 100%;min-width:0}
+ .inline-form>button{max-width:100%;white-space:normal;flex:1 1 auto}
+ .stats>div{min-width:0;flex:1 1 125px}
+ .media-pane{padding:12px}
+ .options li,.campaign-product-option{min-width:0}
+ .campaign-product-option span{min-width:0;overflow-wrap:anywhere}
+ .steps{gap:9px}
+ .status{position:static}
+}
+@media(max-width:360px){
+ .topbar nav{gap:8px}
+ .brand{font-size:17px;min-width:0}
+ .brand span{min-width:0;overflow-wrap:anywhere}
+ .field{min-width:0;flex-basis:100%}
+ button{width:100%;white-space:normal}
+ .check{overflow-wrap:anywhere}
+}
