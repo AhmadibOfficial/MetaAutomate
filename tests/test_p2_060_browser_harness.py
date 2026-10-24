@@ -107,3 +107,34 @@ def test_site_symlink_is_rejected_before_network_bind(tmp_path):
     with pytest.raises(ValueError, match="non-symlink"):
         with harness.serve_local(alias):
             pass
+
+
+def test_missing_node_playwright_cli_has_actionable_fail_closed_error(tmp_path):
+    missing = tmp_path / "node-playwright" / "cli.js"
+    with pytest.raises(RuntimeError, match="Playwright Node driver missing") as error:
+        harness.require_playwright_driver(missing)
+    assert str(missing) in str(error.value)
+    assert "NOT RUN" in str(error.value)
+
+
+def test_present_node_playwright_cli_can_pass_preflight_without_execution(tmp_path):
+    cli = tmp_path / "cli.js"
+    cli.write_text("// synthetic executable entrypoint fixture only", encoding="utf-8")
+    assert harness.require_playwright_driver(cli) is None
+
+
+def test_missing_driver_is_reported_before_static_server_binds(monkeypatch, tmp_path):
+    """The broken Debian package must not create a browser proof or server."""
+    missing = tmp_path / "driver" / "cli.js"
+
+    def preflight():
+        harness.require_playwright_driver(missing)
+
+    monkeypatch.setattr(harness, "ensure_playwright_driver", preflight)
+
+    def forbidden_server(*args, **kwargs):
+        pytest.fail("Missing driver must fail before starting static server")
+
+    monkeypatch.setattr(harness, "serve_local", forbidden_server)
+    with pytest.raises(RuntimeError, match="Playwright Node driver missing"):
+        harness.run()
