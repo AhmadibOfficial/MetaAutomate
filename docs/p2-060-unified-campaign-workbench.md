@@ -213,7 +213,7 @@ verified and **production NO-GO** remains binding.
 
 The first evidence-review execution on Kali returned **9 pytest tests
 passed** but blocked on `Invalid PNG dimensions:
-campaign-workbench-mobile.png`. The independent checksum verification of
+campaign-workbench-mobile.png`. The owner's post-copy checksum verification of
 the preserved 12 files had already passed; this failure occurs within
 the reviewer's overly restrictive generic **5,000px height limit**.
 Full-page screenshots at a 390px viewport may legitimately exceed that
