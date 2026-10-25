@@ -61,7 +61,7 @@ so date boundaries may differ from Nigerian/local business day boundaries.
 assessment date for reproducible unit tests and backtesting; UI uses the
 current UTC day. The engine independently rechecks current freshness when a
 campaign draft is created, so stale items are not permitted merely because a
-caller passed a historical date to a prior analysis.
+caller passed a historical date to a prior analysis. The same gate also holds directly submitted dated fields when either quality-status declaration is missing.
 
 ## Evidence and user interface
 
@@ -104,7 +104,7 @@ git status --short --branch
 ```
 
 Expected pytest cases: **55**, including a nested Node decision suite which
-now contains eight additional date-related cases. The real Chromium gate
+now contains nine additional date-related cases. The real Chromium gate
 checks 1440/390/320 CSS px, held and permitted dated items, the decision
 trace, campaign evidence and unchanged legacy fallback. It prints
 `DEVELOPER_LOCAL_TEMPORAL_EVIDENCE_PASS` only after a real successful run.
