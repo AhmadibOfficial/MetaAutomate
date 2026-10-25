@@ -10,7 +10,9 @@
 <link rel="icon" type="image/webp" href="/assets/metaautomate-mark.webp">
 <link rel="stylesheet" href="/assets/campaign-workbench.css">
 <script defer src="/assets/campaign-engine.js"></script>
+<script defer src="/assets/campaign-reconcile-engine.js"></script>
 <script defer src="/assets/campaign-workbench.js"></script>
+<script defer src="/assets/campaign-reconciliation.js"></script>
 <title>Campaign Workbench — MetaAutomate | P2-060</title>
 </head>
 <body>
@@ -106,6 +108,34 @@
    </form>
    <p id="campaign-metrics-result" class="review-state" aria-live="polite">No results recorded.</p>
    <button id="campaign-evidence" class="subtle" type="button" disabled>Download campaign review &amp; evidence JSON</button>
+ </section>
+ <section class="panel" id="campaign-reconcile" aria-labelledby="reconcile-title">
+   <div class="sectionhead">
+     <span>07 / DATA RECONCILIATION · P2-060g</span>
+     <h2 id="reconcile-title">Explain stock movements, not invented sales.</h2>
+     <p>Compare <strong>two dated ten-column inventory CSVs</strong> with an independently supplied movement ledger. Every number is user-supplied. MetaAutomate can test arithmetic and period alignment, but cannot authenticate stock counts, supplier deliveries, sales, revenue or campaign impact.</p>
+   </div>
+   <p class="review-state" role="note">Only matched SKUs with complete intervening movement dates can be reconciled. A missing SKU is never assumed sold or valued at zero. Weekly sales are compared only when the seven-day sales period matches the movement period exactly.</p>
+   <form id="reconcile-form">
+    <div class="reconcile-fields">
+      <div class="field"><label for="reconcile-previous">Previous dated inventory CSV</label><input id="reconcile-previous" type="file" accept=".csv,text/csv" required><small>Ten-column dated stock snapshot, taken first</small></div>
+      <div class="field"><label for="reconcile-current">Current dated inventory CSV</label><input id="reconcile-current" type="file" accept=".csv,text/csv" required><small>Ten-column dated stock snapshot, taken later</small></div>
+      <div class="field"><label for="reconcile-ledger">Declared movement ledger CSV</label><input id="reconcile-ledger" type="file" accept=".csv,text/csv" required><small><code>sku,period_start,period_end,received_units,customer_returns_units,adjustment_units,sold_units</code>. Signed adjustments can be negative.</small></div>
+      <div class="field"><label for="reconcile-date">UTC assessment date</label><input id="reconcile-date" type="date" required><small>Fix this date to reproduce the same calculation. Historical assessment does not authenticate inputs.</small></div>
+    </div>
+    <div class="inline-form">
+      <button id="reconcile-run" class="primary" type="submit">Reconcile declared stock movements</button>
+      <button id="reconcile-example" class="subtle" type="button">Download synthetic example movement ledger</button>
+    </div>
+   </form>
+   <p id="reconcile-state" class="review-state" role="status" aria-live="polite">No snapshots compared. Nothing uploaded.</p>
+   <div id="reconcile-results" hidden>
+     <h3 id="reconcile-results-title" tabindex="-1">Reconciliation decisions</h3>
+     <p id="reconcile-summary" class="muted"></p>
+     <ul id="reconcile-items" class="options reconcile-decisions"></ul>
+     <button id="reconcile-export" class="subtle" type="button" disabled>Download reproducible report and SHA-256 fingerprint</button>
+     <p class="help">The SHA-256 digest detects changes in the downloaded report payload; it does not prove the imports came from a real business or that the report is digitally signed. The download contains inventory and sales figures. Keep it private.</p>
+   </div>
  </section>
  <p class="status" id="campaign-status" role="status" aria-live="polite">Choose a CSV or download the example file to begin.</p>
  <footer class="footer"><span>MetaAutomate · Intelligence · Creation · Automation</span><a href="/engage/">Start a project ↗</a><span>Source prototype · No integrations activated</span></footer>

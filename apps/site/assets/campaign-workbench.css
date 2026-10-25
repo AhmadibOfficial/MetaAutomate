@@ -116,3 +116,15 @@ fieldset legend{margin-bottom:10px}
  button{width:100%;white-space:normal}
  .check{overflow-wrap:anywhere}
 }
+
+/* P2-060g | Existing MetaAutomate white-first panel and navy/blue/silver/gold. */
+.reconcile-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:20px 0}
+.reconcile-fields .field{min-width:0}
+.reconcile-fields .field input{min-width:0;width:100%}
+.reconcile-decisions{margin:15px 0 18px;list-style:none;padding:0}
+.reconcile-decision{display:flex;flex-direction:column;gap:5px;padding:14px 16px;border:1px solid var(--line);background:#f7fbff;border-radius:11px;min-width:0;overflow-wrap:anywhere}
+.reconcile-decision strong{font-size:14px;color:var(--ink)}
+.reconcile-decision span{font-size:12px;font-weight:800;color:#00678f}
+.reconcile-decision small{color:var(--muted);font-size:12px;line-height:1.55}
+#reconcile-state.is-error{border-left:4px solid #af2525;color:#7b1722}
+@media(max-width:760px){.reconcile-fields{grid-template-columns:1fr}}
