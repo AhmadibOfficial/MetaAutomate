@@ -21,7 +21,7 @@ def test_quality_columns_are_optional_exact_and_user_supplied():
         '"stock_count_status", "sales_coverage_status"',
         'const enhanced = matches(QUALITY_HEADER);',
         'if (!matches(HEADER) && !enhanced)',
-        'quality.mode = "SELF_DECLARED"',
+        'incompleteDates ? "DATED_INCOMPLETE" : "SELF_DECLARED"',
         'quality.heldForReview = quality.issues.length > 0',
         'underlyingSignal: candidate.code',
         'quality.mode === "LEGACY_UNATTESTED"',
