@@ -203,3 +203,124 @@ test("low-stock and sold-out rows remain blocked even with complete statuses", (
     assert.throws(() => engine.makeCampaign(record, "Demo Brand", "Instagram"),
       /eligible/);
 });
+
+
+const datedHeader = qualityHeader + ",stock_observed_on,sales_period_start,sales_period_end";
+const datedCSV = rows => [datedHeader, ...rows].join("\n") + "\n";
+const DATE_ANCHOR = "2026-10-25";
+const dateUTC = (day, offset) =>
+  new Date(Date.parse(day + "T00:00:00Z") + offset * 86400000)
+    .toISOString().slice(0, 10);
+
+test("dated CSV parses actual dates without altering legacy and seven-column rows", () => {
+  const row = "CAP-01,Branded Cap,18,0,850000,counted,complete,2026-10-25,2026-10-19,2026-10-25";
+  const records = engine.parseCSV(datedCSV([row]));
+  assert.equal(records[0].stockObservedOn, "2026-10-25");
+  assert.equal(records[0].salesPeriodStart, "2026-10-19");
+  assert.equal(records[0].salesPeriodEnd, "2026-10-25");
+  assert.equal(engine.DATED_HEADER.length, 10);
+  assert.equal(parse([entry])[0].stockObservedOn, undefined);
+  assert.equal(engine.parseCSV(qualityCSV([
+    "CAP-01,Branded Cap,18,0,850000,counted,complete"
+  ]))[0].stockObservedOn, undefined);
+});
+
+test("dated rows use exactly seven calendar dates and owner UTC assessment date", () => {
+  const records = engine.parseCSV(datedCSV([
+    "CAP-01,Branded Cap,18,0,850000,counted,complete,2026-10-25,2026-10-19,2026-10-25"
+  ]));
+  const result = engine.analyze(records, DATE_ANCHOR);
+  assert.equal(result.asOfDate, DATE_ANCHOR);
+  assert.equal(result.datedCount, 1);
+  assert.equal(result.undatedCount, 0);
+  assert.equal(result.flaggedCount, 1);
+  assert.equal(result.heldCount, 0);
+  assert.equal(result.opportunities[0].quality.status, "DATED_SELF_DECLARED_CURRENT");
+  assert.equal(result.opportunities[0].quality.inventoryAgeDays, 0);
+  assert.equal(result.opportunities[0].quality.salesEndAgeDays, 0);
+  assert.equal(result.opportunities[0].quality.basis, "USER_SUPPLIED_UNVERIFIED");
+});
+
+test("stale stock or sales observation is held rather than confidently promoted", () => {
+  const rows = [
+    "OLD-STOCK,Old Stock,18,0,850000,counted,complete,2026-10-17,2026-10-19,2026-10-25",
+    "OLD-SALES,Old Sales,18,0,850000,counted,complete,2026-10-25,2026-10-11,2026-10-17"
+  ];
+  const result = engine.analyze(engine.parseCSV(datedCSV(rows)), DATE_ANCHOR);
+  assert.equal(result.flaggedCount, 0);
+  assert.equal(result.heldCount, 2);
+  assert.match(result.held[0].quality.issues.join(" "), /older than seven/);
+  assert.match(result.held[1].quality.issues.join(" "), /more than seven/);
+});
+
+test("future inventory and sales dates fail closed", () => {
+  const rows = [
+    "FUT-STOCK,Future Stock,18,0,850000,counted,complete,2026-10-26,2026-10-19,2026-10-25",
+    "FUT-SALES,Future Sales,18,0,850000,counted,complete,2026-10-25,2026-10-20,2026-10-26"
+  ];
+  const out = engine.analyze(engine.parseCSV(datedCSV(rows)), DATE_ANCHOR);
+  assert.equal(out.heldCount, 2);
+  assert.deepEqual(out.held.map(row => row.signal.code), ["quality-hold", "quality-hold"]);
+  assert.match(out.held[0].quality.issues.join(" "), /after the assessment/);
+  assert.match(out.held[1].quality.issues.join(" "), /after the assessment/);
+});
+
+test("misleading period lengths are held; leap years and valid month rollovers work", () => {
+  const rows = [
+    "SHORT-01,Short Period,18,0,850000,counted,complete,2026-10-25,2026-10-20,2026-10-25",
+    "LONG-01,Long Period,18,0,850000,counted,complete,2026-10-25,2026-10-18,2026-10-25",
+    "GOOD-01,Correct Period,18,0,850000,counted,complete,2026-10-25,2026-10-19,2026-10-25"
+  ];
+  const r = engine.analyze(engine.parseCSV(datedCSV(rows)), DATE_ANCHOR);
+  assert.equal(r.heldCount, 2);
+  assert.deepEqual(r.opportunities.map(x => x.sku), ["GOOD-01"]);
+  const leap = engine.analyze(engine.parseCSV(datedCSV([
+    "LEAP-01,Leap Sample,18,0,850000,counted,complete,2024-03-01,2024-02-24,2024-03-01"
+  ])), "2024-03-01");
+  assert.equal(leap.flaggedCount, 1);
+});
+
+test("invalid dates and incomplete 8 or 9 column CSV never silently parse", () => {
+  for (const bad of ["2026-02-30", "2025-02-29", "2026-00-01", "2026-13-01",
+                    "2026-10-25T00:00:00Z", "2026/10/25", "2026-2-5", ""]) {
+    assert.throws(() => engine.parseCSV(datedCSV([
+      "DATE-01,Cap,18,0,850000,counted,complete," + bad + ",2026-10-19,2026-10-25"
+    ])), engine.CampaignError);
+  }
+  for (const suffix of [",2026-10-25", ",2026-10-25,2026-10-19"]) {
+    assert.throws(() => engine.parseCSV(qualityCSV([
+      "DATE-01,Cap,18,0,850000,counted,complete" + suffix
+    ])), engine.CampaignError);
+  }
+});
+
+test("direct engine callers cannot bypass missing date fields or stale observations", () => {
+  const legacyItem = parse([entry])[0];
+  const partial = { ...legacyItem, stockCountStatus:"counted",
+    salesCoverageStatus:"complete", stockObservedOn:"2026-10-25" };
+  const out = engine.analyze([partial], DATE_ANCHOR);
+  assert.equal(out.heldCount, 1);
+  assert.equal(out.evaluated[0].quality.mode, "DATED_INCOMPLETE");
+  assert.throws(() => engine.makeCampaign(partial, "Demo", "Instagram"),
+    /sufficient user-supplied data/);
+  const stale = engine.parseCSV(datedCSV([
+    "OLD-01,Old Stock,18,0,850000,counted,complete,2000-01-01,2000-01-01,2000-01-07"
+  ]))[0];
+  assert.throws(() => engine.makeCampaign(stale, "Demo", "Instagram"),
+    /sufficient user-supplied data/);
+});
+
+test("current dated campaigns disclose declared inputs and never verified outcomes", () => {
+  const today = new Date().toISOString().slice(0, 10);
+  const start = dateUTC(today, -6);
+  const row = ["CAP-01", "Branded Cap", 18, 0, 850000,
+    "counted", "complete", today, start, today].join(",");
+  const candidate = engine.analyze(engine.parseCSV(datedCSV([row]))).opportunities[0];
+  assert.ok(candidate);
+  const draft = engine.makeCampaign(candidate, "Demo", "Instagram");
+  assert.equal(draft.inputQuality.mode, "DATED_SELF_DECLARED");
+  assert.equal(draft.inputQuality.stockObservedOn, today);
+  assert.equal(draft.inputQuality.basis, "USER_SUPPLIED_UNVERIFIED");
+  assert.match(draft.recommendation, /no external verification/i);
+  assert.doesNotMatch(draft.post, /guaranteed|% off|profit/gi);
+});
