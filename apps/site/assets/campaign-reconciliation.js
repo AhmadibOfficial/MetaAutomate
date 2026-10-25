@@ -16,6 +16,7 @@
   };
   function invalidate() {
     generation++;
+    el("reconcile-run").disabled = false;
     report = null;
     el("reconcile-export").disabled = true;
     el("reconcile-results").hidden = true;
