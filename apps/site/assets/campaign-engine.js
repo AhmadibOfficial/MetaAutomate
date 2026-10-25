@@ -183,6 +183,12 @@
       quality.status = quality.heldForReview ? "REVIEW_INPUTS" :
         dated ? "DATED_SELF_DECLARED_CURRENT" : "SELF_DECLARED_COMPLETE";
     } else {
+      if (["stockObservedOn", "salesPeriodStart", "salesPeriodEnd"]
+          .some(key => Object.hasOwn(item, key))) {
+        quality.mode = "DATED_INCOMPLETE";
+        quality.issues.push("Dated fields without stock and sales coverage declarations are invalid");
+        quality.heldForReview = true;
+      }
       quality.issues.push("Legacy CSV: stock count and weekly-sales completeness not declared");
     }
     const candidate = classify(item);
