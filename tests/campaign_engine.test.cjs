@@ -113,3 +113,93 @@ test("source import has no provider calls, storage or background execution", () 
     "../apps/site/assets/campaign-engine.js"), "utf8");
   assert.doesNotMatch(source, /\b(fetch|XMLHttpRequest|localStorage|sessionStorage|WebSocket)\s*[(.]/);
 });
+
+
+const qualityHeader = header + ",stock_count_status,sales_coverage_status";
+const qualityCSV = rows => [qualityHeader, ...rows].join("\n") + "\n";
+
+test("opt-in completeness columns preserve exact self-declared statuses", () => {
+  const records = engine.parseCSV(qualityCSV([
+    "COUNT-01,Confirmed Cap,18,0,850000,counted,complete",
+    "UNKNOWN-01,Unknown History,18,0,850000,unknown,unknown"
+  ]));
+  assert.deepEqual(records[0], { sku:"COUNT-01", name:"Confirmed Cap",
+    stock:18, weeklySales:0, priceKobo:850000,
+    stockCountStatus:"counted", salesCoverageStatus:"complete" });
+  assert.equal(records[1].stockCountStatus, "unknown");
+});
+
+test("incomplete weekly-sales data cannot be mistaken for observed zero", () => {
+  const records = engine.parseCSV(qualityCSV([
+    "GOOD-01,Counted Cap,18,0,850000,counted,complete",
+    "HOLD-01,Unverified Cap,18,0,850000,counted,unknown",
+    "HOLD-02,Partial Sales,40,2,3000000,counted,partial",
+    "HOLD-03,Uncounted Stock,18,0,850000,unknown,complete",
+    "OUT-02,Sold Out,0,0,850000,unknown,unknown"
+  ]));
+  const result = engine.analyze(records);
+  assert.equal(result.flaggedCount, 1);
+  assert.equal(result.heldCount, 3);
+  assert.equal(result.legacyCount, 0);
+  assert.deepEqual(result.opportunities.map(row => row.sku), ["GOOD-01"]);
+  assert.deepEqual(result.held.map(row => row.sku), ["HOLD-01","HOLD-02","HOLD-03"]);
+  assert.deepEqual(result.held.map(row => row.quality.status),
+    ["REVIEW_INPUTS","REVIEW_INPUTS","REVIEW_INPUTS"]);
+  for (const row of records.filter(r => r.sku.startsWith("HOLD")))
+    assert.throws(() => engine.makeCampaign(row, "Demo Brand", "Instagram"),
+      /sufficient user-supplied data/);
+});
+
+test("self-declared complete data still avoids false verification claims", () => {
+  const candidate = engine.analyze(engine.parseCSV(qualityCSV([
+    "GOOD-01,Counted Cap,18,0,850000,counted,complete"
+  ]))).opportunities[0];
+  const campaign = engine.makeCampaign(candidate, "Demo Brand", "Instagram");
+  assert.equal(campaign.inputQuality.mode, "SELF_DECLARED");
+  assert.equal(campaign.inputQuality.status, "SELF_DECLARED_COMPLETE");
+  assert.equal(campaign.inputQuality.basis, "USER_SUPPLIED_UNVERIFIED");
+  assert.match(campaign.recommendation, /not been independently verified/i);
+  assert.match(campaign.post, /confirm before ordering/);
+});
+
+test("legacy five-column CSV is compatible but visibly qualified", () => {
+  const result = engine.analyze(parse([entry, "SHOE-02,Other,1,10,250000"]));
+  assert.equal(result.flaggedCount, 1);
+  assert.equal(result.heldCount, 0);
+  assert.equal(result.legacyCount, 2);
+  assert.equal(result.opportunities[0].quality.mode, "LEGACY_UNATTESTED");
+  const campaign = engine.makeCampaign(result.opportunities[0], "Demo Brand", "Instagram");
+  assert.match(campaign.recommendation, /does not confirm stock counts/i);
+});
+
+test("partial, malformed or nonexact enhanced completeness headers are rejected", () => {
+  for (const v of ["COUNTED", "yes", "", "=COUNT", "unknown "]) {
+    // A leading spreadsheet expression or unsupported status fails.
+    const status = v.trim();
+    if (status === "unknown") continue; // trailing whitespace is normalized
+    assert.throws(() => engine.parseCSV(qualityCSV([
+      "AAA-02,Cap,19,0,850000," + v + ",complete"
+    ])), engine.CampaignError);
+  }
+  for (const row of [
+    "AAA-02,Cap,19,0,850000,counted,unverified",
+    "AAA-02,Cap,19,0,850000,counted",
+    "AAA-02,Cap,19,0,850000,counted,complete,extra"
+  ]) assert.throws(() => engine.parseCSV(qualityCSV([row])), engine.CampaignError);
+  assert.throws(() => engine.parseCSV(
+    header + ",sales_coverage_status,stock_count_status\n" +
+    "AAA-02,Cap,19,0,850000,complete,counted\n"), /Required columns/);
+});
+
+test("low-stock and sold-out rows remain blocked even with complete statuses", () => {
+  const records = engine.parseCSV(qualityCSV([
+    "LOW-02,Near Out,1,10,250000,counted,complete",
+    "OUT-02,No Stock,0,1,250000,counted,complete"
+  ]));
+  const result = engine.analyze(records);
+  assert.equal(result.flaggedCount, 0);
+  assert.equal(result.heldCount, 0);
+  for (const record of records)
+    assert.throws(() => engine.makeCampaign(record, "Demo Brand", "Instagram"),
+      /eligible/);
+});

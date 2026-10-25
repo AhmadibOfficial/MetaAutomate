@@ -9,6 +9,11 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const HEADER = ["sku", "name", "stock", "weekly_sales", "unit_price_kobo"];
+  // Two additional self-declarations are optional; they do not authenticate
+  // provenance. Older five-column CSVs remain supported but are flagged.
+  const QUALITY_HEADER = [...HEADER, "stock_count_status", "sales_coverage_status"];
+  const STOCK_STATES = ["counted", "unknown"];
+  const SALES_STATES = ["complete", "partial", "unknown"];
   const MAX_BYTES = 128000, MAX_ROWS = 400;
   const CHANNELS = ["Instagram", "Facebook", "TikTok", "WhatsApp", "Other"];
   class CampaignError extends Error { constructor(message) { super(message); this.name = "CampaignError"; } }
@@ -35,7 +40,7 @@
     function pushCell() {
       if (cell.length > 200) fail("CSV cell exceeds 200 characters");
       row.push(cell); cell = ""; justClosed = false;
-      if (row.length > HEADER.length) fail("Unexpected CSV columns");
+      if (row.length > QUALITY_HEADER.length) fail("Unexpected CSV columns");
     }
     function pushRow() {
       pushCell();
@@ -60,14 +65,19 @@
     }
     if (inQuote) fail("Unclosed CSV quote");
     if (cell.length || row.length || justClosed) pushRow();
-    if (!rows.length || rows[0].length !== HEADER.length ||
-        rows[0].some((column, i) => column.trim() !== HEADER[i])) {
-      fail("Required columns: " + HEADER.join(", "));
+    const columns = rows.length ? rows[0].map(v => v.trim()) : [];
+    const matches = header => columns.length === header.length &&
+      columns.every((column, i) => column === header[i]);
+    const enhanced = matches(QUALITY_HEADER);
+    if (!matches(HEADER) && !enhanced) {
+      fail("Required columns: " + HEADER.join(", ") +
+        " (or append stock_count_status,sales_coverage_status)");
     }
     if (rows.length <= 1) fail("Include at least one inventory row");
     const found = new Set();
     return rows.slice(1).map((cells, i) => {
-      if (cells.length !== HEADER.length) fail("Row " + (i + 2) + " has the wrong number of columns");
+      if (cells.length !== (enhanced ? QUALITY_HEADER.length : HEADER.length))
+        fail("Row " + (i + 2) + " has the wrong number of columns");
       const sku = safeText(cells[0], 36, "SKU at row " + (i + 2));
       if (!/^[A-Za-z0-9][A-Za-z0-9_-]{1,35}$/.test(sku)) fail("Invalid SKU at row " + (i + 2));
       if (found.has(sku.toLowerCase())) fail("Duplicate SKU: " + sku);
@@ -77,7 +87,14 @@
       const weeklySales = whole(cells[3].trim(), "Weekly sales", 1000000);
       const priceKobo = whole(cells[4].trim(), "Unit price (kobo)", 100000000000);
       if (priceKobo === 0) fail("Unit price must be greater than zero");
-      return { sku, name, stock, weeklySales, priceKobo };
+      if (!enhanced) return { sku, name, stock, weeklySales, priceKobo };
+      const stockCountStatus = cells[5].trim();
+      const salesCoverageStatus = cells[6].trim();
+      if (!STOCK_STATES.includes(stockCountStatus) || !SALES_STATES.includes(salesCoverageStatus))
+        fail("Row " + (i + 2) + " requires stock_count_status=counted|unknown " +
+          "and sales_coverage_status=complete|partial|unknown");
+      return { sku, name, stock, weeklySales, priceKobo,
+        stockCountStatus, salesCoverageStatus };
     });
   }
   function classify(item) {
@@ -90,18 +107,49 @@
       return { code: "low-stock", title: "Low stock — do not promote", actionable: false, rank: 8 };
     return { code: "normal", title: "No promotion signal", actionable: false, rank: 7 };
   }
+  function assess(item) {
+    const quality = { basis: "USER_SUPPLIED_UNVERIFIED", mode: "LEGACY_UNATTESTED",
+      status: "REVIEW_INPUTS", issues: [], heldForReview: false };
+    const extended = Object.hasOwn(item, "stockCountStatus") &&
+      Object.hasOwn(item, "salesCoverageStatus");
+    if (extended) {
+      quality.mode = "SELF_DECLARED";
+      if (item.stockCountStatus !== "counted")
+        quality.issues.push("Stock quantity not self-declared as counted");
+      if (item.salesCoverageStatus !== "complete")
+        quality.issues.push("Weekly-sales coverage is partial or unknown");
+      quality.heldForReview = quality.issues.length > 0;
+      quality.status = quality.heldForReview ? "REVIEW_INPUTS" : "SELF_DECLARED_COMPLETE";
+    } else {
+      quality.issues.push("Legacy CSV: stock count and weekly-sales completeness not declared");
+    }
+    const candidate = classify(item);
+    const signal = quality.heldForReview && candidate.actionable
+      ? { code: "quality-hold", title: "Hold: verify stock and sales records",
+          actionable: false, rank: 6 }
+      : candidate;
+    return { quality, signal, underlyingSignal: candidate.code };
+  }
   function analyze(records) {
     if (!Array.isArray(records) || !records.length || records.length > MAX_ROWS) fail("Invalid inventory");
-    const evaluated = records.map(item => ({ ...item, signal: classify(item) }));
+    const evaluated = records.map(item => ({ ...item, ...assess(item) }));
     const opportunities = evaluated.filter(item => item.signal.actionable).sort((a, b) =>
       a.signal.rank - b.signal.rank || b.stock - a.stock || a.sku.localeCompare(b.sku));
-    return { evaluated, opportunities, totalItems: records.length,
-      flaggedCount: opportunities.length, missingSalesData: true,
-      note: "Signals use supplied inventory and weekly_sales only. No profit, demand or campaign impact predicted." };
+    const held = evaluated.filter(item => item.quality.heldForReview &&
+      item.underlyingSignal !== "normal" && item.underlyingSignal !== "out" &&
+      item.underlyingSignal !== "low-stock");
+    const legacy = evaluated.filter(item => item.quality.mode === "LEGACY_UNATTESTED").length;
+    return { evaluated, opportunities, held, totalItems: records.length,
+      flaggedCount: opportunities.length, heldCount: held.length, legacyCount: legacy,
+      missingSalesData: true,
+      note: "Signals use user-supplied, unverified inventory and weekly_sales only. " +
+        "Legacy rows lack completeness declarations; incomplete enhanced rows are held. " +
+        "No profit, demand or campaign impact predicted." };
   }
   const currency = kobo => "₦" + (kobo / 100).toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   function makeCampaign(item, brand, channel) {
-    if (!item || !classify(item).actionable) fail("Choose an eligible in-stock product");
+    if (!item || !assess(item).signal.actionable)
+      fail("Choose an eligible in-stock product with sufficient user-supplied data");
     brand = safeText(brand, 70, "business name");
     if (!CHANNELS.includes(channel)) fail("Choose a supported draft channel");
     const description = item.weeklySales === 0 ? "Review visibility and customer interest before discounting."
@@ -123,8 +171,14 @@
       "Record narration (30–120 seconds) and assemble a WebM using MetaAutomate Creative Studio.",
       "No model-generated video or external publication occurs here."
     ].join("\n");
+    const quality = assess(item).quality;
+    const caution = quality.mode === "LEGACY_UNATTESTED"
+      ? " Legacy CSV does not confirm stock counts or sales-data completeness."
+      : " Statuses are self-declared and have not been independently verified.";
     return { sku: item.sku, product: item.name, brand, channel, priceKobo: item.priceKobo,
-      reason: classify(item).title, recommendation: description, post, videoBrief };
+      reason: classify(item).title, recommendation: description + caution,
+      inputQuality: { mode: quality.mode, status: quality.status, issues: quality.issues.slice(),
+        basis: quality.basis }, post, videoBrief };
   }
   function summarizeMetrics(data) {
     if (!data || typeof data !== "object") fail("Metrics missing");
@@ -140,6 +194,7 @@
       evidence: "SELF_REPORTED_NOT_INDEPENDENTLY_VERIFIED",
       attribution: "Unverified; these counts do not establish revenue, profit or campaign causation" };
   }
-  return Object.freeze({ HEADER, CHANNELS, MAX_BYTES, MAX_ROWS, CampaignError,
-    parseCSV, analyze, makeCampaign, summarizeMetrics, currency });
+  return Object.freeze({ HEADER, QUALITY_HEADER, STOCK_STATES, SALES_STATES,
+    CHANNELS, MAX_BYTES, MAX_ROWS, CampaignError, parseCSV, analyze,
+    makeCampaign, summarizeMetrics, currency });
 });
