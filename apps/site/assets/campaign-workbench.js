@@ -12,7 +12,7 @@
   const audit = [];
   let records = null, results = null, selected = null, plan = null, approval = null, metrics = null, graphicReady = false;
   function recordEvent(action) { audit.push({ action, at: new Date().toISOString() }); if (audit.length > 200) audit.shift(); }
-  function resetDownstream() {
+  function resetDownstream({ preserveQuality = false } = {}) {
     selected = null; plan = null; approval = null; metrics = null; graphicReady = false;
     el("campaign-project").hidden = true;
     el("campaign-media").hidden = true;
@@ -24,11 +24,13 @@
     el("campaign-approval-state").textContent = "Not reviewed. No provider publishing is available.";
     el("campaign-metrics-result").textContent = "No results recorded.";
     el("campaign-post").value = "";
-    el("campaign-quality-export").disabled = true;
-    el("campaign-quality-held").hidden = true;
-    el("campaign-quality-held-items").replaceChildren();
-    el("campaign-quality-note").textContent = "Data quality has not yet been assessed.";
-    el("campaign-date-note").textContent = "No assessment date recorded. Freshness uses the browser's current UTC calendar date.";
+    if (!preserveQuality) {
+      el("campaign-quality-export").disabled = true;
+      el("campaign-quality-held").hidden = true;
+      el("campaign-quality-held-items").replaceChildren();
+      el("campaign-quality-note").textContent = "Data quality has not yet been assessed.";
+      el("campaign-date-note").textContent = "No assessment date recorded. Freshness uses the browser's current UTC calendar date.";
+    }
     el("campaign-graphic-description").textContent = "No campaign graphic prepared.";
     const canvas = el("campaign-canvas");
     canvas.width = 1; canvas.height = 1;
@@ -114,7 +116,10 @@
     } catch (error) { formatError(error); }
   });
   ["campaign-brand", "campaign-channel"].forEach(id => el(id).addEventListener("change", () => {
-    if (plan) { resetDownstream(); announce("Campaign settings changed. Generate a new draft before reviewing."); }
+    if (plan) {
+      resetDownstream({ preserveQuality: true });
+      announce("Campaign settings changed. Inventory analysis retained; generate a new draft before reviewing.");
+    }
   }));
   el("campaign-opportunities").addEventListener("change", () => {
     const sku = selectedSku();
