@@ -324,3 +324,16 @@ test("current dated campaigns disclose declared inputs and never verified outcom
   assert.match(draft.recommendation, /no external verification/i);
   assert.doesNotMatch(draft.post, /guaranteed|% off|profit/gi);
 });
+
+
+test("direct caller cannot attach dated provenance without stock and sales declarations", () => {
+  const item = { ...parse([entry])[0],
+    stockObservedOn: "2026-10-25",
+    salesPeriodStart: "2026-10-19", salesPeriodEnd: "2026-10-25" };
+  const results = engine.analyze([item], "2026-10-25");
+  assert.equal(results.flaggedCount, 0);
+  assert.equal(results.heldCount, 1);
+  assert.equal(results.evaluated[0].quality.mode, "DATED_INCOMPLETE");
+  assert.throws(() => engine.makeCampaign(item, "Demo", "Instagram"),
+    /sufficient user-supplied data/);
+});
