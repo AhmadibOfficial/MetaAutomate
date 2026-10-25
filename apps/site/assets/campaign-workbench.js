@@ -24,6 +24,10 @@
     el("campaign-approval-state").textContent = "Not reviewed. No provider publishing is available.";
     el("campaign-metrics-result").textContent = "No results recorded.";
     el("campaign-post").value = "";
+    el("campaign-quality-export").disabled = true;
+    el("campaign-quality-held").hidden = true;
+    el("campaign-quality-held-items").replaceChildren();
+    el("campaign-quality-note").textContent = "Data quality has not yet been assessed.";
     el("campaign-graphic-description").textContent = "No campaign graphic prepared.";
     const canvas = el("campaign-canvas");
     canvas.width = 1; canvas.height = 1;
@@ -52,7 +56,8 @@
       text(detail, "strong", item.name);
       text(detail, "small", item.sku + " · " + item.stock + " in stock · " +
         item.weeklySales + " sold/week · " + item.signal.title + " · " +
-        engine.currency(item.priceKobo));
+        (item.quality.mode === "LEGACY_UNATTESTED" ? "Legacy unconfirmed inputs" :
+          "Owner-declared complete inputs") + " · " + engine.currency(item.priceKobo));
       label.appendChild(detail); list.appendChild(li);
     });
     selected = analysis.opportunities[0];
@@ -80,6 +85,17 @@
       el("campaign-count").textContent = String(results.totalItems);
       el("campaign-flagged").textContent = String(results.flaggedCount);
       el("campaign-analysis-note").textContent = results.note;
+      el("campaign-quality-note").textContent =
+        results.flaggedCount + " candidate(s); " + results.heldCount +
+        " candidate(s) held for missing/partial self-declarations; " +
+        results.legacyCount + " legacy row(s) without explicit completeness declarations. " +
+        "All figures remain supplied by you, not independently checked.";
+      el("campaign-quality-held").hidden = results.heldCount === 0;
+      const heldList = el("campaign-quality-held-items");
+      heldList.replaceChildren();
+      results.held.forEach(item => text(heldList, "li",
+        item.sku + " · " + item.name + ": " + item.quality.issues.join("; ")));
+      el("campaign-quality-export").disabled = false;
       listItems(results);
       el("campaign-results").hidden = false;
       el("results-title").focus();
@@ -264,6 +280,7 @@
       drafts: { social: el("campaign-post").value, video: el("campaign-video-brief").value,
         originalGraphicGenerated: graphicReady },
       approval, metrics, events: audit.slice(),
+      inputQuality: plan.inputQuality,
       safeguards: { publishPerformed: false, externalRequests: false, aiModelUsed: false,
         financialPerformanceVerified: false, providerMetricsVerified: false }
     };
@@ -271,6 +288,31 @@
       "application/json", JSON.stringify(report, null, 2) + "\n");
     recordEvent("Campaign evidence JSON downloaded");
     announce("Campaign evidence downloaded. No file has been uploaded or submitted.");
+  });
+  el("campaign-quality-export").addEventListener("click", () => {
+    if (!results || !records) return;
+    const trace = {
+      schemaVersion: 1, milestone: "P2-060e",
+      kind: "INVENTORY_DECISION_TRACE", classification: "USER_SUPPLIED_UNVERIFIED",
+      note: results.note, totalItems: results.totalItems,
+      candidateCount: results.flaggedCount, heldCount: results.heldCount,
+      legacyCount: results.legacyCount,
+      records: results.evaluated.map(item => ({
+        sku: item.sku, product: item.name, stock: item.stock,
+        weeklySales: item.weeklySales, unitPriceKobo: item.priceKobo,
+        stockCountStatus: item.stockCountStatus ?? null,
+        salesCoverageStatus: item.salesCoverageStatus ?? null,
+        underlyingSignal: item.underlyingSignal,
+        decision: item.signal.code, candidate: item.signal.actionable,
+        quality: item.quality
+      })),
+      safeguards: { publishPerformed: false, aiModelUsed: false,
+        inventoryIndependentlyVerified: false, financialPerformanceVerified: false }
+    };
+    download("metaautomate-inventory-decision-trace.json", "application/json",
+      JSON.stringify(trace, null, 2) + "\n");
+    recordEvent("Owner downloaded unverified inventory decision trace");
+    announce("Decision trace downloaded locally. It contains supplied inventory and has not been verified.");
   });
   el("campaign-sample").addEventListener("click", () => {
     const csv = [
