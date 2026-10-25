@@ -173,9 +173,9 @@
         quality.issues.push("No stock observation date or sales period supplied");
       }
       // Seven-column files remain compatible and usable, but not dated.
-      quality.heldForReview = dated && quality.issues.length > 0 ||
-        !dated && (item.stockCountStatus !== "counted" ||
-                   item.salesCoverageStatus !== "complete");
+      quality.heldForReview = quality.issues.length > 0;
+      if (!dated) quality.heldForReview =
+        item.stockCountStatus !== "counted" || item.salesCoverageStatus !== "complete";
       quality.status = quality.heldForReview ? "REVIEW_INPUTS" :
         dated ? "DATED_SELF_DECLARED_CURRENT" : "SELF_DECLARED_COMPLETE";
     } else {
