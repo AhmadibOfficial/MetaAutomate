@@ -103,7 +103,7 @@ PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/metautomate-playwright-browsers" \
 git status --short --branch
 ```
 
-Expected pytest cases: **54**, including a nested Node decision suite which
+Expected pytest cases: **55**, including a nested Node decision suite which
 now contains eight additional date-related cases. The real Chromium gate
 checks 1440/390/320 CSS px, held and permitted dated items, the decision
 trace, campaign evidence and unchanged legacy fallback. It prints
@@ -122,3 +122,14 @@ P2-060f must stay a **draft stacked on #127** and earlier drafts.
 Foundation **3/9 verified**, Phase 02/03 and production **NO-GO**.
 No merge, external publishing, live inference, database migration, cloud
 deployment, customer operations, paid resources or QDB submission.
+
+## Preserve analysis when editing campaign settings
+
+The browser now distinguishes the currently imported inventory analysis
+from the selected campaign draft. Changing brand or channel revokes the
+existing draft approval, copies and exports **without erasing** the UTC
+assessment date, held item reasons or private inventory decision-trace
+download. This prevents the interface from hiding quality caveats while
+retaining the same underlying CSV. A dedicated browser scenario and
+source regression test were added. The branch and all new checks remain
+unverified until the exact-head Kali run.
