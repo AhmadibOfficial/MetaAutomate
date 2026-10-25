@@ -25,7 +25,7 @@ This new P2-060g source is **not yet accepted** at its new HEAD.
    format, including counted/coverage states and valid stock observation
    and seven-day sales period dates.
 2. **Current dated inventory CSV**: same exact schema. Matching SKU means
-   the same product; a changed displayed name is flagged for review.
+   the same product only provisionally; a changed product name is treated as\n   not comparable and held for investigation.
 3. **Movement CSV**: exact header
 
 ```csv
@@ -135,7 +135,7 @@ git status --short --branch
 ```
 
 The current **source-only Python target is 63 tests**, one of which
-invokes the 12 new offline Node.js domain test cases; the existing Node
+invokes the 13 new offline Node.js domain test cases; the existing Node
 inventory suite runs within its existing pytest entrypoint.
 
 The real Chromium acceptance checks 1440, 390 and 320 CSS px, downloads
