@@ -145,13 +145,17 @@
     const extended = Object.hasOwn(item, "stockCountStatus") &&
       Object.hasOwn(item, "salesCoverageStatus");
     if (extended) {
-      const dated = ["stockObservedOn", "salesPeriodStart", "salesPeriodEnd"]
-        .every(key => Object.hasOwn(item, key));
-      quality.mode = dated ? "DATED_SELF_DECLARED" : "SELF_DECLARED";
+      const dateKeys = ["stockObservedOn", "salesPeriodStart", "salesPeriodEnd"];
+      const dated = dateKeys.every(key => Object.hasOwn(item, key));
+      const incompleteDates = !dated && dateKeys.some(key => Object.hasOwn(item, key));
+      quality.mode = dated ? "DATED_SELF_DECLARED" :
+        incompleteDates ? "DATED_INCOMPLETE" : "SELF_DECLARED";
       if (item.stockCountStatus !== "counted")
         quality.issues.push("Stock quantity not self-declared as counted");
       if (item.salesCoverageStatus !== "complete")
         quality.issues.push("Weekly-sales coverage is partial or unknown");
+      if (incompleteDates)
+        quality.issues.push("Partial dated fields are not accepted for campaign decisions");
       if (dated) {
         const stockTime = calendarDay(item.stockObservedOn, "stock_observed_on");
         const startTime = calendarDay(item.salesPeriodStart, "sales_period_start");
@@ -174,7 +178,7 @@
       }
       // Seven-column files remain compatible and usable, but not dated.
       quality.heldForReview = quality.issues.length > 0;
-      if (!dated) quality.heldForReview =
+      if (!dated && !incompleteDates) quality.heldForReview =
         item.stockCountStatus !== "counted" || item.salesCoverageStatus !== "complete";
       quality.status = quality.heldForReview ? "REVIEW_INPUTS" :
         dated ? "DATED_SELF_DECLARED_CURRENT" : "SELF_DECLARED_COMPLETE";
