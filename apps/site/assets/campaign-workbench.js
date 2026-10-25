@@ -316,12 +316,12 @@
   });
   el("campaign-sample").addEventListener("click", () => {
     const csv = [
-      engine.HEADER.join(","),
-      "FAB-101,Classic Kaftan,24,3,3500000",
-      "CAP-220,Embroidered Cap,18,0,850000",
-      "SHO-100,Casual Shoes,2,5,1400000"
+      engine.QUALITY_HEADER.join(","),
+      "FAB-101,Classic Kaftan,24,3,3500000,counted,complete",
+      "CAP-220,Embroidered Cap,18,0,850000,counted,complete",
+      "SHO-100,Casual Shoes,2,5,1400000,unknown,partial"
     ].join("\n") + "\n";
     download("metaautomate-sample-inventory.csv", "text/csv;charset=utf-8", csv);
-    announce("Sample CSV downloaded. Example data is fictional, not a customer record.");
+    announce("Sample CSV downloaded. Example data is fictional; declared statuses are not independently verified.");
   });
 })();
