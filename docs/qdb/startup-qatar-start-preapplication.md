@@ -123,3 +123,42 @@ code review, real customer demand, or release approval.
 - A practical research hypothesis is to interview permissioned Qatar retail/wholesale and inventory-led businesses about the time, costs, and error rates of coordinating stock and marketing content. Interviews, measured baselines, willingness to pay, actual competitors, localization requirements, and Qatar regulatory feasibility are **still missing**. Do not present a TAM/SAM/SOM figure, revenue forecast, or customer count without documented assumptions and evidence.
 
 **Submission remains HOLD.** Public program statistics are contextual research only and cannot substitute for the QDB-required customer/problem validation.
+
+
+## 2026-10-25 — Functional evidence and source-lineage update
+
+- **Developer-reported, exact-commit local acceptance:** P2-060g draft
+  [#129](https://github.com/AhmadibOfficial/MetaAutomate/pull/129)
+  at `f202a0c752893a77ebafab6a6f49976b44ebe04c` returned
+  **63 pytest passes in 6.83s** and
+  `DEVELOPER_LOCAL_RECONCILIATION_PASS` in the owner's Kali transcript.
+  This covers **synthetic** dated stock arithmetic, contradictory weekly
+  sales, missing SKUs and report SHA-256 verification. It does **not**
+  authenticate merchants, sales, Qatar demand or independent CI.
+- **Planned for exact-head acceptance:** P2-060h source-byte binding adds
+  SHA-256 of each of three imported CSV byte streams and a manifest-to-report
+  digest, so an owner can later check that a local report corresponds to
+  those exact files. New source and tests exist in draft, but **no local
+  acceptance or independent security signoff is yet recorded**.
+- **Qatar market/monetization/team status:** no permissioned buyer interviews,
+  paid pilots, signed letters of intent, confirmed willingness-to-pay,
+  evidence-backed prices, customer acquisition cost, margin model or
+  documented Qatar operating team were verified in this update. Do not
+  infer that they are absent in the real world; status remains **unknown
+  until authenticated evidence is supplied**.
+- **Qatar market entry:** Qatar entity registration, local commercial and
+  privacy compliance, bilingual buyer requirements, IP ownership, financial
+  projections and founder-approved investment ask remain **unverified**.
+  The 2026-10-25 review of QDB's official START program page confirms
+  its emphasis on unmet need, validated concept, researched market readiness,
+  technology roadmap, monetization and team, with up-to USD 1.1M
+  milestone-tranched funding. That ceiling is **not** MetaAutomate funding,
+  eligibility, traction or a requested amount.
+- **Release and submission:** foundation **3/9**, GitHub Actions billing
+  block unresolved, independent AppSec and real source authentication
+  pending. All PRs remain draft/unmerged; **production and START submission
+  are NO-GO**. Next external evidence action: conduct consent-based Qatar
+  buyer interviews and record dated pain points, alternatives and purchasing
+  constraints; do not fabricate results.
+
+Implementation details: `docs/p2-060h-import-byte-binding.md`.
