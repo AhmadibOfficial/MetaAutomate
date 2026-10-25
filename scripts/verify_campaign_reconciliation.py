@@ -106,6 +106,26 @@ def exercise(browser, base: str, width: int) -> None:
         assert wrapper["fingerprint"]["authenticatesSources"] is False
         assert wrapper["fingerprint"]["digitallySigned"] is False
         payload = wrapper["payload"]
+        # P2-060h: fingerprints must match the *exact* imported UTF-8 CSV bytes,
+        # not only the derived stock calculations. No source authentication.
+        manifest = wrapper["inputManifest"]
+        assert manifest["classification"] == "USER_SUPPLIED_UNVERIFIED"
+        assert manifest["sourceAuthenticated"] is False
+        assert manifest["consentVerified"] is False
+        assert manifest["timestampAuthenticated"] is False
+        assert manifest["includesOriginalFiles"] is False
+        for entry, role, raw in zip(manifest["inputs"],
+                                    ("previous_snapshot", "current_snapshot", "movement_ledger"),
+                                    (previous, current, movement)):
+            assert entry["role"] == role
+            assert entry["byteLength"] == len(raw.encode("utf-8"))
+            assert entry["sha256"] == hashlib.sha256(raw.encode("utf-8")).hexdigest()
+        binding = wrapper["sourceBinding"]
+        assert binding["authenticatesSources"] is False
+        assert binding["digitallySigned"] is False
+        bundle = json.dumps({"inputManifest": manifest, "payload": payload},
+                            ensure_ascii=False, indent=2) + "\n"
+        assert binding["sha256"] == hashlib.sha256(bundle.encode("utf-8")).hexdigest()
         assert payload["asOfDate"] == reference
         assert payload["counts"] == {
             "totalSkus": 5, "declaredArithmeticMatches": 1,
@@ -134,6 +154,10 @@ def exercise(browser, base: str, width: int) -> None:
         expect(page.locator("#reconcile-export")).to_be_disabled()
         expect(page.locator("#reconcile-results")).to_be_hidden()
         expect(page.locator("#reconcile-state")).to_contain_text("Inputs changed")
+        # A changed source file also invalidates the previous export.
+        upload(page, "#reconcile-ledger", movement.replace(",4,1,-1,3", ",5,1,-1,3"))
+        expect(page.locator("#reconcile-export")).to_be_disabled()
+        expect(page.locator("#reconcile-results")).to_be_hidden()
 
         dims = page.evaluate(
             "() => ({width:innerWidth,scroll:document.documentElement.scrollWidth})"
