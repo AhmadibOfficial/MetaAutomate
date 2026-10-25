@@ -74,6 +74,9 @@ only occurs upon a deliberate local click.
 
 When a campaign's evidence JSON is exported, it also includes optional
 `inputQuality` metadata; the existing schema 1 fields are not removed.
+Each new CSV import resets the transient audit, and preparing a different
+campaign retains only the current import event before starting a new
+draft history. Old approvals/reviews are not attributed to later drafts.
 The prior 12 archived P2-060b artifacts retain their historical hashes.
 
 ## Kali acceptance (new branch only)
