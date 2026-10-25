@@ -77,6 +77,13 @@ if os.environ.get("MAT_PILOT_OUTCOMES_ENABLED") == "1":
     verify_private_pilot_admission()
     pilot_outcomes_router.dependencies.append(Depends(require_private_pilot_admission))
     app.include_router(pilot_outcomes_router)
+# Optional private project discovery AI gateway. Never enable on the public
+# marketing site, in dev-key mode, or before independent model/IdP approval.
+if os.environ.get("MAT_PRIVATE_PROJECT_CHAT_ENABLED") == "1":
+    if _mode != "oidc":
+        raise RuntimeError("Private project AI chat requires verified OIDC mode")
+    from app.project_chat_private import router as private_project_chat_router
+    app.include_router(private_project_chat_router)
 if _mode == "dev_key":
     app.include_router(synthetic_inventory_router)
     app.include_router(synthetic_inventory_import_router)
@@ -94,7 +101,7 @@ async def workspace_security_headers(request, call_next):
         "object-src 'none'; base-uri 'none'; "
         "form-action 'self'; frame-ancestors 'none'"
     )
-    if request.url.path.startswith(("/v1/workspace", "/v1/objective-operations", "/v1/assessments", "/v1/amboy", "/v1/domain-integrations", "/v1/pilot-outcomes")):
+    if request.url.path.startswith(("/v1/workspace", "/v1/objective-operations", "/v1/assessments", "/v1/amboy", "/v1/domain-integrations", "/v1/pilot-outcomes", "/v1/private-project-chat")):
         response.headers["Cache-Control"] = "no-store"
     return response
 
