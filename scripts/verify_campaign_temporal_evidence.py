@@ -111,6 +111,18 @@ def exercise(browser, base: str, width: int) -> None:
         assert evidence["safeguards"]["publishPerformed"] is False
         assert evidence["safeguards"]["aiModelUsed"] is False
 
+        # Campaign settings edits revoke old review, but must not destroy
+        # the already-imported inventory evidence or exact UTC basis.
+        page.locator("#campaign-channel").select_option("TikTok")
+        assert page.locator("#campaign-evidence").is_disabled()
+        assert page.locator("#campaign-copy").is_disabled()
+        expect(page.locator("#campaign-quality-note")).to_contain_text("5 dated row(s)")
+        expect(page.locator("#campaign-date-note")).to_contain_text(assessment_date)
+        assert page.locator("#campaign-quality-export").is_enabled()
+        retained = download_json(page, "#campaign-quality-export")
+        assert retained["asOfDate"] == assessment_date
+        assert retained["heldCount"] == 3
+
         # Old file format still works but does not acquire invented dates.
         import_csv(page, CSV)
         expect(page.locator("#campaign-flagged")).to_have_text("2")
