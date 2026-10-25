@@ -126,3 +126,13 @@ test("domain module cannot silently introduce network, storage or model behavior
   assert.doesNotMatch(src,/\b(fetch|XMLHttpRequest|localStorage|sessionStorage|WebSocket)\s*[(.]/);
   assert.doesNotMatch(src,/model\.infer|provider\.publish/);
 });
+
+
+test("reused SKU with a different product name requires review, not a clean match", () => {
+  const renamed = ["CAP-01,Entirely Different Product,11,3,850000,counted,complete,2026-10-25,2026-10-19,2026-10-25"];
+  const r = make(prev, renamed);
+  assert.equal(r.rows[0].status, "INPUTS_NOT_COMPARABLE");
+  assert.equal(r.rows[0].expectedStock, null);
+  assert.equal(r.counts.declaredArithmeticMatches, 0);
+  assert.match(r.rows[0].issues.join(" "), /Product name changed/);
+});
