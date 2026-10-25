@@ -34,7 +34,7 @@
   <span><b>01</b> Import</span><span><b>02</b> Assess</span><span><b>03</b> Create</span><span><b>04</b> Review</span><span><b>05</b> Measure</span>
  </nav>
  <section class="panel" id="import" aria-labelledby="import-title">
-   <div class="sectionhead"><span>01 / INVENTORY DATA</span><h2 id="import-title">Work with your own stock records.</h2><p>CSV: <code>sku,name,stock,weekly_sales,unit_price_kobo</code>. Optionally add <code>stock_count_status,sales_coverage_status</code> in that order. Stock status: <code>counted</code>/<code>unknown</code>; sales coverage: <code>complete</code>/<code>partial</code>/<code>unknown</code>. These are your own declarations, not independent verification. Incomplete enhanced rows are held for review; older five-column CSVs remain usable with a visible warning. Prices are integer Nigerian kobo (₦1 = 100 kobo). Maximum 400 items and 128 KB. Do not include personal or confidential information in this public-browser prototype.</p></div>
+   <div class="sectionhead"><span>01 / INVENTORY DATA</span><h2 id="import-title">Work with your own stock records.</h2><p>CSV: <code>sku,name,stock,weekly_sales,unit_price_kobo</code>. Optionally add <code>stock_count_status,sales_coverage_status</code> in that order. Stock status: <code>counted</code>/<code>unknown</code>; sales coverage: <code>complete</code>/<code>partial</code>/<code>unknown</code>. For dated records, additionally append <code>stock_observed_on,sales_period_start,sales_period_end</code> as strict UTC calendar dates (<code>YYYY-MM-DD</code>). A dated weekly-sales period must cover exactly seven calendar dates, and stock/sales data must be at most seven days old; future and stale dates are held. Dated fields and statuses are your own declarations, not independent verification. Incomplete enhanced rows are held for review; older five- and seven-column CSVs remain usable with visible warnings. Prices are integer Nigerian kobo (₦1 = 100 kobo). Maximum 400 items and 128 KB. Do not include personal or confidential information in this public-browser prototype.</p></div>
    <form id="campaign-import" class="inline-form">
     <div class="field"><label for="campaign-file">Inventory CSV file</label><input id="campaign-file" type="file" accept=".csv,text/csv" required><small>Processed in your browser. No upload request.</small></div>
     <button type="submit" class="primary">Analyse inventory</button>
@@ -46,6 +46,7 @@
    <div class="stats"><div><strong id="campaign-count">0</strong><small>Imported products</small></div><div><strong id="campaign-flagged">0</strong><small>Potential candidates</small></div></div>
    <p class="muted">Rules flag items with no recorded sales and at least five units in stock, or high stock relative to weekly sales. Sold-out and low-stock items are not promoted. These are prioritization hints, not sales forecasts.</p>
    <p id="campaign-quality-note" class="review-state" aria-live="polite">Data quality has not yet been assessed.</p>
+   <p id="campaign-date-note" class="help">No assessment date recorded. Freshness uses the browser's current UTC calendar date.</p>
    <div id="campaign-quality-held" hidden>
     <h3>Records requiring review before a campaign</h3>
     <ul id="campaign-quality-held-items"></ul>

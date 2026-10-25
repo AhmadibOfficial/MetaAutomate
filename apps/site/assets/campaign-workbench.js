@@ -12,7 +12,7 @@
   const audit = [];
   let records = null, results = null, selected = null, plan = null, approval = null, metrics = null, graphicReady = false;
   function recordEvent(action) { audit.push({ action, at: new Date().toISOString() }); if (audit.length > 200) audit.shift(); }
-  function resetDownstream() {
+  function resetDownstream({ preserveQuality = false } = {}) {
     selected = null; plan = null; approval = null; metrics = null; graphicReady = false;
     el("campaign-project").hidden = true;
     el("campaign-media").hidden = true;
@@ -24,10 +24,13 @@
     el("campaign-approval-state").textContent = "Not reviewed. No provider publishing is available.";
     el("campaign-metrics-result").textContent = "No results recorded.";
     el("campaign-post").value = "";
-    el("campaign-quality-export").disabled = true;
-    el("campaign-quality-held").hidden = true;
-    el("campaign-quality-held-items").replaceChildren();
-    el("campaign-quality-note").textContent = "Data quality has not yet been assessed.";
+    if (!preserveQuality) {
+      el("campaign-quality-export").disabled = true;
+      el("campaign-quality-held").hidden = true;
+      el("campaign-quality-held-items").replaceChildren();
+      el("campaign-quality-note").textContent = "Data quality has not yet been assessed.";
+      el("campaign-date-note").textContent = "No assessment date recorded. Freshness uses the browser's current UTC calendar date.";
+    }
     el("campaign-graphic-description").textContent = "No campaign graphic prepared.";
     const canvas = el("campaign-canvas");
     canvas.width = 1; canvas.height = 1;
@@ -57,7 +60,10 @@
       text(detail, "small", item.sku + " · " + item.stock + " in stock · " +
         item.weeklySales + " sold/week · " + item.signal.title + " · " +
         (item.quality.mode === "LEGACY_UNATTESTED" ? "Legacy unconfirmed inputs" :
-          "Owner-declared complete inputs") + " · " + engine.currency(item.priceKobo));
+          item.quality.mode === "DATED_SELF_DECLARED" ?
+            "Current dates declared, not externally verified" :
+            "Owner-declared complete inputs, dates missing") +
+        " · " + engine.currency(item.priceKobo));
       label.appendChild(detail); list.appendChild(li);
     });
     selected = analysis.opportunities[0];
@@ -87,11 +93,14 @@
       el("campaign-count").textContent = String(results.totalItems);
       el("campaign-flagged").textContent = String(results.flaggedCount);
       el("campaign-analysis-note").textContent = results.note;
+      el("campaign-date-note").textContent = "UTC assessment date: " +
+        results.asOfDate + ". Dated observations are user-supplied, not independently verified.";
       el("campaign-quality-note").textContent =
         results.flaggedCount + " candidate(s); " + results.heldCount +
         " candidate(s) held for missing/partial self-declarations; " +
-        results.legacyCount + " legacy row(s) without explicit completeness declarations. " +
-        "All figures remain supplied by you, not independently checked.";
+        results.legacyCount + " legacy row(s) without explicit completeness declarations; " +
+        results.datedCount + " dated row(s), " + results.undatedCount +
+        " undated row(s). All figures remain supplied by you, not independently checked.";
       el("campaign-quality-held").hidden = results.heldCount === 0;
       const heldList = el("campaign-quality-held-items");
       heldList.replaceChildren();
@@ -107,7 +116,10 @@
     } catch (error) { formatError(error); }
   });
   ["campaign-brand", "campaign-channel"].forEach(id => el(id).addEventListener("change", () => {
-    if (plan) { resetDownstream(); announce("Campaign settings changed. Generate a new draft before reviewing."); }
+    if (plan) {
+      resetDownstream({ preserveQuality: true });
+      announce("Campaign settings changed. Inventory analysis retained; generate a new draft before reviewing.");
+    }
   }));
   el("campaign-opportunities").addEventListener("change", () => {
     const sku = selectedSku();
@@ -300,12 +312,16 @@
       kind: "INVENTORY_DECISION_TRACE", classification: "USER_SUPPLIED_UNVERIFIED",
       note: results.note, totalItems: results.totalItems,
       candidateCount: results.flaggedCount, heldCount: results.heldCount,
-      legacyCount: results.legacyCount,
+      legacyCount: results.legacyCount, datedCount: results.datedCount,
+      undatedCount: results.undatedCount, asOfDate: results.asOfDate,
       records: results.evaluated.map(item => ({
         sku: item.sku, product: item.name, stock: item.stock,
         weeklySales: item.weeklySales, unitPriceKobo: item.priceKobo,
         stockCountStatus: item.stockCountStatus ?? null,
         salesCoverageStatus: item.salesCoverageStatus ?? null,
+        stockObservedOn: item.stockObservedOn ?? null,
+        salesPeriodStart: item.salesPeriodStart ?? null,
+        salesPeriodEnd: item.salesPeriodEnd ?? null,
         underlyingSignal: item.underlyingSignal,
         decision: item.signal.code, candidate: item.signal.actionable,
         quality: item.quality
@@ -319,11 +335,17 @@
     announce("Decision trace downloaded locally. It contains supplied inventory and has not been verified.");
   });
   el("campaign-sample").addEventListener("click", () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const sixDaysAgo = new Date(Date.parse(today + "T00:00:00Z") -
+      6 * 86400000).toISOString().slice(0, 10);
     const csv = [
-      engine.QUALITY_HEADER.join(","),
-      "FAB-101,Classic Kaftan,24,3,3500000,counted,complete",
-      "CAP-220,Embroidered Cap,18,0,850000,counted,complete",
-      "SHO-100,Casual Shoes,2,5,1400000,unknown,partial"
+      engine.DATED_HEADER.join(","),
+      ["FAB-101", "Classic Kaftan", 24, 3, 3500000,
+        "counted", "complete", today, sixDaysAgo, today].join(","),
+      ["CAP-220", "Embroidered Cap", 18, 0, 850000,
+        "counted", "complete", today, sixDaysAgo, today].join(","),
+      ["SHO-100", "Casual Shoes", 2, 5, 1400000,
+        "unknown", "partial", today, sixDaysAgo, today].join(",")
     ].join("\n") + "\n";
     download("metaautomate-sample-inventory.csv", "text/csv;charset=utf-8", csv);
     announce("Sample CSV downloaded. Example data is fictional; declared statuses are not independently verified.");
