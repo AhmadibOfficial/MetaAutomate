@@ -86,3 +86,11 @@ def test_node_quality_decisions_and_backward_compatibility():
         cwd=ROOT, capture_output=True, text=True, timeout=45, check=False
     )
     assert result.returncode == 0, result.stdout + "\n" + result.stderr
+
+
+def test_campaign_audit_events_are_isolated_per_import_and_per_new_draft():
+    source = UI.read_text(encoding="utf-8")
+    assert 'audit.length = 0;' in source
+    assert 'audit.splice(1);' in source
+    assert 'recordEvent("Inventory CSV imported: " + records.length + " items")' in source
+    assert 'recordEvent("Campaign draft prepared for " + plan.sku)' in source
