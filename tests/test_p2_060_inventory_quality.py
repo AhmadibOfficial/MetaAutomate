@@ -19,7 +19,8 @@ def test_quality_columns_are_optional_exact_and_user_supplied():
     source = ENGINE.read_text(encoding="utf-8")
     for snippet in (
         '"stock_count_status", "sales_coverage_status"',
-        'const enhanced = matches(QUALITY_HEADER);',
+        'const dated = matches(DATED_HEADER);',
+        'const enhanced = matches(QUALITY_HEADER) || dated;',
         'if (!matches(HEADER) && !enhanced)',
         'incompleteDates ? "DATED_INCOMPLETE" : "SELF_DECLARED"',
         'quality.heldForReview = quality.issues.length > 0',
