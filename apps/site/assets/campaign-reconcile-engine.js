@@ -150,7 +150,7 @@
       const expectedStart = dateFrom(prevTime + 86400000);
       if (m.periodStart !== expectedStart || m.periodEnd !== c.stockObservedOn)
         issues.push("Movement ledger dates do not cover exactly the intervening stock dates");
-      if (issues.some(issue => !issue.startsWith("Product name changed"))) {
+      if (issues.length) {
         row.status = "INPUTS_NOT_COMPARABLE";
         return row;
       }
