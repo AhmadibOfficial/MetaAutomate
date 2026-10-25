@@ -102,3 +102,15 @@ def test_node_suite_exercises_invalid_dates_and_direct_bypass_attempts():
         "current dated campaigns disclose declared inputs",
     ):
         assert label in source, label
+
+
+def test_changing_campaign_settings_revokes_review_without_erasing_inventory_basis():
+    source = UI.read_text(encoding="utf-8")
+    assert 'function resetDownstream({ preserveQuality = false } = {})' in source
+    assert 'if (!preserveQuality) {' in source
+    assert 'resetDownstream({ preserveQuality: true });' in source
+    assert 'el("campaign-evidence").disabled = true;' in source
+    assert 'el("campaign-quality-export").disabled = true;' in source
+    browser = BROWSER.read_text(encoding="utf-8")
+    assert 'page.locator("#campaign-channel").select_option("TikTok")' in browser
+    assert 'assert retained["heldCount"] == 3' in browser
