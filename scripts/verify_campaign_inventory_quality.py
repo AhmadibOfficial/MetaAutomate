@@ -117,6 +117,25 @@ def exercise(browser, base: str, width: int) -> None:
         assert old["legacyCount"] == 3 and old["heldCount"] == 0
         assert all(row["quality"]["mode"] == "LEGACY_UNATTESTED"
                    for row in old["records"])
+
+        # A different campaign on the same import must not inherit another
+        # draft's approval. Only the current import + campaign/review remains.
+        page.locator("#campaign-create").click()
+        page.locator("#campaign-confirm").check()
+        page.locator("#campaign-authorize").click()
+        page.locator('input[name="candidate"]').nth(1).check()
+        assert page.locator("#campaign-evidence").is_disabled()
+        page.locator("#campaign-create").click()
+        page.locator("#campaign-confirm").check()
+        page.locator("#campaign-authorize").click()
+        isolated = download_json(page, "#campaign-evidence")
+        assert isolated["record"]["sku"] == "FAB-02"
+        assert isolated["inputQuality"]["mode"] == "LEGACY_UNATTESTED"
+        actions = [event["action"] for event in isolated["events"]]
+        assert sum(action.startswith("Inventory CSV imported") for action in actions) == 1
+        assert sum(action.startswith("Campaign draft prepared") for action in actions) == 1
+        assert sum(action.startswith("Internal content review recorded") for action in actions) == 1
+        assert not any(action.startswith("Draft edited") for action in actions)
         assert not errors, errors
         assert not off_origin, off_origin
         size = page.evaluate("() => ({width:innerWidth,scroll:document.documentElement.scrollWidth})")
