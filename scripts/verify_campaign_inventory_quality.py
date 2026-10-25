@@ -87,7 +87,7 @@ def exercise(browser, base: str, width: int) -> None:
 
         page.locator("#campaign-brand").fill("Synthetic MetaAutomate Shop")
         page.locator("#campaign-create").click()
-        expect(page.locator("#campaign-post")).to_contain_text("Classic Kaftan")
+        assert "Classic Kaftan" in page.locator("#campaign-post").input_value()
         page.locator("#campaign-confirm").check()
         page.locator("#campaign-authorize").click()
         assert page.locator("#campaign-copy").is_enabled()
