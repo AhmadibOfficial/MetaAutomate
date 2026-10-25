@@ -71,6 +71,8 @@
   }
   el("campaign-import").addEventListener("submit", async event => {
     event.preventDefault();
+    // Evidence and review events must not leak across separate inventory imports.
+    audit.length = 0;
     const file = el("campaign-file").files?.[0];
     resetDownstream();
     records = results = null;
@@ -137,6 +139,8 @@
       el("campaign-confirm").checked = false;
       el("campaign-authorize").disabled = false;
       el("campaign-approval-state").textContent = "Not reviewed. No provider publishing is available.";
+      // Preserve this import event only, not reviews/metrics from past drafts.
+      audit.splice(1);
       recordEvent("Campaign draft prepared for " + plan.sku);
       drawGraphic();
       el("project-title").focus();
