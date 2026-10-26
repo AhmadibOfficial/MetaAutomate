@@ -44,3 +44,46 @@ def test_identity_ui_preserves_assessment_pages_and_uses_explicit_sso():
     assert 'id="assessment-detail-view"' in web
     assert "/v1/workspace/config" in js
     assert 'window.location.assign("/v1/workspace/oidc/login")' in js
+
+
+
+def _oidc_sql_function(signature: str) -> str:
+    """Extract one still-unapplied SQL function for a source-only guard."""
+    sql = (ROOT / "database/migrations/012_oidc_identities.sql").read_text()
+    assert sql.count(signature) == 1
+    return sql.split(signature, 1)[1].split("$$;", 1)[0]
+
+
+def test_oidc_sql_clears_stale_tenant_context_before_auth():
+    """A failed login must not inherit another identity in the same transaction.
+
+    Source-contract only: actual PostgreSQL execution and RLS remain unverified.
+    """
+    cases = (
+        ("CREATE FUNCTION app.create_oidc_workspace_session(",
+         "IF p_issuer IS NULL"),
+        ("CREATE OR REPLACE FUNCTION app.authenticate_workspace_session(",
+         "IF p_session_sha256 IS NULL"),
+    )
+    for signature, validation in cases:
+        body = _oidc_sql_function(signature)
+        assert body.count("BEGIN") == 1
+        early = body.split("BEGIN", 1)[1].split(validation, 1)[0]
+        assert "set_config('app.organization_id', '', true)" in early
+        assert "set_config('app.user_id', '', true)" in early
+        assert body.count("PERFORM pg_catalog.set_config('app.organization_id', '', true)") == 2
+        assert body.count("PERFORM pg_catalog.set_config('app.user_id', '', true)") == 2
+
+
+def test_oidc_sql_revoked_membership_clears_both_tenant_settings():
+    """After identity lookup, inactive membership must clear org and user GUCs."""
+    for signature in (
+        "CREATE FUNCTION app.create_oidc_workspace_session(",
+        "CREATE OR REPLACE FUNCTION app.authenticate_workspace_session(",
+    ):
+        body = _oidc_sql_function(signature)
+        membership = body.split("SELECT m.role::text INTO v_role", 1)[1]
+        rejection = membership.split("IF NOT FOUND THEN", 1)[1].split("END IF;", 1)[0]
+        assert "set_config('app.organization_id', '', true)" in rejection
+        assert "set_config('app.user_id', '', true)" in rejection
+        assert "RETURN;" in rejection
