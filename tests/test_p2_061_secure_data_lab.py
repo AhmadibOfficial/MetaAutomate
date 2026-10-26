@@ -16,6 +16,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "apps/api"))
+from app import secure_inventory_lab as data_lab_module
 from app.secure_inventory_lab import SecureInventoryLab, DataLabError, parse_inventory
 
 DATA = (b"sku,name,stock,weekly_sales,unit_price_kobo\n"
@@ -137,6 +138,52 @@ def test_active_record_delete_and_tombstone_audit(lab):
     with pytest.raises(DataLabError):
         lab.get_document(owner, doc, now=2000000001)
     assert lab.verify_audit(owner)["events"] == 2
+
+
+
+def test_read_and_audit_are_atomic_against_concurrent_deletion(lab, monkeypatch):
+    """SQLite must not allow another writer to delete after lookup but before audit."""
+    owner = actor()
+    saved = save(lab, owner)
+    identifier = UUID(saved["document_id"])
+    real_unseal = data_lab_module._unseal
+    observed = []
+
+    def inspect_while_decrypting(*args, **kwargs):
+        # The read transaction must already hold a RESERVED write lock here.
+        # A 0-second timeout makes this deterministic and leaves no stray writer.
+        rival = sqlite3.connect(lab.path, timeout=0)
+        try:
+            with pytest.raises(sqlite3.OperationalError, match="locked"):
+                rival.execute("DELETE FROM inventory_documents WHERE document_id=?",
+                              (str(identifier),))
+            observed.append(True)
+        finally:
+            rival.close()
+        return real_unseal(*args, **kwargs)
+
+    monkeypatch.setattr(data_lab_module, "_unseal", inspect_while_decrypting)
+    read = lab.get_document(owner, identifier, now=2000000001)
+    assert observed == [True]
+    assert read["records"][0]["sku"] == "CAP-001"
+    assert lab.verify_audit(owner)["events"] == 2
+
+    # After the serialized read commits, a normal authorized deletion can proceed.
+    assert lab.delete_document(owner, identifier, now=2000000002)["deleted"] is True
+    assert lab.verify_audit(owner)["events"] == 3
+
+
+def test_failed_decryption_cannot_append_read_audit(lab):
+    """Authenticity rejection rolls back without fabricating a successful read."""
+    owner = actor()
+    saved = save(lab, owner)
+    identifier = UUID(saved["document_id"])
+    with sqlite3.connect(lab.path) as conn:
+        conn.execute("UPDATE inventory_documents SET actor_id=? WHERE document_id=?",
+                     (str(uuid4()), str(identifier)))
+    with pytest.raises(DataLabError, match="cannot be verified"):
+        lab.get_document(owner, identifier, now=2000000001)
+    assert lab.verify_audit(owner)["events"] == 1
 
 
 def test_read_is_audited(lab):
@@ -283,3 +330,73 @@ def test_provenance_and_retention_metadata_authenticated_by_aesgcm(lab, column, 
                      (value, doc))
     with pytest.raises(DataLabError):
         lab.get_document(owner, UUID(doc), now=2000000001)
+
+
+def test_corrupt_historical_audit_blocks_import_and_rolls_back(lab):
+    """An altered earlier entry cannot acquire a valid newly appended MAC."""
+    owner = actor()
+    first = save(lab, owner)
+    with sqlite3.connect(lab.path) as conn:
+        conn.execute(
+            "UPDATE inventory_audit SET event='TAMPERED' "
+            "WHERE tenant_id=? AND sequence_number=1", (str(ORG_A),)
+        )
+    with pytest.raises(DataLabError, match="audit chain integrity"):
+        save(lab, owner)
+    with sqlite3.connect(lab.path) as conn:
+        assert conn.execute(
+            "SELECT count(*) FROM inventory_documents WHERE tenant_id=?",
+            (str(ORG_A),)
+        ).fetchone()[0] == 1
+        assert conn.execute(
+            "SELECT count(*) FROM inventory_audit WHERE tenant_id=?",
+            (str(ORG_A),)
+        ).fetchone()[0] == 1
+    assert len(lab.list_documents(owner, now=2000000001)) == 1
+    assert first["document_id"]
+
+
+def test_corrupt_historical_audit_denies_read_and_delete_without_side_effects(lab):
+    owner = actor()
+    saved = save(lab, owner)
+    identifier = UUID(saved["document_id"])
+    with sqlite3.connect(lab.path) as conn:
+        conn.execute(
+            "UPDATE inventory_audit SET prior_mac=? "
+            "WHERE tenant_id=? AND sequence_number=1",
+            ("f" * 64, str(ORG_A)),
+        )
+    with pytest.raises(DataLabError, match="audit chain integrity"):
+        lab.get_document(owner, identifier, now=2000000001)
+    with pytest.raises(DataLabError, match="audit chain integrity"):
+        lab.delete_document(owner, identifier, now=2000000002)
+    with sqlite3.connect(lab.path) as conn:
+        assert conn.execute(
+            "SELECT count(*) FROM inventory_documents WHERE document_id=?",
+            (str(identifier),)
+        ).fetchone()[0] == 1
+        assert conn.execute(
+            "SELECT count(*) FROM inventory_audit WHERE tenant_id=?",
+            (str(ORG_A),)
+        ).fetchone()[0] == 1
+
+
+def test_bad_audit_history_blocks_expiry_purge_but_not_another_tenant(lab):
+    owner_a, owner_b = actor(ORG_A), actor(ORG_B)
+    save(lab, owner_a, retention=1)
+    save(lab, owner_b, retention=1)
+    with sqlite3.connect(lab.path) as conn:
+        conn.execute(
+            "UPDATE inventory_audit SET mac=? "
+            "WHERE tenant_id=? AND sequence_number=1",
+            ("invalid-mac", str(ORG_A)),
+        )
+    with pytest.raises(DataLabError, match="audit chain integrity"):
+        lab.purge_expired(owner_a, now=2000086400)
+    assert lab.purge_expired(owner_b, now=2000086400)["purged"] == 1
+    with sqlite3.connect(lab.path) as conn:
+        remaining = conn.execute(
+            "SELECT tenant_id FROM inventory_documents ORDER BY tenant_id"
+        ).fetchall()
+        assert remaining == [(str(ORG_A),)]
+    assert lab.verify_audit(owner_b)["events"] == 2

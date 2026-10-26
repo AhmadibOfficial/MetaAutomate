@@ -244,13 +244,46 @@ class SecureInventoryLab:
             deny("Explicit local data-lab database path required")
         return cls(path, key)
 
+    def _verified_audit_tip(self, conn, tenant: str) -> tuple[int, str]:
+        """Verify every existing tenant audit event before extending the chain.
+
+        The verification runs inside the caller's SQLite transaction. This
+        detects altered history before recording a new successful operation;
+        it is NOT an independently anchored or deletion-proof audit log.
+        """
+        prior = GENESIS
+        count = 0
+        events = conn.execute(
+            "SELECT * FROM inventory_audit WHERE tenant_id=? ORDER BY sequence_number",
+            (tenant,),
+        )
+        for event in events:
+            count += 1
+            try:
+                data = {field: event[field] for field in (
+                    "tenant_id", "sequence_number", "actor_id", "event",
+                    "document_id", "event_time", "prior_mac")}
+                candidate = event["mac"]
+                valid = (
+                    event["sequence_number"] == count
+                    and event["tenant_id"] == tenant
+                    and event["prior_mac"] == prior
+                    and isinstance(candidate, str)
+                    and re.fullmatch(r"[0-9a-f]{64}", candidate) is not None
+                    and hmac.compare_digest(_mac(self.key, tenant, data), candidate)
+                )
+            except (TypeError, ValueError, UnicodeError) as exc:
+                raise DataLabError("Data-lab audit chain integrity verification failed") from exc
+            if not valid:
+                deny("Data-lab audit chain integrity verification failed")
+            prior = candidate
+        return count, prior
+
     def _audit(self, conn, tenant: str, actor: str, action: str, doc: str, now: int):
-        previous = conn.execute(
-            "SELECT sequence_number,mac FROM inventory_audit WHERE tenant_id=? "
-            "ORDER BY sequence_number DESC LIMIT 1", (tenant,)
-        ).fetchone()
-        seq = previous["sequence_number"] + 1 if previous else 1
-        prior = previous["mac"] if previous else GENESIS
+        # All mutating/read-audit operations already hold BEGIN IMMEDIATE.
+        # Fail closed and roll back the whole operation on a corrupted history.
+        last_sequence, prior = self._verified_audit_tip(conn, tenant)
+        seq = last_sequence + 1
         data = dict(tenant_id=tenant, sequence_number=seq, actor_id=actor,
                     event=action, document_id=doc, event_time=now, prior_mac=prior)
         conn.execute("INSERT INTO inventory_audit VALUES(?,?,?,?,?,?,?,?)",
@@ -306,20 +339,23 @@ class SecureInventoryLab:
         if not isinstance(identifier, UUID):
             deny("Invalid document identifier")
         current = int(time.time()) if now is None else now
+        # Hold one write-serialized transaction across lookup, retention checks,
+        # authentication and the read audit. Otherwise a concurrent DELETE could
+        # commit after the SELECT but before the audit, yielding a stale read.
+        # A failed unseal/audit rolls back without returning decrypted content.
         with _connect(self.path) as conn:
+            conn.execute("BEGIN IMMEDIATE")
             row = conn.execute(
                 "SELECT nonce,encrypted,record_count,retained_until,source_sha256,actor_id FROM inventory_documents "
                 "WHERE tenant_id=? AND document_id=?", (tenant, str(identifier))
             ).fetchone()
-        if row is None or row["retained_until"] <= current:
-            deny("Document not found or retention expired")
-        items = _unseal(self.key, tenant, str(identifier), row["nonce"], row["encrypted"],
-                        row["source_sha256"], row["record_count"],
-                        row["retained_until"], row["actor_id"])
-        if len(items) != row["record_count"]:
-            deny("Stored document record count altered")
-        with _connect(self.path) as conn:
-            conn.execute("BEGIN IMMEDIATE")
+            if row is None or row["retained_until"] <= current:
+                deny("Document not found or retention expired")
+            items = _unseal(self.key, tenant, str(identifier), row["nonce"], row["encrypted"],
+                            row["source_sha256"], row["record_count"],
+                            row["retained_until"], row["actor_id"])
+            if len(items) != row["record_count"]:
+                deny("Stored document record count altered")
             self._audit(conn, tenant, str(principal.user_id), "INVENTORY_READ",
                         str(identifier), current)
         return dict(document_id=str(identifier), record_count=len(items), records=items,
@@ -363,21 +399,10 @@ class SecureInventoryLab:
 
     def verify_audit(self, principal) -> dict:
         tenant, _ = _principal(principal, READ_ROLES)
+        # Reuse the same verifier as _audit so inspection and new operations
+        # apply identical chain-integrity rules.
         with _connect(self.path) as conn:
-            events = conn.execute(
-                "SELECT * FROM inventory_audit WHERE tenant_id=? ORDER BY sequence_number",
-                (tenant,)
-            ).fetchall()
-        previous = GENESIS
-        for expected, event in enumerate(events, 1):
-            data = {field: event[field] for field in (
-                "tenant_id", "sequence_number", "actor_id", "event",
-                "document_id", "event_time", "prior_mac")}
-            checksum = _mac(self.key, tenant, data)
-            if (event["sequence_number"] != expected or event["prior_mac"] != previous or
-                    not hmac.compare_digest(checksum, event["mac"])):
-                deny("Data-lab audit chain integrity verification failed")
-            previous = event["mac"]
-        return dict(events=len(events), integrity="LOCAL_HMAC_CHAIN_VERIFIED",
+            count, previous = self._verified_audit_tip(conn, tenant)
+        return dict(events=count, integrity="LOCAL_HMAC_CHAIN_VERIFIED",
                     last_mac=previous, independently_anchored=False,
                     production_audit_ready=False)
