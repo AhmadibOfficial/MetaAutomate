@@ -91,3 +91,43 @@ issuer/JWKS/PKCE/nonce/MFA integration, forced RLS checks, revoked
 identity/session tests, complete cross-tenant denial, private browser
 acceptance, backup/restore, human review and security sign-off remain
 mandatory. F06 is BLOCKED; production NO-GO remains binding.
+
+
+## Stage 01 / F06 — disposable PostgreSQL negative authentication acceptance
+
+The **existing** `scripts/verify_oidc_identity.py` has been enhanced, rather
+than creating another identity-test harness. It now checks the **actual
+transaction-scoped PostgreSQL** `app.organization_id` and `app.user_id`
+settings after authorized session creation/authentication, then after denied
+CSRF, unknown sessions, unprovisioned subjects, suspended membership,
+revoked session and revoked identity. A new valid authentication following
+a denied attempt must reestablish precisely its own organization and user.
+The regression specifically exercises a previously successful tenant context
+followed by denials **on the same runtime connection/transaction**.
+
+This integration script only runs under the previously established
+`GITHUB_ACTIONS=true` gate on the disposable PostgreSQL service created
+and migrated by `.github/workflows/ci.yml`. It does **not** create a
+database, apply migrations, or connect in an ordinary pytest invocation.
+Do not attempt to bypass its CI-only gate or aim DATABASE_URL at a
+developer/staging/production instance. Because GitHub Actions runners are
+currently billing-blocked, this integration improvement is **source
+committed but not independently exercised**. Two read-only source-contract
+checks in `tests/test_private_oidc_contract.py` can run on the current Kali
+checkout, but do not constitute actual PostgreSQL acceptance.
+
+Safe owner Kali command (source tests ONLY):
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q \
+  tests/test_private_oidc_contract.py \
+  tests/test_stage01_f06_oidc_claim_admission.py \
+  tests/test_p2_04a_oidc_mfa.py
+```
+
+The CI-only integration remains pending a real isolated GitHub runner and
+independent reviewer. Real issuer/JWKS/PKCE/nonce/MFA, sealed ingress, F04
+branch protection and F07 off-host restore are also unresolved. Foundation
+F06 is still BLOCKED; full release **NO-GO**. No migration 012 was
+applied to the owner's Kali machine; no browser, customer, subscription,
+network/AI/social, deployment, billing or funding work was activated.
