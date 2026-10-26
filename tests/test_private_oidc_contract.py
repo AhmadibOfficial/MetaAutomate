@@ -87,3 +87,29 @@ def test_oidc_sql_revoked_membership_clears_both_tenant_settings():
         assert "set_config('app.organization_id', '', true)" in rejection
         assert "set_config('app.user_id', '', true)" in rejection
         assert "RETURN;" in rejection
+
+
+def test_oidc_disposable_postgres_script_enforces_context_denials():
+    """Source check only: never connect to PostgreSQL during ordinary pytest."""
+    script = (ROOT / "scripts/verify_oidc_identity.py").read_text()
+    assert 'os.environ.get("GITHUB_ACTIONS") != "true"' in script
+    assert "def require_context(cursor, expected_org=None, expected_user=None):" in script
+    assert "current_setting('app.organization_id', true)" in script
+    assert "current_setting('app.user_id', true)" in script
+    assert 'status=\'SUSPENDED\'' in script
+    assert 'status=\'ACTIVE\'' in script
+    assert "SELECT app.revoke_workspace_session(%s)" in script
+    assert script.count("require_context(c)") >= 5
+    assert script.count("require_context(c, org, user)") >= 3
+
+
+def test_oidc_disposable_denials_are_rechecked_inside_same_transaction():
+    """Keep the denied-CSRF and unknown-session cases beside a prior success."""
+    script = (ROOT / "scripts/verify_oidc_identity.py").read_text()
+    check = script.split("with psycopg.connect(runtime) as conn:", 2)[2]
+    before = check.split("# Real PostgreSQL membership revocation", 1)[0]
+    assert "require_context(c, org, user)" in before
+    assert "bad-csrf" in before
+    assert "unapproved-subject" in before
+    assert '"0"*64' in before
+    assert before.count("require_context(c)") >= 3
