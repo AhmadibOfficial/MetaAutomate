@@ -37,7 +37,7 @@ A permitted merchant inventory CSV enters a browser workflow. MetaAutomate valid
 - **Potential buyers:** retail and wholesale SMEs, distributors, marketing operations teams managing stock and product communications.
 - **Problem hypothesis:** separate stock, marketing and reporting tools create duplication and avoidable campaign mistakes.
 - **Value hypothesis:** less time per approved campaign, fewer promotions for low-stock items, clearer auditable decision paths.
-- **Revenue hypothesis:** subscription per business with possible setup or managed creative services. Prices, margins, demand and cost of serving customers are undetermined.
+- **Current commercialization boundary:** Subscription plans, subscription pricing, paywalls, entitlements, checkout and billing features are **explicitly out of scope for now**. Implementation/setup assistance is only a possible future hypothesis, not an offered or validated service. A viable business model, cost structure, buyer willingness to pay and monetization evidence are **still unknown**; QDB START's monetization requirement must be addressed with independently supported evidence before any application.
 - **Market-entry research:** Qatar company registration/licensing, Arabic and English accessibility, privacy/data residency requirements, ICP/customer access, and local operating presence must be researched and legally checked before commitment.
 
 ## Critical QDB START submission evidence to collect
