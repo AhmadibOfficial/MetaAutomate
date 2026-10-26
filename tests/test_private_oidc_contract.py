@@ -113,3 +113,37 @@ def test_oidc_disposable_denials_are_rechecked_inside_same_transaction():
     assert "unapproved-subject" in before
     assert '"0"*64' in before
     assert before.count("require_context(c)") >= 3
+
+
+
+def test_oidc_disposable_two_tenants_never_share_session_or_csrf():
+    """Offline source guard: actual PostgreSQL proof awaits isolated CI."""
+    script = (ROOT / "scripts/verify_oidc_identity.py").read_text()
+    assert 'os.environ.get("GITHUB_ACTIONS") != "true"' in script
+    assert "CI OIDC Second Organization" in script
+    assert "CI OIDC Second Member" in script
+    assert "other_session_hash=" in script
+    assert "other_csrf_hash=" in script
+    assert 'Tenant B CSRF unlocked tenant A' in script
+    assert 'Tenant A CSRF unlocked tenant B' in script
+    assert 'Tenant A session binding drifted' in script
+    assert 'Tenant B session binding drifted' in script
+    assert 'Revoking tenant A identity unexpectedly revoked tenant B' in script
+
+
+def test_oidc_tenant_switches_are_checked_against_database_context():
+    """Successful A -> B -> A admission must rebind both session GUCs."""
+    script = (ROOT / "scripts/verify_oidc_identity.py").read_text()
+    section = script.split(
+        "# Validate real session separation across two fictional organizations.", 1
+    )[1].split("# Real PostgreSQL membership revocation/reinstatement", 1)[0]
+    required = (
+        "require_context(c, other_org, other_user)",
+        "require_context(c, org, user)",
+        "require_context(c)",
+    )
+    for check in required:
+        assert check in section
+    assert section.count("require_context(c, other_org, other_user)") >= 2
+    assert section.count("require_context(c, org, user)") >= 2
+    assert section.count("require_context(c)") >= 2
