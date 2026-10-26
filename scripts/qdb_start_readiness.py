@@ -94,6 +94,8 @@ def _foundation(root: Path, inventory: set[str]) -> dict:
         raise ReadinessError("Foundation evidence missing, symlinked or not a regular committed file")
     with (root / FOUNDATION).open(encoding="utf-8") as file:
         data = json.load(file)
+    if not isinstance(data, dict):
+        raise ReadinessError("Foundation evidence must be a JSON object")
     entries = data.get("checks")
     if (data.get("policy") != "NO_GO_UNTIL_ALL_NINE_VERIFIED"
             or not isinstance(entries, list) or len(entries) != 9):
@@ -104,6 +106,22 @@ def _foundation(root: Path, inventory: set[str]) -> dict:
             raise ReadinessError("Malformed foundation entry")
         if entry["id"] in statuses or entry.get("status") not in ("verified", "blocked"):
             raise ReadinessError("Duplicate or unsupported foundation status")
+        if entry["status"] == "verified":
+            # A status flag alone is not source evidence. Count it only when
+            # the claimed supporting source is a regular, committed file.
+            # This checks provenance of source PRESENCE, not independent
+            # operational acceptance or authenticity of external signoffs.
+            source_path = entry.get("source_path")
+            if (not isinstance(source_path, str)
+                    or not _regular_committed_source(root, source_path, inventory)):
+                raise ReadinessError(
+                    "Verified foundation control requires a regular committed source file: "
+                    + entry["id"]
+                )
+            if not isinstance(entry.get("reason"), str) or not entry["reason"].strip():
+                raise ReadinessError(
+                    "Verified foundation control requires an evidence rationale: " + entry["id"]
+                )
         statuses[entry["id"]] = entry["status"]
     if len(statuses) != 9:
         raise ReadinessError("Incomplete foundation evidence")
