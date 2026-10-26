@@ -24,7 +24,9 @@ async function exportSample() {
   return { input, wrapper: {
     schemaVersion: 1, kind: "OWNER_GENERATED_RECONCILIATION_REPORT",
     provenance: "USER_SUPPLIED_UNVERIFIED", payload: structuredClone(payload),
-    fingerprint: { algorithm: "SHA-256", sha256 },
+    fingerprint: { algorithm: "SHA-256",
+      canonicalForm: "UTF-8 JSON of payload, 2-space indent, newline",
+      authenticatesSources: false, digitallySigned: false, sha256 },
     inputManifest, sourceBinding
   }};
 }
@@ -147,5 +149,50 @@ test("source module never reads remote services, storage, model or credentials",
   for(const banned of [/\bfetch\s*\(/,/XMLHttpRequest/,/WebSocket/,/localStorage/,
     /sessionStorage/,/document\.cookie/,/model\.infer/,/provider\.publish/]){
     assert.doesNotMatch(source,banned);
+  }
+});
+
+test("rejects spoofed authentication or signature metadata even with unchanged hashes", async () => {
+  const fields = [
+    ["fingerprint", "authenticatesSources"],
+    ["fingerprint", "digitallySigned"],
+    ["sourceBinding", "authenticatesSources"],
+    ["sourceBinding", "digitallySigned"],
+    ["inputManifest", "sourceAuthenticated"],
+    ["inputManifest", "consentVerified"],
+    ["inputManifest", "timestampAuthenticated"],
+    ["inputManifest", "includesOriginalFiles"]
+  ];
+  for (const [object, field] of fields) {
+    const { input, wrapper } = await exportSample();
+    wrapper[object][field] = true;
+    await assert.rejects(
+      proof.verifyExport(wrapper, input, webcrypto.subtle),
+      /Untrusted or unsupported/, object + "." + field);
+  }
+});
+
+test("rejects unsupported versions, provenance, algorithms, and canonical forms", async () => {
+  const cases = [
+    [["schemaVersion"], 2],
+    [["provenance"], "INDEPENDENTLY_VERIFIED"],
+    [["payload", "schemaVersion"], 2],
+    [["payload", "classification"], "INDEPENDENTLY_VERIFIED"],
+    [["inputManifest", "algorithm"], "SHA-1"],
+    [["fingerprint", "algorithm"], "SHA-1"],
+    [["fingerprint", "canonicalForm"], "unknown"],
+    [["fingerprint", "sha256"], "invalid"],
+    [["sourceBinding", "algorithm"], "SHA-1"],
+    [["sourceBinding", "canonicalForm"], "unknown"],
+    [["sourceBinding", "sha256"], "invalid"]
+  ];
+  for (const [path, value] of cases) {
+    const { input, wrapper } = await exportSample();
+    let target = wrapper;
+    for (const key of path.slice(0, -1)) target = target[key];
+    target[path.at(-1)] = value;
+    await assert.rejects(
+      proof.verifyExport(wrapper, input, webcrypto.subtle),
+      /Untrusted or unsupported/, path.join("."));
   }
 });
