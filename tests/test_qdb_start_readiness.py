@@ -31,7 +31,9 @@ def repo(tmp_path):
     git(root, "config", "user.name", "Offline Test")
     root.joinpath(qdb.FOUNDATION).parent.mkdir(parents=True)
     payload = {"policy": "NO_GO_UNTIL_ALL_NINE_VERIFIED", "checks": [
-        {"id": f"F{i:02}", "status": "verified" if i <= 3 else "blocked"}
+        {"id": f"F{i:02}", "status": "verified" if i <= 3 else "blocked",
+         "source_path": f"docs/operational-core/fixture-F{i:02}.md" if i <= 3 else "",
+         "reason": "Fixture-only committed source" if i <= 3 else "Blocked in fixture"}
         for i in range(1, 10)
     ]}
     root.joinpath(qdb.FOUNDATION).write_text(json.dumps(payload))
@@ -40,6 +42,10 @@ def repo(tmp_path):
             p = root / path
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_text("# fixture\n")
+    for i in range(1, 4):
+        (root / f"docs/operational-core/fixture-F{i:02}.md").write_text(
+            f"# Fixture source F{i:02} (not an acceptance certificate)\\n"
+        )
     git(root, "add", ".")
     git(root, "commit", "-qm", "Fictional offline evidence fixtures")
     return root
@@ -89,6 +95,52 @@ def test_missing_foundation_and_bad_policy_fail_closed(repo):
     git(repo, "add", ".")
     git(repo, "commit", "-qm", "Bad fixture policy")
     with pytest.raises(qdb.ReadinessError, match="NO-GO"):
+        qdb.assess(repo)
+
+
+def test_verified_foundation_source_missing_is_rejected(repo):
+    evidence = repo / qdb.FOUNDATION
+    data = json.loads(evidence.read_text())
+    data["checks"][0]["source_path"] = "docs/operational-core/nonexistent-proof.md"
+    evidence.write_text(json.dumps(data))
+    git(repo, "add", ".")
+    git(repo, "commit", "-qm", "Fixture: missing claimed foundation source")
+    with pytest.raises(qdb.ReadinessError, match="regular committed source"):
+        qdb.assess(repo)
+
+
+def test_new_verified_status_without_source_is_rejected(repo):
+    evidence = repo / qdb.FOUNDATION
+    data = json.loads(evidence.read_text())
+    data["checks"][3]["status"] = "verified"
+    data["checks"][3]["reason"] = "Source not supplied"
+    evidence.write_text(json.dumps(data))
+    git(repo, "add", ".")
+    git(repo, "commit", "-qm", "Fixture: unsupported promotion")
+    with pytest.raises(qdb.ReadinessError, match="F04"):
+        qdb.assess(repo)
+
+
+def test_verified_foundation_rationale_must_not_be_blank(repo):
+    evidence = repo / qdb.FOUNDATION
+    data = json.loads(evidence.read_text())
+    data["checks"][0]["reason"] = "   "
+    evidence.write_text(json.dumps(data))
+    git(repo, "add", ".")
+    git(repo, "commit", "-qm", "Fixture: no evidence rationale")
+    with pytest.raises(qdb.ReadinessError, match="evidence rationale"):
+        qdb.assess(repo)
+
+
+def test_verified_foundation_source_symlink_is_rejected(repo, tmp_path):
+    external = tmp_path / "outside-commit.md"
+    external.write_text("Not a committed repository evidence file\\n")
+    path = repo / "docs/operational-core/fixture-F01.md"
+    path.unlink()
+    path.symlink_to(external)
+    git(repo, "add", "-A")
+    git(repo, "commit", "-qm", "Fixture: symlink instead of committed evidence")
+    with pytest.raises(qdb.ReadinessError, match="regular committed source"):
         qdb.assess(repo)
 
 
