@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="/assets/campaign-workbench.css">
 <script defer src="/assets/campaign-engine.js"></script>
 <script defer src="/assets/campaign-reconcile-engine.js"></script>
+<script defer src="/assets/campaign-import-proof.js"></script>
 <script defer src="/assets/campaign-workbench.js"></script>
 <script defer src="/assets/campaign-reconciliation.js"></script>
 <title>Campaign Workbench — MetaAutomate | P2-060</title>
@@ -134,7 +135,7 @@
      <p id="reconcile-summary" class="muted"></p>
      <ul id="reconcile-items" class="options reconcile-decisions"></ul>
      <button id="reconcile-export" class="subtle" type="button" disabled>Download reproducible report and SHA-256 fingerprint</button>
-     <p class="help">The SHA-256 digest detects changes in the downloaded report payload; it does not prove the imports came from a real business or that the report is digitally signed. The download contains inventory and sales figures. Keep it private.</p>
+     <p class="help">The report includes SHA-256 fingerprints of the exact three imported CSV byte streams, plus a digest binding their manifest to the report. These owner-generated hashes detect changes but cannot prove business authenticity, ownership, consent, transaction accuracy, trusted timestamps or a digital signature. The download contains inventory and sales figures. Keep it private.</p>
    </div>
  </section>
  <p class="status" id="campaign-status" role="status" aria-live="polite">Choose a CSV or download the example file to begin.</p>
