@@ -123,3 +123,33 @@ code review, real customer demand, or release approval.
 - A practical research hypothesis is to interview permissioned Qatar retail/wholesale and inventory-led businesses about the time, costs, and error rates of coordinating stock and marketing content. Interviews, measured baselines, willingness to pay, actual competitors, localization requirements, and Qatar regulatory feasibility are **still missing**. Do not present a TAM/SAM/SOM figure, revenue forecast, or customer count without documented assumptions and evidence.
 
 **Submission remains HOLD.** Public program statistics are contextual research only and cannot substitute for the QDB-required customer/problem validation.
+
+## Approved ten-stage product direction (founder direction, 2026-10-26)
+
+This is a **product-delivery roadmap**, not a claim that repository engineering Phase 01, 02, or 03 has been released. Stage 03 customer discovery runs alongside the MVP.
+
+1. **Secure Foundation:** identity, tenant segregation, role authorization, privacy, audit, testing and recovery. Exit: independently accepted foundation, not merely code presence.
+2. **Inventory-to-Growth MVP:** import, reconciliation, stock choice, governed campaign drafting, approval and self-declared metrics. Exit: independently demonstrated complete workflow.
+3. **Qatar Validation & START Readiness:** permissioned buyer interviews and pilots, market alternatives, pricing hypotheses, team/legal proof and careful evidence. Exit: authentic, reviewable application proposition.
+4. **Sales, Orders & CRM:** consent-governed customer, order and sales management.
+5. **Finance, Purchasing & Supply Chain:** accounting boundaries, procurement, suppliers and stock flows.
+6. **AI Automation & AMBOY:** governed AI assistance, measurable evaluation and human approvals.
+7. **Marketing & Omnichannel Commerce:** verified integrations and authorized publishing only.
+8. **HR, Payroll & Enterprise Controls:** protected personnel data and enterprise governance.
+9. **Integration Marketplace & Multi-Industry:** scoped partner APIs and vertical configurations.
+10. **Academy, Regional & Global Expansion:** training, local partnerships and assessed cross-border operations.
+
+**Sequencing rule:** progress to additional commercial capabilities only after prior technical, security, operational and market gates have clear evidence. The Qatar START application is never automatically submitted. Stages 04–10 are planned, not deployed or sold.
+
+### Stage 01 verification-control source integrity (2026-10-26)
+
+The offline QDB evidence checker now **rejects a Foundation status of `verified`** when its declared `source_path` is not a regular, checked-out and Git-committed file (including missing or symlinked paths), or when its `reason` is blank. This is a bounded anti-inflation check against unsupported evidence claims. Existing verified F01–F03 reference committed source paths and are **not** newly independently certified. A committed source file does not authenticate an outside reviewer or prove a live production security control.
+
+Four fixture-repository regression cases were added for missing sources, unsupported verified promotions, blank rationales and symlinked evidence. Source is committed on draft PR #121; **the updated test suite has not been run on the exact new head**. On a trusted, clean Kali checkout, run:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q tests/test_qdb_start_readiness.py
+python3 scripts/qdb_start_readiness.py
+```
+
+Do not claim independent CI, Foundation advancement or investor readiness from these local checks. GitHub Actions runners remain billing/spending-limit blocked; human-reviewed release gates and **NO-GO** remain unchanged.
