@@ -44,7 +44,7 @@ def repo(tmp_path):
             p.write_text("# fixture\n")
     for i in range(1, 4):
         (root / f"docs/operational-core/fixture-F{i:02}.md").write_text(
-            f"# Fixture source F{i:02} (not an acceptance certificate)\\n"
+            f"# Fixture source F{i:02} (not an acceptance certificate)\n"
         )
     git(root, "add", ".")
     git(root, "commit", "-qm", "Fictional offline evidence fixtures")
