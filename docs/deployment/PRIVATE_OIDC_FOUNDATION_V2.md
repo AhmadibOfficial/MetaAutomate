@@ -57,3 +57,37 @@ and negative-role E2E; actual recovery and independent security review.
 F06 remains BLOCKED; the full nine-control operational release is NO-GO.
 No live provider, app secrets, external network, subscription/billing,
 migrations, merges or deployments were activated by this source change.
+
+
+## Stage 01 / F06 — transaction-scoped tenant isolation (source hardening)
+
+The **unapplied** `012_oidc_identities.sql` candidate contains two
+`SECURITY DEFINER` OIDC session functions. A failed authentication or a
+revoked membership must never leave an organization/user GUC set inside
+a transaction that could execute a subsequent statement.
+
+Both `app.create_oidc_workspace_session` and
+`app.authenticate_workspace_session` now clear
+`app.organization_id` and `app.user_id` **before evaluating** the
+provided identity/session token, and clear both again on denied active
+membership. This retains the successful tenant-setting behavior for an
+authorized principal; failure still returns no principal. The patch
+does **not** apply migration 012, grant access or enable the OIDC service.
+
+Two source-contract regressions were added to
+`tests/test_private_oidc_contract.py`. Run in a clean checkout bound
+to the PR HEAD:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q \
+  tests/test_private_oidc_contract.py \
+  tests/test_stage01_f06_oidc_claim_admission.py \
+  tests/test_p2_04a_oidc_mfa.py
+```
+
+**Not a runtime proof.** These tests inspect the SQL source and synthetic
+callback; independent PostgreSQL transactional checks, a real IdP
+issuer/JWKS/PKCE/nonce/MFA integration, forced RLS checks, revoked
+identity/session tests, complete cross-tenant denial, private browser
+acceptance, backup/restore, human review and security sign-off remain
+mandatory. F06 is BLOCKED; production NO-GO remains binding.
