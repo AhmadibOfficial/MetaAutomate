@@ -75,7 +75,13 @@ BEGIN
     PERFORM pg_catalog.set_config('app.user_id', v_user::text, true);
     SELECT m.role::text INTO v_role FROM public.organization_memberships m
      WHERE m.organization_id=v_org AND m.user_id=v_user AND m.status='ACTIVE';
-    IF NOT FOUND THEN RETURN; END IF;
+    IF NOT FOUND THEN
+        -- A rejected principal must not leave a partially authorized tenant
+        -- context visible to later statements in this transaction.
+        PERFORM pg_catalog.set_config('app.organization_id', '', true);
+        PERFORM pg_catalog.set_config('app.user_id', '', true);
+        RETURN;
+    END IF;
 
     INSERT INTO public.workspace_sessions (
         organization_id,user_id,oidc_identity_id,session_sha256,csrf_sha256,expires_at
@@ -129,7 +135,12 @@ BEGIN
 
     SELECT m.role::text INTO v_role FROM public.organization_memberships m
      WHERE m.organization_id=v_org AND m.user_id=v_user AND m.status='ACTIVE';
-    IF NOT FOUND THEN RETURN; END IF;
+    IF NOT FOUND THEN
+        -- Clear transaction-scoped tenant context after revoked membership.
+        PERFORM pg_catalog.set_config('app.organization_id', '', true);
+        PERFORM pg_catalog.set_config('app.user_id', '', true);
+        RETURN;
+    END IF;
     RETURN QUERY SELECT v_org,v_user,v_role;
 END;
 $$;
