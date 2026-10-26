@@ -67,6 +67,12 @@ def main():
     csrf="csrf-"+secrets.token_urlsafe(36)
     session_hash=hashlib.sha256(token.encode()).hexdigest()
     csrf_hash=hashlib.sha256(csrf.encode()).hexdigest()
+    # A second wholly fictional tenant proves that CSRF/session hashes
+    # cannot be swapped across provisioned organization identities.
+    other_subject="verified-idp-other-"+uuid4().hex
+    other_digest=hashlib.sha256(other_subject.encode()).hexdigest()
+    other_session_hash=hashlib.sha256(secrets.token_bytes(36)).hexdigest()
+    other_csrf_hash=hashlib.sha256(secrets.token_bytes(36)).hexdigest()
 
     with psycopg.connect(admin) as conn:
         with conn.cursor() as c:
@@ -90,6 +96,29 @@ def main():
                 "VALUES(%s,%s,%s,%s) RETURNING id",(org,user,ISSUER,DIGEST),
             )
             identity_id=c.fetchone()[0]
+            c.execute(
+                "INSERT INTO organizations(slug,name) "
+                "VALUES(%s,'CI OIDC Second Organization') RETURNING id",
+                ("ci-oidc-other-"+uuid4().hex,),
+            )
+            other_org=c.fetchone()[0]
+            c.execute(
+                "INSERT INTO users(email,display_name) "
+                "VALUES(%s,'OIDC CI Second Member') RETURNING id",
+                ("ci-oidc-other-"+uuid4().hex+"@example.invalid",),
+            )
+            other_user=c.fetchone()[0]
+            c.execute("SELECT app.set_context(%s,%s)", (other_org,other_user))
+            c.execute(
+                "INSERT INTO organization_memberships(organization_id,user_id,role,status) "
+                "VALUES(%s,%s,'OPERATOR','ACTIVE')",
+                (other_org,other_user),
+            )
+            c.execute(
+                "INSERT INTO oidc_identities(organization_id,user_id,issuer,subject_sha256) "
+                "VALUES(%s,%s,%s,%s)",
+                (other_org,other_user,ISSUER,other_digest),
+            )
 
     with psycopg.connect(runtime) as conn:
         with conn.cursor() as c:
@@ -134,6 +163,46 @@ def main():
             c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
                       (session_hash,csrf_hash))
             require(c.fetchone()[0]==org, "Valid session did not recover after denial")
+            require_context(c, org, user)
+
+    # Validate real session separation across two fictional organizations.
+    # A successful A session followed by B admission must replace, not mix,
+    # tenant context, and neither tenant may replay the other's CSRF hash.
+    with psycopg.connect(runtime) as conn:
+        with conn.cursor() as c:
+            c.execute("SELECT * FROM app.create_oidc_workspace_session(%s,%s,%s,%s)",
+                      (ISSUER,other_digest,other_session_hash,other_csrf_hash))
+            other_identity=c.fetchone()
+            require(other_identity
+                    and other_identity[0]==other_org
+                    and other_identity[1]==other_user
+                    and other_identity[2]=="OPERATOR",
+                    "Second tenant must resolve only its own principal")
+            require_context(c, other_org, other_user)
+
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (session_hash,other_csrf_hash))
+            require(c.fetchone() is None, "Tenant B CSRF unlocked tenant A")
+            require_context(c)
+
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (other_session_hash,csrf_hash))
+            require(c.fetchone() is None, "Tenant A CSRF unlocked tenant B")
+            require_context(c)
+
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (session_hash,csrf_hash))
+            require(c.fetchone()[0]==org, "Tenant A session binding drifted")
+            require_context(c, org, user)
+
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (other_session_hash,other_csrf_hash))
+            require(c.fetchone()[0]==other_org, "Tenant B session binding drifted")
+            require_context(c, other_org, other_user)
+
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (session_hash,csrf_hash))
+            require(c.fetchone()[0]==org, "Tenant A could not be reselected")
             require_context(c, org, user)
 
     # Real PostgreSQL membership revocation/reinstatement: disposable CI only.
@@ -196,6 +265,11 @@ def main():
                       (second_hash,csrf_hash))
             require(c.fetchone() is None, "Revoked OIDC identity retained access")
             require_context(c)
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (other_session_hash,other_csrf_hash))
+            require(c.fetchone()[0]==other_org,
+                    "Revoking tenant A identity unexpectedly revoked tenant B")
+            require_context(c, other_org, other_user)
 
     env=os.environ.copy()
     env.pop("DATABASE_URL",None)
@@ -220,7 +294,7 @@ def main():
     broken=env.copy()
     broken["DATABASE_URL"]=admin
     subprocess_config_check(broken,False)
-    print("PASS: disposable OIDC identity, CSRF denial, tenant-context clearing, membership/session/identity revocation and private startup checks")
+    print("PASS: disposable two-tenant OIDC isolation, CSRF denial, context clearing, membership/session/identity revocation and private startup checks")
 
 
 if __name__ == "__main__":
