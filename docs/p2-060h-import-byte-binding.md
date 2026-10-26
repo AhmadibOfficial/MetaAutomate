@@ -77,7 +77,7 @@ PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/metautomate-playwright-browsers" \
 ```
 
 **Expected** 69 Python test cases (63 inherited + 6 new), with one new
-Python test executing **13** Node byte-manifest tests, and a real
+Python test executing **15** Node byte-manifest tests, and a real
 `DEVELOPER_LOCAL_RECONCILIATION_PASS` browser marker. These are
 **acceptance targets, not claimed outcomes**. The browser verifier now also
 checks SHA-256 for each exact imported CSV, the manifest/payload binding,
@@ -103,3 +103,23 @@ information is not MetaAutomate-specific validation.
 existing GitHub Actions billing restrictions, independent AppSec/real data
 provenance pending, release NO-GO. Keep PR draft, unmerged and undeployed;
 no Qatar application submission without explicit human authorization.
+
+## 2026-10-26 — Fail-closed verification metadata hardening
+
+The local `verifyExport` verifier now refuses a report that claims authenticated
+sources, consent, trusted timestamps, original-file inclusion, or a digital
+signature; it also refuses unsupported wrapper/payload versions, provenance,
+hash algorithms, canonical forms, and malformed SHA-256 hex. These fields were
+previously not all checked, and some were outside the digested bundle.
+Two Node regression cases cover metadata-spoofing and format-downgrade
+attempts, increasing the planned Node suite from **13 to 15 cases**.
+The full Python gate remains **69 expected cases** (including the Node
+suite as one Python case), not 69 verified passes. A four-case isolated
+Node regression using reconstructed module source passed on 2026-10-26,
+but is **not exact-commit acceptance** or independent AppSec review.
+
+This closes a misleading-verification-result gap; it **does not** prevent
+an owner or adversary from replacing all inputs and recomputing digests.
+Independent source authentication, actual business accuracy and real-world
+merchant consent remain unverified. GitHub Actions is billing-blocked;
+the draft PR is unmerged and production remains **NO-GO**.
