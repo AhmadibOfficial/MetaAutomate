@@ -23,3 +23,37 @@ This candidate replaces outdated PR #6. The previous branch used migration numbe
 6. Review PR head SHA and CI; acquire fresh, explicit approvals before applying migration 012 or deploying the application. Opening this PR does not authorize any runtime change.
 
 The release evidence gate remains the source-merge signal, not a promise of production security.
+
+
+## Stage 01 / F06 — OIDC identity-claim shape hardening (draft only)
+
+The existing Authlib authorization-code callback previously coerced the
+verified issuer and subject to strings. Unexpected `sub` types could
+therefore become implicit string account identifiers; non-ASCII subjects
+would fail later in the ASCII-only SHA-256 identity digest. The callback
+now **denies before database session creation** when the purported
+provider-verified claims are not a mapping, `iss` is not the configured
+issuer as an exact string, or `sub` is not a printable 1–255-byte ASCII
+string. The ID-token presence check also rejects nonstring placeholders.
+Valid claim shapes proceed through the **existing** recent signed-MFA
+policy; neither the MFA check nor the membership SQL is bypassed.
+
+This is a narrow defense-in-depth fix. The synthetic tests use a fake
+`authorize_access_token` response and deliberately **do not** establish
+a signed JWT, real IdP, authentic MFA, correct Authlib state/nonce/PKCE,
+tenant isolation, live SSO, browser acceptance or deployment readiness.
+
+From a reviewed clean exact-commit checkout:
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q \
+  tests/test_stage01_f06_oidc_claim_admission.py \
+  tests/test_p2_04a_oidc_mfa.py \
+  tests/test_private_oidc_contract.py
+```
+
+Additional operator-owned acceptance remains mandatory: genuine IdP OIDC
+code+PKCE+nonce signature/JWKS, MFA, tenant mapping, session revocation
+and negative-role E2E; actual recovery and independent security review.
+F06 remains BLOCKED; the full nine-control operational release is NO-GO.
+No live provider, app secrets, external network, subscription/billing,
+migrations, merges or deployments were activated by this source change.
