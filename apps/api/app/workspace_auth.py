@@ -4,6 +4,7 @@ OIDC mode requires a configured HTTPS identity provider. ID tokens are validated
 by Authlib before exact issuer+subject matching to a provisioned DB identity.
 OIDC mode never accepts local developer access keys.
 """
+from collections.abc import Mapping
 import hashlib
 import os
 import secrets
@@ -177,7 +178,7 @@ async def oidc_callback(request: Request):
     # Never coerce an unexpected claim to text before DB account binding:
     # for example, str(None), str(True) or unicode can cause identity
     # confusion or an uncaught ASCII-encoding failure in _digest().
-    if not isinstance(userinfo, dict):
+    if not isinstance(userinfo, Mapping):
         raise HTTPException(status_code=401, detail="Verified OIDC identity required")
     issuer = userinfo.get("iss")
     subject = userinfo.get("sub")
