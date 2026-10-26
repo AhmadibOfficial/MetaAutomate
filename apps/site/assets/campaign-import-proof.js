@@ -77,6 +77,31 @@
         !wrapper.payload || !wrapper.fingerprint ||
         !wrapper.inputManifest || !wrapper.sourceBinding)
       throw new Error("Expected complete owner-generated reconciliation export");
+    // Fail closed on claims that a bare digest cannot establish. These
+    // metadata fields are outside the hash inputs and must not be spoofable.
+    const fingerprint = wrapper.fingerprint, binding = wrapper.sourceBinding;
+    const manifest = wrapper.inputManifest;
+    const sha256Hex = value => typeof value === "string" && /^[0-9a-f]{64}$/.test(value);
+    if (wrapper.schemaVersion !== 1 ||
+        wrapper.provenance !== "USER_SUPPLIED_UNVERIFIED" ||
+        wrapper.payload.schemaVersion !== 1 ||
+        wrapper.payload.classification !== "USER_SUPPLIED_UNVERIFIED" ||
+        manifest.algorithm !== "SHA-256" ||
+        manifest.sourceAuthenticated !== false ||
+        manifest.consentVerified !== false ||
+        manifest.timestampAuthenticated !== false ||
+        manifest.includesOriginalFiles !== false ||
+        fingerprint.algorithm !== "SHA-256" ||
+        fingerprint.canonicalForm !== "UTF-8 JSON of payload, 2-space indent, newline" ||
+        fingerprint.authenticatesSources !== false ||
+        fingerprint.digitallySigned !== false ||
+        !sha256Hex(fingerprint.sha256) ||
+        binding.algorithm !== "SHA-256" ||
+        binding.canonicalForm !== "UTF-8 JSON of {inputManifest,payload}, 2-space indent, newline" ||
+        binding.authenticatesSources !== false ||
+        binding.digitallySigned !== false ||
+        !sha256Hex(binding.sha256))
+      throw new Error("Untrusted or unsupported reconciliation export metadata");
     const actual = await inspectInputs(inputs, subtle);
     const sourceBytesMatch = JSON.stringify(actual.inputManifest) ===
       JSON.stringify(wrapper.inputManifest);
