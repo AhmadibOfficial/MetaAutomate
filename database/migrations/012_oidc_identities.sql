@@ -55,8 +55,7 @@ DECLARE
     v_oidc_id uuid;
     v_role text;
 BEGIN
-    -- Never inherit tenant identity from an earlier attempted authentication
-    -- in the same transaction, including invalid or non-matching tokens.
+    -- Invalid/missing identity can never inherit an earlier tenant context.
     PERFORM pg_catalog.set_config('app.organization_id', '', true);
     PERFORM pg_catalog.set_config('app.user_id', '', true);
     IF p_issuer IS NULL OR p_issuer NOT LIKE 'https://%'
@@ -80,8 +79,7 @@ BEGIN
     SELECT m.role::text INTO v_role FROM public.organization_memberships m
      WHERE m.organization_id=v_org AND m.user_id=v_user AND m.status='ACTIVE';
     IF NOT FOUND THEN
-        -- A rejected principal must not leave a partially authorized tenant
-        -- context visible to later statements in this transaction.
+        -- Denied tenant membership must not leak an authorization context.
         PERFORM pg_catalog.set_config('app.organization_id', '', true);
         PERFORM pg_catalog.set_config('app.user_id', '', true);
         RETURN;
@@ -109,11 +107,10 @@ DECLARE
     v_user uuid;
     v_role text;
 BEGIN
-    -- Never inherit tenant identity from an earlier attempted authentication
-    -- in the same transaction, including invalid or non-matching tokens.
+    -- Invalid/expired sessions can never inherit an earlier tenant context.
     PERFORM pg_catalog.set_config('app.organization_id', '', true);
     PERFORM pg_catalog.set_config('app.user_id', '', true);
-    IF p_session_sha256 IS NULL OR p_session_sha256 !~ '^[0-9a-f]{64}
+    IF p_session_sha256 IS NULL OR p_session_sha256 !~ '^[0-9a-f]{64}$'
        OR (p_csrf_sha256 IS NOT NULL AND p_csrf_sha256 !~ '^[0-9a-f]{64}$') THEN
         RETURN;
     END IF;
@@ -144,53 +141,7 @@ BEGIN
     SELECT m.role::text INTO v_role FROM public.organization_memberships m
      WHERE m.organization_id=v_org AND m.user_id=v_user AND m.status='ACTIVE';
     IF NOT FOUND THEN
-        -- Clear transaction-scoped tenant context after revoked membership.
-        PERFORM pg_catalog.set_config('app.organization_id', '', true);
-        PERFORM pg_catalog.set_config('app.user_id', '', true);
-        RETURN;
-    END IF;
-    RETURN QUERY SELECT v_org,v_user,v_role;
-END;
-$$;
-
-REVOKE ALL ON FUNCTION app.create_oidc_workspace_session(text,text,text,text)
-    FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION app.create_oidc_workspace_session(text,text,text,text)
-    TO metaautomate_runtime;
-
-COMMIT;
-
-       OR (p_csrf_sha256 IS NOT NULL AND p_csrf_sha256 !~ '^[0-9a-f]{64}$') THEN
-        RETURN;
-    END IF;
-
-    SELECT s.organization_id,s.user_id INTO v_org,v_user
-      FROM public.workspace_sessions s
-      JOIN public.organizations o ON o.id=s.organization_id
-      LEFT JOIN public.api_access_tokens t
-             ON t.organization_id=s.organization_id AND t.id=s.token_id
-      LEFT JOIN public.oidc_identities i
-             ON i.organization_id=s.organization_id AND i.id=s.oidc_identity_id
-     WHERE s.session_sha256=p_session_sha256
-       AND s.revoked_at IS NULL AND s.expires_at>now()
-       AND o.status='ACTIVE'
-       AND (p_csrf_sha256 IS NULL OR s.csrf_sha256=p_csrf_sha256)
-       AND (
-            (s.token_id IS NOT NULL
-             AND t.revoked_at IS NULL AND t.expires_at>now())
-            OR
-            (s.oidc_identity_id IS NOT NULL AND i.status='ACTIVE'
-             AND i.revoked_at IS NULL AND i.user_id=s.user_id)
-       );
-
-    IF NOT FOUND THEN RETURN; END IF;
-    PERFORM pg_catalog.set_config('app.organization_id',v_org::text,true);
-    PERFORM pg_catalog.set_config('app.user_id',v_user::text,true);
-
-    SELECT m.role::text INTO v_role FROM public.organization_memberships m
-     WHERE m.organization_id=v_org AND m.user_id=v_user AND m.status='ACTIVE';
-    IF NOT FOUND THEN
-        -- Clear transaction-scoped tenant context after revoked membership.
+        -- A revoked membership must not leave the session tenant GUC set.
         PERFORM pg_catalog.set_config('app.organization_id', '', true);
         PERFORM pg_catalog.set_config('app.user_id', '', true);
         RETURN;
