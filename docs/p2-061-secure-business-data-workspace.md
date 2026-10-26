@@ -180,3 +180,44 @@ acceptance, automatic retention or independently anchored audit logging.
 Source and tests remain pending local Kali execution, independent CI and
 human review; all operational NO-GO gates remain unchanged.
 
+
+## P2-061c — fail-closed historical audit checking (same stacked draft)
+
+The local encrypted-inventory lab previously authenticated each **new** event
+but did not inspect older audit events before appending. An altered historical
+row could therefore be extended with a new valid-looking MAC. The shared
+`_verified_audit_tip` now checks the **entire existing tenant chain within
+the same SQLite transaction** before `_audit` appends a successful
+`INVENTORY_IMPORTED`, `INVENTORY_READ`, `INVENTORY_DELETED`, or
+`INVENTORY_EXPIRED_PURGED` event. Integrity mismatch rejects the request;
+SQLite rolls back document changes and does not append a success event.
+`verify_audit` reuses the same helper. This is tenant-scoped and leaves
+other tenants' chains independent.
+
+Three source regression cases cover corrupt history refusing imports,
+reads/deletes and purges, with rollback and other-tenant isolation.
+
+**Limitations:** An unauthenticated local HMAC chain is not an external
+tamper-proof anchor: deletion of a trailing sequence or replacement of the
+entire database plus key can remain undetectable. Full-chain checks are
+O(number of audit events) per audited operation; enforce bounded logs or
+checkpointing as a separately reviewed follow-up before production. Local
+SQLite encryption is not production forced PostgreSQL RLS or verified disaster
+recovery. No Foundation status changed.
+
+Run exact-commit validation on the existing Kali machine:
+
+```bash
+cd "$HOME/MetaAutomate"
+git fetch origin
+git switch feature/p2-061-atomic-read-audit
+git status --short --branch
+git rev-parse HEAD
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q tests/test_p2_061_secure_data_lab.py
+python3 scripts/verify_p2_061_offline.py
+```
+
+Neither command was run as part of the GitHub source-only change.
+Run them against a clean, reviewed exact-commit checkout. GitHub Actions
+remain account billing/spending-limit blocked. **NO-GO** for merge,
+deploy, live data, migrations, spending and funding submission.
