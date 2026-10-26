@@ -131,3 +131,23 @@ branch protection and F07 off-host restore are also unresolved. Foundation
 F06 is still BLOCKED; full release **NO-GO**. No migration 012 was
 applied to the owner's Kali machine; no browser, customer, subscription,
 network/AI/social, deployment, billing or funding work was activated.
+
+
+## Stage 01 / F06 — two-tenant disposable OIDC isolation
+
+The pre-existing CI-only `scripts/verify_oidc_identity.py` fixture now provisions
+**two fictional organizations and separate identities** (OWNER and OPERATOR)
+in the same ephemeral PostgreSQL service. It verifies:
+
+- Each OIDC issuer+subject maps to its **own** preprovisioned organization and user.
+- Swapping the organizations' CSRF hashes denies access and clears both tenant GUCs.
+- Re-authenticating A → B → A on the same connection binds **both** transaction-local tenant settings to the selected principal, with no retained previous tenant.
+- Revoking tenant A's identity blocks A without invalidating tenant B's independent session.
+
+Two source-contract tests preserve the negative matrix. The actual PostgreSQL
+assertions remain **NOT_RUN** until GitHub Actions or another independently
+authorized, genuinely disposable runner becomes available. The source-contract
+tests can be executed normally on Kali; do not bypass the CI-only PostgreSQL
+guard, apply migration 012 on existing data, change GitHub billing, merge
+branches, activate actual OIDC/SSO, deploy, or claim F06 acceptance. Foundation
+NO-GO remains binding.
