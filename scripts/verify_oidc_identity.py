@@ -38,6 +38,26 @@ def subprocess_config_check(env, should_start: bool):
         assert result.returncode != 0, "OIDC mode must reject unsafe startup configuration"
 
 
+
+def require_context(cursor, expected_org=None, expected_user=None):
+    """Inspect real transaction-local tenant settings in ephemeral PostgreSQL.
+
+    A rejected identity must leave neither the org nor the user context set,
+    even after a previously successful authentication in the same transaction.
+    """
+    cursor.execute(
+        "SELECT current_setting('app.organization_id', true),"
+        " current_setting('app.user_id', true)"
+    )
+    actual_org, actual_user = cursor.fetchone()
+    if expected_org is None:
+        require(actual_org in (None, "") and actual_user in (None, ""),
+                "Rejected identity left a transaction-scoped tenant context")
+    else:
+        require((actual_org, actual_user)
+                == (str(expected_org), str(expected_user)),
+                "Authenticated identity has an incorrect tenant context")
+
 def main():
     if os.environ.get("GITHUB_ACTIONS") != "true":
         raise RuntimeError("OIDC integration tests require an ephemeral GitHub CI PostgreSQL service")
@@ -84,27 +104,98 @@ def main():
             c.execute("SELECT * FROM app.create_oidc_workspace_session(%s,%s,%s,%s)",
                       (ISSUER,DIGEST,session_hash,csrf_hash))
             identity=c.fetchone()
-            assert identity and identity[0]==org and identity[1]==user and identity[2]=="OWNER"
+            require(identity and identity[0]==org and identity[1]==user
+                    and identity[2]=="OWNER", "Valid OIDC tenant binding failed")
+            require_context(c, org, user)
+
             c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
                       (session_hash,csrf_hash))
-            assert c.fetchone()[0]==org
+            require(c.fetchone()[0]==org, "Valid OIDC session failed")
+            require_context(c, org, user)
+
+            # Every denial starts after a successful tenant binding in the
+            # SAME transaction. A stale app.organization_id would be unsafe.
             c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
                       (session_hash,hashlib.sha256(b"bad-csrf").hexdigest()))
-            assert c.fetchone() is None
+            require(c.fetchone() is None, "Wrong CSRF was authenticated")
+            require_context(c)
+
             c.execute("SELECT * FROM app.create_oidc_workspace_session(%s,%s,%s,%s)",
                       (ISSUER,hashlib.sha256(b"unapproved-subject").hexdigest(),
                        hashlib.sha256(b"unused-session").hexdigest(),csrf_hash))
-            assert c.fetchone() is None
+            require(c.fetchone() is None, "Unprovisioned subject was admitted")
+            require_context(c)
+
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      ("0"*64, csrf_hash))
+            require(c.fetchone() is None, "Unknown session was authenticated")
+            require_context(c)
+
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (session_hash,csrf_hash))
+            require(c.fetchone()[0]==org, "Valid session did not recover after denial")
+            require_context(c, org, user)
+
+    # Real PostgreSQL membership revocation/reinstatement: disposable CI only.
+    with psycopg.connect(admin) as conn:
+        with conn.cursor() as c:
+            c.execute("SELECT app.set_context(%s,%s)", (org,user))
+            c.execute("UPDATE organization_memberships SET status='SUSPENDED' "
+                      "WHERE organization_id=%s AND user_id=%s", (org,user))
+            require(c.rowcount==1, "Synthetic membership suspension failed")
+    with psycopg.connect(runtime) as conn:
+        with conn.cursor() as c:
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (session_hash,csrf_hash))
+            require(c.fetchone() is None, "Suspended membership retained access")
+            require_context(c)
+            # Creation with a known signed and provisioned subject must also fail.
+            c.execute("SELECT * FROM app.create_oidc_workspace_session(%s,%s,%s,%s)",
+                      (ISSUER,DIGEST,hashlib.sha256(b"suspended-attempt").hexdigest(),
+                       csrf_hash))
+            require(c.fetchone() is None, "Suspended member created a session")
+            require_context(c)
+
+    with psycopg.connect(admin) as conn:
+        with conn.cursor() as c:
+            c.execute("SELECT app.set_context(%s,%s)", (org,user))
+            c.execute("UPDATE organization_memberships SET status='ACTIVE' "
+                      "WHERE organization_id=%s AND user_id=%s", (org,user))
+            require(c.rowcount==1, "Synthetic membership restoration failed")
+
+    with psycopg.connect(runtime) as conn:
+        with conn.cursor() as c:
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (session_hash,csrf_hash))
+            require(c.fetchone()[0]==org, "Restored member did not recover access")
+            require_context(c, org, user)
+            c.execute("SELECT app.revoke_workspace_session(%s)", (session_hash,))
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (session_hash,csrf_hash))
+            require(c.fetchone() is None, "Revoked session retained access")
+            require_context(c)
+
+    # Separate valid second session proves identity revocation independently of
+    # the explicit session revocation tested above.
+    second_hash=hashlib.sha256(secrets.token_bytes(36)).hexdigest()
+    with psycopg.connect(runtime) as conn:
+        with conn.cursor() as c:
+            c.execute("SELECT * FROM app.create_oidc_workspace_session(%s,%s,%s,%s)",
+                      (ISSUER,DIGEST,second_hash,csrf_hash))
+            require(c.fetchone()[0]==org, "Second disposable identity admission failed")
+            require_context(c, org, user)
 
     with psycopg.connect(admin) as conn:
         with conn.cursor() as c:
             c.execute("UPDATE oidc_identities SET status='REVOKED',revoked_at=now() WHERE id=%s",
                       (identity_id,))
+            require(c.rowcount==1, "Synthetic identity revocation failed")
     with psycopg.connect(runtime) as conn:
         with conn.cursor() as c:
             c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
-                      (session_hash,csrf_hash))
-            assert c.fetchone() is None
+                      (second_hash,csrf_hash))
+            require(c.fetchone() is None, "Revoked OIDC identity retained access")
+            require_context(c)
 
     env=os.environ.copy()
     env.pop("DATABASE_URL",None)
@@ -129,7 +220,7 @@ def main():
     broken=env.copy()
     broken["DATABASE_URL"]=admin
     subprocess_config_check(broken,False)
-    print("PASS: OIDC tenant mapping, restricted grants, CSRF, revocation, SSO-only mode and fail-closed startup")
+    print("PASS: disposable OIDC identity, CSRF denial, tenant-context clearing, membership/session/identity revocation and private startup checks")
 
 
 if __name__ == "__main__":
