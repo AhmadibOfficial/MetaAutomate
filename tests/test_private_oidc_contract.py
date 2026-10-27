@@ -235,3 +235,34 @@ def test_oidc_disposable_revocation_requires_own_authenticated_context():
     assert "require_context(c, org, user)" in section
     assert section.count("require_context(c)") >= 2
     assert section.count("require_context(c, other_org, other_user)") == 2
+
+
+def test_oidc_candidate_migration_has_valid_function_delimiters_and_single_commit():
+    """Source-only guard against truncated SQL and premature COMMIT.
+
+    This validates the candidate text, not execution on PostgreSQL.
+    """
+    sql = (ROOT / "database/migrations/012_oidc_identities.sql").read_text()
+    assert sql.count("AS $$\\n") == 3
+    assert sql.count("\\n$$;") == 3
+    assert sql.count("$$") == 6
+    assert sql.count("\\nCOMMIT;") == 1
+    assert sql.rstrip().endswith("COMMIT;")
+    assert sql.count(
+        "GRANT EXECUTE ON FUNCTION app.create_oidc_workspace_session("
+    ) == 1
+    assert sql.count(
+        "REVOKE ALL ON FUNCTION app.create_oidc_workspace_session("
+    ) == 1
+    for chunk in sql.split("AS $$\\n")[1:]:
+        body, _remainder = chunk.split("\\n$$;", 1)
+        assert "BEGIN" in body and "END;" in body
+        assert "COMMIT;" not in body
+        assert "GRANT EXECUTE" not in body
+        assert "REVOKE ALL" not in body
+    revoker = _oidc_sql_function(
+        "CREATE OR REPLACE FUNCTION app.revoke_workspace_session("
+    )
+    assert "p_session_sha256 !~ '^[0-9a-f]{64}$'" in revoker
+    assert "AND organization_id = v_org::uuid" in revoker
+    assert "AND user_id = v_user::uuid" in revoker
