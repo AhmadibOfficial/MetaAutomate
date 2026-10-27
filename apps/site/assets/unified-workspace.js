@@ -6,10 +6,11 @@
   const engine = globalThis.MetaCampaign;
   const $ = id => document.getElementById(id);
   const screens = ["overview", "inventory", "campaign", "evidence", "modules", "readiness"];
-  const titles = { overview: "Overview", inventory: "Inventory intelligence", campaign: "Campaign studio", evidence: "Evidence center", modules: "All modules", readiness: "Qatar START readiness" };
+  const titles = { overview: "Home", inventory: "My inventory", campaign: "Create a post", evidence: "My reports", modules: "Other tools", readiness: "Project status" };
   const LIMIT = 40;
   let records = null, analysis = null, plan = null, approved = false, activity = [], messageTimer = null;
   let importGeneration = 0; // Invalidate an in-flight file read when input/session changes.
+  let exampleMode = false; // Never present synthetic sample data as owner-supplied business records.
   if (!engine || !["parseCSV", "analyze", "makeCampaign"].every(key => typeof engine[key] === "function")) {
     $("live-status").textContent = "Inventory engine unavailable. No actions can run.";
     $("live-status").classList.add("visible");
@@ -41,7 +42,7 @@
     schema: "metaautomate.local.v1",
     kind,
     generatedAtClientClock: new Date().toISOString(),
-    source: "USER_DECLARED_UNVERIFIED",
+    source: exampleMode ? "SYNTHETIC_EXAMPLE_UNVERIFIED" : "USER_DECLARED_UNVERIFIED",
     independentlyVerified: false,
     customerTractionVerified: false,
     revenueVerified: false,
@@ -95,6 +96,7 @@
   }
   function clearInventory(trackClear = true) {
     importGeneration++;
+    exampleMode = false;
     records = null;
     analysis = null;
     resetPlan();
@@ -116,6 +118,7 @@
   });
   $("inventory-file").addEventListener("change", () => {
     importGeneration++;
+    exampleMode = false;
     const file = $("inventory-file").files?.[0];
     // A newly chosen file must never leave a previous approval or analysis active.
     records = null;
@@ -130,6 +133,35 @@
     $("candidate-select").replaceChildren();
     $("file-label").textContent = file ? "Selected: " + file.name.slice(0, 75) : "No file selected";
     renderEvidence();
+  });
+  $("try-example").addEventListener("click", () => {
+    importGeneration++; // Invalidate a previously started file read.
+    const fictionalCSV = [
+      "sku,name,stock,weekly_sales,unit_price_kobo",
+      "EX-01,Example Cap,18,0,850000",
+      "EX-02,Example Kaftan,24,3,3500000",
+      "EX-03,Example Shoe,0,5,1200000"
+    ].join("\n") + "\n";
+    // Same production decision engine, but explicitly labelled fictional throughout.
+    try {
+      const parsed = engine.parseCSV(fictionalCSV);
+      const reviewed = engine.analyze(parsed);
+      $("inventory-file").value = "";
+      $("file-label").textContent = "Example products (not a real import)";
+      records = parsed;
+      analysis = reviewed;
+      exampleMode = true;
+      activity = [];
+      resetPlan();
+      renderInventory();
+      track("SYNTHETIC_EXAMPLE_ANALYZED");
+      location.hash = "#inventory";
+      navigate();
+      announce("Example loaded: 3 fictional products. Your own data has not been uploaded.");
+    } catch (error) {
+      clearInventory(false);
+      announce(error instanceof Error ? "Example unavailable: " + error.message : "Example unavailable.");
+    }
   });
   $("download-sample").addEventListener("click", () => {
     saveBlob("metaautomate-sample-inventory.csv",
@@ -154,6 +186,7 @@
       const reviewed = engine.analyze(parsed);
       if (generation !== importGeneration || $("inventory-file").files?.[0] !== file) return;
       // Commit state only after all parsing and analysis checks succeed.
+      exampleMode = false;
       records = parsed;
       analysis = reviewed;
       activity = [];
@@ -185,6 +218,9 @@
   }
   function renderInventory() {
     if (!analysis) return;
+    $("inventory-caveat").textContent = exampleMode
+      ? "Example only: fictional products and prices. These are not your business records."
+      : "Data origin is self-declared and not independently verified.";
     $("inventory-results").hidden = false;
     $("inventory-total").textContent = String(analysis.totalItems);
     $("inventory-stock").textContent = String(records.reduce((sum, item) => sum + item.stock, 0));
@@ -223,6 +259,7 @@
     if (!analysis) return;
     const payload = { importedItems: analysis.totalItems, flaggedItems: analysis.flaggedCount,
       ruleNote: analysis.note,
+      exampleOnly: exampleMode,
       inventory: analysis.evaluated.map(item => ({
         sku: item.sku, name: item.name, stock: item.stock, weeklySales: item.weeklySales,
         unitPriceKobo: item.priceKobo, signal: item.signal.title, actionable: item.signal.actionable
@@ -329,6 +366,7 @@
     // Only counts and review state; avoid copying entire product/marketing data into receipts.
     const receipt = {
       importedProductCount: analysis.totalItems,
+      exampleOnly: exampleMode,
       promotionCandidateCount: analysis.flaggedCount,
       selectedSku: plan?.sku || null,
       campaignDraftPrepared: !!plan,
