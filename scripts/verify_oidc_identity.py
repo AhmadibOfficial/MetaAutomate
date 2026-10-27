@@ -10,6 +10,8 @@ from pathlib import Path
 
 import psycopg
 
+from oidc_ci_database_guard import require_ci_database_urls
+
 
 ISSUER = "https://identity-ci.example.invalid/tenant"
 SECOND_ISSUER = ISSUER + "/independent"
@@ -64,6 +66,8 @@ def main():
         raise RuntimeError("OIDC integration tests require an ephemeral GitHub CI PostgreSQL service")
     admin=os.environ["DATABASE_URL"]
     runtime=os.environ["APP_DATABASE_URL"]
+    # Check target before opening any connection or provisioning fixtures.
+    require_ci_database_urls(admin, runtime)
     token="opaque-session-"+secrets.token_urlsafe(36)
     csrf="csrf-"+secrets.token_urlsafe(36)
     session_hash=hashlib.sha256(token.encode()).hexdigest()
