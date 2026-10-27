@@ -261,3 +261,38 @@ Next acceptance still requires independently authorized disposable
 PostgreSQL syntax/application, revocation and RLS testing. Never run the
 migration against the owner's existing database or bypass the CI-only
 integration guard. F06 remains BLOCKED; production and QDB submission NO-GO.
+
+
+## Stage 01 / F06 — CI database target interlock (2026-10-27)
+
+The disposable OIDC integration harness now calls
+`scripts/oidc_ci_database_guard.py` **before any PostgreSQL connection**.
+The standard-library-only guard requires the expected GitHub-hosted
+`push`/`pull_request` job context, repository, numeric run ID, and separate
+admin/runtime PostgreSQL URLs targeting the existing CI fixture at
+`localhost:5432/metaautomate`. It rejects remote hosts, arbitrary databases,
+wrong roles, socket-style DSNs, query-parameter overrides and missing passwords.
+The exact fixture host, database and roles are taken from
+`.github/workflows/ci.yml`; no service or migration was changed.
+
+Two offline Python regression tests exercise accepted synthetic CI inputs and
+negative environment/DSN cases **without connecting to any database**. They
+can be run alongside the existing F06 source-contract tests from a clean,
+trusted checkout:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider \
+  tests/test_private_oidc_contract.py \
+  tests/test_stage01_f06_oidc_claim_admission.py \
+  tests/test_p2_04a_oidc_mfa.py
+```
+
+**Limit:** CI environment variables and a loopback DSN do not cryptographically
+prove that PostgreSQL is disposable. A malicious or misconfigured runner could
+still mimic them, and a local process could occupy that port. The CI-only
+interlock is defense-in-depth against accidental non-CI or remote execution,
+not authorization to set CI variables manually or to run this script on Kali.
+Actual isolated PostgreSQL acceptance, independent security review, real
+IdP/MFA/PKCE/JWKS, F04–F09 and release approvals remain pending.
+GitHub Actions billing is still blocked. No production database was touched;
+Foundation remains historically 3/9 verified and **NO-GO**.
