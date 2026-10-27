@@ -46,6 +46,20 @@ class ReadinessError(ValueError):
     pass
 
 
+def _unique_json_object(pairs: list[tuple[str, object]]) -> dict:
+    """Reject ambiguous evidence, including duplicate keys in nested objects.
+
+    Python's default JSON decoder silently keeps the final duplicate value.
+    That could conceal an earlier GO status or false CI approval in a packet.
+    """
+    obj = {}
+    for key, value in pairs:
+        if key in obj:
+            raise ReadinessError("Duplicate JSON key in evidence: " + repr(key)[:100])
+        obj[key] = value
+    return obj
+
+
 def _git(root: Path, *args: str) -> str:
     proc = subprocess.run(["git", *args], cwd=root, capture_output=True,
                           text=True, check=False, timeout=10)
@@ -93,7 +107,7 @@ def _foundation(root: Path, inventory: set[str]) -> dict:
     if not _regular_committed_source(root, FOUNDATION, inventory):
         raise ReadinessError("Foundation evidence missing, symlinked or not a regular committed file")
     with (root / FOUNDATION).open(encoding="utf-8") as file:
-        data = json.load(file)
+        data = json.load(file, object_pairs_hook=_unique_json_object)
     if not isinstance(data, dict):
         raise ReadinessError("Foundation evidence must be a JSON object")
     entries = data.get("checks")
@@ -144,7 +158,7 @@ def _local_report(path: Path | None, repo: Path, commit: str) -> dict:
     if resolved.is_relative_to(repo.resolve()) or not resolved.is_file() or resolved.stat().st_size > 128_000:
         raise ReadinessError("Local test report must be a small existing file outside the repository")
     with resolved.open(encoding="utf-8") as file:
-        doc = json.load(file)
+        doc = json.load(file, object_pairs_hook=_unique_json_object)
     if not isinstance(doc, dict) or doc.get("gate") != "LOCAL_SOURCE_CHECK_ONLY":
         raise ReadinessError("Unexpected local validation format")
     if doc.get("commit") != commit:
