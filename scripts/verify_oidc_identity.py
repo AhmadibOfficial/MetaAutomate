@@ -235,6 +235,31 @@ def main():
             require(c.fetchone()[0]==org, "Tenant A could not be reselected")
             require_context(c, org, user)
 
+            # Revocation is a privileged mutation: tenant A's authenticated
+            # context must not be able to revoke tenant B's valid session.
+            c.execute("SELECT app.revoke_workspace_session(%s)",
+                      (other_session_hash,))
+            require_context(c, org, user)
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (other_session_hash,other_csrf_hash))
+            require(c.fetchone()[0]==other_org,
+                    "Tenant A revoked tenant B's session")
+            require_context(c, other_org, other_user)
+
+    # A new restricted connection has no authenticated tenant context.
+    # Supplying a known synthetic hash alone must never revoke a session.
+    with psycopg.connect(runtime) as conn:
+        with conn.cursor() as c:
+            require_context(c)
+            c.execute("SELECT app.revoke_workspace_session(%s)",
+                      (other_session_hash,))
+            require_context(c)
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (other_session_hash,other_csrf_hash))
+            require(c.fetchone()[0]==other_org,
+                    "Unauthenticated runtime revoked tenant B's session")
+            require_context(c, other_org, other_user)
+
     # The same opaque subject can exist under a different trusted issuer.
     # Only the full (issuer, subject) tuple identifies the intended tenant.
     with psycopg.connect(runtime) as conn:
