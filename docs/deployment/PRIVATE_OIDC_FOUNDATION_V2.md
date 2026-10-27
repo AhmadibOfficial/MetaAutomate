@@ -345,3 +345,29 @@ head has not yet passed full pytest or PostgreSQL integration. Run the
 source-only suite on a clean reviewed checkout; never spoof CI variables or
 apply migration 012 to an owner database. F06 remains BLOCKED, Foundation
 historically 3/9 verified, and production and Qatar START submission NO-GO.
+
+
+## Stage 01 / F06 — bind disposable DB guard to CI workflow/job (2026-10-27)
+
+The standard-library-only interlock now requires GitHub's workflow name
+`MetaAutomate CI`, job ID `test`, and a `GITHUB_WORKFLOW_REF` pointing to
+`AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@refs/...`.
+A generic GitHub Actions flag, correct repository and matching local DSNs
+are not enough to allow the destructive synthetic database fixture.
+The source-only regression exercises accepted workflow refs, wrong or
+missing workflow/job identities and verifies the interlock precedes the
+first `psycopg.connect`. It makes no database connections.
+
+**Known CI coverage gap:** `.github/workflows/ci.yml` currently filters
+pull requests to base branches `main` and `feat/vscode-workspace-v1`.
+Stacked draft PR #131 targets `feature/p2-061-atomic-read-audit`, so that
+PR does not itself trigger this workflow. Billing-blocked GitHub runners
+remain an additional independent obstacle. Do not expand CI triggers,
+purchase runner minutes or simulate CI by setting environment variables
+without a separately reviewed and approved plan.
+
+Workflow environment variables and ref strings can be spoofed; this guard
+cannot prove runner/database isolation. No actual PostgreSQL execution,
+OIDC provider/MFA acceptance, CI pass, merge, migration, deployment,
+subscription or QDB application is claimed. Foundation F06 remains
+BLOCKED and the operational release decision stays NO-GO.

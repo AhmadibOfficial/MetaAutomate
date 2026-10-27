@@ -287,6 +287,9 @@ def _ci_fixture():
         "RUNNER_ENVIRONMENT": "github-hosted",
         "GITHUB_EVENT_NAME": "pull_request",
         "GITHUB_RUN_ID": "123456789",
+        "GITHUB_WORKFLOW": "MetaAutomate CI",
+        "GITHUB_JOB": "test",
+        "GITHUB_WORKFLOW_REF": "AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@refs/pull/131/merge",
     }
     admin = "postgresql://metaautomate:ci_only_password@localhost:5432/metaautomate"
     runtime = "postgresql://metaautomate_runtime:ci_runtime_password@localhost:5432/metaautomate"
@@ -363,3 +366,43 @@ def test_oidc_ci_database_guard_rejects_non_fixture_urls():
     ):
         with pytest.raises(RuntimeError):
             guard(admin, unsafe_runtime, env)
+
+
+def test_oidc_ci_database_guard_is_bound_to_expected_workflow_and_job():
+    """Reject accidental execution in unrelated GitHub Actions workflows/jobs.
+
+    Source-only standard-library check; no psycopg or database connection.
+    """
+    guard = _ci_guard()
+    env, admin, runtime = _ci_fixture()
+    guard(admin, runtime, env)
+    guard(admin, runtime, {
+        **env,
+        "GITHUB_WORKFLOW_REF": (
+            "AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@refs/heads/main"
+        ),
+    })
+    for key, value in (
+        ("GITHUB_WORKFLOW", "Unrelated workflow"),
+        ("GITHUB_JOB", "release-evidence-gate"),
+        ("GITHUB_WORKFLOW_REF",
+         "AhmadibOfficial/MetaAutomate/.github/workflows/other.yml@refs/pull/131/merge"),
+        ("GITHUB_WORKFLOW_REF",
+         "someone-else/MetaAutomate/.github/workflows/ci.yml@refs/pull/131/merge"),
+        ("GITHUB_WORKFLOW_REF", ""),
+        ("GITHUB_WORKFLOW_REF",
+         "AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml"),
+    ):
+        with pytest.raises(RuntimeError, match="CI (test job|workflow path)"):
+            guard(admin, runtime, {**env, key: value})
+    for key in ("GITHUB_WORKFLOW", "GITHUB_JOB", "GITHUB_WORKFLOW_REF"):
+        missing = dict(env)
+        missing.pop(key)
+        with pytest.raises(RuntimeError):
+            guard(admin, runtime, missing)
+
+    # The interlock must remain before the first PostgreSQL connection.
+    script = (ROOT / "scripts/verify_oidc_identity.py").read_text()
+    assert script.index("require_ci_database_urls(admin, runtime)") < script.index(
+        "with psycopg.connect(admin) as conn:"
+    )

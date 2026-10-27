@@ -27,6 +27,17 @@ def require_ci_database_urls(admin_url: str, runtime_url: str, environ=None) -> 
     if not run_id.isascii() or not run_id.isdecimal():
         raise RuntimeError("OIDC database integration requires a GitHub run ID")
 
+    # Require the actual repository workflow and its database test job,
+    # not just a generic GitHub Actions environment in another job.
+    # These variables remain spoofable; this is accident prevention only.
+    if env.get("GITHUB_WORKFLOW") != "MetaAutomate CI" or env.get("GITHUB_JOB") != "test":
+        raise RuntimeError("OIDC database integration requires the designated CI test job")
+    workflow_ref = env.get("GITHUB_WORKFLOW_REF", "")
+    if not workflow_ref.startswith(
+        "AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@refs/"
+    ):
+        raise RuntimeError("OIDC database integration requires the reviewed CI workflow path")
+
     # libpq can fill omitted connection parameters from PG* environment
     # variables even when the URL spells out a host. In particular,
     # PGHOSTADDR can select a different network address than localhost.
