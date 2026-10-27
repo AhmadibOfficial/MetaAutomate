@@ -151,3 +151,37 @@ tests can be executed normally on Kali; do not bypass the CI-only PostgreSQL
 guard, apply migration 012 on existing data, change GitHub billing, merge
 branches, activate actual OIDC/SSO, deploy, or claim F06 acceptance. Foundation
 NO-GO remains binding.
+
+
+## Stage 01 / F06 — NULL OIDC digest rejection (candidate migration only)
+
+The unapplied `database/migrations/012_oidc_identities.sql` candidate now
+explicitly rejects NULL subject, session and CSRF SHA-256 values **before**
+attempting an OIDC workspace-session insert. PostgreSQL treats
+`NULL !~ pattern` as UNKNOWN rather than TRUE, so a regex-only OR guard
+could otherwise fall through and raise a database constraint error. The
+intended response is an ordinary no-principal denial with both
+transaction-local tenant settings cleared, not an exception or session.
+
+The existing CI-only disposable PostgreSQL identity harness adds three
+NULL-digest denial cases, each immediately after successful authentication
+in the same transaction, followed by a valid reauthentication. Two
+source-contract tests ensure the early SQL guards and harness assertions
+remain present. No production migration or runtime setting was changed.
+
+Owner-local **source-only** acceptance command at the exact reviewed PR head:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider \
+  tests/test_private_oidc_contract.py \
+  tests/test_stage01_f06_oidc_claim_admission.py \
+  tests/test_p2_04a_oidc_mfa.py
+```
+
+The new head has **not** been executed against PostgreSQL, Kali pytest or
+independent CI. Real OIDC/PKCE/JWKS/MFA, tenant RLS, negative-role browser
+testing, private ingress, backup/restore and release approval remain
+unverified. F06 is BLOCKED; Foundation remains historically 3/9 verified,
+and production/application submission remain NO-GO. Do not bypass the
+CI-only database guard, apply migration 012, merge or deploy without
+separate explicit approval.
