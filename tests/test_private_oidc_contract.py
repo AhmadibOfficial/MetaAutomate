@@ -314,6 +314,26 @@ def test_oidc_ci_database_guard_rejects_untrusted_execution_context():
         guard(admin, runtime, {})
 
 
+
+def test_oidc_ci_database_guard_rejects_libpq_shadow_settings():
+    """A literal localhost URL must not be redirected by libpq PG* defaults."""
+    guard = _ci_guard()
+    env, admin, runtime = _ci_fixture()
+    # Existing CI exports PGPASSWORD; explicit URLs carry fixture passwords.
+    guard(admin, runtime, {**env, "PGPASSWORD": "ci_only_password"})
+    for key, value in (
+        ("PGHOSTADDR", "203.0.113.17"),
+        ("PGHOSTADDR", "127.0.0.1"),
+        ("PGSERVICE", "developer-db"),
+        ("PGSERVICEFILE", "/tmp/unsafe-service.conf"),
+        ("PGSYSCONFDIR", "/tmp/unsafe-libpq"),
+        ("PGOPTIONS", "-c search_path=public"),
+    ):
+        with pytest.raises(RuntimeError, match="libpq environment overrides"):
+            guard(admin, runtime, {**env, key: value})
+
+
+
 def test_oidc_ci_database_guard_rejects_non_fixture_urls():
     """Never connect to remote, arbitrary, socket or query-overridden DSNs."""
     guard = _ci_guard()
