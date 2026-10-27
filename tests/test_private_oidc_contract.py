@@ -202,3 +202,36 @@ def test_oidc_disposable_cross_issuer_revocation_is_independent():
     assert "(issuer_session_hash,issuer_csrf_hash)" in section
     assert "Revoking issuer A identity invalidated issuer B identity" in section
     assert "require_context(c, other_org, other_user)" in section
+
+
+def test_oidc_sql_revocation_is_scoped_to_authenticated_principal():
+    """Source-only: revoked session digest alone cannot cross tenant boundaries."""
+    body = _oidc_sql_function("CREATE OR REPLACE FUNCTION app.revoke_workspace_session(")
+    assert "SECURITY DEFINER" in body
+    assert "current_setting('app.organization_id', true)" in body
+    assert "current_setting('app.user_id', true)" in body
+    assert "p_session_sha256 IS NULL" in body
+    assert "v_org IS NULL OR v_org = ''" in body
+    assert "v_user IS NULL OR v_user = ''" in body
+    assert "AND organization_id = v_org::uuid" in body
+    assert "AND user_id = v_user::uuid" in body
+    assert "AND revoked_at IS NULL" in body
+    legacy = (ROOT / "database/migrations/010_workspace_sessions.sql").read_text()
+    assert "REVOKE ALL ON FUNCTION app.revoke_workspace_session(text) FROM PUBLIC" in legacy
+    assert "GRANT EXECUTE ON FUNCTION app.revoke_workspace_session(text)" in legacy
+
+
+def test_oidc_disposable_revocation_requires_own_authenticated_context():
+    """Source guard for actual ephemeral PostgreSQL negative mutation checks."""
+    script = (ROOT / "scripts/verify_oidc_identity.py").read_text()
+    assert 'os.environ.get("GITHUB_ACTIONS") != "true"' in script
+    section = script.split(
+        "# Revocation is a privileged mutation:", 1
+    )[1].split("# The same opaque subject can exist", 1)[0]
+    assert section.count("SELECT app.revoke_workspace_session(%s)") == 2
+    assert section.count("(other_session_hash,)") == 2
+    assert "Tenant A revoked tenant B's session" in section
+    assert "Unauthenticated runtime revoked tenant B's session" in section
+    assert "require_context(c, org, user)" in section
+    assert section.count("require_context(c)") >= 2
+    assert section.count("require_context(c, other_org, other_user)") == 2
