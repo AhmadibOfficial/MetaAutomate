@@ -142,6 +142,26 @@ def main():
             require(c.fetchone()[0]==org, "Valid OIDC session failed")
             require_context(c, org, user)
 
+            # NULL digests must fail as ordinary denials before the INSERT.
+            # PostgreSQL three-valued OR would otherwise skip the validation
+            # branch and raise a NOT NULL error rather than return no principal.
+            # Rebind the valid identity after every denial in this transaction.
+            for label, subject_digest, session_digest, csrf_digest in (
+                ("subject", None, hashlib.sha256(b"unused-null-subject").hexdigest(), csrf_hash),
+                ("session", DIGEST, None, csrf_hash),
+                ("csrf", DIGEST, hashlib.sha256(b"unused-null-csrf").hexdigest(), None),
+            ):
+                c.execute("SELECT * FROM app.create_oidc_workspace_session(%s,%s,%s,%s)",
+                          (ISSUER, subject_digest, session_digest, csrf_digest))
+                require(c.fetchone() is None, f"NULL OIDC {label} digest was admitted")
+                require_context(c)
+                c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                          (session_hash, csrf_hash))
+                recovered = c.fetchone()
+                require(recovered is not None and recovered[0] == org,
+                        f"Valid session failed after NULL OIDC {label} denial")
+                require_context(c, org, user)
+
             # Every denial starts after a successful tenant binding in the
             # SAME transaction. A stale app.organization_id would be unsafe.
             c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
