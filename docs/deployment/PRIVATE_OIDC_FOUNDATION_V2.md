@@ -296,3 +296,27 @@ Actual isolated PostgreSQL acceptance, independent security review, real
 IdP/MFA/PKCE/JWKS, F04–F09 and release approvals remain pending.
 GitHub Actions billing is still blocked. No production database was touched;
 Foundation remains historically 3/9 verified and **NO-GO**.
+
+
+## Stage 01 / F06 — Exact disposable CI DSN matching (2026-10-27)
+
+The OIDC PostgreSQL integration interlock now accepts **only the two literal
+admin/runtime connection URLs configured in `.github/workflows/ci.yml`**,
+including their deliberately throwaway CI-only passwords. It no longer accepts
+an arbitrary nonempty password or alternate localhost spelling. This narrows
+accidental targeting of a developer-local database that happens to share the
+same host, port, database name and role. Exact comparison also rejects
+ambiguous percent-encoding, whitespace and URL parser normalization.
+
+Six additional negative fixture cases cover alternate credentials, IP
+spelling and embedded control characters. The guard does not open a database
+connection, and the test cases are source-only. These CI fixture credentials
+are intentionally non-production and must never be reused for any developer,
+staging or production database. If the CI fixture changes, update the guard
+and tests together under review.
+
+This remains **defense-in-depth**, not proof of an isolated runner or database:
+a malicious environment can spoof GitHub variables and mimic the literal
+connection URL. No PostgreSQL migration or actual integration run occurred.
+F06 remains BLOCKED, Foundation 3/9 historically verified, and production,
+customer operations and QDB submission remain NO-GO.
