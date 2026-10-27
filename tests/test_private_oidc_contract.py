@@ -173,3 +173,32 @@ def test_oidc_disposable_null_digests_clear_context_after_prior_success():
     assert "require_context(c)" in section
     assert "require_context(c, org, user)" in section
     assert "Valid session failed after NULL OIDC {label} denial" in section
+
+
+def test_oidc_disposable_same_subject_is_bound_to_exact_issuer():
+    """Source-only guard: two synthetic issuers must not alias one subject."""
+    script = (ROOT / "scripts/verify_oidc_identity.py").read_text()
+    assert 'os.environ.get("GITHUB_ACTIONS") != "true"' in script
+    assert 'SECOND_ISSUER = ISSUER + "/independent"' in script
+    assert "(other_org,other_user,SECOND_ISSUER,DIGEST)" in script
+    section = script.split(
+        "# The same opaque subject can exist under a different trusted issuer.", 1
+    )[1].split("# Real PostgreSQL membership revocation/reinstatement", 1)[0]
+    assert "(SECOND_ISSUER,DIGEST,issuer_session_hash,issuer_csrf_hash)" in section
+    assert "Same subject from second issuer resolved wrong tenant" in section
+    assert "require_context(c, other_org, other_user)" in section
+    assert "Issuer confusion admitted an unprovisioned subject" in section
+    assert "require_context(c)" in section
+    assert "Cross-issuer denial changed original tenant binding" in section
+    assert "require_context(c, org, user)" in section
+
+
+def test_oidc_disposable_cross_issuer_revocation_is_independent():
+    """Revoking issuer A must not revoke an unrelated issuer B identity."""
+    script = (ROOT / "scripts/verify_oidc_identity.py").read_text()
+    section = script.split(
+        "Revoked OIDC identity retained access", 1
+    )[1].split("env=os.environ.copy()", 1)[0]
+    assert "(issuer_session_hash,issuer_csrf_hash)" in section
+    assert "Revoking issuer A identity invalidated issuer B identity" in section
+    assert "require_context(c, other_org, other_user)" in section
