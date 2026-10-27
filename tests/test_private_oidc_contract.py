@@ -324,6 +324,9 @@ def test_oidc_ci_database_guard_rejects_non_fixture_urls():
         admin.replace("/metaautomate", "/production"),
         admin.replace("metaautomate:", "postgres:"),
         admin + "?host=production.example.com",
+        admin.replace("ci_only_password", "developer_password"),
+        admin.replace("localhost", "127.0.0.1"),
+        admin.replace("localhost", "local\nhost"),
         "host=/var/run/postgresql dbname=metaautomate user=metaautomate",
         "postgresql://metaautomate@localhost:5432/metaautomate",
     ):
@@ -333,6 +336,9 @@ def test_oidc_ci_database_guard_rejects_non_fixture_urls():
         runtime.replace("localhost", "db.example.com"),
         runtime.replace("metaautomate_runtime:", "metaautomate:"),
         runtime + "?hostaddr=203.0.113.10",
+        runtime.replace("ci_runtime_password", "developer_password"),
+        runtime.replace("localhost", "127.0.0.1"),
+        runtime.replace("localhost", "local\thost"),
         runtime.replace("/metaautomate", "/developer"),
     ):
         with pytest.raises(RuntimeError):
