@@ -5,7 +5,6 @@ PostgreSQL DSNs. Environment variables are not proof of database provenance:
 the CI service still needs an independent isolated-runner acceptance.
 """
 import os
-from urllib.parse import urlsplit
 
 
 def require_ci_database_urls(admin_url: str, runtime_url: str, environ=None) -> None:
@@ -28,26 +27,18 @@ def require_ci_database_urls(admin_url: str, runtime_url: str, environ=None) -> 
     if not run_id.isascii() or not run_id.isdecimal():
         raise RuntimeError("OIDC database integration requires a GitHub run ID")
 
-    for label, dsn, expected_user in (
-        ("admin", admin_url, "metaautomate"),
-        ("runtime", runtime_url, "metaautomate_runtime"),
-    ):
-        try:
-            parsed = urlsplit(dsn)
-            valid = (
-                parsed.scheme == "postgresql"
-                and parsed.hostname in ("localhost", "127.0.0.1")
-                and parsed.port == 5432
-                and parsed.path == "/metaautomate"
-                and parsed.username == expected_user
-                and bool(parsed.password)
-                and parsed.netloc.count("@") == 1
-                and not parsed.query
-                and not parsed.fragment
-            )
-        except (TypeError, ValueError):
-            valid = False
-        if not valid:
+    # Only the exact throwaway service credentials and URL spellings in
+    # .github/workflows/ci.yml are accepted. Merely checking host/database
+    # would also admit a developer DB using different local credentials.
+    # Exact string equality avoids URL-parser normalization differences.
+    expected_urls = (
+        ("admin", admin_url,
+         "postgresql://metaautomate:ci_only_password@localhost:5432/metaautomate"),
+        ("runtime", runtime_url,
+         "postgresql://metaautomate_runtime:ci_runtime_password@localhost:5432/metaautomate"),
+    )
+    for label, supplied, expected_url in expected_urls:
+        if supplied != expected_url:
             raise RuntimeError(
-                f"OIDC {label} PostgreSQL URL must target the expected loopback-only CI fixture"
+                f"OIDC {label} PostgreSQL URL must exactly match the disposable CI fixture"
             )
