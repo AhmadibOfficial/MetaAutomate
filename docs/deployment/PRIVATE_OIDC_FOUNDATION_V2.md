@@ -209,3 +209,35 @@ or tenant RLS. The CI-only guard remains in place. Do not set `GITHUB_ACTIONS`
 manually, run against the owner's Kali database, apply migration 012, merge,
 deploy, spend money, enable subscriptions, or submit the funding application.
 Foundation F06 remains BLOCKED and release remains NO-GO.
+
+
+## Stage 01 / F06 — tenant- and user-bound session revocation (candidate only)
+
+The existing migration 010 `app.revoke_workspace_session` accepts an opaque
+session digest but did not constrain its update by the authenticated
+transaction principal. The **unapplied** migration 012 now replaces that
+function without changing its SQL signature: it requires nonempty
+`app.organization_id` and `app.user_id` transaction settings and updates
+only the session whose digest, organization **and user** all match. This
+preserves the normal authenticated browser logout flow, while denying
+cross-tenant, cross-user or unauthenticated runtime revocation by digest
+alone.
+
+The existing CI-only ephemeral PostgreSQL identity harness now attempts to
+revoke tenant B's session from tenant A's authenticated context and again
+from a new connection with no identity context. Both must leave B's
+session usable; the original legitimate revocation assertion remains.
+Two offline source-contract tests cover the function guard and negative
+harness cases.
+
+**Security scope:** transaction-local settings are meaningful only when
+established through the existing trusted authentication flow; they are
+not a defense against arbitrary SQL execution or an independently verified
+identity proof. The SQL function is a migration candidate, not a change
+applied to any owner database. The actual negative tests are **NOT_RUN**
+until independently authorized disposable PostgreSQL CI is available.
+GitHub Actions account billing remains blocked. Live OIDC issuer/JWKS,
+MFA/PKCE, cross-tenant RLS, browser tests and independent review are
+unverified. F06 BLOCKED, Foundation 3/9 historically verified, production
+and QDB submission NO-GO. Do not spoof CI flags, apply migration 012,
+merge, deploy, enable billing or spend funds without separate approval.
