@@ -3,6 +3,38 @@
 **Status:** Draft / review-only / no merge or deployment authorization.
 **Dependency:** Stacked on Stage 01 F06 draft #131; itself dependent on #122 → #121 → #120 → #119. Foundation 3/9 historically verified; operational NO-GO.
 
+## P2-062b — 20-second first-use redesign (27 October 2026)
+The opening screen now answers just three questions without showing the
+technical roadmap, release metrics or a catalog of nine modules:
+1. **What does this do?** "Sell smarter with the stock you have."
+2. **What should I do first?** "Start with my inventory" or "Try an example instead."
+3. **What happens?** Add products → see potential stock opportunities → write a post.
+
+Main navigation is **Home / My inventory / Create a post**. Reports, tools
+and project status remain accessible under a visually secondary "More" section.
+Content uses everyday language, a light reading surface and compact cards,
+while preserving MetaAutomate's navy, electric blue, silver and gold palette.
+
+The one-click example processes **three explicitly fictional records** using
+the existing stock engine. Display and downloaded receipts label the data
+\`SYNTHETIC_EXAMPLE_UNVERIFIED\`, never customer evidence or traction. A new
+file selection or session reset invalidates stale imports and prior approvals.
+
+### Verified in this authoring run
+- Committed GitHub source readback, JavaScript compilation, unique HTML
+  element IDs, complete JS-to-DOM target mapping, and no external request
+  primitives: **PASS** (developer-local source checks).
+- In-memory mock-DOM interaction with the actual committed campaign engine:
+  sample 3 products / 2 candidates, draft creation, review-gated download,
+  edit-triggered revocation and local evidence download: **PASS**.
+- Updated source-level pytest and Chromium fixture for the new first-use
+  walkthrough, including explicitly synthetic JSON receipts: **committed,
+  not executed at exact branch HEAD**.
+
+Real browser viewport screenshots, keyboard/screen-reader checks,
+full pytest, Chromium acceptance, GitHub Actions and independent security
+review are **still pending**. No release approval is implied.
+
 ## Delivered
 - New responsive workspace dashboard with navigation for overview, inventory, campaign studio, evidence, existing modules and Qatar START readiness. Skip link, labels, keyboard-operable controls, focus styles, mobile sidebar and reduced-motion treatment.
 - Reuses the actual P2-060 MetaCampaign engine rather than recreating stock logic. Fatal UTF-8 decoding; existing 128 KB/400-row bounds and CSV security checks. User-declared product CSV stays in browser memory.
