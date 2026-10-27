@@ -259,3 +259,37 @@ def test_opt_in_synthetic_demo_rejects_symlinked_engine(repo, tmp_path):
     git(repo, "commit", "-qm", "Symlinked demo engine fixture")
     with pytest.raises(qdb.ReadinessError, match="regular committed"):
         qdb.assess(repo, run_synthetic_demo=True)
+
+
+
+@pytest.mark.parametrize("duplicate", [
+    ('"policy": "NO_GO_UNTIL_ALL_NINE_VERIFIED"',
+     '"policy": "GO", "policy": "NO_GO_UNTIL_ALL_NINE_VERIFIED"'),
+    ('"status": "verified"',
+     '"status": "blocked", "status": "verified"'),
+])
+def test_duplicate_foundation_json_keys_are_rejected(repo, duplicate):
+    """Ambiguous top-level and nested statuses must not inflate readiness."""
+    source, replacement = duplicate
+    evidence = repo / qdb.FOUNDATION
+    raw = evidence.read_text()
+    assert raw.count(source) >= 1
+    evidence.write_text(raw.replace(source, replacement, 1))
+    git(repo, "add", qdb.FOUNDATION)
+    git(repo, "commit", "-qm", "Fixture: ambiguous duplicated evidence key")
+    with pytest.raises(qdb.ReadinessError, match="Duplicate JSON key"):
+        qdb.assess(repo)
+
+
+def test_duplicate_local_report_approval_key_is_rejected(repo, tmp_path):
+    """The final false value must not hide an earlier false CI claim."""
+    report = _local_report(repo, tmp_path / "ambiguous-report.json")
+    raw = report.read_text()
+    assert raw.count('"github_ci_verified": false') == 1
+    report.write_text(raw.replace(
+        '"github_ci_verified": false',
+        '"github_ci_verified": true, "github_ci_verified": false',
+        1,
+    ))
+    with pytest.raises(qdb.ReadinessError, match="Duplicate JSON key"):
+        qdb.assess(repo, local_report=report)
