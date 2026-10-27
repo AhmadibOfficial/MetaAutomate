@@ -102,6 +102,22 @@ def test_real_stock_engine_and_human_draft_guard(source):
         else:
             assert part in code
 
+
+def test_focused_public_homepage_links_all_five_industries():
+    home = (ROOT / "apps/site/index.html").read_text("utf-8")
+    css = (ROOT / "apps/site/assets/focused-home.css").read_text("utf-8")
+    assert "Real business challenges." in home
+    assert "Five industries." in home
+    assert "/workspace/" in home
+    for key in ("sales", "healthcare", "realestate", "retail", "cloud"):
+        assert '/workspace/?sector=' + key + '#home' in home
+    assert "connect-src 'none'" in home
+    assert 'href="/assets/focused-home.css"' in home
+    assert "min-width:0" not in css or "solution-grid" in css
+    assert "Objective Workspace" not in home
+    assert "capability-grid" not in home
+    assert "AI model-generated" not in home
+
 @pytest.mark.skipif(shutil.which("node") is None, reason="Node.js not installed")
 def test_js_syntax_and_existing_inventory_regression():
     for path in (JS, ENGINE):
