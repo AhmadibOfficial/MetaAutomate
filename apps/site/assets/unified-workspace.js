@@ -23,7 +23,8 @@
       example:"An approved usage report shows an unexplained change in cloud costs.",
       steps:["Define the cost or reliability question","Review only authorized, non-sensitive metrics","Record a proposed change and potential risks","Request engineering approval before any infrastructure change"]}
   });
-  let selectedIndustry = "sales", plans = [], selectedId = null, counter = 0;
+  const sectorLink = /(?:^|[?&])sector=(sales|healthcare|realestate|retail|cloud)(?:&|$)/.exec(location.search || "");
+  let selectedIndustry = sectorLink ? sectorLink[1] : "sales", plans = [], selectedId = null, counter = 0;
   let records = null, analysis = null, exampleMode = false, planDraft = null, approvedDraft = false;
   let events = [], generation = 0, toastTimer = null;
   const safeText = value => String(value).trim();
