@@ -147,3 +147,29 @@ def test_oidc_tenant_switches_are_checked_against_database_context():
     assert section.count("require_context(c, other_org, other_user)") >= 2
     assert section.count("require_context(c, org, user)") >= 2
     assert section.count("require_context(c)") >= 2
+
+
+
+def test_oidc_sql_null_digests_deny_before_insert():
+    """PostgreSQL NULL OR predicates must not fall through to session INSERT."""
+    body = _oidc_sql_function("CREATE FUNCTION app.create_oidc_workspace_session(")
+    early = body.split("BEGIN", 1)[1].split("SELECT i.organization_id", 1)[0]
+    for digest in ("p_subject_sha256", "p_session_sha256", "p_csrf_sha256"):
+        assert f"OR {digest} IS NULL" in early
+        assert f"OR {digest} !~ '^[0-9a-f]{{64}}$'" in early
+    assert early.index("p_subject_sha256 IS NULL") < early.index("END IF;")
+
+
+def test_oidc_disposable_null_digests_clear_context_after_prior_success():
+    """Source guard for three real PostgreSQL NULL-denial integration cases."""
+    script = (ROOT / "scripts/verify_oidc_identity.py").read_text()
+    assert 'os.environ.get("GITHUB_ACTIONS") != "true"' in script
+    section = script.split(
+        "# NULL digests must fail as ordinary denials", 1
+    )[1].split("# Every denial starts after a successful tenant binding", 1)[0]
+    for label in ("subject", "session", "csrf"):
+        assert f'("{label}",' in section
+    assert "NULL OIDC {label} digest was admitted" in section
+    assert "require_context(c)" in section
+    assert "require_context(c, org, user)" in section
+    assert "Valid session failed after NULL OIDC {label} denial" in section
