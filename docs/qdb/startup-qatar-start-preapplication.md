@@ -153,3 +153,43 @@ python3 scripts/qdb_start_readiness.py
 ```
 
 Do not claim independent CI, Foundation advancement or investor readiness from these local checks. GitHub Actions runners remain billing/spending-limit blocked; human-reviewed release gates and **NO-GO** remain unchanged.
+
+
+## Evidence-packet JSON ambiguity guard (2026-10-27)
+
+The offline QDB evidence reader now **rejects duplicate JSON keys at every object
+level**, in both the nine-check Foundation record and optional developer-local
+test reports. Python's default JSON decoder would otherwise silently accept
+the last of two `policy`, `status` or `github_ci_verified` values. Such a
+record cannot be treated as unambiguous evidence even if its final value looks
+safe. Three fixture-repository regression cases cover top-level and nested
+Foundation duplicates and duplicate local CI approval fields. The new tests
+are **committed but not executed at this exact head**; no CI acceptance or
+independent security review is claimed.
+
+On a clean, trusted checkout, execute
+`PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider tests/test_qdb_start_readiness.py`
+and then `python3 scripts/qdb_start_readiness.py`. These are source checks,
+not application submission, customer traction or release authorization.
+
+## Additional Qatar ecosystem signal (2026-10-27 research update)
+
+Invest Qatar reported on **26 October 2026** that the Startup Qatar initiative
+had helped establish **over 850 startups** and that **over 50 startups** had
+secured **more than US$100 million** in funding across the initiative. This is
+a public agency statement about the **broader ecosystem**, not a QDB START
+approval rate, a MetaAutomate market size estimate, a validated buyer segment,
+a partnership or evidence of MetaAutomate's traction. Official release:
+https://www.invest.qa/en/media-centre/news-and-articles/invest-qatar-receives-2026-united-nations-investment-promotion-award-for-advancing-qatars-startup
+
+QDB's currently published START requirements still demand a validated
+problem-solving concept, unmet market need, execution roadmap, market research,
+business model/monetization strategy and committed leadership team:
+https://www.qdb.qa/en/financing-and-funding/equity-and-investment/startup-qatar-investment-program
+
+**Remaining founder-verified inputs:** consented Qatar buyer interviews,
+competitive alternatives, reproducible pilot outcomes, team consent/availability,
+legal entry feasibility, realistic unit-economics assumptions and reviewed
+funding milestones. All remain **unknown or planned**, not invented evidence.
+Application submission remains HOLD and Foundation operational status remains
+NO-GO.
