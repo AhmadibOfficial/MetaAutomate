@@ -12,6 +12,7 @@ import psycopg
 
 
 ISSUER = "https://identity-ci.example.invalid/tenant"
+SECOND_ISSUER = ISSUER + "/independent"
 SUBJECT = "verified-idp-subject-" + uuid4().hex
 DIGEST = hashlib.sha256(SUBJECT.encode()).hexdigest()
 
@@ -73,6 +74,8 @@ def main():
     other_digest=hashlib.sha256(other_subject.encode()).hexdigest()
     other_session_hash=hashlib.sha256(secrets.token_bytes(36)).hexdigest()
     other_csrf_hash=hashlib.sha256(secrets.token_bytes(36)).hexdigest()
+    issuer_session_hash=hashlib.sha256(secrets.token_bytes(36)).hexdigest()
+    issuer_csrf_hash=hashlib.sha256(secrets.token_bytes(36)).hexdigest()
 
     with psycopg.connect(admin) as conn:
         with conn.cursor() as c:
@@ -118,6 +121,13 @@ def main():
                 "INSERT INTO oidc_identities(organization_id,user_id,issuer,subject_sha256) "
                 "VALUES(%s,%s,%s,%s)",
                 (other_org,other_user,ISSUER,other_digest),
+            )
+            # Same subject hash, distinct trusted issuer, distinct tenant.
+            # Issuer+subject must be resolved together, never subject alone.
+            c.execute(
+                "INSERT INTO oidc_identities(organization_id,user_id,issuer,subject_sha256) "
+                "VALUES(%s,%s,%s,%s)",
+                (other_org,other_user,SECOND_ISSUER,DIGEST),
             )
 
     with psycopg.connect(runtime) as conn:
@@ -225,6 +235,40 @@ def main():
             require(c.fetchone()[0]==org, "Tenant A could not be reselected")
             require_context(c, org, user)
 
+    # The same opaque subject can exist under a different trusted issuer.
+    # Only the full (issuer, subject) tuple identifies the intended tenant.
+    with psycopg.connect(runtime) as conn:
+        with conn.cursor() as c:
+            c.execute("SELECT * FROM app.create_oidc_workspace_session(%s,%s,%s,%s)",
+                      (SECOND_ISSUER,DIGEST,issuer_session_hash,issuer_csrf_hash))
+            cross_issuer_identity=c.fetchone()
+            require(cross_issuer_identity
+                    and cross_issuer_identity[0]==other_org
+                    and cross_issuer_identity[1]==other_user
+                    and cross_issuer_identity[2]=="OPERATOR",
+                    "Same subject from second issuer resolved wrong tenant")
+            require_context(c, other_org, other_user)
+
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (issuer_session_hash,issuer_csrf_hash))
+            require(c.fetchone()[0]==other_org,
+                    "Second issuer session did not retain tenant B binding")
+            require_context(c, other_org, other_user)
+
+            c.execute("SELECT * FROM app.create_oidc_workspace_session(%s,%s,%s,%s)",
+                      (SECOND_ISSUER,other_digest,
+                       hashlib.sha256(b"unknown-issuer-subject").hexdigest(),
+                       issuer_csrf_hash))
+            require(c.fetchone() is None,
+                    "Issuer confusion admitted an unprovisioned subject")
+            require_context(c)
+
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (session_hash,csrf_hash))
+            require(c.fetchone()[0]==org,
+                    "Cross-issuer denial changed original tenant binding")
+            require_context(c, org, user)
+
     # Real PostgreSQL membership revocation/reinstatement: disposable CI only.
     with psycopg.connect(admin) as conn:
         with conn.cursor() as c:
@@ -290,6 +334,11 @@ def main():
             require(c.fetchone()[0]==other_org,
                     "Revoking tenant A identity unexpectedly revoked tenant B")
             require_context(c, other_org, other_user)
+            c.execute("SELECT * FROM app.authenticate_workspace_session(%s,%s)",
+                      (issuer_session_hash,issuer_csrf_hash))
+            require(c.fetchone()[0]==other_org,
+                    "Revoking issuer A identity invalidated issuer B identity")
+            require_context(c, other_org, other_user)
 
     env=os.environ.copy()
     env.pop("DATABASE_URL",None)
@@ -314,7 +363,7 @@ def main():
     broken=env.copy()
     broken["DATABASE_URL"]=admin
     subprocess_config_check(broken,False)
-    print("PASS: disposable two-tenant OIDC isolation, CSRF denial, context clearing, membership/session/identity revocation and private startup checks")
+    print("PASS: disposable two-tenant, cross-issuer OIDC isolation, CSRF denial, context clearing, membership/session/identity revocation and private startup checks")
 
 
 if __name__ == "__main__":
