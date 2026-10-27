@@ -9,6 +9,7 @@
   const titles = { overview: "Overview", inventory: "Inventory intelligence", campaign: "Campaign studio", evidence: "Evidence center", modules: "All modules", readiness: "Qatar START readiness" };
   const LIMIT = 40;
   let records = null, analysis = null, plan = null, approved = false, activity = [], messageTimer = null;
+  let importGeneration = 0; // Invalidate an in-flight file read when input/session changes.
   if (!engine || !["parseCSV", "analyze", "makeCampaign"].every(key => typeof engine[key] === "function")) {
     $("live-status").textContent = "Inventory engine unavailable. No actions can run.";
     $("live-status").classList.add("visible");
@@ -93,6 +94,7 @@
     $("draft-text").value = "";
   }
   function clearInventory(trackClear = true) {
+    importGeneration++;
     records = null;
     analysis = null;
     resetPlan();
@@ -113,6 +115,7 @@
     announce("Local workspace session cleared. No server data exists.");
   });
   $("inventory-file").addEventListener("change", () => {
+    importGeneration++;
     const file = $("inventory-file").files?.[0];
     // A newly chosen file must never leave a previous approval or analysis active.
     records = null;
@@ -137,6 +140,7 @@
   $("inventory-form").addEventListener("submit", async event => {
     event.preventDefault();
     const file = $("inventory-file").files?.[0];
+    const generation = ++importGeneration;
     if (!file || file.size === 0 || file.size > engine.MAX_BYTES) {
       announce("Choose a nonempty CSV no larger than 128 KB.");
       return;
@@ -148,6 +152,7 @@
       const csv = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
       const parsed = engine.parseCSV(csv);
       const reviewed = engine.analyze(parsed);
+      if (generation !== importGeneration || $("inventory-file").files?.[0] !== file) return;
       // Commit state only after all parsing and analysis checks succeed.
       records = parsed;
       analysis = reviewed;
@@ -157,6 +162,7 @@
       track("USER_DECLARED_INVENTORY_ANALYZED");
       announce("Inventory analyzed in this browser; no information uploaded.");
     } catch (error) {
+      if (generation !== importGeneration || $("inventory-file").files?.[0] !== file) return;
       records = null;
       analysis = null;
       resetPlan();
