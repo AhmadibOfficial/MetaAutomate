@@ -95,6 +95,15 @@ def test_no_network_persistence_or_unreviewed_draft_export(page_source):
     assert "Subscriptions" in html or "subscriptions" in html
 
 
+def test_inflight_file_reads_cannot_restore_stale_approvals(page_source):
+    _, js, _ = page_source
+    assert "let importGeneration = 0" in js
+    assert "importGeneration++;" in js
+    assert "const generation = ++importGeneration;" in js
+    assert js.count('generation !== importGeneration || $("inventory-file").files?.[0] !== file') == 2
+    assert "resetPlan();" in js
+
+
 @pytest.mark.skipif(shutil.which("node") is None, reason="Node.js unavailable")
 def test_workspace_js_syntax_and_reused_campaign_engine():
     for path in (JS, ENGINE):
