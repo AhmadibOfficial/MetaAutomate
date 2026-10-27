@@ -185,3 +185,27 @@ unverified. F06 is BLOCKED; Foundation remains historically 3/9 verified,
 and production/application submission remain NO-GO. Do not bypass the
 CI-only database guard, apply migration 012, merge or deploy without
 separate explicit approval.
+
+
+## Stage 01 / F06 — issuer-and-subject collision isolation (synthetic only)
+
+The existing **CI-only**, disposable PostgreSQL identity fixture now adds a
+second fictional HTTPS issuer. It deliberately provisions the **same SHA-256
+subject digest** under two different issuers to different organizations and
+users. The integration assertions require the pair `(issuer, subject_sha256)`
+to resolve the correct tenant and member role. They also require:
+
+- A different issuer with an unprovisioned subject to deny admission and
+  clear both transaction-local tenant context settings after a prior success.
+- The original issuer's session to remain correctly bound after that denial.
+- Revoking the first issuer's identity not to revoke a distinct identity from
+  the second issuer, even when both share the same subject digest.
+
+Two additional **source-only** regression tests check that the negative
+cases remain present. The actual PostgreSQL assertions are **NOT_RUN** until
+an authorized ephemeral CI database is available; these tests do **not**
+validate actual IdP issuer trust, signature/JWKS, MFA, PKCE, browser sessions
+or tenant RLS. The CI-only guard remains in place. Do not set `GITHUB_ACTIONS`
+manually, run against the owner's Kali database, apply migration 012, merge,
+deploy, spend money, enable subscriptions, or submit the funding application.
+Foundation F06 remains BLOCKED and release remains NO-GO.
