@@ -55,10 +55,18 @@ DECLARE
     v_oidc_id uuid;
     v_role text;
 BEGIN
+    -- Invalid/missing identity can never inherit an earlier tenant context.
+    PERFORM pg_catalog.set_config('app.organization_id', '', true);
+    PERFORM pg_catalog.set_config('app.user_id', '', true);
+    -- Explicit NULL checks avoid SQL's three-valued OR semantics:
+    -- a missing digest must deny, never reach an INSERT with NULL values.
     IF p_issuer IS NULL OR p_issuer NOT LIKE 'https://%'
        OR length(p_issuer) > 512
+       OR p_subject_sha256 IS NULL
        OR p_subject_sha256 !~ '^[0-9a-f]{64}$'
+       OR p_session_sha256 IS NULL
        OR p_session_sha256 !~ '^[0-9a-f]{64}$'
+       OR p_csrf_sha256 IS NULL
        OR p_csrf_sha256 !~ '^[0-9a-f]{64}$' THEN
        RETURN;
     END IF;
@@ -75,7 +83,12 @@ BEGIN
     PERFORM pg_catalog.set_config('app.user_id', v_user::text, true);
     SELECT m.role::text INTO v_role FROM public.organization_memberships m
      WHERE m.organization_id=v_org AND m.user_id=v_user AND m.status='ACTIVE';
-    IF NOT FOUND THEN RETURN; END IF;
+    IF NOT FOUND THEN
+        -- Denied tenant membership must not leak an authorization context.
+        PERFORM pg_catalog.set_config('app.organization_id', '', true);
+        PERFORM pg_catalog.set_config('app.user_id', '', true);
+        RETURN;
+    END IF;
 
     INSERT INTO public.workspace_sessions (
         organization_id,user_id,oidc_identity_id,session_sha256,csrf_sha256,expires_at
@@ -99,6 +112,9 @@ DECLARE
     v_user uuid;
     v_role text;
 BEGIN
+    -- Invalid/expired sessions can never inherit an earlier tenant context.
+    PERFORM pg_catalog.set_config('app.organization_id', '', true);
+    PERFORM pg_catalog.set_config('app.user_id', '', true);
     IF p_session_sha256 IS NULL OR p_session_sha256 !~ '^[0-9a-f]{64}$'
        OR (p_csrf_sha256 IS NOT NULL AND p_csrf_sha256 !~ '^[0-9a-f]{64}$') THEN
         RETURN;
@@ -129,8 +145,43 @@ BEGIN
 
     SELECT m.role::text INTO v_role FROM public.organization_memberships m
      WHERE m.organization_id=v_org AND m.user_id=v_user AND m.status='ACTIVE';
-    IF NOT FOUND THEN RETURN; END IF;
+    IF NOT FOUND THEN
+        -- A revoked membership must not leave the session tenant GUC set.
+        PERFORM pg_catalog.set_config('app.organization_id', '', true);
+        PERFORM pg_catalog.set_config('app.user_id', '', true);
+        RETURN;
+    END IF;
     RETURN QUERY SELECT v_org,v_user,v_role;
+END;
+$$;
+
+-- Stage 01 F06: narrow the legacy session revoker to the authenticated
+-- transaction principal. A runtime caller must not revoke another user's
+-- or another tenant's session by presenting its opaque session digest.
+-- This changes the candidate migration only; it is not applied here.
+CREATE OR REPLACE FUNCTION app.revoke_workspace_session(p_session_sha256 text)
+RETURNS void
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = pg_catalog, public, app
+AS $$
+DECLARE
+    v_org text;
+    v_user text;
+BEGIN
+    v_org := pg_catalog.current_setting('app.organization_id', true);
+    v_user := pg_catalog.current_setting('app.user_id', true);
+    IF p_session_sha256 IS NULL OR p_session_sha256 !~ '^[0-9a-f]{64}$'
+       OR v_org IS NULL OR v_org = ''
+       OR v_user IS NULL OR v_user = '' THEN
+        RETURN;
+    END IF;
+
+    UPDATE public.workspace_sessions
+       SET revoked_at = now()
+     WHERE session_sha256 = p_session_sha256
+       AND organization_id = v_org::uuid
+       AND user_id = v_user::uuid
+       AND revoked_at IS NULL;
 END;
 $$;
 

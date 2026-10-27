@@ -4,6 +4,7 @@ OIDC mode requires a configured HTTPS identity provider. ID tokens are validated
 by Authlib before exact issuer+subject matching to a provisioned DB identity.
 OIDC mode never accepts local developer access keys.
 """
+from collections.abc import Mapping
 import hashlib
 import os
 import secrets
@@ -172,11 +173,21 @@ async def oidc_callback(request: Request):
     except OAuthError:
         raise HTTPException(status_code=401, detail="Identity provider sign-in failed") from None
     userinfo = tokens.get("userinfo") or {}
-    issuer = str(userinfo.get("iss", ""))
-    subject = str(userinfo.get("sub", ""))
     configured = os.environ["OIDC_ISSUER"].rstrip("/")
-    if (not tokens.get("id_token") or issuer != configured
-            or not subject or len(subject) > 512):
+    # A signed ID token must carry well-typed, canonical identity claims.
+    # Never coerce an unexpected claim to text before DB account binding:
+    # for example, str(None), str(True) or unicode can cause identity
+    # confusion or an uncaught ASCII-encoding failure in _digest().
+    if not isinstance(userinfo, Mapping):
+        raise HTTPException(status_code=401, detail="Verified OIDC identity required")
+    issuer = userinfo.get("iss")
+    subject = userinfo.get("sub")
+    if (not tokens.get("id_token") or not isinstance(tokens.get("id_token"), str)
+            or not isinstance(issuer, str) or issuer != configured
+            or not isinstance(subject, str)
+            or not subject or len(subject) > 255
+            or not subject.isascii()
+            or any(ord(char) < 33 or ord(char) > 126 for char in subject)):
         raise HTTPException(status_code=401, detail="Verified OIDC identity required")
 
     # Authlib already validated the signed id_token. A provider must also

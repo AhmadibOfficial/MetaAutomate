@@ -23,3 +23,383 @@ This candidate replaces outdated PR #6. The previous branch used migration numbe
 6. Review PR head SHA and CI; acquire fresh, explicit approvals before applying migration 012 or deploying the application. Opening this PR does not authorize any runtime change.
 
 The release evidence gate remains the source-merge signal, not a promise of production security.
+
+
+## Stage 01 / F06 — OIDC identity-claim shape hardening (draft only)
+
+The existing Authlib authorization-code callback previously coerced the
+verified issuer and subject to strings. Unexpected `sub` types could
+therefore become implicit string account identifiers; non-ASCII subjects
+would fail later in the ASCII-only SHA-256 identity digest. The callback
+now **denies before database session creation** when the purported
+provider-verified claims are not a mapping, `iss` is not the configured
+issuer as an exact string, or `sub` is not a printable 1–255-byte ASCII
+string. The ID-token presence check also rejects nonstring placeholders.
+Valid claim shapes proceed through the **existing** recent signed-MFA
+policy; neither the MFA check nor the membership SQL is bypassed.
+
+This is a narrow defense-in-depth fix. The synthetic tests use a fake
+`authorize_access_token` response and deliberately **do not** establish
+a signed JWT, real IdP, authentic MFA, correct Authlib state/nonce/PKCE,
+tenant isolation, live SSO, browser acceptance or deployment readiness.
+
+From a reviewed clean exact-commit checkout:
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q \
+  tests/test_stage01_f06_oidc_claim_admission.py \
+  tests/test_p2_04a_oidc_mfa.py \
+  tests/test_private_oidc_contract.py
+```
+
+Additional operator-owned acceptance remains mandatory: genuine IdP OIDC
+code+PKCE+nonce signature/JWKS, MFA, tenant mapping, session revocation
+and negative-role E2E; actual recovery and independent security review.
+F06 remains BLOCKED; the full nine-control operational release is NO-GO.
+No live provider, app secrets, external network, subscription/billing,
+migrations, merges or deployments were activated by this source change.
+
+
+## Stage 01 / F06 — transaction-scoped tenant isolation (source hardening)
+
+The **unapplied** `012_oidc_identities.sql` candidate contains two
+`SECURITY DEFINER` OIDC session functions. A failed authentication or a
+revoked membership must never leave an organization/user GUC set inside
+a transaction that could execute a subsequent statement.
+
+Both `app.create_oidc_workspace_session` and
+`app.authenticate_workspace_session` now clear
+`app.organization_id` and `app.user_id` **before evaluating** the
+provided identity/session token, and clear both again on denied active
+membership. This retains the successful tenant-setting behavior for an
+authorized principal; failure still returns no principal. The patch
+does **not** apply migration 012, grant access or enable the OIDC service.
+
+Two source-contract regressions were added to
+`tests/test_private_oidc_contract.py`. Run in a clean checkout bound
+to the PR HEAD:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q \
+  tests/test_private_oidc_contract.py \
+  tests/test_stage01_f06_oidc_claim_admission.py \
+  tests/test_p2_04a_oidc_mfa.py
+```
+
+**Not a runtime proof.** These tests inspect the SQL source and synthetic
+callback; independent PostgreSQL transactional checks, a real IdP
+issuer/JWKS/PKCE/nonce/MFA integration, forced RLS checks, revoked
+identity/session tests, complete cross-tenant denial, private browser
+acceptance, backup/restore, human review and security sign-off remain
+mandatory. F06 is BLOCKED; production NO-GO remains binding.
+
+
+## Stage 01 / F06 — disposable PostgreSQL negative authentication acceptance
+
+The **existing** `scripts/verify_oidc_identity.py` has been enhanced, rather
+than creating another identity-test harness. It now checks the **actual
+transaction-scoped PostgreSQL** `app.organization_id` and `app.user_id`
+settings after authorized session creation/authentication, then after denied
+CSRF, unknown sessions, unprovisioned subjects, suspended membership,
+revoked session and revoked identity. A new valid authentication following
+a denied attempt must reestablish precisely its own organization and user.
+The regression specifically exercises a previously successful tenant context
+followed by denials **on the same runtime connection/transaction**.
+
+This integration script only runs under the previously established
+`GITHUB_ACTIONS=true` gate on the disposable PostgreSQL service created
+and migrated by `.github/workflows/ci.yml`. It does **not** create a
+database, apply migrations, or connect in an ordinary pytest invocation.
+Do not attempt to bypass its CI-only gate or aim DATABASE_URL at a
+developer/staging/production instance. Because GitHub Actions runners are
+currently billing-blocked, this integration improvement is **source
+committed but not independently exercised**. Two read-only source-contract
+checks in `tests/test_private_oidc_contract.py` can run on the current Kali
+checkout, but do not constitute actual PostgreSQL acceptance.
+
+Safe owner Kali command (source tests ONLY):
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q \
+  tests/test_private_oidc_contract.py \
+  tests/test_stage01_f06_oidc_claim_admission.py \
+  tests/test_p2_04a_oidc_mfa.py
+```
+
+The CI-only integration remains pending a real isolated GitHub runner and
+independent reviewer. Real issuer/JWKS/PKCE/nonce/MFA, sealed ingress, F04
+branch protection and F07 off-host restore are also unresolved. Foundation
+F06 is still BLOCKED; full release **NO-GO**. No migration 012 was
+applied to the owner's Kali machine; no browser, customer, subscription,
+network/AI/social, deployment, billing or funding work was activated.
+
+
+## Stage 01 / F06 — two-tenant disposable OIDC isolation
+
+The pre-existing CI-only `scripts/verify_oidc_identity.py` fixture now provisions
+**two fictional organizations and separate identities** (OWNER and OPERATOR)
+in the same ephemeral PostgreSQL service. It verifies:
+
+- Each OIDC issuer+subject maps to its **own** preprovisioned organization and user.
+- Swapping the organizations' CSRF hashes denies access and clears both tenant GUCs.
+- Re-authenticating A → B → A on the same connection binds **both** transaction-local tenant settings to the selected principal, with no retained previous tenant.
+- Revoking tenant A's identity blocks A without invalidating tenant B's independent session.
+
+Two source-contract tests preserve the negative matrix. The actual PostgreSQL
+assertions remain **NOT_RUN** until GitHub Actions or another independently
+authorized, genuinely disposable runner becomes available. The source-contract
+tests can be executed normally on Kali; do not bypass the CI-only PostgreSQL
+guard, apply migration 012 on existing data, change GitHub billing, merge
+branches, activate actual OIDC/SSO, deploy, or claim F06 acceptance. Foundation
+NO-GO remains binding.
+
+
+## Stage 01 / F06 — NULL OIDC digest rejection (candidate migration only)
+
+The unapplied `database/migrations/012_oidc_identities.sql` candidate now
+explicitly rejects NULL subject, session and CSRF SHA-256 values **before**
+attempting an OIDC workspace-session insert. PostgreSQL treats
+`NULL !~ pattern` as UNKNOWN rather than TRUE, so a regex-only OR guard
+could otherwise fall through and raise a database constraint error. The
+intended response is an ordinary no-principal denial with both
+transaction-local tenant settings cleared, not an exception or session.
+
+The existing CI-only disposable PostgreSQL identity harness adds three
+NULL-digest denial cases, each immediately after successful authentication
+in the same transaction, followed by a valid reauthentication. Two
+source-contract tests ensure the early SQL guards and harness assertions
+remain present. No production migration or runtime setting was changed.
+
+Owner-local **source-only** acceptance command at the exact reviewed PR head:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider \
+  tests/test_private_oidc_contract.py \
+  tests/test_stage01_f06_oidc_claim_admission.py \
+  tests/test_p2_04a_oidc_mfa.py
+```
+
+The new head has **not** been executed against PostgreSQL, Kali pytest or
+independent CI. Real OIDC/PKCE/JWKS/MFA, tenant RLS, negative-role browser
+testing, private ingress, backup/restore and release approval remain
+unverified. F06 is BLOCKED; Foundation remains historically 3/9 verified,
+and production/application submission remain NO-GO. Do not bypass the
+CI-only database guard, apply migration 012, merge or deploy without
+separate explicit approval.
+
+
+## Stage 01 / F06 — issuer-and-subject collision isolation (synthetic only)
+
+The existing **CI-only**, disposable PostgreSQL identity fixture now adds a
+second fictional HTTPS issuer. It deliberately provisions the **same SHA-256
+subject digest** under two different issuers to different organizations and
+users. The integration assertions require the pair `(issuer, subject_sha256)`
+to resolve the correct tenant and member role. They also require:
+
+- A different issuer with an unprovisioned subject to deny admission and
+  clear both transaction-local tenant context settings after a prior success.
+- The original issuer's session to remain correctly bound after that denial.
+- Revoking the first issuer's identity not to revoke a distinct identity from
+  the second issuer, even when both share the same subject digest.
+
+Two additional **source-only** regression tests check that the negative
+cases remain present. The actual PostgreSQL assertions are **NOT_RUN** until
+an authorized ephemeral CI database is available; these tests do **not**
+validate actual IdP issuer trust, signature/JWKS, MFA, PKCE, browser sessions
+or tenant RLS. The CI-only guard remains in place. Do not set `GITHUB_ACTIONS`
+manually, run against the owner's Kali database, apply migration 012, merge,
+deploy, spend money, enable subscriptions, or submit the funding application.
+Foundation F06 remains BLOCKED and release remains NO-GO.
+
+
+## Stage 01 / F06 — tenant- and user-bound session revocation (candidate only)
+
+The existing migration 010 `app.revoke_workspace_session` accepts an opaque
+session digest but did not constrain its update by the authenticated
+transaction principal. The **unapplied** migration 012 now replaces that
+function without changing its SQL signature: it requires nonempty
+`app.organization_id` and `app.user_id` transaction settings and updates
+only the session whose digest, organization **and user** all match. This
+preserves the normal authenticated browser logout flow, while denying
+cross-tenant, cross-user or unauthenticated runtime revocation by digest
+alone.
+
+The existing CI-only ephemeral PostgreSQL identity harness now attempts to
+revoke tenant B's session from tenant A's authenticated context and again
+from a new connection with no identity context. Both must leave B's
+session usable; the original legitimate revocation assertion remains.
+Two offline source-contract tests cover the function guard and negative
+harness cases.
+
+**Security scope:** transaction-local settings are meaningful only when
+established through the existing trusted authentication flow; they are
+not a defense against arbitrary SQL execution or an independently verified
+identity proof. The SQL function is a migration candidate, not a change
+applied to any owner database. The actual negative tests are **NOT_RUN**
+until independently authorized disposable PostgreSQL CI is available.
+GitHub Actions account billing remains blocked. Live OIDC issuer/JWKS,
+MFA/PKCE, cross-tenant RLS, browser tests and independent review are
+unverified. F06 BLOCKED, Foundation 3/9 historically verified, production
+and QDB submission NO-GO. Do not spoof CI flags, apply migration 012,
+merge, deploy, enable billing or spend funds without separate approval.
+
+
+## Stage 01 / F06 — SQL candidate integrity regression
+
+Source review detected a **malformed migration 012** in the prior draft:
+the replacement session-revoker function had a truncated dollar-quoted
+body and a premature `COMMIT`/grant inserted inside the digest predicate.
+This would make the candidate migration invalid if applied. The candidate
+text has been repaired **without executing it**: all three PL/pgSQL bodies
+use balanced `AS $$ ... $$;` delimiters, the session digest guard is intact,
+and exactly one `COMMIT` terminates the migration after the function grant.
+
+A source-only regression in `tests/test_private_oidc_contract.py` checks
+the three delimiters, the single terminal transaction boundary, the grant
+placement and the revoker's tenant/user/digest predicates. These are
+**static text checks, not SQL parsing or a PostgreSQL execution result**.
+Next acceptance still requires independently authorized disposable
+PostgreSQL syntax/application, revocation and RLS testing. Never run the
+migration against the owner's existing database or bypass the CI-only
+integration guard. F06 remains BLOCKED; production and QDB submission NO-GO.
+
+
+## Stage 01 / F06 — CI database target interlock (2026-10-27)
+
+The disposable OIDC integration harness now calls
+`scripts/oidc_ci_database_guard.py` **before any PostgreSQL connection**.
+The standard-library-only guard requires the expected GitHub-hosted
+`push`/`pull_request` job context, repository, numeric run ID, and separate
+admin/runtime PostgreSQL URLs targeting the existing CI fixture at
+`localhost:5432/metaautomate`. It rejects remote hosts, arbitrary databases,
+wrong roles, socket-style DSNs, query-parameter overrides and missing passwords.
+The exact fixture host, database and roles are taken from
+`.github/workflows/ci.yml`; no service or migration was changed.
+
+Two offline Python regression tests exercise accepted synthetic CI inputs and
+negative environment/DSN cases **without connecting to any database**. They
+can be run alongside the existing F06 source-contract tests from a clean,
+trusted checkout:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider \
+  tests/test_private_oidc_contract.py \
+  tests/test_stage01_f06_oidc_claim_admission.py \
+  tests/test_p2_04a_oidc_mfa.py
+```
+
+**Limit:** CI environment variables and a loopback DSN do not cryptographically
+prove that PostgreSQL is disposable. A malicious or misconfigured runner could
+still mimic them, and a local process could occupy that port. The CI-only
+interlock is defense-in-depth against accidental non-CI or remote execution,
+not authorization to set CI variables manually or to run this script on Kali.
+Actual isolated PostgreSQL acceptance, independent security review, real
+IdP/MFA/PKCE/JWKS, F04–F09 and release approvals remain pending.
+GitHub Actions billing is still blocked. No production database was touched;
+Foundation remains historically 3/9 verified and **NO-GO**.
+
+
+## Stage 01 / F06 — Exact disposable CI DSN matching (2026-10-27)
+
+The OIDC PostgreSQL integration interlock now accepts **only the two literal
+admin/runtime connection URLs configured in `.github/workflows/ci.yml`**,
+including their deliberately throwaway CI-only passwords. It no longer accepts
+an arbitrary nonempty password or alternate localhost spelling. This narrows
+accidental targeting of a developer-local database that happens to share the
+same host, port, database name and role. Exact comparison also rejects
+ambiguous percent-encoding, whitespace and URL parser normalization.
+
+Six additional negative fixture cases cover alternate credentials, IP
+spelling and embedded control characters. The guard does not open a database
+connection, and the test cases are source-only. These CI fixture credentials
+are intentionally non-production and must never be reused for any developer,
+staging or production database. If the CI fixture changes, update the guard
+and tests together under review.
+
+This remains **defense-in-depth**, not proof of an isolated runner or database:
+a malicious environment can spoof GitHub variables and mimic the literal
+connection URL. No PostgreSQL migration or actual integration run occurred.
+F06 remains BLOCKED, Foundation 3/9 historically verified, and production,
+customer operations and QDB submission remain NO-GO.
+
+
+## Stage 01 / F06 — libpq environment redirection guard (2026-10-27)
+
+The existing disposable-CI database URL interlock now also rejects nonempty
+`PGHOSTADDR`, `PGSERVICE`, `PGSERVICEFILE`, `PGSYSCONFDIR` and
+`PGOPTIONS` environment variables **before opening a connection**.
+PostgreSQL libpq can supply missing connection parameters from environment
+variables even when a URL contains `localhost`: `PGHOSTADDR` can select
+the actual network address independently of the URL's host label.
+Reference: https://www.postgresql.org/docs/current/libpq-envars.html and
+https://www.postgresql.org/docs/current/libpq-connect.html .
+
+The repository's existing `PGPASSWORD` CI setting is permitted because the
+two approved fixture URLs already contain explicit throwaway passwords.
+One offline regression test verifies six rejected shadow configurations
+and a permitted fixture case; no PostgreSQL connection is made by the test.
+
+This is an accident-prevention interlock, **not** proof of disposable
+database provenance or protection against a malicious runner, local port
+forwarding, compromised CI, or spoofed environment variables. The new exact
+head has not yet passed full pytest or PostgreSQL integration. Run the
+source-only suite on a clean reviewed checkout; never spoof CI variables or
+apply migration 012 to an owner database. F06 remains BLOCKED, Foundation
+historically 3/9 verified, and production and Qatar START submission NO-GO.
+
+
+## Stage 01 / F06 — bind disposable DB guard to CI workflow/job (2026-10-27)
+
+The standard-library-only interlock now requires GitHub's workflow name
+`MetaAutomate CI`, job ID `test`, and a `GITHUB_WORKFLOW_REF` pointing to
+`AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@refs/...`.
+A generic GitHub Actions flag, correct repository and matching local DSNs
+are not enough to allow the destructive synthetic database fixture.
+The source-only regression exercises accepted workflow refs, wrong or
+missing workflow/job identities and verifies the interlock precedes the
+first `psycopg.connect`. It makes no database connections.
+
+**Known CI coverage gap:** `.github/workflows/ci.yml` currently filters
+pull requests to base branches `main` and `feat/vscode-workspace-v1`.
+Stacked draft PR #131 targets `feature/p2-061-atomic-read-audit`, so that
+PR does not itself trigger this workflow. Billing-blocked GitHub runners
+remain an additional independent obstacle. Do not expand CI triggers,
+purchase runner minutes or simulate CI by setting environment variables
+without a separately reviewed and approved plan.
+
+Workflow environment variables and ref strings can be spoofed; this guard
+cannot prove runner/database isolation. No actual PostgreSQL execution,
+OIDC provider/MFA acceptance, CI pass, merge, migration, deployment,
+subscription or QDB application is claimed. Foundation F06 remains
+BLOCKED and the operational release decision stays NO-GO.
+
+
+## Stage 01 / F06 — bind CI event, checkout and workflow refs (2026-10-27)
+
+The source-only disposable PostgreSQL interlock previously accepted any
+suffix under the expected workflow path, including an unrelated branch,
+tag or mismatched PR number. It now requires the exact
+GITHUB_WORKFLOW_REF suffix to equal GITHUB_REF and validates that the
+event matches the triggers actually declared in .github/workflows/ci.yml:
+
+- push must target refs/heads/main and have no PR base ref.
+- pull_request must use refs/pull/<positive-number>/merge and target
+  main or feat/vscode-workspace-v1.
+- missing, inconsistent or unsupported refs fail before any psycopg.connect.
+
+The existing test fixture now includes GITHUB_REF/GITHUB_BASE_REF and an
+offline negative matrix. The update changes neither the CI workflow triggers
+nor any database connection, migration, runner, secret or deployment.
+GitHub documents the pull_request merge-ref convention at
+https://docs.github.com/en/actions/reference/workflows-and-actions/variables
+and https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows .
+
+From a clean exact-head checkout, run the existing offline tests:
+
+    PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider tests/test_private_oidc_contract.py tests/test_stage01_f06_oidc_claim_admission.py tests/test_p2_04a_oidc_mfa.py
+
+These CI environment values remain spoofable; matching them does NOT prove
+that a runner or database is disposable. CI is account billing-blocked,
+and stacked draft PR #131 targets a branch outside the CI pull_request
+base filters. No green CI, live PostgreSQL, IdP, MFA, release or QDB
+submission is claimed. Stage 01 F06 BLOCKED; Foundation historically
+3/9 verified, operational NO-GO.
