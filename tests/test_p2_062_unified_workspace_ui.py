@@ -1,11 +1,11 @@
-"""P2-062: offline source and security guards for unified workspace preview."""
+"""P2-062c: fail-closed offline contract for task-first five-industry workspace."""
 from __future__ import annotations
 
+from html.parser import HTMLParser
+from pathlib import Path
 import re
 import shutil
 import subprocess
-from html.parser import HTMLParser
-from pathlib import Path
 
 import pytest
 
@@ -15,126 +15,99 @@ JS = ROOT / "apps/site/assets/unified-workspace.js"
 CSS = ROOT / "apps/site/assets/unified-workspace.css"
 ENGINE = ROOT / "apps/site/assets/campaign-engine.js"
 
-
-class Elements(HTMLParser):
+class SourceHTML(HTMLParser):
     def __init__(self):
         super().__init__()
-        self.ids: set[str] = set()
-        self.links: list[str] = []
-        self.scripts: list[dict[str, str]] = []
-        self.forms: list[dict[str, str]] = []
-        self.routes: list[tuple[str, str]] = []
+        self.ids = []
+        self.routes = []
+        self.sectors = []
+        self.scripts = []
+        self.forms = []
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
         if "id" in a:
-            assert a["id"] not in self.ids, "duplicate ID: " + a["id"]
-            self.ids.add(a["id"])
-        if tag == "a":
-            self.links.append(a.get("href", ""))
-            if "data-route" in a:
-                self.routes.append((a["data-route"], a.get("href", "")))
+            self.ids.append(a["id"])
+        if "data-route" in a:
+            self.routes.append((a["data-route"], a.get("href")))
+        if "data-sector" in a:
+            self.sectors.append(a["data-sector"])
         if tag == "script":
             self.scripts.append(a)
         if tag == "form":
             self.forms.append(a)
 
-
 @pytest.fixture(scope="module")
-def page_source():
+def source():
     assert all(p.is_file() and p.stat().st_size > 100 for p in (HTML, JS, CSS, ENGINE))
-    return HTML.read_text("utf-8"), JS.read_text("utf-8"), CSS.read_text("utf-8")
+    page, code, style = [p.read_text(encoding="utf-8") for p in (HTML, JS, CSS)]
+    parsed = SourceHTML()
+    parsed.feed(page)
+    return page, code, style, parsed
 
+def test_only_four_clear_main_views(source):
+    page, code, _, parsed = source
+    routes = ("home", "work", "results", "settings")
+    assert {name for name, _ in parsed.routes} == set(routes)
+    assert set(parsed.routes) == {(n, "#" + n) for n in routes}
+    assert all('id="view-' + n + '"' in page for n in routes)
+    assert 'id="view-modules"' not in page
+    assert 'id="view-readiness"' not in page
+    assert 'id="view-evidence"' not in page
+    assert "What would you like" in page
+    assert "to <em>improve today?" in page
+    assert "My Work" in page and "Results" in page and "Team &amp; Settings" in page
 
-def test_linked_files_and_no_inline_executable_code(page_source):
-    html, js, css = page_source
-    parser = Elements()
-    parser.feed(html)
-    assert len(parser.ids) > 35
-    assert len(parser.ids) == len(set(parser.ids))
-    assert {s.get("src") for s in parser.scripts} == {
-        "/assets/campaign-engine.js", "/assets/unified-workspace.js"
-    }
-    assert all("src" in s and "onload" not in s for s in parser.scripts)
-    assert "/assets/unified-workspace.css" in html
-    assert "connect-src 'none'" in html
-    assert "form-action 'none'" in html
-    assert "frame-src 'none'" in html
-    assert "Content-Security-Policy" in html
-    for color in ("#040d20", "#00a7ed", "#dce6f1", "#efb94f"):
-        assert color in css.lower()
+def test_five_specific_industries_not_generic_placeholders(source):
+    page, code, _, parsed = source
+    assert sorted(parsed.sectors) == sorted([
+        "sales", "healthcare", "realestate", "retail", "cloud"
+    ])
+    for text in ["Sales &amp; Customers", "Healthcare", "Real Estate",
+                 "Retail &amp; Stock", "Cloud &amp; IT"]:
+        assert text in page
+    for key in parsed.sectors:
+        assert key + ":" in code
+    assert '"plan-review"' in code and '"complete-plan"' in code
+    assert 'plan.steps.every(step=>step.done)' in code
+    assert 'outsideActionsPerformed:false' in code
 
+def test_sources_valid_and_no_dom_injection_or_network(source):
+    page, code, style, parsed = source
+    assert len(parsed.ids) == len(set(parsed.ids)), "Duplicate HTML IDs"
+    js_ids = set(re.findall(r'\$\("([a-z0-9-]+)"\)', code))
+    assert js_ids <= set(parsed.ids), "Unknown DOM IDs: " + repr(js_ids - set(parsed.ids))
+    assert {s.get("src") for s in parsed.scripts} == {
+        "/assets/campaign-engine.js", "/assets/unified-workspace.js"}
+    assert "connect-src 'none'" in page
+    assert "form-action 'none'" in page and "frame-src 'none'" in page
+    assert "Nothing is uploaded, published" in page
+    assert all("action" not in form and "method" not in form for form in parsed.forms)
+    for banned in ("fetch(", "XMLHttpRequest", "WebSocket(", "localStorage",
+                   "sessionStorage", ".innerHTML", "eval(", "new Function("):
+        assert banned not in code, banned
+    for color in ("#081c36", "#0788d2", "#e9b84f", "#e2e9f1"):
+        assert color in style.lower()
 
-def test_all_view_routes_and_dom_selectors_resolve(page_source):
-    html, js, _ = page_source
-    parser = Elements()
-    parser.feed(html)
-    views = {"overview", "inventory", "campaign", "evidence", "modules", "readiness"}
-    for name in views:
-        assert "view-" + name in parser.ids
-        assert (name, "#" + name) in parser.routes
-    js_ids = set(re.findall(r'\$\("([a-z0-9-]+)"\)', js))
-    assert js_ids <= parser.ids, f"JS references missing HTML IDs: {sorted(js_ids - parser.ids)}"
-    for route, href in parser.routes:
-        assert route in views and href == "#" + route
-    assert all("action=" not in form and "method=" not in form for form in parser.forms)
+def test_real_stock_engine_and_human_draft_guard(source):
+    _, code, _, _ = source
+    for part in ('engine.parseCSV(text)', 'engine.analyze(data)', 'engine.makeCampaign(',
+                 'new TextDecoder("utf-8",{fatal:true})',
+                 'token!==generation', 'dropDraft()', 'function revokeDraft()',
+                 'if(!planDraft||!approvedDraft)return', 'sourceAuthenticated:false',
+                 'aiModelUsed:false', 'externalPublishingPerformed:false',
+                 'signed:false', 'generateAtUntrusted'):
+        if part == "generateAtUntrusted":
+            assert "generatedAtUntrustedClientClock" in code
+        else:
+            assert part in code
 
-
-def test_no_network_persistence_or_unreviewed_draft_export(page_source):
-    html, js, _ = page_source
-    for dangerous in ("fetch(", "XMLHttpRequest", "WebSocket(", "localStorage",
-                      "sessionStorage", ".innerHTML", "eval(", "new Function("):
-        assert dangerous not in js, dangerous
-    for necessary in ('TextDecoder("utf-8", { fatal: true })', "engine.parseCSV(csv)",
-                      "engine.analyze(parsed)", "engine.makeCampaign(",
-                      "if (!approved || !plan) return;", "function revokeApproval()",
-                      "thirdPartySourceAuthenticated: false", "aiModelUsed: false",
-                      "independentlyVerified: false", "signed: false"):
-        assert necessary in js, necessary
-    assert "Nothing posts automatically" in html or "No automatic" in html
-    assert "Subscriptions" in html or "subscriptions" in html
-
-
-def test_home_explains_one_action_in_plain_language(page_source):
-    html, js, _ = page_source
-    overview = html.split('id="view-overview"', 1)[1].split('id="view-inventory"', 1)[0]
-    assert "Sell smarter with" in overview
-    assert "Start with my inventory" in overview
-    assert 'id="try-example"' in overview
-    assert overview.count('class="example-stage"') == 3
-    assert "Nothing posts automatically" in overview
-    assert "metric-grid" not in overview
-    assert "OIDC" not in overview and "F06" not in overview
-    assert 'location.hash = "#inventory"' in js
-
-
-def test_example_is_real_engine_with_explicit_synthetic_provenance(page_source):
-    _, js, _ = page_source
-    assert 'engine.parseCSV(fictionalCSV)' in js
-    assert 'engine.analyze(parsed)' in js
-    assert 'exampleMode = true;' in js
-    assert 'source: exampleMode ? "SYNTHETIC_EXAMPLE_UNVERIFIED"' in js
-    assert '"Example only: fictional products and prices.' in js
-    assert 'importGeneration++; // Invalidate a previously started file read.' in js
-
-
-def test_inflight_file_reads_cannot_restore_stale_approvals(page_source):
-    _, js, _ = page_source
-    assert "let importGeneration = 0" in js
-    assert "importGeneration++;" in js
-    assert "const generation = ++importGeneration;" in js
-    assert js.count('generation !== importGeneration || $("inventory-file").files?.[0] !== file') == 2
-    assert "resetPlan();" in js
-
-
-@pytest.mark.skipif(shutil.which("node") is None, reason="Node.js unavailable")
-def test_workspace_js_syntax_and_reused_campaign_engine():
+@pytest.mark.skipif(shutil.which("node") is None, reason="Node.js not installed")
+def test_js_syntax_and_existing_inventory_regression():
     for path in (JS, ENGINE):
-        result = subprocess.run(["node", "--check", str(path)],
-                                cwd=ROOT, capture_output=True, text=True, timeout=20)
+        result = subprocess.run(["node", "--check", str(path)], cwd=ROOT, text=True,
+                                capture_output=True, timeout=20)
         assert result.returncode == 0, result.stdout + result.stderr
-    result = subprocess.run(
-        ["node", "--test", str(ROOT / "tests/campaign_engine.test.cjs")],
-        cwd=ROOT, capture_output=True, text=True, timeout=40
-    )
+    result = subprocess.run(["node", "--test", "tests/campaign_engine.test.cjs"],
+                            cwd=ROOT, text=True, capture_output=True, timeout=40)
     assert result.returncode == 0, result.stdout + result.stderr
