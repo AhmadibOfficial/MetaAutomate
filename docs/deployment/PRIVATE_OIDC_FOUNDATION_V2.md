@@ -320,3 +320,28 @@ a malicious environment can spoof GitHub variables and mimic the literal
 connection URL. No PostgreSQL migration or actual integration run occurred.
 F06 remains BLOCKED, Foundation 3/9 historically verified, and production,
 customer operations and QDB submission remain NO-GO.
+
+
+## Stage 01 / F06 — libpq environment redirection guard (2026-10-27)
+
+The existing disposable-CI database URL interlock now also rejects nonempty
+`PGHOSTADDR`, `PGSERVICE`, `PGSERVICEFILE`, `PGSYSCONFDIR` and
+`PGOPTIONS` environment variables **before opening a connection**.
+PostgreSQL libpq can supply missing connection parameters from environment
+variables even when a URL contains `localhost`: `PGHOSTADDR` can select
+the actual network address independently of the URL's host label.
+Reference: https://www.postgresql.org/docs/current/libpq-envars.html and
+https://www.postgresql.org/docs/current/libpq-connect.html .
+
+The repository's existing `PGPASSWORD` CI setting is permitted because the
+two approved fixture URLs already contain explicit throwaway passwords.
+One offline regression test verifies six rejected shadow configurations
+and a permitted fixture case; no PostgreSQL connection is made by the test.
+
+This is an accident-prevention interlock, **not** proof of disposable
+database provenance or protection against a malicious runner, local port
+forwarding, compromised CI, or spoofed environment variables. The new exact
+head has not yet passed full pytest or PostgreSQL integration. Run the
+source-only suite on a clean reviewed checkout; never spoof CI variables or
+apply migration 012 to an owner database. F06 remains BLOCKED, Foundation
+historically 3/9 verified, and production and Qatar START submission NO-GO.
