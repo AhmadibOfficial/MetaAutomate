@@ -371,3 +371,35 @@ cannot prove runner/database isolation. No actual PostgreSQL execution,
 OIDC provider/MFA acceptance, CI pass, merge, migration, deployment,
 subscription or QDB application is claimed. Foundation F06 remains
 BLOCKED and the operational release decision stays NO-GO.
+
+
+## Stage 01 / F06 — bind CI event, checkout and workflow refs (2026-10-27)
+
+The source-only disposable PostgreSQL interlock previously accepted any
+suffix under the expected workflow path, including an unrelated branch,
+tag or mismatched PR number. It now requires the exact
+GITHUB_WORKFLOW_REF suffix to equal GITHUB_REF and validates that the
+event matches the triggers actually declared in .github/workflows/ci.yml:
+
+- push must target refs/heads/main and have no PR base ref.
+- pull_request must use refs/pull/<positive-number>/merge and target
+  main or feat/vscode-workspace-v1.
+- missing, inconsistent or unsupported refs fail before any psycopg.connect.
+
+The existing test fixture now includes GITHUB_REF/GITHUB_BASE_REF and an
+offline negative matrix. The update changes neither the CI workflow triggers
+nor any database connection, migration, runner, secret or deployment.
+GitHub documents the pull_request merge-ref convention at
+https://docs.github.com/en/actions/reference/workflows-and-actions/variables
+and https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows .
+
+From a clean exact-head checkout, run the existing offline tests:
+
+    PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider tests/test_private_oidc_contract.py tests/test_stage01_f06_oidc_claim_admission.py tests/test_p2_04a_oidc_mfa.py
+
+These CI environment values remain spoofable; matching them does NOT prove
+that a runner or database is disposable. CI is account billing-blocked,
+and stacked draft PR #131 targets a branch outside the CI pull_request
+base filters. No green CI, live PostgreSQL, IdP, MFA, release or QDB
+submission is claimed. Stage 01 F06 BLOCKED; Foundation historically
+3/9 verified, operational NO-GO.
