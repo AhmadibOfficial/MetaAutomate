@@ -290,6 +290,8 @@ def _ci_fixture():
         "GITHUB_WORKFLOW": "MetaAutomate CI",
         "GITHUB_JOB": "test",
         "GITHUB_WORKFLOW_REF": "AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@refs/pull/131/merge",
+        "GITHUB_REF": "refs/pull/131/merge",
+        "GITHUB_BASE_REF": "main",
     }
     admin = "postgresql://metaautomate:ci_only_password@localhost:5432/metaautomate"
     runtime = "postgresql://metaautomate_runtime:ci_runtime_password@localhost:5432/metaautomate"
@@ -406,3 +408,57 @@ def test_oidc_ci_database_guard_is_bound_to_expected_workflow_and_job():
     assert script.index("require_ci_database_urls(admin, runtime)") < script.index(
         "with psycopg.connect(admin) as conn:"
     )
+
+
+def test_oidc_ci_database_guard_binds_event_to_workflow_and_checkout_refs():
+    """Source-only guard rejects mismatched/unsupported CI refs before DB access."""
+    guard = _ci_guard()
+    env, admin, runtime = _ci_fixture()
+    guard(admin, runtime, env)
+
+    # A main-branch push is allowed by the checked-in CI workflow.
+    push = {**env,
+            "GITHUB_EVENT_NAME": "push",
+            "GITHUB_REF": "refs/heads/main",
+            "GITHUB_WORKFLOW_REF":
+                "AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@refs/heads/main"}
+    push.pop("GITHUB_BASE_REF")
+    guard(admin, runtime, push)
+
+    # PRs to the second explicitly configured CI base are also permitted.
+    guard(admin, runtime, {**env, "GITHUB_BASE_REF": "feat/vscode-workspace-v1"})
+
+    # Reject branch/tag/event mismatches, unsupported PR bases, and malformed
+    # merge refs. None of these cases may open a PostgreSQL connection.
+    bad_cases = (
+        {"GITHUB_REF": "refs/heads/feature/unreviewed"},
+        {"GITHUB_REF": "refs/pull/132/merge"},
+        {"GITHUB_REF": "refs/pull/0/merge",
+         "GITHUB_WORKFLOW_REF":
+             "AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@refs/pull/0/merge"},
+        {"GITHUB_REF": "refs/pull/131/head",
+         "GITHUB_WORKFLOW_REF":
+             "AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@refs/pull/131/head"},
+        {"GITHUB_REF": "refs/pull/131/merge/extra",
+         "GITHUB_WORKFLOW_REF":
+             "AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@refs/pull/131/merge/extra"},
+        {"GITHUB_BASE_REF": "feature/p2-061-atomic-read-audit"},
+        {"GITHUB_BASE_REF": ""},
+        {"GITHUB_EVENT_NAME": "push"},
+        {"GITHUB_EVENT_NAME": "push", "GITHUB_REF": "refs/heads/main"},
+        {"GITHUB_EVENT_NAME": "push", "GITHUB_REF": "refs/heads/feature/unreviewed",
+         "GITHUB_WORKFLOW_REF":
+             "AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@refs/heads/feature/unreviewed"},
+        {"GITHUB_EVENT_NAME": "push", "GITHUB_REF": "refs/tags/v1",
+         "GITHUB_WORKFLOW_REF":
+             "AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@refs/tags/v1"},
+    )
+    for changes in bad_cases:
+        with pytest.raises(RuntimeError, match="CI refs|main-branch push|allowed PR merge"):
+            guard(admin, runtime, {**env, **changes})
+
+    for key in ("GITHUB_REF", "GITHUB_BASE_REF"):
+        missing = dict(env)
+        missing.pop(key)
+        with pytest.raises(RuntimeError):
+            guard(admin, runtime, missing)
