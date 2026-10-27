@@ -241,3 +241,23 @@ MFA/PKCE, cross-tenant RLS, browser tests and independent review are
 unverified. F06 BLOCKED, Foundation 3/9 historically verified, production
 and QDB submission NO-GO. Do not spoof CI flags, apply migration 012,
 merge, deploy, enable billing or spend funds without separate approval.
+
+
+## Stage 01 / F06 — SQL candidate integrity regression
+
+Source review detected a **malformed migration 012** in the prior draft:
+the replacement session-revoker function had a truncated dollar-quoted
+body and a premature `COMMIT`/grant inserted inside the digest predicate.
+This would make the candidate migration invalid if applied. The candidate
+text has been repaired **without executing it**: all three PL/pgSQL bodies
+use balanced `AS $$ ... $$;` delimiters, the session digest guard is intact,
+and exactly one `COMMIT` terminates the migration after the function grant.
+
+A source-only regression in `tests/test_private_oidc_contract.py` checks
+the three delimiters, the single terminal transaction boundary, the grant
+placement and the revoker's tenant/user/digest predicates. These are
+**static text checks, not SQL parsing or a PostgreSQL execution result**.
+Next acceptance still requires independently authorized disposable
+PostgreSQL syntax/application, revocation and RLS testing. Never run the
+migration against the owner's existing database or bypass the CI-only
+integration guard. F06 remains BLOCKED; production and QDB submission NO-GO.
