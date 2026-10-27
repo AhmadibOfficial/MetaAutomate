@@ -243,10 +243,10 @@ def test_oidc_candidate_migration_has_valid_function_delimiters_and_single_commi
     This validates the candidate text, not execution on PostgreSQL.
     """
     sql = (ROOT / "database/migrations/012_oidc_identities.sql").read_text()
-    assert sql.count("AS $$\\n") == 3
-    assert sql.count("\\n$$;") == 3
+    assert sql.count("AS $$\n") == 3
+    assert sql.count("\n$$;") == 3
     assert sql.count("$$") == 6
-    assert sql.count("\\nCOMMIT;") == 1
+    assert sql.count("\nCOMMIT;") == 1
     assert sql.rstrip().endswith("COMMIT;")
     assert sql.count(
         "GRANT EXECUTE ON FUNCTION app.create_oidc_workspace_session("
@@ -254,8 +254,8 @@ def test_oidc_candidate_migration_has_valid_function_delimiters_and_single_commi
     assert sql.count(
         "REVOKE ALL ON FUNCTION app.create_oidc_workspace_session("
     ) == 1
-    for chunk in sql.split("AS $$\\n")[1:]:
-        body, _remainder = chunk.split("\\n$$;", 1)
+    for chunk in sql.split("AS $$\n")[1:]:
+        body, _remainder = chunk.split("\n$$;", 1)
         assert "BEGIN" in body and "END;" in body
         assert "COMMIT;" not in body
         assert "GRANT EXECUTE" not in body
