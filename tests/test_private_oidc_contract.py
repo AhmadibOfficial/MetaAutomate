@@ -121,7 +121,7 @@ def test_oidc_disposable_two_tenants_never_share_session_or_csrf():
     script = (ROOT / "scripts/verify_oidc_identity.py").read_text()
     assert 'os.environ.get("GITHUB_ACTIONS") != "true"' in script
     assert "CI OIDC Second Organization" in script
-    assert "CI OIDC Second Member" in script
+    assert "OIDC CI Second Member" in script
     assert "other_session_hash=" in script
     assert "other_csrf_hash=" in script
     assert 'Tenant B CSRF unlocked tenant A' in script
