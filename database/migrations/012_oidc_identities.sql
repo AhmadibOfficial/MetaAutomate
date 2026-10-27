@@ -163,19 +163,14 @@ CREATE OR REPLACE FUNCTION app.revoke_workspace_session(p_session_sha256 text)
 RETURNS void
 LANGUAGE plpgsql SECURITY DEFINER
 SET search_path = pg_catalog, public, app
-AS $
+AS $$
 DECLARE
     v_org text;
     v_user text;
 BEGIN
     v_org := pg_catalog.current_setting('app.organization_id', true);
     v_user := pg_catalog.current_setting('app.user_id', true);
-    IF p_session_sha256 IS NULL OR p_session_sha256 !~ '^[0-9a-f]{64}
-GRANT EXECUTE ON FUNCTION app.create_oidc_workspace_session(text,text,text,text)
-    TO metaautomate_runtime;
-
-COMMIT;
-
+    IF p_session_sha256 IS NULL OR p_session_sha256 !~ '^[0-9a-f]{64}$'
        OR v_org IS NULL OR v_org = ''
        OR v_user IS NULL OR v_user = '' THEN
         RETURN;
@@ -188,7 +183,7 @@ COMMIT;
        AND user_id = v_user::uuid
        AND revoked_at IS NULL;
 END;
-$;
+$$;
 
 REVOKE ALL ON FUNCTION app.create_oidc_workspace_session(text,text,text,text)
     FROM PUBLIC;
