@@ -189,3 +189,9 @@ input:focus,select:focus,textarea:focus{border-color:#068bd3}
 @media(max-width:1050px){.quick-intro{grid-template-columns:minmax(0,1fr) minmax(240px,.82fr);gap:18px}.quick-intro h1{font-size:clamp(38px,4.7vw,58px)}.intro-example{padding:19px}.sidebar{flex-basis:214px}}
 @media(max-width:900px){.sidebar{width:258px;flex-basis:unset}.quick-intro{min-height:370px}.intro-example{max-width:380px}}
 @media(max-width:700px){.quick-intro{grid-template-columns:1fr;padding:13px 0 25px;gap:26px}.quick-intro h1{font-size:clamp(40px,10vw,55px);margin:10px 0 15px}.quick-intro .page-description{font-size:14px;margin-bottom:22px}.intro-example{max-width:none;justify-self:stretch}.quick-trust{font-size:10px}.progress-strip{align-items:flex-start;padding:17px}.compact-metrics{width:100%;justify-content:space-around}.compact-metrics>div{min-width:0;flex:1;padding:0 8px}.compact-metrics>div:first-child{border:0}.support-links{gap:12px;padding-bottom:5px}.safety-banner{line-height:1.55;margin-bottom:22px}.topbar{background:#fff}.icon-button{background:#f1f7fb;color:#195475;border-color:#cae1ed}}
+
+/* Secondary, safe first-run walkthrough */
+.try-example{display:inline-flex;align-items:center;gap:8px;border:0;background:transparent;color:#0d77ae;font-size:13px;font-weight:750;padding:12px 8px;margin-left:9px;vertical-align:middle}
+.try-example:hover{text-decoration:underline;text-underline-offset:4px}
+.try-example:focus-visible{outline:3px solid #efb94f;outline-offset:3px;border-radius:4px}
+@media(max-width:700px){.try-example{display:flex;margin:8px 0 0;padding:10px 1px}}
