@@ -133,6 +133,16 @@ def run(out: Path | None):
                 assert report["payload"]["approvalScope"] == "COPY_OR_DOWNLOAD_ONLY"
                 if out:
                     page.screenshot(path=str(out / "workspace-desktop.png"), full_page=True)
+                # A new invalid upload must revoke prior approval and hide stale evidence.
+                page.locator('a[data-route="inventory"]').first.click()
+                page.locator("#inventory-file").set_input_files({
+                    "name": "unsafe.csv", "mimeType": "text/csv",
+                    "buffer": b"sku,name,stock,weekly_sales,unit_price_kobo\nCAP-01,=SUM(1),18,0,850000\n"
+                })
+                page.locator("#inventory-form button[type=submit]").click()
+                assert page.locator("#inventory-results").is_hidden()
+                assert page.locator("#draft-output").is_hidden()
+                assert page.locator("#export-evidence").is_disabled()
                 page.locator('a[data-route="modules"]').first.click()
                 page.locator("#module-search").fill("creative")
                 assert page.locator("#module-grid .module-card:visible").count() == 1
