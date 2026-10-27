@@ -378,8 +378,12 @@ def test_oidc_ci_database_guard_is_bound_to_expected_workflow_and_job():
     guard = _ci_guard()
     env, admin, runtime = _ci_fixture()
     guard(admin, runtime, env)
+    # A workflow on main is valid only with a matching main push context.
     guard(admin, runtime, {
         **env,
+        "GITHUB_EVENT_NAME": "push",
+        "GITHUB_REF": "refs/heads/main",
+        "GITHUB_BASE_REF": "",
         "GITHUB_WORKFLOW_REF": (
             "AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@refs/heads/main"
         ),
