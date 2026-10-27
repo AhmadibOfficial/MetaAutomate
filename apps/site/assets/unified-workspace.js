@@ -182,8 +182,13 @@
   }
   $("clear-inventory").addEventListener("click",()=>{clearInventory();log("LOCAL_INVENTORY_CLEARED");announce("Inventory cleared from this tab.");});
   $("inventory-file").addEventListener("change",()=>{
-    clearInventory();
-    // Never clear a newly selected file, only stale state. See async generation.
+    // Invalidate prior analysis but leave the newly selected file intact.
+    generation++;records=analysis=null;exampleMode=false;
+    $("inventory-results").hidden=true;
+    $("inventory-table").replaceChildren();
+    $("candidate-select").replaceChildren();
+    $("draft-form").hidden=true;
+    dropDraft();drawResults();
   });
   $("download-sample").addEventListener("click",()=>{
     save("metaautomate-example-stock.csv",
