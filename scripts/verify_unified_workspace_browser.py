@@ -92,6 +92,20 @@ def run(out: Path | None):
                 assert page.goto(origin + "/workspace/", wait_until="load").status == 200
                 assert page.locator("#view-overview").is_visible()
                 assert page.locator("#view-inventory").is_hidden()
+                assert page.locator("#heading-overview").is_visible()
+                # First-run experience: understand the workflow immediately using fake records.
+                page.locator("#try-example").click()
+                assert page.locator("#view-inventory").is_visible()
+                assert page.locator("#inventory-total").inner_text() == "3"
+                assert page.locator("#inventory-candidates").inner_text() == "2"
+                assert "Example only" in page.locator("#inventory-caveat").inner_text()
+                with page.expect_download() as sample_evidence:
+                    page.locator("#download-analysis").click()
+                sample_report = json.loads(Path(sample_evidence.value.path()).read_text("utf-8"))
+                assert sample_report["source"] == "SYNTHETIC_EXAMPLE_UNVERIFIED"
+                assert sample_report["payload"]["exampleOnly"] is True
+                page.locator("#clear-inventory").click()
+                assert page.locator("#inventory-results").is_hidden()
                 page.locator('a[data-route="inventory"]').first.click()
                 assert page.locator("#view-inventory").is_visible()
                 with page.expect_download() as sample:
