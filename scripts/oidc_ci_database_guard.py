@@ -27,6 +27,21 @@ def require_ci_database_urls(admin_url: str, runtime_url: str, environ=None) -> 
     if not run_id.isascii() or not run_id.isdecimal():
         raise RuntimeError("OIDC database integration requires a GitHub run ID")
 
+    # libpq can fill omitted connection parameters from PG* environment
+    # variables even when the URL spells out a host. In particular,
+    # PGHOSTADDR can select a different network address than localhost.
+    # Reject shadow connection settings before opening a connection.
+    # CI's PGPASSWORD is intentionally permitted: both URLs supply their
+    # own explicit fixture passwords.
+    for key in (
+        "PGHOSTADDR", "PGSERVICE", "PGSERVICEFILE",
+        "PGSYSCONFDIR", "PGOPTIONS",
+    ):
+        if env.get(key):
+            raise RuntimeError(
+                "OIDC database integration refuses libpq environment overrides"
+            )
+
     # Only the exact throwaway service credentials and URL spellings in
     # .github/workflows/ci.yml are accepted. Merely checking host/database
     # would also admit a developer DB using different local credentials.
