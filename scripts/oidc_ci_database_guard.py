@@ -5,6 +5,7 @@ PostgreSQL DSNs. Environment variables are not proof of database provenance:
 the CI service still needs an independent isolated-runner acceptance.
 """
 import os
+import re
 
 
 def require_ci_database_urls(admin_url: str, runtime_url: str, environ=None) -> None:
@@ -33,10 +34,26 @@ def require_ci_database_urls(admin_url: str, runtime_url: str, environ=None) -> 
     if env.get("GITHUB_WORKFLOW") != "MetaAutomate CI" or env.get("GITHUB_JOB") != "test":
         raise RuntimeError("OIDC database integration requires the designated CI test job")
     workflow_ref = env.get("GITHUB_WORKFLOW_REF", "")
-    if not workflow_ref.startswith(
-        "AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@refs/"
-    ):
+    workflow_prefix = "AhmadibOfficial/MetaAutomate/.github/workflows/ci.yml@"
+    if not workflow_ref.startswith(workflow_prefix):
         raise RuntimeError("OIDC database integration requires the reviewed CI workflow path")
+
+    # The workflow source ref and event ref must be the *same* allowed
+    # GitHub checkout target. Merely accepting any refs/ suffix could allow
+    # a synthetic or accidental run on an unrelated feature/tag ref.
+    # See .github/workflows/ci.yml trigger filters. These environment
+    # strings are still spoofable and do not prove database provenance.
+    ref = env.get("GITHUB_REF", "")
+    if workflow_ref != workflow_prefix + ref:
+        raise RuntimeError("OIDC database integration requires matching CI refs")
+    event = env["GITHUB_EVENT_NAME"]
+    if event == "push":
+        if ref != "refs/heads/main" or env.get("GITHUB_BASE_REF"):
+            raise RuntimeError("OIDC database integration requires a main-branch push")
+    elif event == "pull_request":
+        if (re.fullmatch(r"refs/pull/[1-9][0-9]*/merge", ref, flags=re.ASCII) is None
+                or env.get("GITHUB_BASE_REF") not in ("main", "feat/vscode-workspace-v1")):
+            raise RuntimeError("OIDC database integration requires an allowed PR merge ref and base")
 
     # libpq can fill omitted connection parameters from PG* environment
     # variables even when the URL spells out a host. In particular,
