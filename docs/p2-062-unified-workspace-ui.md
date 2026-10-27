@@ -1,76 +1,58 @@
-# P2-062 — Unified Workspace graphical interface (source-only)
+# P2-062 — MetaAutomate focused five-sector interface
 
-**Status:** Draft / review-only / no merge or deployment authorization.
-**Dependency:** Stacked on Stage 01 F06 draft #131; itself dependent on #122 → #121 → #120 → #119. Foundation 3/9 historically verified; operational NO-GO.
+**Status:** Unmerged draft. No launch, financial application, customer onboarding, external AI/social operations or paid services authorized.
 
-## P2-062b — 20-second first-use redesign (27 October 2026)
-The opening screen now answers just three questions without showing the
-technical roadmap, release metrics or a catalog of nine modules:
-1. **What does this do?** "Sell smarter with the stock you have."
-2. **What should I do first?** "Start with my inventory" or "Try an example instead."
-3. **What happens?** Add products → see potential stock opportunities → write a post.
+## Approved product experience
+Public homepage: one clear value statement, exactly five industry solutions, three explainers, direct link to workspace. Removed excessive home landing sections/cards from the draft homepage, **without deleting historical assets, existing product modules or other application source**.
 
-Main navigation is **Home / My inventory / Create a post**. Reports, tools
-and project status remain accessible under a visually secondary "More" section.
-Content uses everyday language, a light reading surface and compact cards,
-while preserving MetaAutomate's navy, electric blue, silver and gold palette.
+Workspace: **Home**, **My Work**, **Results**, **Team & Settings**. Five home options:
+1. Sales & Customers — inquiry/follow-up planning
+2. Healthcare — non-clinical scheduling/admin planning
+3. Real Estate — viewing/maintenance planning
+4. Retail & Stock — inventory decision planning
+5. Cloud & IT — authorized audit/change planning
 
-The one-click example processes **three explicitly fictional records** using
-the existing stock engine. Display and downloaded receipts label the data
-\`SYNTHETIC_EXAMPLE_UNVERIFIED\`, never customer evidence or traction. A new
-file selection or session reset invalidates stale imports and prior approvals.
+Each option uses an actual deterministic, client-side workflow checklist. The user can enter a non-sensitive challenge, create a local plan, check steps, and separately record human review. The checklist **does not perform the task** or substantiate savings/ROI. Results counts only work in the current browser session.
 
-### Verified in this authoring run
-- Committed GitHub source readback, JavaScript compilation, unique HTML
-  element IDs, complete JS-to-DOM target mapping, and no external request
-  primitives: **PASS** (developer-local source checks).
-- In-memory mock-DOM interaction with the actual committed campaign engine:
-  sample 3 products / 2 candidates, draft creation, review-gated download,
-  edit-triggered revocation and local evidence download: **PASS**.
-- Updated source-level pytest and Chromium fixture for the new first-use
-  walkthrough, including explicitly synthetic JSON receipts: **committed,
-  not executed at exact branch HEAD**.
+Real existing P2-060 inventory CSV engine is preserved, exposed as an optional tool within **My Work** with fatal UTF-8 decoding, inherited size limits, conservative stock candidate assessment, approved marketing drafts and review-revoking edits. Actual inventory imports and draft generation are local; there are no model/provider/CRM/cloud/medical integrations.
 
-Real browser viewport screenshots, keyboard/screen-reader checks,
-full pytest, Chromium acceptance, GitHub Actions and independent security
-review are **still pending**. No release approval is implied.
+Team & Settings states the true privacy status: local volatile browser session, no account/team access, English-only UI today; Arabic requires reviewed translation, including RTL and workflow-specific content, before release. The privacy/control section offers a working clear-session action.
 
-## Delivered
-- New responsive workspace dashboard with navigation for overview, inventory, campaign studio, evidence, existing modules and Qatar START readiness. Skip link, labels, keyboard-operable controls, focus styles, mobile sidebar and reduced-motion treatment.
-- Reuses the actual P2-060 MetaCampaign engine rather than recreating stock logic. Fatal UTF-8 decoding; existing 128 KB/400-row bounds and CSV security checks. User-declared product CSV stays in browser memory.
-- Inventory table, counts, conservative stock opportunities, sample CSV download and local JSON assessment export. Choosing a new file invalidates previous results and approvals.
-- Editable campaign drafts created from eligible stock. Copy and text export require explicit internal review; editing or changing inputs revokes approval.
-- In-memory event list and JSON receipt expressly declaring no independent source authentication, revenue verification, provider publishing or signed attestation. Local browser clock is untrusted.
-- Module search links to existing pages; private encrypted storage, AI operations and future modules are labelled gated/planned and are NOT made available to public users.
-- Alignment with ten-stage roadmap: Stage 01 security first, Stage 02 Inventory-to-Growth MVP, Stage 03 Qatar buyer research in parallel. No subscription, paywall, checkout, or billing features.
+The homepage's five sector links select the matching workspace industry using a fixed allowlist; user-controlled URL query strings cannot select other code paths.
 
-## Source files
-- apps/site/workspace/index.html
+## What was intentionally removed from the GUI
+- Broad feature/module directories and technology catalog as primary navigation
+- Separate developer-oriented funding readiness/release dashboard in the customer UI
+- Duplicated inventory/campaign/evidence pages; the relevant functional pieces are grouped under My Work and Results
+- Technical readiness counts, unsupported metrics, AI-branded decorative dashboard cards, and placeholders implying live services
+- Old long-form homepage service/capability/operating content from the new draft homepage; the old Git version remains recoverable
+
+**Not removed:** authentication and security infrastructure, audited source, private labs, test harnesses, staged PRs, business intelligence engine, release gates and original project directories.
+
+## Files modified
+- apps/site/index.html — public focused entry page
+- apps/site/assets/focused-home.css — new public homepage styling
+- apps/site/workspace/index.html — 4-view 5-sector workspace
 - apps/site/assets/unified-workspace.css
 - apps/site/assets/unified-workspace.js
-- apps/site/assets/campaign-engine.js — existing engine reused, unchanged
-- tests/test_p2_062_unified_workspace_ui.py
-- scripts/verify_unified_workspace_browser.py
-- apps/site/index.html — labelled navigation link on draft only
+- tests/test_p2_062_unified_workspace_ui.py — source and engine regression
+- scripts/verify_unified_workspace_browser.py — synthetic-only loopback Chromium acceptance
 
-## Acceptance — trusted clean exact-head checkout
-Run the commands separately:
+## Verification / evidence boundaries
+- GitHub source readback and V8 parsing; static HTML IDs/links, CSP no-network and DOM-target inspections: developer-local source checks, **PASS**.
+- In-memory DOM simulation, actual committed MetaCampaign engine: sector selection, non-persistent work creation, four-item checklist, review gate, fake CSV (3 products/2 candidates), controlled draft creation, approval revocation and local downloads: **PASS in synthetic mock DOM only**.
+- **Not run**: exact-branch Python pytest/Node suite on owner Kali, real Playwright Chromium, mobile visual/accessibility/screen-reader review, full repo regression, any real infrastructure authentication/data test, independent AppSec or CI.
+- GitHub Actions runner remains billing/spending-limit blocked, and the stacked PR may not trigger current target-branch workflow filters.
+- No proof of customer deployment, healthcare/patient operations, cloud savings, sales conversion, UAE/Qatar market traction or financial returns.
 
+## Required clean-checkout acceptance
     PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider tests/test_p2_062_unified_workspace_ui.py
     node --check apps/site/assets/unified-workspace.js
     python3 scripts/verify_unified_workspace_browser.py
 
-The browser harness requires previously installed, approved Playwright/Chromium and does not install packages. If explicitly choosing an installed Chromium binary, set MAT_CHROMIUM_EXECUTABLE to that path. Optional proof artifacts use --output-dir with a new private path outside the repository. The harness binds 127.0.0.1 on an ephemeral port, allows exactly five static assets, blocks off-origin traffic, uses fake inventory, and checks desktop/mobile layout, downloads, approval invalidation, navigation and provenance flags.
+If approved local Playwright/Chromium is not already installed, the browser harness stops rather than downloading anything. It allows only ephemeral 127.0.0.1 static assets, blocks other HTTP traffic and uses fictional CSV. Do not bypass or weaken fail-closed checks to mark acceptance.
 
-## Limits
-This is a functional **browser-local GUI** with links to existing tools; it is not a complete operational or authenticated SaaS backend. It does not integrate the protected apps/web data vault, execute real AI or social operations, retain/upload commercial business information, verify revenue or invent customers, or connect to QDB/F6S. Access to the public preview is not an authentication gate; do not use sensitive records.
+## Release and funding NO-GO
+Foundation 3/9 historically internally verified. F04–F09 remain blocked; real OIDC/MFA, tenant isolation and staging security still require independent acceptance. The Qatar START dossier exists in separate draft #121, but buyer interviews, pilot data, price discovery, team commitments, legal incorporation/eligibility, and financial evidence are unverified. Billing/subscriptions remain deferred.
 
-## Release gates remain outstanding
-- Exact-head source tests, real Chromium test and independently witnessed browser acceptance
-- Independent security/accessibility review and regression review
-- Foundation F04–F09, especially real OIDC/MFA and isolated PostgreSQL acceptance
-- Human review of stacked drafts plus separate explicit release approval
-- Qatar buyer interviews, genuine pilot outcomes, validated business-model assumptions without billing features, team/legal evidence, founder-reviewed financial plan and funding narrative
-- CI runners available and actual green checks; current account billing/spending-limit block is not a test pass
-
-**Operational NO-GO, no merge/deploy/migration/live data/social or AI/billing/spending/funding submission.**
+Keep this PR **draft**, stacked on draft #131. Do not merge, deploy, migrate, purchase cloud resources, enable personal/customer records or provider publishing, run clinical/enterprise automation or submit QDB/F6S application without separately requested and authorized release decision.
