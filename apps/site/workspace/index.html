@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="/assets/unified-workspace.css">
   <script defer src="/assets/campaign-engine.js"></script>
   <script defer src="/assets/unified-workspace.js"></script>
-  <title>MetaAutomate OS — Unified Workspace Preview</title>
+  <title>MetaAutomate — Simple Business Workspace</title>
 </head>
 <body>
 <a href="#main" class="skip">Skip to main content</a>
@@ -19,28 +19,22 @@
   <aside class="sidebar" id="sidebar">
     <a class="identity" href="/" aria-label="MetaAutomate homepage">
       <img src="/assets/metaautomate-mark.webp" width="42" height="42" alt="">
-      <span><strong>Meta<span class="identity-accent">Automate</span></strong><small>WORKSPACE / PREVIEW</small></span>
+      <span><strong>Meta<span class="identity-accent">Automate</span></strong><small>WORKSPACE PREVIEW</small></span>
     </a>
-    <div class="workspace-label"><span class="workspace-dot"></span> LOCAL DEVELOPMENT <span class="workspace-label-end">V2</span></div>
-    <p class="rail-heading">WORKSPACE</p>
-    <nav class="rail-nav" aria-label="Workspace views">
-      <a href="#overview" data-route="overview" aria-current="page"><span aria-hidden="true">◫</span> Overview</a>
-      <a href="#inventory" data-route="inventory"><span aria-hidden="true">▤</span> Inventory intelligence</a>
-      <a href="#campaign" data-route="campaign"><span aria-hidden="true">✦</span> Campaign studio</a>
-      <a href="#evidence" data-route="evidence"><span aria-hidden="true">◈</span> Evidence center</a>
-      <a href="#modules" data-route="modules"><span aria-hidden="true">▦</span> All modules</a>
-      <a href="#readiness" data-route="readiness"><span aria-hidden="true">◇</span> Qatar START readiness</a>
+    <nav class="rail-nav primary-nav" aria-label="Main workspace navigation">
+      <a href="#overview" data-route="overview" aria-current="page"><span aria-hidden="true">⌂</span> Home</a>
+      <a href="#inventory" data-route="inventory"><span aria-hidden="true">▤</span> My inventory</a>
+      <a href="#campaign" data-route="campaign"><span aria-hidden="true">✎</span> Create a post</a>
     </nav>
-    <p class="rail-heading rail-heading-spaced">EXISTING TOOLS</p>
-    <nav class="rail-nav rail-nav-quiet" aria-label="Existing tools">
-      <a href="/campaigns/"><span aria-hidden="true">↗</span> Full campaign workbench</a>
-      <a href="/creative/"><span aria-hidden="true">↗</span> Creative Studio</a>
-      <a href="/automation/"><span aria-hidden="true">↗</span> Growth Autopilot</a>
-      <a href="/engage/"><span aria-hidden="true">↗</span> Start a Project</a>
+    <p class="rail-heading rail-heading-spaced">MORE</p>
+    <nav class="rail-nav secondary-nav" aria-label="Other workspace tools">
+      <a href="#evidence" data-route="evidence"><span aria-hidden="true">◈</span> My reports</a>
+      <a href="#modules" data-route="modules"><span aria-hidden="true">▦</span> Other tools</a>
+      <a href="#readiness" data-route="readiness"><span aria-hidden="true">◇</span> Project status</a>
     </nav>
     <div class="rail-bottom">
-      <div class="guard-icon" aria-hidden="true">◇</div>
-      <div><strong>Human review required</strong><p>No publication, live integrations, customer storage or model execution.</p></div>
+      <div class="guard-icon" aria-hidden="true">✓</div>
+      <div><strong>Private on this device</strong><p>No upload or automatic posting. Preview only.</p></div>
     </div>
   </aside>
 
@@ -48,53 +42,47 @@
     <header class="topbar">
       <div class="topbar-left">
         <button class="icon-button menu-toggle" id="menu-toggle" type="button" aria-label="Toggle navigation" aria-controls="sidebar" aria-expanded="false">☰</button>
-        <div class="crumb">WORKSPACE <span>/</span> <strong id="current-section">Overview</strong></div>
+        <div class="crumb">WORKSPACE <span>/</span> <strong id="current-section">Home</strong></div>
       </div>
-      <div class="topbar-right"><span class="local-pill"><span></span> BROWSER-LOCAL</span><a class="top-link" href="/engage/">Start a Project <span aria-hidden="true">↗</span></a></div>
+      <div class="topbar-right"><span class="local-pill"><span></span> LOCAL PREVIEW</span><a class="top-link" href="/creative/">Create image <span aria-hidden="true">↗</span></a></div>
     </header>
     <main id="main" tabindex="-1">
-      <p class="safety-banner" role="note"><strong>Development preview:</strong> import non-sensitive product inventory only. Work is processed locally in this tab. These are not authenticated customer operations, verified business outcomes or live AI/social automations.</p>
+      <p class="safety-banner" role="note"><strong>Preview only.</strong> Use non-sensitive product information. Your file stays in this browser; nothing is posted or sent.</p>
       <section class="screen" id="view-overview" data-view="overview" aria-labelledby="heading-overview">
-        <div class="page-heading"><div><p class="kicker">MISSION CONTROL / YOUR WORKSPACE</p><h1 id="heading-overview">Build with intelligence.<br><span>Operate with clarity.</span></h1><p class="page-description">An integrated view of MetaAutomate’s working local tools and securely gated development capabilities. Start with your inventory, then create a reviewable campaign.</p></div><a class="primary-link" href="#inventory" data-route="inventory">Analyze inventory <span aria-hidden="true">↗</span></a></div>
-        <div class="metric-grid" aria-label="Current tab inventory summary">
-          <article class="metric-card"><p>IMPORTED PRODUCTS</p><strong id="overview-count">—</strong><small>Current browser session</small><span class="metric-glyph">▤</span></article>
-          <article class="metric-card"><p>PROMOTION CANDIDATES</p><strong id="overview-opportunities">—</strong><small>Rule-based, not AI predicted</small><span class="metric-glyph">✦</span></article>
-          <article class="metric-card"><p>CAMPAIGN REVIEW</p><strong class="metric-text" id="overview-review">Not started</strong><small>Internal draft review only</small><span class="metric-glyph">◇</span></article>
-          <article class="metric-card"><p>FOUNDATION CONTROLS</p><strong>3 <span class="faint">/ 9</span></strong><small>Historical source record; NO-GO</small><span class="metric-glyph">⛨</span></article>
+        <div class="quick-intro">
+          <div class="quick-intro-copy">
+            <p class="kicker">YOUR BUSINESS WORKSPACE</p>
+            <h1 id="heading-overview">Sell smarter with<br><span>the stock you have.</span></h1>
+            <p class="page-description">Upload your product list. See what you have plenty of, then create a post you can review and share yourself.</p>
+            <a class="primary-link big-cta" href="#inventory" data-route="inventory">Start with my inventory <span aria-hidden="true">→</span></a>
+            <p class="quick-trust">No account needed · Your file stays in this browser · Nothing posts automatically</p>
+          </div>
+          <div class="intro-example" aria-label="What you can do in three steps">
+            <div class="example-top"><span class="example-mark">✦</span><div><strong>One simple workflow</strong><small>From stock list to post</small></div></div>
+            <div class="example-stage"><span class="example-num">1</span><div><strong>Add your products</strong><small>Upload a CSV file</small></div><span aria-hidden="true" class="example-check">✓</span></div>
+            <div class="example-stage"><span class="example-num">2</span><div><strong>See what to promote</strong><small>We find items with extra stock</small></div><span class="example-symbol" aria-hidden="true">→</span></div>
+            <div class="example-stage"><span class="example-num">3</span><div><strong>Write a post</strong><small>Edit it, review it and download it</small></div><span class="example-symbol" aria-hidden="true">→</span></div>
+            <div class="example-note">You always choose what to publish.</div>
+          </div>
         </div>
-        <div class="content-grid">
-          <section class="surface big-span" aria-labelledby="launch-heading">
-            <div class="surface-title"><div><p class="kicker">START HERE</p><h2 id="launch-heading">From stock to a reviewed draft</h2></div><span class="eyebrow-chip">LOCAL WORKFLOW</span></div>
-            <div class="workflow-line">
-              <a href="#inventory" data-route="inventory"><span class="step-num">01</span><strong>Import inventory</strong><small>Validate and assess a CSV</small></a>
-              <span class="workflow-arrow" aria-hidden="true">→</span>
-              <a href="#campaign" data-route="campaign"><span class="step-num">02</span><strong>Prepare a campaign</strong><small>Editable content for review</small></a>
-              <span class="workflow-arrow" aria-hidden="true">→</span>
-              <a href="#evidence" data-route="evidence"><span class="step-num">03</span><strong>Export evidence</strong><small>Label self-declared results</small></a>
+        <div class="welcome-bottom">
+          <section class="progress-strip" aria-labelledby="launch-heading">
+            <div><p class="kicker">YOUR PROGRESS</p><h2 id="launch-heading">Ready when you are.</h2><p>Import a file to see your results here.</p></div>
+            <div class="compact-metrics" aria-label="Current session">
+              <div><strong id="overview-count">—</strong><span>Products</span></div>
+              <div><strong id="overview-opportunities">—</strong><span>Post ideas</span></div>
+              <div><strong id="overview-review" class="compact-review">Not started</strong><span>Review</span></div>
             </div>
-            <div class="surface-footer"><span>No uploads or external API calls</span><a href="/campaigns/">Open the extended campaign workbench ↗</a></div>
           </section>
-          <section class="surface" aria-labelledby="foundation-heading">
-            <div class="surface-title"><div><p class="kicker">RELEASE GATE</p><h2 id="foundation-heading">Secure Foundation</h2></div></div>
-            <div class="foundation-progress" aria-label="3 of 9 historical Foundation controls verified"><div></div></div>
-            <div class="foundation-legend"><strong>3 verified historically</strong><span>6 blocked</span></div>
-            <p class="muted">Real OIDC/MFA, independent PostgreSQL isolation and staging acceptance are still required. No customer activation.</p>
-            <a href="#readiness" data-route="readiness" class="inline-link">Review readiness details ↗</a>
-          </section>
-        </div>
-        <div class="section-top"><div><p class="kicker">PLATFORM CAPABILITIES</p><h2>Connected tools, one experience.</h2></div><a class="inline-link" href="#modules" data-route="modules">View all modules ↗</a></div>
-        <div class="module-preview-grid">
-          <a class="feature-card" href="#inventory" data-route="inventory"><span class="feature-icon">▤</span><span class="feature-status">LOCAL / FUNCTIONAL</span><h3>Inventory intelligence</h3><p>Analyze real user-provided CSV records with deterministic rules.</p><span class="feature-arrow">Explore →</span></a>
-          <a class="feature-card" href="#campaign" data-route="campaign"><span class="feature-icon">✦</span><span class="feature-status">LOCAL / FUNCTIONAL</span><h3>Campaign studio</h3><p>Create human-reviewed marketing drafts using the shared engine.</p><span class="feature-arrow">Explore →</span></a>
-          <a class="feature-card" href="/creative/"><span class="feature-icon">◈</span><span class="feature-status">EXISTING TOOL</span><h3>Creative production</h3><p>Original graphics and user-narrated video production.</p><span class="feature-arrow">Open tool →</span></a>
+          <div class="support-links"><span>Already have something in mind?</span><a href="/creative/">Make an image ↗</a><a href="/engage/">Plan a project ↗</a></div>
         </div>
       </section>
 
       <section class="screen" id="view-inventory" data-view="inventory" aria-labelledby="heading-inventory" hidden>
-        <div class="page-heading compact"><div><p class="kicker">01 / DATA INTELLIGENCE</p><h1 id="heading-inventory">Inventory intelligence<span class="period">.</span></h1><p class="page-description">Analyze your own non-sensitive CSV without uploading it. The exact existing P2-060 rules power this view.</p></div><button class="secondary-button" id="download-sample" type="button">Download sample CSV ↓</button></div>
+        <div class="page-heading compact"><div><p class="kicker">01 / DATA INTELLIGENCE</p><h1 id="heading-inventory">My inventory<span class="period">.</span></h1><p class="page-description">Upload your stock list to find products worth promoting.</p></div><button class="secondary-button" id="download-sample" type="button">Download sample CSV ↓</button></div>
         <div class="content-grid">
           <section class="surface big-span">
-            <div class="surface-title"><div><p class="kicker">LOCAL INPUT</p><h2>Import your product records</h2></div><span class="eyebrow-chip">NO NETWORK</span></div>
+            <div class="surface-title"><div><p class="kicker">LOCAL INPUT</p><h2>Upload your stock list</h2></div><span class="eyebrow-chip">NO NETWORK</span></div>
             <form id="inventory-form" class="upload-form">
               <label class="file-drop" for="inventory-file"><span class="file-drop-icon" aria-hidden="true">⇧</span><strong>Choose an inventory CSV</strong><small>Maximum 128 KB / 400 rows · UTF-8 · no personal data</small><span id="file-label" class="file-label">No file selected</span></label>
               <input type="file" id="inventory-file" accept=".csv,text/csv" required>
@@ -103,46 +91,46 @@
             <p class="field-hint">Columns: <code>sku,name,stock,weekly_sales,unit_price_kobo</code>. All values, including sales counts, are user-declared. Avoid confidential files in this public preview.</p>
           </section>
           <aside class="surface">
-            <p class="kicker">HOW IT WORKS</p><h2>Conservative by design.</h2>
+            <p class="kicker">HOW IT WORKS</p><h2>How we choose</h2>
             <div class="logic-list"><p><span>01</span> Flag zero recorded sales when at least 5 units remain.</p><p><span>02</span> Flag high stock relative to weekly sales.</p><p><span>03</span> Never recommend sold-out or low-stock products.</p></div>
             <p class="muted">No demand prediction, authenticated accounting or profit calculation.</p>
           </aside>
         </div>
         <section class="surface inventory-results" id="inventory-results" hidden aria-labelledby="results-heading">
-          <div class="surface-title"><div><p class="kicker">ASSESSMENT RESULT / CURRENT SESSION</p><h2 id="results-heading">Your inventory overview</h2></div><button class="secondary-button" id="download-analysis" type="button">Export analysis JSON ↓</button></div>
-          <div class="inline-stats"><div><strong id="inventory-total">0</strong><span>Products</span></div><div><strong id="inventory-stock">0</strong><span>Declared units</span></div><div><strong id="inventory-candidates">0</strong><span>Review candidates</span></div></div>
+          <div class="surface-title"><div><p class="kicker">YOUR RESULTS</p><h2 id="results-heading">Products and opportunities</h2></div><button class="secondary-button" id="download-analysis" type="button">Export analysis JSON ↓</button></div>
+          <div class="inline-stats"><div><strong id="inventory-total">0</strong><span>Products</span></div><div><strong id="inventory-stock">0</strong><span>Declared units</span></div><div><strong id="inventory-candidates">0</strong><span>Post ideas</span></div></div>
           <div class="table-wrap"><table><thead><tr><th>Product</th><th>SKU</th><th>Stock</th><th>Weekly sales</th><th>Assessment</th></tr></thead><tbody id="inventory-table"></tbody></table></div>
           <p class="muted" id="inventory-caveat">Data origin is self-declared and not independently verified.</p>
-          <a href="#campaign" data-route="campaign" class="primary-link">Create a reviewed campaign ↗</a>
+          <a href="#campaign" data-route="campaign" class="primary-link">Create a post →</a>
         </section>
       </section>
 
       <section class="screen" id="view-campaign" data-view="campaign" aria-labelledby="heading-campaign" hidden>
-        <div class="page-heading compact"><div><p class="kicker">02 / GROWTH WORKBENCH</p><h1 id="heading-campaign">Campaign studio<span class="period">.</span></h1><p class="page-description">Build an editable draft from imported stock. Copy/download requires explicit internal human review; nothing is published.</p></div><a class="secondary-button" href="/campaigns/">Advanced workbench ↗</a></div>
+        <div class="page-heading compact"><div><p class="kicker">02 / GROWTH WORKBENCH</p><h1 id="heading-campaign">Create a post<span class="period">.</span></h1><p class="page-description">Choose a product. We write a starting draft that you can edit and approve before downloading.</p></div><a class="secondary-button" href="/campaigns/">Advanced workbench ↗</a></div>
         <div class="content-grid">
           <section class="surface big-span">
-            <div class="surface-title"><div><p class="kicker">CAMPAIGN INPUT</p><h2>Prepare a relevant message</h2></div></div>
+            <div class="surface-title"><div><p class="kicker">CAMPAIGN INPUT</p><h2>Choose your product</h2></div></div>
             <p id="campaign-empty" class="empty-info">Import an inventory CSV and identify an eligible product first. <a href="#inventory" data-route="inventory">Go to Inventory →</a></p>
             <form id="draft-form" hidden>
-              <div class="field-grid"><label>Stock opportunity<select id="candidate-select" required></select></label><label>Target channel<select id="channel-select"><option>Instagram</option><option>Facebook</option><option>WhatsApp</option><option>TikTok</option><option>Other</option></select></label></div>
+              <div class="field-grid"><label>Product to promote<select id="candidate-select" required></select></label><label>Where will you post?<select id="channel-select"><option>Instagram</option><option>Facebook</option><option>WhatsApp</option><option>TikTok</option><option>Other</option></select></label></div>
               <label>Business name<input id="brand-name" type="text" maxlength="70" autocomplete="off" value="My Business" required></label>
-              <button class="primary-button" type="submit">Generate reviewable draft ↗</button>
+              <button class="primary-button" type="submit">Create my post →</button>
             </form>
           </section>
           <aside class="surface"><p class="kicker">WORKFLOW GOVERNANCE</p><h2>People approve. Tools assist.</h2><p class="muted">Generated copy uses inventory entries you provide. Verify product rights, current prices, delivery claims and eligibility before manual use.</p><span class="state-label">EXTERNAL PUBLISHING DISABLED</span></aside>
         </div>
         <section id="draft-output" class="surface" hidden aria-labelledby="draft-output-heading">
-          <div class="surface-title"><div><p class="kicker">DRAFT ONLY / UNPUBLISHED</p><h2 id="draft-output-heading">Your campaign copy</h2></div><span id="draft-status" class="state-label">NOT REVIEWED</span></div>
+          <div class="surface-title"><div><p class="kicker">DRAFT ONLY / UNPUBLISHED</p><h2 id="draft-output-heading">Your post is ready to edit</h2></div><span id="draft-status" class="state-label">NOT REVIEWED</span></div>
           <p class="muted" id="draft-reason"></p>
           <label class="editor-label" for="draft-text">Editable social copy</label><textarea id="draft-text" rows="8" maxlength="2200"></textarea>
-          <label class="check-label"><input id="review-check" type="checkbox"> I reviewed the content, product claims, price, creative rights and privacy. This authorizes copy/download only, not publishing.</label>
-          <div class="form-row"><button class="primary-button" id="record-review" type="button">Record internal review</button><button class="secondary-button" id="copy-draft" type="button" disabled>Copy reviewed text</button><button class="secondary-button" id="save-draft" type="button" disabled>Download .txt ↓</button></div>
+          <label class="check-label"><input id="review-check" type="checkbox"> I checked the product details, price and rights, and I understand MetaAutomate will not publish this post.</label>
+          <div class="form-row"><button class="primary-button" id="record-review" type="button">Approve this draft</button><button class="secondary-button" id="copy-draft" type="button" disabled>Copy post</button><button class="secondary-button" id="save-draft" type="button" disabled>Download post ↓</button></div>
           <div class="subtle-panel"><strong>Next in the existing workbench</strong><p>Generate an original PNG graphic, prepare a narrated-video brief, and record self-reported funnel metrics without provider connections.</p><a class="inline-link" href="/campaigns/">Continue in Campaign Workbench ↗</a></div>
         </section>
       </section>
 
       <section class="screen" id="view-evidence" data-view="evidence" aria-labelledby="heading-evidence" hidden>
-        <div class="page-heading compact"><div><p class="kicker">03 / EVIDENCE &amp; AUDIT</p><h1 id="heading-evidence">Evidence center<span class="period">.</span></h1><p class="page-description">Export a truthful local session receipt that distinguishes actual tool execution from user-declared source data and unverified outcomes.</p></div></div>
+        <div class="page-heading compact"><div><p class="kicker">03 / EVIDENCE &amp; AUDIT</p><h1 id="heading-evidence">My reports<span class="period">.</span></h1><p class="page-description">Export a truthful local session receipt that distinguishes actual tool execution from user-declared source data and unverified outcomes.</p></div></div>
         <div class="content-grid">
           <section class="surface big-span">
             <div class="surface-title"><div><p class="kicker">LOCAL SESSION RECEIPT</p><h2>Review what has happened</h2></div><span class="eyebrow-chip">NOT SIGNED</span></div>
@@ -154,7 +142,7 @@
       </section>
 
       <section class="screen" id="view-modules" data-view="modules" aria-labelledby="heading-modules" hidden>
-        <div class="page-heading compact"><div><p class="kicker">META AUTOMATE / PLATFORM</p><h1 id="heading-modules">Explore all modules<span class="period">.</span></h1><p class="page-description">A single launchpad for real public tools, local development prototypes and future gated business capabilities.</p></div></div>
+        <div class="page-heading compact"><div><p class="kicker">META AUTOMATE / PLATFORM</p><h1 id="heading-modules">Other tools<span class="period">.</span></h1><p class="page-description">A single launchpad for real public tools, local development prototypes and future gated business capabilities.</p></div></div>
         <label class="search-label" for="module-search">Find a capability</label><input id="module-search" class="module-search" type="search" placeholder="Search intelligence, creative, inventory, automation…">
         <div class="module-grid" id="module-grid">
           <a class="module-card" data-search="inventory stock data intelligence" href="#inventory" data-route="inventory"><span class="module-icon">▤</span><small>LOCAL TOOL</small><h2>Inventory Intelligence</h2><p>Parse, validate and prioritize stock.</p><b>Open →</b></a>
@@ -171,7 +159,7 @@
       </section>
 
       <section class="screen" id="view-readiness" data-view="readiness" aria-labelledby="heading-readiness" hidden>
-        <div class="page-heading compact"><div><p class="kicker">03 / QATAR VALIDATION / HUMAN-REVIEWED</p><h1 id="heading-readiness">START readiness<span class="period">.</span></h1><p class="page-description">Engineering status and investment research are deliberately separated. This preview does not make an eligibility or funding claim.</p></div></div>
+        <div class="page-heading compact"><div><p class="kicker">03 / QATAR VALIDATION / HUMAN-REVIEWED</p><h1 id="heading-readiness">Project status<span class="period">.</span></h1><p class="page-description">Engineering status and investment research are deliberately separated. This preview does not make an eligibility or funding claim.</p></div></div>
         <div class="readiness-grid">
           <article class="surface"><p class="kicker">STAGE 01</p><h2>Secure Foundation</h2><strong class="readiness-value">3 / 9</strong><p>Historically verified controls. Real OIDC/MFA, isolated staging, backups, independent security and pilot proof remain blocked.</p><span class="state-label">OPERATIONAL NO-GO</span></article>
           <article class="surface"><p class="kicker">STAGE 02</p><h2>Inventory-to-Growth</h2><strong class="readiness-value">Prototype</strong><p>Local CSV analysis, campaign drafts and browser demonstrations. Production authorization and independent E2E acceptance pending.</p><span class="state-label">REVIEW REQUIRED</span></article>
