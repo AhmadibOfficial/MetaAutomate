@@ -1,5 +1,8 @@
 """Private OIDC v2 source contracts; no network, DB or migration changes."""
 from pathlib import Path
+import runpy
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -99,6 +102,7 @@ def test_oidc_disposable_postgres_script_enforces_context_denials():
     assert 'status=\'SUSPENDED\'' in script
     assert 'status=\'ACTIVE\'' in script
     assert "SELECT app.revoke_workspace_session(%s)" in script
+    assert "require_ci_database_urls(admin, runtime)" in script
     assert script.count("require_context(c)") >= 5
     assert script.count("require_context(c, org, user)") >= 3
 
@@ -266,3 +270,70 @@ def test_oidc_candidate_migration_has_valid_function_delimiters_and_single_commi
     assert "p_session_sha256 !~ '^[0-9a-f]{64}$'" in revoker
     assert "AND organization_id = v_org::uuid" in revoker
     assert "AND user_id = v_user::uuid" in revoker
+
+
+def _ci_guard():
+    """Load only the standard-library safety interlock; no psycopg or DB."""
+    return runpy.run_path(
+        str(ROOT / "scripts/oidc_ci_database_guard.py")
+    )["require_ci_database_urls"]
+
+
+def _ci_fixture():
+    env = {
+        "GITHUB_ACTIONS": "true",
+        "CI": "true",
+        "GITHUB_REPOSITORY": "AhmadibOfficial/MetaAutomate",
+        "RUNNER_ENVIRONMENT": "github-hosted",
+        "GITHUB_EVENT_NAME": "pull_request",
+        "GITHUB_RUN_ID": "123456789",
+    }
+    admin = "postgresql://metaautomate:ci_only_password@localhost:5432/metaautomate"
+    runtime = "postgresql://metaautomate_runtime:ci_runtime_password@localhost:5432/metaautomate"
+    return env, admin, runtime
+
+
+def test_oidc_ci_database_guard_rejects_untrusted_execution_context():
+    """A forged CI flag alone must not permit disposable DB mutations."""
+    guard = _ci_guard()
+    env, admin, runtime = _ci_fixture()
+    guard(admin, runtime, env)
+    for key, value in (
+        ("GITHUB_ACTIONS", "false"),
+        ("CI", "false"),
+        ("GITHUB_REPOSITORY", "someone-else/repository"),
+        ("RUNNER_ENVIRONMENT", "self-hosted"),
+        ("GITHUB_EVENT_NAME", "workflow_dispatch"),
+        ("GITHUB_RUN_ID", "not-a-number"),
+    ):
+        unsafe = dict(env)
+        unsafe[key] = value
+        with pytest.raises(RuntimeError):
+            guard(admin, runtime, unsafe)
+    with pytest.raises(RuntimeError):
+        guard(admin, runtime, {})
+
+
+def test_oidc_ci_database_guard_rejects_non_fixture_urls():
+    """Never connect to remote, arbitrary, socket or query-overridden DSNs."""
+    guard = _ci_guard()
+    env, admin, runtime = _ci_fixture()
+    for unsafe_admin in (
+        admin.replace("localhost", "db.example.com"),
+        admin.replace(":5432/", ":5433/"),
+        admin.replace("/metaautomate", "/production"),
+        admin.replace("metaautomate:", "postgres:"),
+        admin + "?host=production.example.com",
+        "host=/var/run/postgresql dbname=metaautomate user=metaautomate",
+        "postgresql://metaautomate@localhost:5432/metaautomate",
+    ):
+        with pytest.raises(RuntimeError):
+            guard(unsafe_admin, runtime, env)
+    for unsafe_runtime in (
+        runtime.replace("localhost", "db.example.com"),
+        runtime.replace("metaautomate_runtime:", "metaautomate:"),
+        runtime + "?hostaddr=203.0.113.10",
+        runtime.replace("/metaautomate", "/developer"),
+    ):
+        with pytest.raises(RuntimeError):
+            guard(admin, unsafe_runtime, env)
