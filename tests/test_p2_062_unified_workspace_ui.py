@@ -91,8 +91,31 @@ def test_no_network_persistence_or_unreviewed_draft_export(page_source):
                       "thirdPartySourceAuthenticated: false", "aiModelUsed: false",
                       "independentlyVerified: false", "signed: false"):
         assert necessary in js, necessary
-    assert "No publication" in html or "No automatic" in html or "nothing is published" in html
+    assert "Nothing posts automatically" in html or "No automatic" in html
     assert "Subscriptions" in html or "subscriptions" in html
+
+
+def test_home_explains_one_action_in_plain_language(page_source):
+    html, js, _ = page_source
+    overview = html.split('id="view-overview"', 1)[1].split('id="view-inventory"', 1)[0]
+    assert "Sell smarter with" in overview
+    assert "Start with my inventory" in overview
+    assert 'id="try-example"' in overview
+    assert overview.count('class="example-stage"') == 3
+    assert "Nothing posts automatically" in overview
+    assert "metric-grid" not in overview
+    assert "OIDC" not in overview and "F06" not in overview
+    assert 'location.hash = "#inventory"' in js
+
+
+def test_example_is_real_engine_with_explicit_synthetic_provenance(page_source):
+    _, js, _ = page_source
+    assert 'engine.parseCSV(fictionalCSV)' in js
+    assert 'engine.analyze(parsed)' in js
+    assert 'exampleMode = true;' in js
+    assert 'source: exampleMode ? "SYNTHETIC_EXAMPLE_UNVERIFIED"' in js
+    assert '"Example only: fictional products and prices.' in js
+    assert 'importGeneration++; // Invalidate a previously started file read.' in js
 
 
 def test_inflight_file_reads_cannot_restore_stale_approvals(page_source):
