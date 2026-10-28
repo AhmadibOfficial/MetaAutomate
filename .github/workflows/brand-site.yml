@@ -5,15 +5,15 @@ on:
     branches: [main]
     paths:
       - "apps/site/**"
-      - "scripts/verify_brand_site.py"
-      - "scripts/verify_brand_accessibility_tree.py"
+      - "scripts/verify_brand_site_v2.py"
+      - "scripts/verify_unified_workspace_browser.py"
       - "render.yaml"
       - ".github/workflows/brand-site.yml"
   push:
     branches: [feat/global-company-experience-v2, main]
     paths:
       - "apps/site/**"
-      - "scripts/verify_brand_site.py"
+      - "scripts/verify_brand_site_v2.py"
       - "render.yaml"
       - ".github/workflows/brand-site.yml"
 
@@ -52,30 +52,35 @@ jobs:
           assert "disk" not in site
           assert "startCommand" not in site
           home=(root/"index.html").read_text(encoding="utf-8")
-          assert "Business challenges deserve" in home
-          assert "Invest in clarity" in home
+          assert "Real business challenges." in home
+          assert "Clear next steps." in home
           assert 'id="solutions"' in home
           assert 'id="workspace-demo"' in home
-          assert home.index('id="solutions"') < home.index('id="workspace-demo"') < home.index('id="services"')
+          assert home.index('id="solutions"') < home.index('id="services"') < home.index('id="workspace-demo"')
           assert 'class="section proof-section"' not in home
-          assert "PLANNING EXPERIENCE" in home
-          assert "Objective Workspace brings goals" in home
-          assert "guided scenario uses illustrative information" in home
+          assert "OUR APPROACH" in home
+          assert "Prepare an actionable plan" in home
+          assert "browser-local development preview" in home
           assert "MetaAutomate" in home
-          assert "Always HALAL" in home
+          assert "Always HALAL" in (root/"company/index.html").read_text(encoding="utf-8")
           for page in pages:
               html=(root/page).read_text(encoding="utf-8")
               assert "<main id=\"main\">" in html, page
               assert "metaautomate-mark.webp" in html, page
-              assert 'href="/engage/"' in html, page
+              assert 'href="/engage/' in html, page
               for secret in (".workspace-access-key","DATABASE_URL","REGISTRY_READ_API_KEY","OIDC_CLIENT_SECRET","PRIVATE KEY"):
                   assert secret not in html, (page,secret)
           for path in root.rglob("*"):
               assert path.is_file() or path.is_dir()
               assert not path.name.startswith(".env"),path
           print("PASS: four accessible static pages; no secrets, API or database deployment")
+          for rel in ["workspace/index.html","assets/focused-home.css","assets/campaign-engine.js","assets/unified-workspace.css","assets/unified-workspace.js"]:
+              path = root / rel
+              assert path.is_file() and path.stat().st_size > 0, f"Missing new workspace asset: {rel}"
           PY
           node --check apps/site/assets/site.js
+          node --check apps/site/assets/campaign-engine.js
+          node --check apps/site/assets/unified-workspace.js
       - name: Install Chromium for real website verification
         run: |
           python -m pip install 'playwright>=1.55,<2'
@@ -96,8 +101,8 @@ jobs:
             cat /tmp/meta-site-http.log
             exit 1
           fi
-          python scripts/verify_brand_site.py
-          python scripts/verify_brand_accessibility_tree.py
+          python scripts/verify_brand_site_v2.py
+          python scripts/verify_unified_workspace_browser.py
       - name: Upload reviewed global brand desktop and mobile screenshots
         if: always()
         uses: actions/upload-artifact@v4
