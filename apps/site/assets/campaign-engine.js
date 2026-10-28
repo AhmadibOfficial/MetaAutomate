@@ -1,0 +1,145 @@
+/* P2-060 | Local inventory-to-campaign decision engine.
+   Pure functions: no DOM, network, persistence, provider calls or model inference.
+   Exposed as MetaCampaign in browser and CommonJS for offline tests. */
+(function (root, factory) {
+  "use strict";
+  const api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  else root.MetaCampaign = api;
+})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  "use strict";
+  const HEADER = ["sku", "name", "stock", "weekly_sales", "unit_price_kobo"];
+  const MAX_BYTES = 128000, MAX_ROWS = 400;
+  const CHANNELS = ["Instagram", "Facebook", "TikTok", "WhatsApp", "Other"];
+  class CampaignError extends Error { constructor(message) { super(message); this.name = "CampaignError"; } }
+  const fail = text => { throw new CampaignError(text); };
+  const safeText = (value, max, label) => {
+    if (typeof value !== "string") fail(label + " must be text");
+    const v = value.trim();
+    if (!v || v.length > max || /[\u0000-\u001f\u007f<>]/.test(v) ||
+        /^[\s]*[=+\-@]/.test(v)) fail("Unsafe or invalid " + label);
+    return v;
+  };
+  const whole = (value, label, max) => {
+    if (!/^(0|[1-9][0-9]*)$/.test(value)) fail(label + " must be a nonnegative integer");
+    const n = Number(value);
+    if (!Number.isSafeInteger(n) || n > max) fail(label + " is outside allowed range");
+    return n;
+  };
+  function parseCSV(text) {
+    if (typeof text !== "string" || !text.length || new TextEncoder().encode(text).length > MAX_BYTES)
+      fail("Choose a nonempty CSV smaller than 128 KB");
+    text = text.replace(/^\uFEFF/, "");
+    const rows = [];
+    let row = [], cell = "", inQuote = false, justClosed = false;
+    function pushCell() {
+      if (cell.length > 200) fail("CSV cell exceeds 200 characters");
+      row.push(cell); cell = ""; justClosed = false;
+      if (row.length > HEADER.length) fail("Unexpected CSV columns");
+    }
+    function pushRow() {
+      pushCell();
+      if (!(row.length === 1 && row[0] === "")) rows.push(row);
+      row = [];
+      if (rows.length > MAX_ROWS + 1) fail("CSV has too many records (maximum 400)");
+    }
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQuote) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { cell += '"'; i++; } else { inQuote = false; justClosed = true; }
+        } else cell += c;
+      } else if (c === ",") { pushCell(); }
+      else if (c === "\n" || c === "\r") {
+        if (c === "\r" && text[i + 1] === "\n") i++;
+        pushRow();
+      } else if (c === '"' && cell === "" && !justClosed) { inQuote = true; }
+      else if (c === '"' || justClosed) fail("Malformed CSV quoting");
+      else cell += c;
+      if (cell.length > 200) fail("CSV cell exceeds 200 characters");
+    }
+    if (inQuote) fail("Unclosed CSV quote");
+    if (cell.length || row.length || justClosed) pushRow();
+    if (!rows.length || rows[0].length !== HEADER.length ||
+        rows[0].some((column, i) => column.trim() !== HEADER[i])) {
+      fail("Required columns: " + HEADER.join(", "));
+    }
+    if (rows.length <= 1) fail("Include at least one inventory row");
+    const found = new Set();
+    return rows.slice(1).map((cells, i) => {
+      if (cells.length !== HEADER.length) fail("Row " + (i + 2) + " has the wrong number of columns");
+      const sku = safeText(cells[0], 36, "SKU at row " + (i + 2));
+      if (!/^[A-Za-z0-9][A-Za-z0-9_-]{1,35}$/.test(sku)) fail("Invalid SKU at row " + (i + 2));
+      if (found.has(sku.toLowerCase())) fail("Duplicate SKU: " + sku);
+      found.add(sku.toLowerCase());
+      const name = safeText(cells[1], 90, "product name at row " + (i + 2));
+      const stock = whole(cells[2].trim(), "Stock", 1000000);
+      const weeklySales = whole(cells[3].trim(), "Weekly sales", 1000000);
+      const priceKobo = whole(cells[4].trim(), "Unit price (kobo)", 100000000000);
+      if (priceKobo === 0) fail("Unit price must be greater than zero");
+      return { sku, name, stock, weeklySales, priceKobo };
+    });
+  }
+  function classify(item) {
+    if (item.stock === 0) return { code: "out", title: "Out of stock", actionable: false, rank: 9 };
+    if (item.weeklySales === 0 && item.stock >= 5)
+      return { code: "no-sales", title: "No recorded weekly sales", actionable: true, rank: 1 };
+    if (item.weeklySales > 0 && item.stock >= Math.max(10, item.weeklySales * 4))
+      return { code: "high-cover", title: "At least four weeks of cover", actionable: true, rank: 2 };
+    if (item.weeklySales > 0 && item.stock < item.weeklySales)
+      return { code: "low-stock", title: "Low stock — do not promote", actionable: false, rank: 8 };
+    return { code: "normal", title: "No promotion signal", actionable: false, rank: 7 };
+  }
+  function analyze(records) {
+    if (!Array.isArray(records) || !records.length || records.length > MAX_ROWS) fail("Invalid inventory");
+    const evaluated = records.map(item => ({ ...item, signal: classify(item) }));
+    const opportunities = evaluated.filter(item => item.signal.actionable).sort((a, b) =>
+      a.signal.rank - b.signal.rank || b.stock - a.stock || a.sku.localeCompare(b.sku));
+    return { evaluated, opportunities, totalItems: records.length,
+      flaggedCount: opportunities.length, missingSalesData: true,
+      note: "Signals use supplied inventory and weekly_sales only. No profit, demand or campaign impact predicted." };
+  }
+  const currency = kobo => "₦" + (kobo / 100).toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  function makeCampaign(item, brand, channel) {
+    if (!item || !classify(item).actionable) fail("Choose an eligible in-stock product");
+    brand = safeText(brand, 70, "business name");
+    if (!CHANNELS.includes(channel)) fail("Choose a supported draft channel");
+    const description = item.weeklySales === 0 ? "Review visibility and customer interest before discounting."
+      : "Review demand, positioning and availability before promoting.";
+    const post = [
+      item.name + " from " + brand + ".",
+      "Listed price: " + currency(item.priceKobo) + " (please confirm before ordering).",
+      "Message us to check availability, delivery options and the final price.",
+      "Draft only — verify every claim before publishing."
+    ].join("\n\n");
+    const videoBrief = [
+      "30–60 SECOND PROMOTIONAL VIDEO BRIEF — DRAFT",
+      "Brand: " + brand, "Product: " + item.name,
+      "0–10 sec: Show original product visuals or a licensed graphic; introduce the item.",
+      "10–30 sec: Explain factual product attributes supplied and verified by the business.",
+      "30–45 sec: Display the listed price " + currency(item.priceKobo) + " with a verification reminder.",
+      "45–60 sec: Invite customers to ask about availability and delivery.",
+      "Use only authorized visuals and voice recordings. A human must review the final output.",
+      "Record narration (30–120 seconds) and assemble a WebM using MetaAutomate Creative Studio.",
+      "No model-generated video or external publication occurs here."
+    ].join("\n");
+    return { sku: item.sku, product: item.name, brand, channel, priceKobo: item.priceKobo,
+      reason: classify(item).title, recommendation: description, post, videoBrief };
+  }
+  function summarizeMetrics(data) {
+    if (!data || typeof data !== "object") fail("Metrics missing");
+    const impressions = whole(String(data.impressions), "Impressions", 1000000000);
+    const clicks = whole(String(data.clicks), "Clicks", 1000000000);
+    const orders = whole(String(data.orders), "Orders", 1000000000);
+    const note = safeText(data.sourceNote, 160, "measurement source");
+    if (clicks > impressions || orders > clicks)
+      fail("For this same-funnel sample, orders cannot exceed clicks or clicks exceed impressions");
+    return { impressions, clicks, orders, sourceNote: note,
+      clickThroughRatePct: impressions ? Math.round((clicks / impressions) * 10000) / 100 : null,
+      clickToOrderPct: clicks ? Math.round((orders / clicks) * 10000) / 100 : null,
+      evidence: "SELF_REPORTED_NOT_INDEPENDENTLY_VERIFIED",
+      attribution: "Unverified; these counts do not establish revenue, profit or campaign causation" };
+  }
+  return Object.freeze({ HEADER, CHANNELS, MAX_BYTES, MAX_ROWS, CampaignError,
+    parseCSV, analyze, makeCampaign, summarizeMetrics, currency });
+});
