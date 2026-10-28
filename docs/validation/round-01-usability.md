@@ -4,6 +4,8 @@
 
 **Scope:** Review draft [PR #132](https://github.com/AhmadibOfficial/MetaAutomate/pull/132). Do not add GUI sections or change capabilities during the testing round. Foundation release remains **NO-GO**; PR draft, unmerged, not deployed.
 
+**Session preparation:** [Five fictional scenarios, unbooked invitation board, ready-to-send outreach and confusion log](round-01-five-session-pack.md). This does not mean participants have been contacted or sessions booked.
+
 ## One simple research question
 
 **Can a real business user understand what MetaAutomate offers within 20 seconds, then create and review a simple plan without help—and accurately recognize that no real business operation has happened?**
