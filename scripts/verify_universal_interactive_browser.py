@@ -72,8 +72,10 @@ def main():
                 page=browser.new_page(viewport={"width":1440,"height":900},accept_downloads=True)
                 def limit_requests(route):
                     url=urlsplit(route.request.url)
+                    allowed_query=(not url.query or (url.path=="/universal/" and url.query in
+                        ("goal=customers","goal=operations","goal=costs","goal=automation","goal=insights")))
                     if (url.scheme!="http" or url.netloc!=f"127.0.0.1:{server.server_port}"
-                            or url.path not in FILES or url.query):
+                            or url.path not in FILES or not allowed_query):
                         off_origin.append(route.request.url)
                         route.abort()
                     else:
@@ -85,12 +87,7 @@ def main():
                 page.locator('[data-goal="costs"]').click()
                 assert page.locator("#focus-title").inner_text()=="Costs & finance"
                 assert page.locator("#focus-start").get_attribute("href")=="/universal/?goal=costs"
-                # Query parameters belong to the local document; the CSP still denies API connections.
-                page.route("**/*",lambda route: (
-                    route.continue_() if (urlsplit(route.request.url).scheme=="http"
-                    and urlsplit(route.request.url).netloc==f"127.0.0.1:{server.server_port}"
-                    and urlsplit(route.request.url).path in FILES)
-                    else route.abort()))
+                # Only the five known local goal query strings are accepted.
                 assert page.goto(base+"/universal/?goal=costs",wait_until="load").status==200
                 assert page.locator(".goal-card").count()==5
                 assert page.locator(".side-links a").count()==4
