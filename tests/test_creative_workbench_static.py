@@ -44,7 +44,7 @@ def test_new_creative_workbench_has_all_real_destinations_and_right_brand():
     assert "Create original business graphics" in creative
     assert "Independent" not in creative or "Human" in creative
     assert "/assets/metaautomate-mark.webp" in creative
-    assert set(cp.form_ids)=={"creative-brief-form"}
+    assert set(cp.form_ids)=={"creative-brief-form", "maker-form", "video-maker-form"}
     assert {"/assets/site.js","/assets/creative.js","/assets/creative-maker.js"}<=set(cp.scripts)
     assert len(cp.ids)==len(re.findall(r'\bid="([^"]+)"',creative)), "Repeated HTML ID"
     for key in ("creative-kind","creative-goal","creative-rights","creative-likeness",
