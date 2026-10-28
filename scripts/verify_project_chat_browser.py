@@ -85,6 +85,11 @@ def main():
             no_overflow(page)
             page.screenshot(path=str(ART/f"start-project-chat-{name}.png"),
                             full_page=True)
+            # The New project button lives in the responsive sidebar.
+            # Open the drawer in mobile mode instead of clicking a hidden control.
+            if not page.locator("#project-chat-new").is_visible():
+                page.locator("#workspace-sidebar-toggle").click()
+            expect(page.locator("#project-chat-new")).to_be_visible()
             page.locator("#project-chat-new").click()
             expect(page.locator("#project-chat-summary")).to_be_hidden()
             expect(page.locator("#project-chat-progress")).to_contain_text("Step 1 of 5")

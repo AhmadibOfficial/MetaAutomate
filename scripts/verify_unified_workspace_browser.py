@@ -165,7 +165,7 @@ def main():
                     "name":"synthetic.csv","mimeType":"text/csv","buffer":FAKE_CSV
                 })
                 page.locator("#inventory-form button[type=submit]").click()
-                assert "3 products checked" in page.locator("#inventory-summary").inner_text()
+                expect(page.locator("#inventory-summary")).to_contain_text("3 products checked")
                 assert page.locator("#inventory-table tr").count()==3
                 page.locator("#draft-form button[type=submit]").click()
                 assert page.locator("#draft-output").is_visible()
