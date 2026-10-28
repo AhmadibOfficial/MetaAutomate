@@ -87,6 +87,42 @@ def main():
                 for key in ["sales","healthcare","realestate","retail","cloud"]:
                     page.locator('[data-sector="'+key+'"]').click()
                     assert page.locator('[data-sector="'+key+'"]').get_attribute("aria-pressed")=="true"
+                # Five independently reset technical flows, one synthetic source.
+                # These are automated checks, never five independent human sessions.
+                business_cases = [
+                    ("sales", "Review customer inquiry follow-ups"),
+                    ("healthcare", "Review appointment administration"),
+                    ("realestate", "Coordinate property viewing requests"),
+                    ("retail", "Review stock reconciliation"),
+                    ("cloud", "Review approved technology costs"),
+                ]
+                for sector, challenge in business_cases:
+                    page.locator('[data-sector="' + sector + '"]').click()
+                    page.locator("#challenge").fill(challenge)
+                    page.locator("#new-work-form button[type=submit]").click()
+                    assert page.locator("#view-work").is_visible()
+                    assert page.locator("#plan-list .plan-button").count() == 1
+                    assert page.locator("#complete-plan").is_disabled()
+                    tasks = page.locator("#plan-steps input[type=checkbox]")
+                    assert tasks.count() == 4
+                    for index in range(4):
+                        tasks.nth(index).check()
+                    assert page.locator("#complete-plan").is_disabled()
+                    page.locator("#plan-review").check()
+                    page.locator("#complete-plan").click()
+                    assert "reviewed" in page.locator("#plan-status").inner_text().lower()
+                    page.locator('.sidebar-nav a[data-route="results"]').click()
+                    assert page.locator("#results-plans").inner_text() == "1"
+                    assert page.locator("#results-reviewed").inner_text() == "1"
+                    assert page.locator("#results-steps").inner_text() == "4"
+                    page.locator('.sidebar-nav a[data-route="settings"]').click()
+                    page.locator("#clear-session").click()
+                    page.locator('.sidebar-nav a[data-route="results"]').click()
+                    assert page.locator("#results-plans").inner_text() == "0"
+                    assert page.locator("#results-reviewed").inner_text() == "0"
+                    page.locator('.sidebar-nav a[data-route="home"]').click()
+                    assert page.locator("#view-home").is_visible()
+                # Continue separate evidence/inventory/mobile regression tests.
                 page.locator('[data-sector="realestate"]').click()
                 page.locator("#challenge").fill("Reduce time between viewing request and agent review")
                 page.locator("#new-work-form button[type=submit]").click()
@@ -126,7 +162,7 @@ def main():
                 page.locator("#review-check").check()
                 page.locator("#record-review").click()
                 assert page.locator("#save-draft").is_enabled()
-                page.locator("#draft-text").fill("Revised fictional copy")
+                page.locator("#draft-text").fill("Revised sample copy")
                 assert page.locator("#save-draft").is_disabled()
                 page.locator("#inventory-file").set_input_files({
                     "name":"unsafe.csv","mimeType":"text/csv",
@@ -154,7 +190,7 @@ def main():
                 assert not errors, errors
                 assert not off_origin, off_origin
                 print(json.dumps({"result":"DEVELOPER_LOCAL_BROWSER_PASS",
-                    "scope":"synthetic, loopback-only","screens":4,"industries":5,
+                    "scope":"synthetic, loopback-only","screens":4,"industries":5,"sectorPlanFlowsChecked":5,
                     "evidence":"user-declared, not independently verified","ciVerified":False,
                     "productionApproved":False},sort_keys=True))
             finally:
