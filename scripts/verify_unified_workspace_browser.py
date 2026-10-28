@@ -54,7 +54,7 @@ class StaticHandler(BaseHTTPRequestHandler):
 
 def main():
     try:
-        from playwright.sync_api import sync_playwright
+        from playwright.sync_api import expect, sync_playwright
     except ImportError as exc:
         raise SystemExit("BROWSER_TEST_BLOCKED: approved Playwright installation required") from exc
     server=ThreadingHTTPServer(("127.0.0.1",0),StaticHandler)
@@ -111,7 +111,7 @@ def main():
                     page.locator('[data-sector="' + sector + '"]').click()
                     page.locator("#challenge").fill(challenge)
                     page.locator("#new-work-form button[type=submit]").click()
-                    assert page.locator("#view-work").is_visible()
+                    expect(page.locator("#view-work")).to_be_visible()
                     assert page.locator("#plan-list .plan-button").count() == 1
                     assert page.locator("#complete-plan").is_disabled()
                     tasks = page.locator("#plan-steps input[type=checkbox]")
@@ -132,12 +132,12 @@ def main():
                     assert page.locator("#results-plans").inner_text() == "0"
                     assert page.locator("#results-reviewed").inner_text() == "0"
                     page.locator('.sidebar-nav a[data-route="home"]').click()
-                    assert page.locator("#view-home").is_visible()
+                    expect(page.locator("#view-home")).to_be_visible()
                 # Continue separate evidence/inventory/mobile regression tests.
                 page.locator('[data-sector="realestate"]').click()
                 page.locator("#challenge").fill("Reduce time between viewing request and agent review")
                 page.locator("#new-work-form button[type=submit]").click()
-                assert page.locator("#view-work").is_visible()
+                expect(page.locator("#view-work")).to_be_visible()
                 assert page.locator("#plan-list .plan-button").count()==1
                 assert page.locator("#complete-plan").is_disabled()
                 checklist=page.locator("#plan-steps input[type=checkbox]")
@@ -182,7 +182,7 @@ def main():
                 page.locator("#inventory-form button[type=submit]").click()
                 assert page.locator("#inventory-results").is_hidden()
                 page.locator('.sidebar-nav a[data-route="settings"]').click()
-                assert page.locator("#view-settings").is_visible()
+                expect(page.locator("#view-settings")).to_be_visible()
                 page.locator("#clear-session").click()
                 page.locator('.sidebar-nav a[data-route="results"]').click()
                 assert page.locator("#results-plans").inner_text()=="0"
