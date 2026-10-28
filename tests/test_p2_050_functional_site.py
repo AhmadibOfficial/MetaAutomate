@@ -104,13 +104,16 @@ def test_ai_tasks_produce_copyable_results_without_conversation_download():
     assert 'href="/creative/#instant-design"' in html
     assert "sessionStorage" not in script
 
-def test_product_homepage_launches_working_tools_first():
+def test_product_homepage_launches_focused_workflows_without_losing_real_tools():
     html=read("index.html")
-    assert 'class="product-tools shell"' in html
-    assert html.index('class="product-tools shell"') < html.index('id="solutions"')
-    assert 'href="/creative/#instant-design"' in html
-    assert 'href="/creative/#instant-video"' in html
-    assert "Create a PNG image" in html
-    assert "Make a narrated video" in html
-    assert 'href="/engage/"' in html
-    assert 'href="/assets/product-tools.css"' in html
+    workspace=read("workspace/index.html")
+    assert 'href="/workspace/"' in html
+    assert 'id="solutions"' in html
+    for sector in ("sales", "healthcare", "realestate", "retail", "cloud"):
+        assert f"/workspace/?sector={sector}#home" in html
+    assert 'href="/creative/"' in html
+    assert 'href="/engage/#project-chat-input"' in html
+    assert 'src="/assets/campaign-engine.js"' in workspace
+    assert 'id="inventory-file"' in workspace
+    assert 'id="draft-text"' in workspace
+    assert "nothing is published" in workspace.lower() or "No publishing is available." in workspace
