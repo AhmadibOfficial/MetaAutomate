@@ -35,7 +35,7 @@ def test_approved_brand_and_responsive_goals():
 
 def test_industry_expansion_is_navigation_not_customer_automation():
     assert WORK.count('class="sector-card"') == 5
-    assert WORK.count('<option value="') == len(PACK_IDS)
+    assert WORK.count('<option value="') == len(PACK_IDS) + 1  # includes the empty placeholder
     for pack in PACK_IDS:
         assert f'<option value="{pack}">' in WORK
         assert f'"{pack}"' in JS

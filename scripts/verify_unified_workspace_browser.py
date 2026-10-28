@@ -80,8 +80,19 @@ def main():
                         route.continue_()
                 page.route("**/*",local_only)
                 page.on("pageerror",lambda e:errors.append(str(e)))
+                response_status=[]
+                page.on("response", lambda r: response_status.append((r.url, r.status)))
                 assert page.goto(origin+"/workspace/",wait_until="load").status==200
-                assert page.locator("#view-home").is_visible()
+                if not page.locator("#view-home").is_visible():
+                    raise AssertionError("Unexpected invisible Home: " + json.dumps({
+                        "url": page.url,
+                        "html_present": page.locator("#view-home").count(),
+                        "hidden": page.locator("#view-home").get_attribute("hidden") if page.locator("#view-home").count() else None,
+                        "display": page.locator("#view-home").evaluate("(el)=>getComputedStyle(el).display") if page.locator("#view-home").count() else None,
+                        "errors": errors,
+                        "off_origin": off_origin,
+                        "responses": response_status,
+                    }))
                 assert page.locator("[data-sector]").count()==5
                 assert page.locator(".sidebar-nav a").count()==4
                 for key in ["sales","healthcare","realestate","retail","cloud"]:
