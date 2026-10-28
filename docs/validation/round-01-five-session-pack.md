@@ -30,7 +30,7 @@
 
 > Hello,
 >
-> I'm testing a simpler MetaAutomate business workspace and would value your feedback. It takes about 15 minutes. You would see a local prototype, choose a realistic sample business case, and try a few tasks while I observe whether the interface is clear.
+> I'm testing a simpler MetaAutomate business workspace and would value your feedback. It takes about 15 minutes. You would see a guided workspace preview, choose a realistic sample business case, and try a few tasks while I observe whether the interface is clear.
 >
 > Participation is voluntary. Please don't share customer, patient, employee, financial or confidential business data. No recording is planned; with your consent I'd take anonymous notes about what is confusing. This is research, not a sales call, real business automation or a funding application.
 >
@@ -66,14 +66,14 @@ The founder reviews all five cards in separate clean local sessions; these are i
 - **No actual tenant or property address, contracts, financing, phone numbers or broker activity.**
 
 ### S04 — Retail: Slow-moving products
-- Business: **Example Clothing Shop**, fictional.
+- Business: **Example Clothing Shop**, a sample organization.
 - Situation: “A CSV lists three products and stock/sales counts; some need closer review.”
 - Goal: “Find the Retail & Stock area, create a review plan and, if time permits, use the sample inventory CSV to inspect stock candidates.”
 - Observe: Can participant find the optional stock tool in My Work, understand fixed-rule vs predictive-AI decisions, and avoid assuming any marketing post was published?
 - Sample file is generated using **Sample CSV** inside the local interface. No real stock data.
 
 ### S05 — Cloud/IT: Surprising cost
-- Business: **Example IT Team**, fictional.
+- Business: **Example IT Team**, a sample organization.
 - Situation: “An authorized team noticed an unexplained increase in compute spending on a hypothetical account.”
 - Goal: “Create a safe review plan for the cost question.”
 - Observe: Can participant choose Cloud & IT, avoid interpreting the checklist as a live audit, and state that changes require an engineer's approval?
