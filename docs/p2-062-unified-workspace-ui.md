@@ -2,6 +2,14 @@
 
 **Status:** Unmerged draft. No launch, financial application, customer onboarding, external AI/social operations or paid services authorized.
 
+## Next priority — observed usability, not new features (28 October 2026)
+
+**Freeze GUI scope** while testing the four-screen, five-industry interface. Round 01 source documents:
+- [Moderated 20-second usability test and go/no-go rubric](validation/round-01-usability.md)
+- [Blank anonymized observation template](validation/round-01-scorecard-template.csv)
+
+Targets: five consenting real business users initially (ideally one per sector); observe comprehension, plan creation, independent review, finding results, and understanding that no business operation occurred. No sessions or buyer demand have yet been verified. Do not commit participant data or recruit/contact people without separate explicit authorization. Local offline preview only, no server deployment. Fix observed usability blockers before adding any sections.
+
 ## Approved product experience
 Public homepage: one clear value statement, exactly five industry solutions, three explainers, direct link to workspace. Removed excessive home landing sections/cards from the draft homepage, **without deleting historical assets, existing product modules or other application source**.
 
