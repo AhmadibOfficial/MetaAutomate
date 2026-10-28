@@ -10,6 +10,12 @@
 **Research question:** Do real business users understand the offer in 20 seconds, create/review a plan, find Results, and understand that no real actions were executed?
 **Duration:** 15 minutes per participant, plus a five-minute facilitator buffer. One moderator, one user, one local browser, controlled sample cases only. Default **no recording**.
 
+## Developer source-check status (not founder or browser evidence)
+
+On 2026-10-28 the committed workspace JavaScript and shared inventory engine were loaded in an isolated V8 **mock-DOM** test, once for each of the five sectors. Each scenario completed: correct sector selection, plan creation, four checklist steps, human review guard, session Results, local JSON export action and clear-session reset. **5/5 developer mock-DOM flows passed; 0/5 founder desktop walkthroughs executed.** This does **not** prove the real GUI renders correctly in Chromium, 20-second comprehension, independent human usability or Qatar demand. No user confusion has been observed; no hypothetical defect should be treated as actual feedback.
+
+An additional exact-source Playwright test now loops over the five sector plans in an ephemeral loopback Chromium environment, checking review gating and resetting each session. **This browser test is committed but not executed.** On an independently reviewed founder Kali checkout, run the approved command: `python3 scripts/verify_unified_workspace_browser.py`. Never claim a Chromium pass unless it actually completes successfully.
+
 ## Self-test board — founder to run all five cases
 
 | Scenario | Assigned evaluator | Purpose | Date/time | Executed | Findings |
