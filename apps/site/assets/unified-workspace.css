@@ -25,3 +25,22 @@ textarea,input:not([type=checkbox]):not([type=file]),select{width:100%;padding:1
 @media(max-width:950px){.sidebar{position:fixed;width:240px;transform:translateX(-100%);transition:transform .2s;box-shadow:0 0 0 100vmax transparent}.sidebar.open{transform:translateX(0);box-shadow:0 0 0 100vmax #06101b9a}.mobile-menu{display:inline-grid;place-items:center}.main-area{width:100%}.sector-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hero-note{display:none}}
 @media(max-width:660px){main{padding:17px}.topbar{padding:12px 17px;height:65px}.hero{padding:13px 0 20px}.hero h1{font-size:clamp(38px,10vw,51px)}.hero>div:first-child>p:last-child{font-size:13px}.section-heading{display:block}.section-heading p{margin-top:3px}.sector-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.sector-card{padding:14px;min-height:142px}.sector-card strong{font-size:12px}.sector-card small{font-size:10px}.sector-icon{font-size:25px}.start-panel,.work-grid,.settings-grid{grid-template-columns:1fr;gap:15px}.start-panel{padding:19px}.page-head h1{font-size:33px}.results-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.result-card{padding:16px}.result-card strong{font-size:31px}.panel{padding:17px}.notice{margin-bottom:16px}.footer{font-size:10px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+
+/* P2-064: accessible interactive objectives, expanded sectors, four brand colors. */
+.goal-section{margin:24px 0 28px}
+.goal-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.goal-card{display:grid;text-align:left;align-content:start;gap:8px;min-height:132px;padding:20px 19px;background:var(--paper);color:var(--ink);border:1px solid #dce7f1;border-radius:13px;box-shadow:0 7px 22px #102d4b09;transition:transform .18s,border-color .18s,box-shadow .18s}
+.goal-card:hover{transform:translateY(-3px);border-color:var(--blue);box-shadow:0 12px 26px #0b4d8421}
+.goal-card[aria-pressed=true]{background:linear-gradient(140deg,#e7f5ff,#fff);border-color:var(--blue);box-shadow:inset 4px 0 var(--gold),0 10px 24px #0a6eaa19}
+.goal-glyph{display:inline-grid;place-items:center;width:39px;height:39px;background:#ecf7ff;color:#087db9;border-radius:11px;font-size:23px}
+.goal-card strong{font-size:13px;color:var(--navy)}
+.goal-card small{font-size:11px;color:#70879b;line-height:1.5}
+.sector-extend{display:grid;grid-template-columns:minmax(0,.8fr) minmax(210px,1.2fr);align-items:center;gap:10px 20px;margin:12px 0 20px;padding:17px 20px;background:linear-gradient(115deg,#f0f6fb,#fff);border:1px solid var(--silver);border-radius:13px}
+.sector-extend label{display:grid;gap:4px;color:var(--navy);font-size:13px}
+.sector-extend label span,.sector-extend p{color:#668098;font-size:11px;margin:0}
+.sector-extend select{width:100%;background:white;color:var(--navy);border:1px solid #bfd5e5;padding:10px 12px;border-radius:9px;min-width:0}
+.sector-extend p{grid-column:1/-1}
+@media(max-width:900px){.goal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.goal-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.goal-card{padding:14px 12px;min-height:146px}.goal-card strong{font-size:12px}.goal-card small{font-size:10px}.sector-extend{grid-template-columns:1fr;padding:14px}}
+@media(prefers-reduced-motion:reduce){.goal-card{transition:none}.goal-card:hover{transform:none}}
