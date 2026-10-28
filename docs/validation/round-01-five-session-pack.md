@@ -1,22 +1,26 @@
-# MetaAutomate — Round 01: Five consent-based usability sessions
+# MetaAutomate — Round 01: Founder walkthroughs across five sectors
 
-**Prepared:** 2026-10-28. **Status: 0/5 booked, 0/5 consented, 0/5 completed.** These are *unfilled research slots*, not named recruits, customer accounts or Qatari traction.
+**Prepared:** 2026-10-28. **Tester assigned:** founder, using the non-identifying code `SELF-01` in the repository. **Five fictional scenarios, one individual. Status: 0/5 scheduled, 0/5 executed, 0/5 observed.** No external participants, bookings, consent records, customer accounts, market traction or Qatar demand have been established.
+
+**Evidence classification:** internal self-evaluation only. Five walkthroughs by one founder do **not** equal five independent user tests, cannot meet the 4/5 independent usability thresholds and cannot validate buyer willingness to pay. Later independent testing remains required before relying on these findings for the Qatar START application.
 
 **Source under evaluation:** draft PR #132 at the tested checkout's exact HEAD SHA (record SHA before every session). Keep GUI unchanged until observed findings are reviewed; no merges or deployment.
 **Research question:** Do real business users understand the offer in 20 seconds, create/review a plan, find Results, and understand that no real actions were executed?
 **Duration:** 15 minutes per participant, plus a five-minute facilitator buffer. One moderator, one user, one local browser, fictional examples only. Default **no recording**.
 
-## Booking board — all slots pending
+## Self-test board — founder to run all five cases
 
-| Slot code | Intended participant background | Invitation | Consent | Date/time | Session | Observation |
-|---|---|---|---|---|---|---|
-| S01 | Sales/customer-service operations | Not sent | Unknown | Not booked | Not held | Unknown |
-| S02 | Healthcare administrative operations (not patients/clinicians treating patients) | Not sent | Unknown | Not booked | Not held | Unknown |
-| S03 | Real-estate agency/property operations | Not sent | Unknown | Not booked | Not held | Unknown |
-| S04 | Retail/shop inventory operations | Not sent | Unknown | Not booked | Not held | Unknown |
-| S05 | Authorized IT/cloud operations | Not sent | Unknown | Not booked | Not held | Unknown |
+| Scenario | Assigned evaluator | Purpose | Date/time | Executed | Findings |
+|---|---|---|---|---|---|
+| S01 Sales | SELF-01 (founder) | Missed inquiry | Not scheduled | No | Not observed |
+| S02 Healthcare | SELF-01 (founder) | Admin appointment backlog | Not scheduled | No | Not observed |
+| S03 Real Estate | SELF-01 (founder) | Viewing follow-up | Not scheduled | No | Not observed |
+| S04 Retail | SELF-01 (founder) | Stock review | Not scheduled | No | Not observed |
+| S05 Cloud & IT | SELF-01 (founder) | Cost review | Not scheduled | No | Not observed |
 
-This board has **no participant identities or contact details**. Actual invitations require a supplied contact, the user's approval to contact them and an available calendar/booking path. Do **not** mark a session booked simply because an invitation draft was created. If a role cannot be recruited, mark that slot as an **unfilled target**, not a completed study.
+**Method:** Open the local workspace, run each sector's fictional task, then write down actual UI failures, confusing wording, completion time and exact source SHA. Do not score founder self-tests as unbiased first-impression comprehension: the founder already knows the product. Use the same five cases for *functional/self-review* and reserve the 20-second independent comprehension score for first-time external users.
+
+**Next independent research:** Keep the invitation template below for a later, separate round of five genuinely independent consenting adult users. No recruitment or outreach is requested or performed here. Do not add the founder's name/contact information or any human observations to GitHub.
 
 ## Ready-to-send invitation (personalize only with known contact details)
 
