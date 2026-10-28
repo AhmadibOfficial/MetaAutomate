@@ -42,69 +42,37 @@ def page(path: str) -> PageStructure:
     return parser
 
 
-def test_homepage_communicates_customer_offer_and_has_real_destinations():
+def test_homepage_communicates_five_real_challenges_without_false_delivery_claims():
     html = (SITE / "index.html").read_text()
     p = page("index.html")
-    assert "Business challenges deserve" in html
-    assert "smarter solutions" in html
-    assert "Invest in clarity" in html
-    assert "stronger client experiences" in html
-    assert "Business owners &amp; founders" in html
-    assert "Operations teams" in html
-    assert {"solutions", "workspace-demo", "services", "industries", "platform"} <= p.ids
-    assert html.index('id="solutions"') < html.index('id="workspace-demo"') < html.index('id="services"')
-    assert "Explore our planning approach" in html
-    assert "The right investment starts" in html
-    assert "Give your team more time" in html
-    assert "Build trust through quality" in html
-    assert 'class="section proof-section"' not in html
-    assert html.count('class="social-card social-') == 2
-    assert html.count('class="footer-social-link"') == 8
+    assert "Real business challenges." in html
+    assert "Clear next steps." in html
+    assert "Development preview" in html
+    assert "not an autonomous customer service" in html
+    assert {"main", "solutions", "how"} & p.ids == {"solutions", "how"}
+    assert "/workspace/" in p.refs
     assert "/engage/#project-chat-input" in p.refs
+    assert "/creative/" in p.refs
     assert "#solutions" in p.refs
-    assert "/services/#ai" in p.refs
-    assert "/services/#data" in p.refs
-    assert "/services/#security" in p.refs
-    assert "/company/#roadmap" in p.refs
+    assert "#how" in p.refs
 
-
-def test_seven_target_sectors_are_explicit_not_live_product_claims():
-    home = (SITE / "index.html").read_text(encoding="utf-8")
-    services = (SITE / "services/index.html").read_text(encoding="utf-8")
-    assert home.count('class="focus-sector-card"') == 7
-    for name in ("Retail", "Wholesale", "Transportation", "Logistics",
-                 "Tourism", "Education", "Healthcare"):
-        assert f"<h3>{name}</h3>" in home
-        assert name.lower() in services.lower()
-    for workflow in ("inventory", "sales", "customer follow-ups", "finance",
-                     "operational decisions"):
-        assert workflow in home.lower()
-    assert "not deployed sector products" in home
-    assert "not seven deployed sector platforms" in services
-    assert "Agriculture, food security and Islamic knowledge systems" in home
-    assert "no promise of guaranteed earnings" not in home.lower()
-    assert "not a promise of guaranteed earnings" in home
-
-
-def test_nine_capability_cards_are_scoped_and_link_to_real_disciplines():
-    html = (SITE / "index.html").read_text(encoding="utf-8")
-    structure = page("index.html")
-    assert html.count('class="capability-card') == 9
-    for name in (
-        "AI Agents &amp; Orchestration", "Image Studio &amp; Video Projects",
-        "Social Media Automation", "Software Engineering",
-        "Cybersecurity &amp; QA", "Data Analysis &amp; Research",
-        "Cloud &amp; DevOps", "Business Automation",
-        "Islamic Knowledge Systems",
-    ):
+def test_five_industry_sector_paths_map_to_workspace():
+    html = (SITE / "index.html").read_text()
+    assert html.count('class="solution"') == 5
+    for key in ("sales", "healthcare", "realestate", "retail", "cloud"):
+        assert f"/workspace/?sector={key}#home" in html
+    for name in ("Sales &amp; Customers", "Healthcare", "Real Estate",
+                 "Retail &amp; Inventory", "Cloud &amp; Enterprise IT"):
         assert name in html
-    for anchor in ("/services/#ai", "/creative/",
-                   "/services/#software", "/services/#security",
-                   "/services/#data", "/services/#cloud"):
-        assert anchor in structure.refs
-    assert "not nine live products" in html
-    assert "scoped, reviewed and tested before live use" in html
+    assert "Specialized integrations remain under development." in html
 
+def test_home_has_small_solutions_list_instead_of_large_capability_catalog():
+    html = (SITE / "index.html").read_text()
+    assert 'class="solution-grid"' in html
+    assert 'class="capability-card' not in html
+    assert 'class="focus-sector-card"' not in html
+    assert "Nine" not in html
+    assert "review" in html.lower() and "workspace" in html.lower()
 
 def test_evolution_roadmap_distinguishes_delivery_from_long_term_aspiration():
     html = (SITE / "company/index.html").read_text(encoding="utf-8")
@@ -120,80 +88,59 @@ def test_evolution_roadmap_distinguishes_delivery_from_long_term_aspiration():
     assert "International readiness" in html
 
 
-def test_operating_philosophy_has_seven_non_operational_steps():
-    html = (SITE / "index.html").read_text(encoding="utf-8")
-    js = (SITE / "assets/site.js").read_text(encoding="utf-8")
-    assert '02 / OUR OPERATING PHILOSOPHY' in html
-    assert "understand, think, design, create, automate, verify and improve" in html
-    assert html.count('class="operation-tab') == 7
-    for number, name in enumerate(
-        ("understand", "think", "design", "create", "automate", "verify", "improve"), 1
-    ):
-        assert f'id="tab-{name}"' in html
-        assert f'data-operation="{name}"' in html
-        assert f'number:"{number:02d} / 07"' in js
-    assert 'id="operation-counter">01 / 07' in html
-    assert "Customer operations and autonomous execution require independently verified controls" in html
-    assert "explicit authorization" in html
-
-
-def test_operating_use_cases_are_illustrative_complete_and_connected():
-    html = (SITE / "index.html").read_text(encoding="utf-8")
-    js = (SITE / "assets/site.js").read_text(encoding="utf-8")
-    assert html.count('class="use-case-option') == 3
-    for name in ("Inventory &amp; purchasing", "Content &amp; client engagement",
-                 "Secure digital products"):
-        assert name in html
-    for code in ("inventory", "content", "mobile"):
-        assert f'data-use-case="{code}"' in html
-        assert f'    {code}: {{' in js
-    for stage in ("understand", "think", "design", "create", "automate",
-                  "verify", "improve"):
-        assert js.count(f"        {stage}: ") == 3
-    assert 'aria-live="polite"' in html
-    assert "No live execution".lower() in html.lower()
-    assert "Guided scenarios" in html
-    assert "not customer testimonials" in html.lower()
-    assert "Guided scenarios" in html or "Customer operations and autonomous execution require independently verified controls" in html
-
-
-def test_workspace_example_is_truthful_fiction_not_a_fake_product_screenshot():
+def test_three_plain_language_steps_replace_seven_technical_tabs():
     html = (SITE / "index.html").read_text()
-    assert "PLANNING EXPERIENCE" in html
-    assert "illustrative information" in html
-    assert "Guided planning scenario" in html
-    assert "No orders, messages or external actions sent" in html
-    assert "Objective Workspace brings goals" in html
-    assert html.count("data-workspace-step=") == 3
-    assert 'role="group" aria-label="Objective Workspace example steps"' in html
-    assert 'aria-live="polite"' in html
-    assert 'aria-pressed="true"' in html
+    assert 'class="how"' in html
+    assert '<strong>Choose</strong>' in html
+    assert '<strong>Plan</strong>' in html
+    assert '<strong>Review</strong>' in html
+    assert html.count('class="operation-tab') == 0
+    assert 'src="/assets/site.js"' not in html
 
+def test_deep_links_survive_without_restoring_old_sections():
+    html = (SITE / "index.html").read_text()
+    for anchor in ('id="solutions"', 'id="workspace-demo"',
+                   'id="platform"', 'id="services"', 'id="industries"'):
+        assert anchor in html
+    for href in ('href="/workspace/"', 'href="/creative/"',
+                 'href="/engage/#project-chat-input"'):
+        assert href in html
+    assert "No confusing dashboards or inflated AI claims." in html
 
-def test_brand_and_navigation_match_marketing_and_focused_project_pages():
+def test_workspace_route_is_truthfully_scoped_to_local_preview():
+    html = (SITE / "index.html").read_text()
+    app = (SITE / "workspace/index.html").read_text()
+    assert "browser-local development preview" in html
+    assert "Nothing is uploaded, published" in app
+    assert "Do not include names, patient records" in app
+    assert "What would you like" in app
+    assert "not a fake screenshot" not in html.lower()
+
+def test_brand_and_navigation_preserve_existing_service_pages():
     for p in ("index.html", "services/index.html",
               "company/index.html", "engage/index.html"):
         html = (SITE / p).read_text()
         structure = page(p)
         assert "/assets/metaautomate-mark.webp" in html
-        assert "/services/" in structure.refs
-        if p == "engage/index.html":
+        if p == "index.html":
+            assert "/workspace/" in structure.refs
+            assert "#solutions" in structure.refs
+            assert "#how" in structure.refs
+            assert 'class="product-tools shell"' not in html
+        elif p == "engage/index.html":
             assert "/" in structure.refs
             assert "/creative/" in structure.refs
             assert 'id="workspace-sidebar-toggle"' in html
             assert 'id="brief-form"' not in html
-            assert "Always HALAL" not in html
         else:
             assert "/#solutions" in structure.refs
             assert "/#workspace-demo" in structure.refs
             assert "/company/" in structure.refs
             assert "/engage/" in structure.refs
-            assert "Always HALAL" in html
         assert any(img.get("src") == "/assets/metaautomate-mark.webp"
                    for img in structure.images)
         for resource in structure.scripts:
             assert resource.get("src", "").startswith("/assets/")
-
 
 def test_project_chat_replaces_old_enquiry_with_local_mail_draft():
     html = (SITE / "engage/index.html").read_text()
@@ -223,14 +170,12 @@ def test_company_roadmap_does_not_misrepresent_source_as_live_execution():
     assert "<small>PLANNED</small>" not in content
 
 
-def test_primary_website_ctas_do_not_use_white_on_bright_cyan():
-    css = (SITE / "assets/site.css").read_text(encoding="utf-8")
-    assert "/* Publication accessibility review:" in css
-    accessibility = css.split("/* Publication accessibility review:", 1)[1]
-    assert "linear-gradient(115deg,#005caa,#0063b2)" in accessibility
-    assert "linear-gradient(110deg,#005caa,#0063b2)" in accessibility
-    assert ".eyebrow:not(.eyebrow-dark){color:#006aa3}" in accessibility
-    assert ".clarity-index,.workspace-demo-kicker{color:#00679c}" in accessibility
+def test_focused_homepage_cta_uses_dark_legible_blue_and_has_focus_states():
+    css = (SITE / "assets/focused-home.css").read_text()
+    assert "linear-gradient(95deg,#0780ca,#0ba4e7)" in css
+    assert ":focus-visible" in css
+    assert "prefers-reduced-motion" in css
+    assert "@media(max-width:670px)" in css
 
 def test_website_assets_have_size_budgets_and_no_third_party_dependencies():
     css = (SITE / "assets" / "site.css").read_bytes()
