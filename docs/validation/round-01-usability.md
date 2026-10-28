@@ -6,6 +6,12 @@
 
 **Session preparation:** [Five fictional scenarios, unbooked invitation board, ready-to-send outreach and confusion log](round-01-five-session-pack.md). This does not mean participants have been contacted or sessions booked.
 
+## Founder self-test (preliminary, distinct from independent validation)
+
+The founder has been assigned all five fictional sector walkthroughs **as a single tester** (`SELF-01`). See [the updated scenario board](round-01-five-session-pack.md). All five sessions remain **unscheduled and unexecuted**; no observed usability problems or fixes can yet be reported.
+
+This internal exploratory round is useful for finding obvious functional/wording problems, **not** for asserting five independent real users, unbiased 20-second comprehension, external customer demand or Qatar market validation. The independent five-user recruitment and pass thresholds below remain a separate, subsequent study. No recruitment/outreach or customer-data collection has taken place.
+
 ## One simple research question
 
 **Can a real business user understand what MetaAutomate offers within 20 seconds, then create and review a simple plan without help—and accurately recognize that no real business operation has happened?**
