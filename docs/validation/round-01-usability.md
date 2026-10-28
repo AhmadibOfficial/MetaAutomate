@@ -4,13 +4,15 @@
 
 **Scope:** Review draft [PR #132](https://github.com/AhmadibOfficial/MetaAutomate/pull/132). Do not add GUI sections or change capabilities during the testing round. Foundation release remains **NO-GO**; PR draft, unmerged, not deployed.
 
-**Session preparation:** [Five fictional scenarios, unbooked invitation board, ready-to-send outreach and confusion log](round-01-five-session-pack.md). This does not mean participants have been contacted or sessions booked.
+**Session preparation:** [Five sample business scenarios, unbooked invitation board, ready-to-send outreach and confusion log](round-01-five-session-pack.md). This does not mean participants have been contacted or sessions booked.
 
 ## Founder self-test (preliminary, distinct from independent validation)
 
-The founder has been assigned all five fictional sector walkthroughs **as a single tester** (`SELF-01`). See [the updated scenario board](round-01-five-session-pack.md). All five sessions remain **unscheduled and unexecuted**; no observed usability problems or fixes can yet be reported.
+The founder has been assigned all five controlled sample workflows **as a single tester** (`SELF-01`). See [the updated scenario board](round-01-five-session-pack.md). All five sessions remain **unscheduled and unexecuted**; no observed usability problems or fixes can yet be reported.
 
 This internal exploratory round is useful for finding obvious functional/wording problems, **not** for asserting five independent real users, unbiased 20-second comprehension, external customer demand or Qatar market validation. The independent five-user recruitment and pass thresholds below remain a separate, subsequent study. No recruitment/outreach or customer-data collection has taken place.
+
+**Recruitment hold:** Do not invite or schedule external users until the founder has personally completed the five-sector walkthrough, reviewed the exact-head browser/security results and explicitly approved moving to outside validation. The later five-user acceptance criteria below remain unchanged.
 
 ## One simple research question
 
@@ -27,7 +29,7 @@ This internal exploratory round is useful for finding obvious functional/wording
 ## Session setup and privacy (15 minutes)
 
 1. Moderator runs the **draft GUI locally**, with no live integrations, from a clean review checkout. Use a supported, already-installed browser; do not deploy, install paid dependencies or modify customer systems. For a direct in-person test, use a pre-opened browser tab. For remote tests, screen-share the **test machine only** after informed consent and do not show secrets, terminals or customer data.
-2. Use only **fictional business tasks** and the bundled fictional retail stock CSV. No personal, patient, financial, tenant or infrastructure data. No recordings by default. The participant may stop at any time.
+2. Use only **sample business cases** and the bundled sample inventory CSV. No personal, patient, financial, tenant or infrastructure data. No recordings by default. The participant may stop at any time.
 3. Explain: “This is a local prototype. It can create reviewable plans, not operate your business. We are testing whether the interface is understandable.” Do **not** explain navigation or point to buttons before tasks. Consent to *anonymous notes* separately.
 4. Assign only random-looking, non-identifying codes such as P01; **no names, organizations, contact details, precise locations or IP addresses** in the scorecard. Store raw session notes privately outside GitHub and only share anonymized aggregates once reviewed.
 
@@ -46,11 +48,11 @@ Open http://127.0.0.1:8765/workspace/ on that machine. **Do not run the worktree
 | Step | Moderator instruction | Observe without hints | Success definition |
 |---|---|---|---|
 | 0. Twenty-second first impression | Display Home for 20 seconds, then hide it. Ask: “What can this tool help you do? What would you do first? Do you think it actually sends messages or makes changes?” | Exact words, hesitation, correct/incorrect expectation | Can state it's for organizing/improving a business workflow, identify sector/plan entry, and **does not claim live operations** |
-| 1. Find your starting point | “Choose the business area that fits the fictional example. Create a plan for this problem.” | Time, incorrect clicks, hints | Correct industry selected and a new plan appears in **My Work**, without help |
+| 1. Find your starting point | “Choose the business area that fits the sample business case. Create a plan for this problem.” | Time, incorrect clicks, hints | Correct industry selected and a new plan appears in **My Work**, without help |
 | 2. Review your plan | “Show how you'd work through the steps and mark your plan reviewed.” | Understand checkbox and required review; any confusion about execution | All four steps checked and the review acknowledgment recorded, without help |
 | 3. Find your results | “Show me what this session has recorded. Did MetaAutomate perform the task for you?” | Can find Results and distinguish activity counts from proven savings | Finds Results and explicitly identifies counts as local planning, **not actual business execution** |
 | 4. Privacy control | “Clear everything from this session.” | Able to navigate Team & Settings and reset | Results return to zero; no client data was ever present |
-| Optional retail-only | “Using the sample CSV provided by the moderator, find an item to review for promotion.” | Can find collapsed inventory tool in My Work; understands product recommendations | Sees stock opportunities; understands they are rules over fictional data, not AI forecasts |
+| Optional retail-only | “Using the sample CSV provided by the moderator, find an item to review for promotion.” | Can find collapsed inventory tool in My Work; understands product recommendations | Sees stock opportunities; understands they are rules over sample records, not AI forecasts |
 
 **No coaching during scored tasks.** If the moderator must intervene, mark *hinted* and task success **false** for the unassisted score, then allow the user to finish for qualitative observation. Capture errors as issues, not as participant failures.
 
