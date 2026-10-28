@@ -118,6 +118,17 @@ def test_focused_public_homepage_links_all_five_industries():
     assert "capability-grid" not in home
     assert "AI model-generated" not in home
 
+def test_local_chromium_harness_covers_all_five_sectors_separately():
+    harness = (ROOT / "scripts/verify_unified_workspace_browser.py").read_text("utf-8")
+    assert "for sector, challenge in business_cases:" in harness
+    for key in ("sales", "healthcare", "realestate", "retail", "cloud"):
+        assert f'("{key}",' in harness
+    assert 'page.locator("#clear-session").click()' in harness
+    assert 'assert page.locator("#results-reviewed").inner_text() == "1"' in harness
+    assert 'assert page.locator("#results-reviewed").inner_text() == "0"' in harness
+    assert 'No customer' not in harness or 'synthetic' in harness.lower()
+
+
 @pytest.mark.skipif(shutil.which("node") is None, reason="Node.js not installed")
 def test_js_syntax_and_existing_inventory_regression():
     for path in (JS, ENGINE):
