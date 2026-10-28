@@ -49,7 +49,7 @@ def test_homepage_communicates_five_real_challenges_without_false_delivery_claim
     assert "Clear next steps." in html
     assert "Development preview" in html
     assert "not an autonomous customer service" in html
-    assert {"main", "solutions", "how"} & p.ids == {"solutions", "how"}
+    assert {"main", "solutions", "how"} <= p.ids
     assert "/workspace/" in p.refs
     assert "/engage/#project-chat-input" in p.refs
     assert "/creative/" in p.refs
