@@ -107,13 +107,18 @@ def test_ai_tasks_produce_copyable_results_without_conversation_download():
 def test_product_homepage_launches_focused_workflows_without_losing_real_tools():
     html=read("index.html")
     workspace=read("workspace/index.html")
-    assert 'href="/workspace/"' in html
+    universal=read("universal/index.html")
+    assert 'href="/universal/"' in html
     assert 'id="solutions"' in html
-    for sector in ("sales", "healthcare", "realestate", "retail", "cloud"):
-        assert f"/workspace/?sector={sector}#home" in html
+    for goal in ("customers", "operations", "costs", "automation", "insights"):
+        assert f'data-goal="{goal}"' in html
     assert 'href="/creative/"' in html
     assert 'href="/engage/#project-chat-input"' in html
+    assert 'href="/workspace/"' in html
     assert 'src="/assets/campaign-engine.js"' in workspace
     assert 'id="inventory-file"' in workspace
     assert 'id="draft-text"' in workspace
     assert "nothing is published" in workspace.lower() or "No publishing is available." in workspace
+    assert 'id="project-form"' in universal
+    assert "No connected AI" in universal
+

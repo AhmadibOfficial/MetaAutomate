@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#040D20">
+<meta name="color-scheme" content="light">
+<meta name="description" content="MetaAutomate business workspace — turn a business challenge into a structured, human-reviewed workflow.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'none'; frame-src 'none'">
+<link rel="icon" type="image/webp" href="/assets/metaautomate-mark.webp">
+<link rel="stylesheet" href="/assets/universal-workspace.css">
+<script src="/assets/universal-workspace.js" defer></script>
+<title>MetaAutomate — Intelligent Business Workspace</title>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+<div class="workspace">
+<aside class="sidebar" id="sidebar" aria-label="Workspace navigation">
+  <a class="brand" href="/" aria-label="MetaAutomate homepage"><img src="/assets/metaautomate-mark.webp" alt="" width="43" height="43"><span><strong>Meta<span>Automate</span></strong><small>INTELLIGENCE · AUTOMATION</small></span></a>
+  <div class="menu-caption">YOUR WORKSPACE</div>
+  <nav class="side-links" aria-label="Workspace">
+    <a href="#home" data-route="home" aria-current="page"><span aria-hidden="true" class="nav-glyph">⌂</span>Home</a>
+    <a href="#work" data-route="work"><span aria-hidden="true" class="nav-glyph">☷</span>My Work <span class="count-dot" id="nav-count" hidden>0</span></a>
+    <a href="#results" data-route="results"><span aria-hidden="true" class="nav-glyph">▥</span>Results</a>
+    <a href="#settings" data-route="settings"><span aria-hidden="true" class="nav-glyph">⚙</span>Team &amp; Settings</a>
+  </nav>
+  <div class="sidebar-footer"><span aria-hidden="true" class="status-dot"></span><div><strong>Human-controlled</strong><small>Local workspace · No external actions</small></div></div>
+</aside>
+<div class="content-area">
+<header class="topbar">
+  <div class="topbar-start"><button type="button" class="menu-toggle" id="menu-toggle" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">☰</button><span class="breadcrumb">Workspace <span aria-hidden="true">/</span> <strong id="route-name">Home</strong></span></div>
+  <span class="environment"><span aria-hidden="true">●</span> LOCAL WORKSPACE PREVIEW</span>
+</header>
+<main id="main" tabindex="-1">
+  <div class="scope-banner" role="note"><span aria-hidden="true">✦</span><span><strong>Guided workspace.</strong> Create and review business plans using sample or non-sensitive information. No connected AI, customer accounts, external execution or automatic publishing.</span></div>
+  <section id="view-home" class="view" aria-labelledby="home-title">
+    <div class="hero">
+      <div class="hero-copy"><div class="eyebrow"><span class="gold-rule"></span>YOUR INTELLIGENT WORKSPACE</div>
+        <h1 id="home-title">What would you like to <em>improve today?</em></h1>
+        <p>Start with a business challenge. MetaAutomate helps you organize the right next steps—with decisions kept in your hands.</p>
+      </div>
+      <div class="hero-orbit" aria-hidden="true"><span class="orbit-ring orbit-outer"></span><span class="orbit-ring orbit-inner"></span><span class="orbit-center">✦</span><span class="orbit-label">CHOOSE · PLAN · REVIEW</span></div>
+    </div>
+    <div class="section-intro"><div><div class="eyebrow">01 / DEFINE YOUR FOCUS</div><h2>What do you want to achieve?</h2></div><span class="aside-hint">Choose one starting point</span></div>
+    <div class="goal-grid" id="goal-grid" role="group" aria-label="Business goals">
+      <button type="button" class="goal-card" data-goal="customers" aria-pressed="false"><span class="goal-ico" aria-hidden="true">✉</span><strong>Customer experience</strong><small>Inquiries, service and follow-ups</small><span class="goal-selected" aria-hidden="true">✓</span></button>
+      <button type="button" class="goal-card" data-goal="operations" aria-pressed="true"><span class="goal-ico" aria-hidden="true">⚙</span><strong>Business operations</strong><small>Processes, resources and delivery</small><span class="goal-selected" aria-hidden="true">✓</span></button>
+      <button type="button" class="goal-card" data-goal="costs" aria-pressed="false"><span class="goal-ico" aria-hidden="true">◈</span><strong>Costs &amp; finance</strong><small>Spending, efficiency and value</small><span class="goal-selected" aria-hidden="true">✓</span></button>
+      <button type="button" class="goal-card" data-goal="automation" aria-pressed="false"><span class="goal-ico" aria-hidden="true">✧</span><strong>Intelligent automation</strong><small>Tasks, approvals and AI plans</small><span class="goal-selected" aria-hidden="true">✓</span></button>
+      <button type="button" class="goal-card" data-goal="insights" aria-pressed="false"><span class="goal-ico" aria-hidden="true">▥</span><strong>Business intelligence</strong><small>Metrics, insight and decisions</small><span class="goal-selected" aria-hidden="true">✓</span></button>
+    </div>
+    <div class="composer">
+      <div class="composer-head"><div><div class="eyebrow">02 / START A PROJECT</div><h2>Tell us about your business challenge</h2><p>One clear objective is enough to begin.</p></div><span class="composer-mark" aria-hidden="true">✦</span></div>
+      <form id="project-form">
+        <div class="form-grid">
+          <div class="field"><label for="industry">Your industry</label><select id="industry" required aria-describedby="industry-hint"></select><p id="industry-hint" class="hint">Select an area or choose a custom business workflow.</p></div>
+          <div class="field" id="custom-sector-group" hidden><label for="custom-sector">Describe your industry</label><input id="custom-sector" maxlength="70" placeholder="e.g. Equipment servicing" autocomplete="off"><p class="hint">Use a general industry name, not private company details.</p></div>
+        </div>
+        <div class="field"><label for="challenge">What would you like to improve? <span class="optional">(optional)</span></label><textarea id="challenge" maxlength="240" rows="3" placeholder="For example: Our team spends too much time manually tracking service requests."></textarea><p class="hint">Do not include personal identities, patient information, credentials, financial account details or confidential records.</p></div>
+        <div class="composer-actions"><span class="trust-note"><span aria-hidden="true">✓</span> Your plan stays in this browser tab</span><button class="primary-button" type="submit">Create my workflow <span aria-hidden="true">→</span></button></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="view-work" class="view" hidden aria-labelledby="work-title">
+    <div class="page-heading"><div><div class="eyebrow">YOUR WORKSPACE</div><h1 id="work-title">My Work<span class="gold-punctuation">.</span></h1><p>Follow your plans, review each step and record the decision.</p></div><a href="#home" data-route="home" class="secondary-link">+ New workflow</a></div>
+    <div class="work-columns"><div class="surface">
+      <div class="surface-heading"><h2>My workflows</h2><span class="pill" id="work-count">0</span></div>
+      <p id="empty-work" class="empty-state">No workflows yet. Choose a goal on Home to get started.</p>
+      <div id="workflow-list" class="workflow-list"></div>
+    </div>
+    <div class="surface" id="workflow-detail" hidden>
+      <div class="eyebrow">WORKFLOW / REVIEW</div><div class="detail-heading"><h2 id="workflow-title">Selected workflow</h2><span id="workflow-status" class="status-pill">Awaiting review</span></div>
+      <p class="detail-sub" id="workflow-description"></p>
+      <div class="step-progress"><div class="step-bar"><span id="progress-fill"></span></div><span id="progress-count">0 of 4</span></div>
+      <ol id="workflow-steps" class="steps"></ol>
+      <div class="review-gate"><label><input type="checkbox" id="review-confirm"> I reviewed every step and confirm this is a planning record, not an executed business operation.</label><button class="primary-button" type="button" id="complete-workflow" disabled>Record review</button><p id="review-message" role="status">Review is required before completion is recorded.</p></div>
+    </div></div>
+    <div class="related-tool"><div><div class="eyebrow">SPECIALIST WORKSPACE</div><h3>Inventory &amp; content planning</h3><p>Use the existing local inventory analysis and marketing-draft tool in the current workspace.</p></div><a href="/workspace/#work" class="secondary-link">Open inventory tool <span aria-hidden="true">↗</span></a></div>
+  </section>
+
+  <section id="view-results" class="view" hidden aria-labelledby="results-title">
+    <div class="page-heading"><div><div class="eyebrow">YOUR PROGRESS</div><h1 id="results-title">Results<span class="gold-punctuation">.</span></h1><p>What you've planned and reviewed in this browser tab.</p></div><button type="button" id="export-report" class="secondary-button" disabled>Download activity report ↓</button></div>
+    <div class="metrics-grid">
+      <article class="metric-card"><span>Workflows created</span><strong id="metric-created">0</strong><small>Plans in this session</small></article>
+      <article class="metric-card"><span>Reviews recorded</span><strong id="metric-reviewed">0</strong><small>Human-reviewed plans</small></article>
+      <article class="metric-card"><span>Steps checked</span><strong id="metric-steps">0</strong><small>Checklist activity</small></article>
+      <article class="metric-card"><span>Verified business savings</span><strong>—</strong><small>Requires approved data and evidence</small></article>
+    </div>
+    <div class="surface results-evidence"><div class="eyebrow">EVIDENCE BEFORE IMPACT</div><h2>Make every result accountable.</h2><p>Future operating metrics will need trustworthy baselines, approved data sources and independently verifiable results. Creating or reviewing a workflow alone does not prove financial savings, revenue or completed customer operations.</p><div id="activity-record" class="activity-record"></div></div>
+  </section>
+
+  <section id="view-settings" class="view" hidden aria-labelledby="settings-title">
+    <div class="page-heading"><div><div class="eyebrow">WORKSPACE CONTROLS</div><h1 id="settings-title">Team &amp; Settings<span class="gold-punctuation">.</span></h1><p>Control over data, access and future integrations.</p></div></div>
+    <div class="settings-grid">
+      <div class="surface setting-card"><span class="setting-icon">♙</span><h2>Team &amp; access</h2><p>Role-based accounts and team invitations require the separate identity and tenant-security release process.</p><span class="not-active">Not yet enabled</span></div>
+      <div class="surface setting-card"><span class="setting-icon">◇</span><h2>Integrations</h2><p>Provider integrations are disabled pending independent authorization, permissions and audit acceptance.</p><span class="not-active">No live connectors</span></div>
+      <div class="surface setting-card"><span class="setting-icon">文</span><h2>Languages</h2><p>English is available today. Arabic and right-to-left support require verified translations and accessibility testing.</p><span class="not-active">English interface</span></div>
+      <div class="surface setting-card"><span class="setting-icon">✓</span><h2>Data &amp; privacy</h2><p>This workspace keeps your plans in temporary browser-tab memory only, without uploading them.</p><button type="button" id="clear-session" class="secondary-button">Clear this session</button></div>
+    </div>
+  </section>
+  <footer class="site-footer"><span>MetaAutomate · Intelligence, Creation &amp; Automation</span><span>Local planning experience · External actions disabled</span></footer>
+</main>
+</div>
+</div>
+<div id="live-status" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

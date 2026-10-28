@@ -103,18 +103,17 @@ def test_real_stock_engine_and_human_draft_guard(source):
             assert part in code
 
 
-def test_focused_public_homepage_links_all_five_industries():
-    home = (ROOT / "apps/site/index.html").read_text("utf-8")
-    css = (ROOT / "apps/site/assets/focused-home.css").read_text("utf-8")
-    assert "Real business challenges." in home
-    assert "Five industries." in home
-    assert "/workspace/" in home
-    for key in ("sales", "healthcare", "realestate", "retail", "cloud"):
-        assert '/workspace/?sector=' + key + '#home' in home
+def test_public_homepage_preserves_inventory_link_and_opens_universal_flow():
+    home=(ROOT/"apps/site/index.html").read_text("utf-8")
+    css=(ROOT/"apps/site/assets/universal-landing.css").read_text("utf-8")
+    assert "Your business is complex." in home
+    assert 'href="/universal/"' in home
+    assert 'href="/workspace/"' in home
+    for key in ("customers","operations","costs","automation","insights"):
+        assert f'data-goal="{key}"' in home
     assert "connect-src 'none'" in home
-    assert 'href="/assets/focused-home.css"' in home
-    assert "min-width:0" not in css or "solution-grid" in css
-    assert "Objective Workspace" not in home
+    assert 'href="/assets/universal-landing.css"' in home
+    assert '#040D20' in css and '#EFB94F' in css
     assert "capability-grid" not in home
     assert "AI model-generated" not in home
 
