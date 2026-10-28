@@ -67,7 +67,11 @@ jobs:
               html=(root/page).read_text(encoding="utf-8")
               assert "<main id=\"main\">" in html, page
               assert "metaautomate-mark.webp" in html, page
-              assert 'href="/engage/' in html, page
+              if page == "engage/index.html":
+                  assert 'href="/creative/' in html, page
+                  assert 'href="/"' in html, page
+              else:
+                  assert 'href="/engage/' in html, page
               for secret in (".workspace-access-key","DATABASE_URL","REGISTRY_READ_API_KEY","OIDC_CLIENT_SECRET","PRIVATE KEY"):
                   assert secret not in html, (page,secret)
           for path in root.rglob("*"):
