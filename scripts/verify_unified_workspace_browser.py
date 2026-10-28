@@ -194,7 +194,8 @@ def main():
                 mobile.locator("#menu-toggle").click()
                 assert mobile.locator("#sidebar").evaluate("n => n.classList.contains('open')")
                 mobile.locator('.sidebar-nav a[data-route="work"]').click()
-                assert mobile.locator("#view-work").is_visible()
+                expect(mobile.locator("#view-work")).to_be_visible()
+                expect(mobile.locator("#menu-toggle")).to_have_attribute("aria-expanded","false")
                 assert not mobile.locator("#sidebar").evaluate("n => n.classList.contains('open')")
                 viewport=mobile.evaluate("({scroll:document.documentElement.scrollWidth,viewport:innerWidth})")
                 assert viewport["scroll"]<=viewport["viewport"]+2,viewport
