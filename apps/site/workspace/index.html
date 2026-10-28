@@ -36,8 +36,18 @@
       <p class="notice" role="note"><strong>Development preview.</strong> Use sample or non-sensitive business information only. Nothing is uploaded, published, purchased or executed on external systems.</p>
 
       <section class="screen" id="view-home" data-view="home" aria-labelledby="home-title">
-        <div class="hero"><div><p class="eyebrow">GOOD TO SEE YOU</p><h1 id="home-title">What would you like<br>to <em>improve today?</em></h1><p>Choose your business area. MetaAutomate will help you organize the next steps, with you in control.</p></div><div class="hero-note"><span aria-hidden="true">✦</span><strong>One goal at a time.</strong><small>Choose · Plan · Review</small></div></div>
-        <div class="section-heading"><h2>Choose your business area</h2><p>Start where you need the most help.</p></div>
+        <div class="hero"><div><p class="eyebrow">GOOD TO SEE YOU</p><h1 id="home-title">What would you like<br>to <em>improve today?</em></h1><p>Choose the outcome that matters. MetaAutomate helps you prepare and review a practical workflow across industries.</p></div><div class="hero-note"><span aria-hidden="true">✦</span><strong>One goal at a time.</strong><small>Choose · Plan · Review</small></div></div>
+        <section class="goal-section" aria-labelledby="goal-title">
+          <div class="section-heading"><h2 id="goal-title">What do you want to achieve?</h2><p>One connected workspace for many kinds of business problems.</p></div>
+          <div class="goal-grid" id="goal-grid" role="group" aria-label="Choose an objective">
+            <button class="goal-card" type="button" data-goal="customer" aria-pressed="false"><span class="goal-glyph" aria-hidden="true">✉</span><strong>Customer experience</strong><small>Inquiries, relationships and service</small></button>
+            <button class="goal-card" type="button" data-goal="operations" aria-pressed="true"><span class="goal-glyph" aria-hidden="true">⚙</span><strong>Business operations</strong><small>Processes, capacity and resources</small></button>
+            <button class="goal-card" type="button" data-goal="finance" aria-pressed="false"><span class="goal-glyph" aria-hidden="true">◈</span><strong>Costs & finance</strong><small>Spending, efficiency and value</small></button>
+            <button class="goal-card" type="button" data-goal="automation" aria-pressed="false"><span class="goal-glyph" aria-hidden="true">✦</span><strong>Intelligent automation</strong><small>Tasks, approvals and orchestration</small></button>
+            <button class="goal-card" type="button" data-goal="insights" aria-pressed="false"><span class="goal-glyph" aria-hidden="true">▥</span><strong>Business intelligence</strong><small>Data, decisions and performance</small></button>
+          </div>
+        </section>
+        <div class="section-heading"><h2>Choose your business area</h2><p>Select a familiar starting point or explore a different business area.</p></div>
         <div class="sector-grid" id="sector-grid" role="group" aria-label="Choose a business area">
           <button type="button" class="sector-card" data-sector="sales" aria-pressed="true"><span class="sector-icon" aria-hidden="true">✉</span><strong>Sales &amp; Customers</strong><small>Answer and follow up on inquiries</small></button>
           <button type="button" class="sector-card" data-sector="healthcare" aria-pressed="false"><span class="sector-icon" aria-hidden="true">♡</span><strong>Healthcare</strong><small>Organize appointments and admin</small></button>
@@ -45,13 +55,30 @@
           <button type="button" class="sector-card" data-sector="retail" aria-pressed="false"><span class="sector-icon" aria-hidden="true">▣</span><strong>Retail &amp; Stock</strong><small>Find inventory problems</small></button>
           <button type="button" class="sector-card" data-sector="cloud" aria-pressed="false"><span class="sector-icon" aria-hidden="true">☁</span><strong>Cloud &amp; IT</strong><small>Review costs and system issues</small></button>
         </div>
+        <div class="sector-extend"><label for="more-industries"><strong>Explore more industries</strong><span> Industry examples, not a limit on what MetaAutomate can support.</span></label><select id="more-industries"><option value="">Choose another business area</option><option value="wholesale">Wholesale &amp; Distribution</option>
+<option value="transportation">Transportation</option>
+<option value="logistics">Logistics &amp; Supply Chain</option>
+<option value="tourism">Tourism</option>
+<option value="hospitality">Hotels &amp; Hospitality</option>
+<option value="education">Education &amp; Training</option>
+<option value="manufacturing">Manufacturing</option>
+<option value="agriculture">Agriculture &amp; Agribusiness</option>
+<option value="construction">Construction &amp; Facilities</option>
+<option value="financial_operations">Finance &amp; Insurance Administration</option>
+<option value="telecommunications">Telecommunications</option>
+<option value="energy_utilities">Energy &amp; Utilities</option>
+<option value="public_services">Public Administration</option>
+<option value="legal_professional">Legal &amp; Professional Services</option>
+<option value="media_marketing">Media &amp; Marketing</option>
+<option value="nonprofit">Nonprofits &amp; Community Organizations</option>
+<option value="custom_operations">Custom Organization Workflow</option></select><p id="industry-selection-status" role="status">Or select one of the popular business areas above.</p></div>
         <section class="start-panel" id="sector-detail" aria-labelledby="selected-sector-title">
           <div class="start-copy"><p class="eyebrow">YOUR NEXT STEP</p><h2 id="selected-sector-title">Sales &amp; Customers</h2><p id="selected-sector-description">Keep customer questions and follow-ups organized.</p><div class="example"><span>Example challenge</span><p id="selected-sector-example">A customer asked about a product, but nobody has replied.</p></div></div>
           <form id="new-work-form" class="start-form">
             <label for="challenge">What would you like to improve? <span>(optional)</span></label>
             <textarea id="challenge" maxlength="240" rows="3" placeholder="Describe a process, not a person's private information."></textarea>
             <p class="field-note">Do not include names, patient records, contact details, passwords or confidential company data.</p>
-            <button type="submit" class="primary-button">Create my plan <span aria-hidden="true">→</span></button>
+            <button type="submit" class="primary-button">Create my workflow <span aria-hidden="true">→</span></button>
           </form>
         </section>
       </section>

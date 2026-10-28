@@ -6,7 +6,7 @@
   const engine = globalThis.MetaCampaign;
   const views = ["home", "work", "results", "settings"];
   const viewNames = {home:"Home",work:"My Work",results:"Results",settings:"Team & Settings"};
-  const industries = Object.freeze({
+  const industries = {
     sales: {label:"Sales & Customers",desc:"Keep customer questions and follow-ups organized.",
       example:"A customer asked about a product, but nobody has replied.",
       steps:["Record the inquiry without personal identifiers","Prepare a possible reply for review","Check the information and approve the next action","Record whether a follow-up is needed"]},
@@ -22,7 +22,13 @@
     cloud:{label:"Cloud & IT",desc:"Review technology spending and system issues safely.",
       example:"An approved usage report shows an unexplained change in cloud costs.",
       steps:["Define the cost or reliability question","Review only authorized, non-sensitive metrics","Record a proposed change and potential risks","Request engineering approval before any infrastructure change"]}
-  });
+  };
+  // P2-064: source-only extension choices from the reviewed domain-pack catalog.
+  // This local UI does not activate domain packs or execute any external workflow.
+  const extraIndustries = Object.freeze({"wholesale":{"label":"Wholesale & Distribution","desc":"Organize and review wholesale & distribution workflows.","example":"Draft stock replenishment and bulk order reviews","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"transportation":{"label":"Transportation","desc":"Organize and review transportation workflows.","example":"Review fleet capacity, assignment and service delays","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"logistics":{"label":"Logistics & Supply Chain","desc":"Organize and review logistics & supply chain workflows.","example":"Plan shipment exception and capacity workflows","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"tourism":{"label":"Tourism","desc":"Organize and review tourism workflows.","example":"Review guest inquiries and itinerary handoffs","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"hospitality":{"label":"Hotels & Hospitality","desc":"Organize and review hotels & hospitality workflows.","example":"Organize room inventory and guest-service requests","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"education":{"label":"Education & Training","desc":"Organize and review education & training workflows.","example":"Prepare class scheduling and enrollment process review","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"manufacturing":{"label":"Manufacturing","desc":"Organize and review manufacturing workflows.","example":"Evaluate production bottlenecks and maintenance plans","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"agriculture":{"label":"Agriculture & Agribusiness","desc":"Organize and review agriculture & agribusiness workflows.","example":"Review commodity inventory, procurement and farm operations","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"construction":{"label":"Construction & Facilities","desc":"Organize and review construction & facilities workflows.","example":"Review work orders, project delays and resource allocations","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"financial_operations":{"label":"Finance & Insurance Administration","desc":"Organize and review finance & insurance administration workflows.","example":"Plan account-service and reconciliation reviews","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"telecommunications":{"label":"Telecommunications","desc":"Organize and review telecommunications workflows.","example":"Review subscriber service operations and capacity planning","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"energy_utilities":{"label":"Energy & Utilities","desc":"Organize and review energy & utilities workflows.","example":"Review maintenance scheduling, asset and consumption reports","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"public_services":{"label":"Public Administration","desc":"Organize and review public administration workflows.","example":"Plan administrative request queues and case review","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"legal_professional":{"label":"Legal & Professional Services","desc":"Organize and review legal & professional services workflows.","example":"Organize document intake and matter follow-up workflows","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"media_marketing":{"label":"Media & Marketing","desc":"Organize and review media & marketing workflows.","example":"Review campaigns, content plans and publication approvals","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"nonprofit":{"label":"Nonprofits & Community Organizations","desc":"Organize and review nonprofits & community organizations workflows.","example":"Plan service request, donor communication and reporting","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"custom_operations":{"label":"Custom Organization Workflow","desc":"Organize and review custom organization workflow workflows.","example":"Capture a business problem outside existing sector templates","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]}});
+  const objectiveFamilies = Object.freeze({"customer":{"name":"Customer experience","steps":["Map the customer request and service expectations","Identify the handoff or response bottleneck","Prepare a controlled follow-up proposal for review","Define how the customer outcome will be measured"]},"operations":{"name":"Business operations","steps":["Describe the current process and its constraints","Identify delays, dependencies and exceptions","Propose an accountable sequence of tasks and checks","Set a measurable operational review point"]},"finance":{"name":"Costs & finance","steps":["Define an authorized baseline and cost categories","Identify possible waste or unexpected changes","Prepare a cost review proposal with uncertainty noted","Set evidence requirements before claiming savings"]},"automation":{"name":"Intelligent automation","steps":["Identify a repetitive process and permitted inputs","Map actions, failure handling and human checkpoints","Specify the exact approval and security requirements","Define how execution would later be verified"]},"insights":{"name":"Business intelligence","steps":["Define the business question and useful metrics","Identify authorized data sources and data quality checks","Prepare an explainable analysis and decision proposal","Define outcome measures and evidence provenance"]}});
+  let selectedGoal = "operations";
+  Object.assign(industries, extraIndustries);
   const sectorLink = /(?:^|[?&])sector=(sales|healthcare|realestate|retail|cloud)(?:&|$)/.exec(location.search || "");
   let selectedIndustry = sectorLink ? sectorLink[1] : "sales", plans = [], selectedId = null, counter = 0;
   let records = null, analysis = null, exampleMode = false, planDraft = null, approvedDraft = false;
@@ -75,10 +81,28 @@
   for (const link of document.querySelectorAll("a[data-route]")) {
     link.addEventListener("click",()=>{if(location.hash===link.getAttribute("href"))navigate();});
   }
+  function chooseGoal(key) {
+    if (!Object.hasOwn(objectiveFamilies,key)) return;
+    selectedGoal=key;
+    for(const button of document.querySelectorAll("[data-goal]"))
+      button.setAttribute("aria-pressed", String(button.dataset.goal===key));
+    $("challenge").placeholder = "Describe what you want to improve in "+objectiveFamilies[key].name.toLowerCase()+".";
+  }
+  for(const button of document.querySelectorAll("[data-goal]"))
+    button.addEventListener("click",()=>chooseGoal(button.dataset.goal));
+  $("more-industries").addEventListener("change",()=>{
+    const choice=$("more-industries").value;
+    if(choice && Object.hasOwn(extraIndustries,choice))chooseSector(choice);
+    else if(!choice)chooseSector("sales");
+  });
   function chooseSector(key) {
     if (!Object.hasOwn(industries,key)) return;
     selectedIndustry=key;
     const current=industries[key];
+    if($("more-industries")) {
+      $("more-industries").value = Object.hasOwn(extraIndustries,key)?key:"";
+      $("industry-selection-status").textContent = Object.hasOwn(extraIndustries,key) ? current.label+" selected for workflow planning." : "Popular business area selected.";
+    }
     for(const button of document.querySelectorAll("[data-sector]"))
       button.setAttribute("aria-pressed",String(button.dataset.sector===key));
     $("selected-sector-title").textContent=current.label;
@@ -97,8 +121,8 @@
       announce("Please use plain text without control characters or angle brackets.");return;
     }
     if (plans.length>=15){announce("This local preview supports up to 15 plans. Clear the session to start over.");return;}
-    const entry={id:++counter,industry:selectedIndustry,desc:note||industry.example,
-      steps:industry.steps.map(text=>({text,done:false})),reviewed:false};
+    const entry={id:++counter,industry:selectedIndustry,goal:selectedGoal,desc:note||industry.example,
+      steps:objectiveFamilies[selectedGoal].steps.map(text=>({text,done:false})),reviewed:false};
     plans.push(entry);
     selectedId=entry.id;
     $("challenge").value="";
@@ -195,7 +219,7 @@
     save("metaautomate-example-stock.csv",
       "sku,name,stock,weekly_sales,unit_price_kobo\nCAP-01,Example Cap,18,0,850000\nKAF-02,Example Kaftan,24,3,3500000\nSHO-03,Example Shoes,0,5,1200000\n",
       "text/csv;charset=utf-8");
-    announce("Fictional sample downloaded.");
+    announce("Sample inventory CSV downloaded.");
   });
   $("inventory-form").addEventListener("submit",async event=>{
     event.preventDefault();
@@ -223,7 +247,7 @@
     if(!analysis)return;
     $("inventory-results").hidden=false;
     $("inventory-summary").textContent=analysis.totalItems+" products checked · "+analysis.flaggedCount+" stock opportunities for review";
-    $("inventory-caveat").textContent=exampleMode?"Fictional example only. Not customer evidence.":"User-provided records are not independently verified.";
+    $("inventory-caveat").textContent=exampleMode?"Sample records only. Not customer evidence.":"User-provided records are not independently verified.";
     const table=$("inventory-table");table.replaceChildren();
     for(const item of analysis.evaluated){
       const tr=document.createElement("tr");
@@ -334,5 +358,6 @@
     announce("All in-memory workspace content cleared.");
   });
   chooseSector(selectedIndustry);
+  chooseGoal(selectedGoal);
   renderWork();drawResults();navigate();
 })();
