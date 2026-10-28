@@ -167,6 +167,7 @@ def test_mobile(browser, errors, external, observations):
         page.locator('.sidebar-nav a[data-route="work"]').click()
         expect(page.locator("#view-work")).to_be_visible()
         expect(menu).to_have_attribute("aria-expanded", "false")
+        menu.click()
         page.locator('.sidebar-nav a[data-route="home"]').click()
         page.locator('[data-goal="customer"]').click()
         expect(page.locator('[data-goal="customer"]')).to_have_attribute("aria-pressed", "true")
