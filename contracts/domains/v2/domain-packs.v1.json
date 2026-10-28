@@ -1,0 +1,676 @@
+{
+  "schema_version": "1.0.0",
+  "record_type": "SOURCE_ONLY_DOMAIN_PACK_CATALOG",
+  "operational_status": "NO_GO",
+  "shared_capability_ids": [
+    "OBJECTIVE_INTELLIGENCE",
+    "CUSTOMER_CASES",
+    "OPERATIONS",
+    "FINANCE_VALUE",
+    "CONTENT_DOCUMENTS",
+    "DECISION_INTELLIGENCE",
+    "ORCHESTRATION",
+    "ANALYTICS_MEASUREMENT",
+    "SECURITY_GOVERNANCE",
+    "PLATFORM_EXTENSION"
+  ],
+  "extension_contract": {
+    "industry_count_limit": null,
+    "accepts_new_sector_ids": true,
+    "requires_source_review": true,
+    "required_server_side_admission": true,
+    "production_enabled": false
+  },
+  "profiles": [
+    {
+      "id": "sales_customer_service",
+      "label": "Sales & Customer Service",
+      "sector_group": "Commercial",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Organize customer inquiries and follow-up decisions"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "CUSTOMER_CASES",
+        "CONTENT_DOCUMENTS",
+        "ORCHESTRATION",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "live customer identity, conversations or contact details"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    },
+    {
+      "id": "healthcare_administration",
+      "label": "Healthcare Administration",
+      "sector_group": "Healthcare",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "REGULATED",
+      "use_cases": [
+        "Prepare appointment and administrative intake review"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "CUSTOMER_CASES",
+        "OPERATIONS",
+        "CONTENT_DOCUMENTS",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "patient identities, diagnoses, prescriptions, insurance claims and clinical records"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DOMAIN_SPECIALIST",
+        "DATA_PROTECTION",
+        "LEGAL_REGULATORY"
+      ]
+    },
+    {
+      "id": "real_estate",
+      "label": "Real Estate",
+      "sector_group": "Property",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Review property inquiries and viewing scheduling workflows"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "CUSTOMER_CASES",
+        "OPERATIONS",
+        "CONTENT_DOCUMENTS",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "tenant identities, property addresses, contract signatures and live tenancy records"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    },
+    {
+      "id": "retail",
+      "label": "Retail",
+      "sector_group": "Commerce",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Review stock, replenishment and customer engagement"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "OPERATIONS",
+        "CUSTOMER_CASES",
+        "FINANCE_VALUE",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "customer records, real inventory mutations, charges and payments"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    },
+    {
+      "id": "wholesale",
+      "label": "Wholesale & Distribution",
+      "sector_group": "Commerce",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Draft stock replenishment and bulk order reviews"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "OPERATIONS",
+        "FINANCE_VALUE",
+        "CUSTOMER_CASES",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "buyer identities, live purchase orders, trade credit and financial transfers"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    },
+    {
+      "id": "cloud_it",
+      "label": "Cloud & Enterprise IT",
+      "sector_group": "Technology",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Review approved IT cost and reliability questions"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "OPERATIONS",
+        "DECISION_INTELLIGENCE",
+        "ANALYTICS_MEASUREMENT",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "cloud secrets, tenant credentials, production mutations and sensitive telemetry"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    },
+    {
+      "id": "transportation",
+      "label": "Transportation",
+      "sector_group": "Mobility",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Review fleet capacity, assignment and service delays"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "OPERATIONS",
+        "DECISION_INTELLIGENCE",
+        "CUSTOMER_CASES",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "live vehicle locations, driver identities, passenger details and dispatch writes"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    },
+    {
+      "id": "logistics",
+      "label": "Logistics & Supply Chain",
+      "sector_group": "Mobility",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Plan shipment exception and capacity workflows"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "OPERATIONS",
+        "ANALYTICS_MEASUREMENT",
+        "ORCHESTRATION",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "live shipment addresses, custody information and tracking identities"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    },
+    {
+      "id": "tourism",
+      "label": "Tourism",
+      "sector_group": "Hospitality",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Review guest inquiries and itinerary handoffs"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "CUSTOMER_CASES",
+        "OPERATIONS",
+        "CONTENT_DOCUMENTS",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "traveler identity documents, real bookings and payments"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    },
+    {
+      "id": "hospitality",
+      "label": "Hotels & Hospitality",
+      "sector_group": "Hospitality",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Organize room inventory and guest-service requests"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "CUSTOMER_CASES",
+        "OPERATIONS",
+        "ANALYTICS_MEASUREMENT",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "guest profiles, payment details and live reservations"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    },
+    {
+      "id": "education",
+      "label": "Education & Training",
+      "sector_group": "Education",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "REGULATED",
+      "use_cases": [
+        "Prepare class scheduling and enrollment process review"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "OPERATIONS",
+        "CONTENT_DOCUMENTS",
+        "CUSTOMER_CASES",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "student identities, minors data, grades, payment records and guardianship records"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DOMAIN_SPECIALIST",
+        "DATA_PROTECTION",
+        "LEGAL_REGULATORY"
+      ]
+    },
+    {
+      "id": "manufacturing",
+      "label": "Manufacturing",
+      "sector_group": "Industrial",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Evaluate production bottlenecks and maintenance plans"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "OPERATIONS",
+        "DECISION_INTELLIGENCE",
+        "ANALYTICS_MEASUREMENT",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "production control writes, plant secrets and industrial safety overrides"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    },
+    {
+      "id": "agriculture",
+      "label": "Agriculture & Agribusiness",
+      "sector_group": "Agriculture",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Review commodity inventory, procurement and farm operations"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "OPERATIONS",
+        "FINANCE_VALUE",
+        "ANALYTICS_MEASUREMENT",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "supplier identities, farm locations and live trade/payments"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    },
+    {
+      "id": "construction",
+      "label": "Construction & Facilities",
+      "sector_group": "Property",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Review work orders, project delays and resource allocations"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "OPERATIONS",
+        "DECISION_INTELLIGENCE",
+        "CONTENT_DOCUMENTS",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "worker identities, site access details and safety-critical work orders"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    },
+    {
+      "id": "financial_operations",
+      "label": "Finance & Insurance Administration",
+      "sector_group": "Financial Services",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "REGULATED",
+      "use_cases": [
+        "Plan account-service and reconciliation reviews"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "FINANCE_VALUE",
+        "CONTENT_DOCUMENTS",
+        "ORCHESTRATION",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "bank credentials, personal finances, insurance policy records, advice and money movement"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DOMAIN_SPECIALIST",
+        "DATA_PROTECTION",
+        "LEGAL_REGULATORY"
+      ]
+    },
+    {
+      "id": "telecommunications",
+      "label": "Telecommunications",
+      "sector_group": "Infrastructure",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "REGULATED",
+      "use_cases": [
+        "Review subscriber service operations and capacity planning"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "CUSTOMER_CASES",
+        "OPERATIONS",
+        "ANALYTICS_MEASUREMENT",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "subscriber identities, telecom metadata, SIM provisioning and network configurations"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DOMAIN_SPECIALIST",
+        "DATA_PROTECTION",
+        "LEGAL_REGULATORY"
+      ]
+    },
+    {
+      "id": "energy_utilities",
+      "label": "Energy & Utilities",
+      "sector_group": "Infrastructure",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "REGULATED",
+      "use_cases": [
+        "Review maintenance scheduling, asset and consumption reports"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "OPERATIONS",
+        "DECISION_INTELLIGENCE",
+        "ANALYTICS_MEASUREMENT",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "grid controls, customer meter identities and operational safety commands"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DOMAIN_SPECIALIST",
+        "DATA_PROTECTION",
+        "LEGAL_REGULATORY"
+      ]
+    },
+    {
+      "id": "public_services",
+      "label": "Public Administration",
+      "sector_group": "Government",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "REGULATED",
+      "use_cases": [
+        "Plan administrative request queues and case review"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "CUSTOMER_CASES",
+        "CONTENT_DOCUMENTS",
+        "ORCHESTRATION",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "citizen records, government credentials and official case determinations"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DOMAIN_SPECIALIST",
+        "DATA_PROTECTION",
+        "LEGAL_REGULATORY"
+      ]
+    },
+    {
+      "id": "legal_professional",
+      "label": "Legal & Professional Services",
+      "sector_group": "Professional",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "REGULATED",
+      "use_cases": [
+        "Organize document intake and matter follow-up workflows"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "CONTENT_DOCUMENTS",
+        "CUSTOMER_CASES",
+        "ORCHESTRATION",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "privileged client records, contracts, legal advice and signatures"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DOMAIN_SPECIALIST",
+        "DATA_PROTECTION",
+        "LEGAL_REGULATORY"
+      ]
+    },
+    {
+      "id": "media_marketing",
+      "label": "Media & Marketing",
+      "sector_group": "Creative",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Review campaigns, content plans and publication approvals"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "CONTENT_DOCUMENTS",
+        "CUSTOMER_CASES",
+        "ANALYTICS_MEASUREMENT",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "private creative assets, personal profiles and outbound publishing"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    },
+    {
+      "id": "nonprofit",
+      "label": "Nonprofits & Community Organizations",
+      "sector_group": "Social Impact",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Plan service request, donor communication and reporting"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "CUSTOMER_CASES",
+        "CONTENT_DOCUMENTS",
+        "FINANCE_VALUE",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "donor identities, beneficiary records, funds transfer and sensitive community data"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    },
+    {
+      "id": "custom_operations",
+      "label": "Custom Organization Workflow",
+      "sector_group": "Extensible",
+      "status": "DESIGN_ONLY",
+      "enabled": false,
+      "production_ready": false,
+      "risk_tier": "ELEVATED",
+      "use_cases": [
+        "Capture a business problem outside existing sector templates"
+      ],
+      "capability_refs": [
+        "OBJECTIVE_INTELLIGENCE",
+        "ORCHESTRATION",
+        "SECURITY_GOVERNANCE"
+      ],
+      "data_exclusions": [
+        "all real personal, regulated, secret or business-critical records before independent review"
+      ],
+      "required_reviews": [
+        "IDENTITY_TENANT",
+        "SECURITY_ACCEPTANCE",
+        "HUMAN_APPROVAL",
+        "MEASUREMENT_BASELINE",
+        "DATA_PROTECTION"
+      ]
+    }
+  ]
+}

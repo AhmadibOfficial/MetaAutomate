@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://metaautomate.example/contracts/domains/v2/domain-pack.schema.json",
+  "title": "MetaAutomate source-only domain pack catalog",
+  "description": "Developer-only catalog; metadata never grants permission, activates industry capabilities or proves deployment.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "operational_status",
+    "profiles",
+    "extension_contract",
+    "shared_capability_ids"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "record_type": {
+      "const": "SOURCE_ONLY_DOMAIN_PACK_CATALOG"
+    },
+    "operational_status": {
+      "const": "NO_GO"
+    },
+    "shared_capability_ids": {
+      "type": "array",
+      "minItems": 10,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z][A-Z0-9_]+$"
+      }
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/pack"
+      }
+    },
+    "extension_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "industry_count_limit",
+        "accepts_new_sector_ids",
+        "requires_source_review",
+        "required_server_side_admission",
+        "production_enabled"
+      ],
+      "properties": {
+        "industry_count_limit": {
+          "type": "null"
+        },
+        "accepts_new_sector_ids": {
+          "const": true
+        },
+        "requires_source_review": {
+          "const": true
+        },
+        "required_server_side_admission": {
+          "const": true
+        },
+        "production_enabled": {
+          "const": false
+        }
+      }
+    }
+  },
+  "$defs": {
+    "pack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "sector_group",
+        "status",
+        "enabled",
+        "production_ready",
+        "risk_tier",
+        "use_cases",
+        "capability_refs",
+        "data_exclusions",
+        "required_reviews"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{2,55}$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 90
+        },
+        "sector_group": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 60
+        },
+        "status": {
+          "const": "DESIGN_ONLY"
+        },
+        "enabled": {
+          "const": false
+        },
+        "production_ready": {
+          "const": false
+        },
+        "risk_tier": {
+          "enum": [
+            "STANDARD",
+            "ELEVATED",
+            "REGULATED"
+          ]
+        },
+        "use_cases": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 140
+          }
+        },
+        "capability_refs": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]+$"
+          }
+        },
+        "data_exclusions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 5
+          }
+        },
+        "required_reviews": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "IDENTITY_TENANT",
+              "DOMAIN_SPECIALIST",
+              "DATA_PROTECTION",
+              "SECURITY_ACCEPTANCE",
+              "LEGAL_REGULATORY",
+              "MEASUREMENT_BASELINE",
+              "HUMAN_APPROVAL",
+              "CONNECTOR_AUTHORIZATION"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
