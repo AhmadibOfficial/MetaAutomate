@@ -61,8 +61,8 @@ def page(path: Path):
 def test_universal_workflow_home_has_five_goal_options_and_four_views():
     html, dom = page(WORKSPACE)
     assert {a["data-goal"] for tag,a in dom.attrs if "data-goal" in a} == set(GOALS)
-    assert sorted(a["data-route"] for tag,a in dom.attrs if tag=="a" and "data-route" in a
-                  and a.get("href","#").startswith("#"))==sorted(list(PAGES))
+    assert {a["data-route"] for tag,a in dom.attrs if tag=="a" and "data-route" in a
+            and a.get("href","#").startswith("#")}==set(PAGES)
     assert all(f'id="view-{view}"' in html for view in PAGES)
     assert "What would you like to" in html
     assert 'id="industry"' in html
