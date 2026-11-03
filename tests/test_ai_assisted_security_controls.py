@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts" / "security"))
 import guard
 import check_changed_source as scanner
+import dependency_review
 
 class TestSecurityControls(unittest.TestCase):
     def test_sensitive_paths_and_safe_templates(self):
@@ -47,6 +48,20 @@ class TestSecurityControls(unittest.TestCase):
                        "node.innerHTML = value", "document.write(untrusted)"):
             self.assertTrue(any(rule.search(source) for _, rule in scanner.JS_BAD), source)
         self.assertFalse(any(rule.search("node.textContent = safe") for _, rule in scanner.JS_BAD))
+
+    def test_dependency_identity_and_external_index_rejection(self):
+        self.assertEqual(
+            dependency_review.canonical("HTTPX2"),
+            "httpx2",
+        )
+        for value in ("-i https://bad.example", "git+https://example.org/source.git",
+                      "untrusted @ https://example.org/a.whl"):
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError):
+                    dependency_review.parse_names([value])
+        manifest = json.loads((ROOT / "docs/security/approved-api-python-packages.json").read_text("utf-8"))
+        self.assertIn("httpx2", manifest["packages"])
+        self.assertEqual(manifest["status"], "PACKAGE_IDENTITIES_REVIEWED_NOT_FULLY_VERSION_LOCKED")
 
     def test_ci_and_hooks_are_fail_closed(self):
         ci = (ROOT / ".github/workflows/security-ai-assisted.yml").read_text("utf-8")
