@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "defaultMode": "default",
+    "blockReadsOutsideWorkingDirectories": true,
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/.env)",
+      "Read(./**/.env.*)",
+      "Read(./**/secrets/**)",
+      "Read(./**/credentials/**)",
+      "Read(./**/.aws/**)",
+      "Read(./**/.ssh/**)",
+      "Read(./**/.npmrc)",
+      "Read(./**/.pypirc)",
+      "Read(./**/.netrc)",
+      "Read(./**/*.pem)",
+      "Read(./**/*.key)",
+      "Read(./**/*.p12)",
+      "Read(./**/*.pfx)",
+      "Read(./**/*.tfstate*)",
+      "Read(./.claude/settings.local.json)",
+      "Edit(./.claude/settings.json)",
+      "Write(./.claude/settings.json)",
+      "Bash(git push *)",
+      "Bash(git merge *)",
+      "Bash(git reset --hard *)",
+      "Bash(git clean *)",
+      "Bash(rm -rf *)",
+      "Bash(curl *)",
+      "Bash(wget *)"
+    ],
+    "ask": [
+      "Bash(*)"
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": false
+  }
+}

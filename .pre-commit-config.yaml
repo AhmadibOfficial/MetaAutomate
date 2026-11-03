@@ -1,0 +1,15 @@
+repos:
+  - repo: local
+    hooks:
+      - id: sensitive-staged-paths
+        name: Block staged secret file paths
+        language: system
+        entry: python3 scripts/security/guard.py --staged
+        pass_filenames: false
+        stages: [pre-commit]
+      - id: gitleaks-staged
+        name: Scan staged changes with Gitleaks, redacted
+        language: system
+        entry: gitleaks git --staged --redact --no-banner
+        pass_filenames: false
+        stages: [pre-commit]
