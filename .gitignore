@@ -147,3 +147,19 @@ credentials/
 *.zip
 
 .workspace-access-key
+
+# AI-assisted engineering private local state
+.claude/settings.local.json
+.claude/projects/
+.codex/*.local.toml
+.ai-workspace/
+.ai-context-private/
+.ai-scratch/
+*.tfstate
+*.tfstate.*
+*.agekey
+*.kubeconfig
+*.sqlite
+*.sqlite3
+*.db
+artifacts/private/
