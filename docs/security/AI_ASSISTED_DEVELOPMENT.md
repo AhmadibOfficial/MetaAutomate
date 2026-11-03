@@ -42,3 +42,5 @@ F04–F09, OIDC, MFA, tenant isolation, recovery, regulatory and independent rev
 Review this PR, validate the security tests, ensure Gitleaks and changed-code Bandit run successfully on the exact head, inspect any scanner alerts privately, activate and independently verify branch rules, and only then consider a separately authorized merge.
 
 Documentation references: https://code.claude.com/docs/en/settings ; https://learn.chatgpt.com/docs/agent-approvals-security ; https://github.com/gitleaks/gitleaks-action ; https://pypi.org/project/bandit/1.9.4/
+
+Dependency change control: docs/security/approved-api-python-packages.json records current direct API dependency identities, including the verified httpx2 package. scripts/security/dependency_review.py blocks unreviewed additions, direct URLs, alternate indexes, VCS links, and renames. This is NOT a version lock and NOT a transitive vulnerability audit; independent artifact integrity and advisory checks are still required before any new installation.
