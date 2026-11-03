@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
+import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts" / "security"))
@@ -42,6 +43,14 @@ class TestSecurityControls(unittest.TestCase):
         self.assertIn("Bash(*)", data["permissions"]["ask"])
         self.assertEqual("default", data["permissions"]["defaultMode"])
         self.assertTrue(data["sandbox"]["enabled"])
+
+    def test_codex_project_sandbox_defaults(self):
+        with (ROOT / ".codex/config.toml").open("rb") as stream:
+            cfg = tomllib.load(stream)
+        self.assertEqual(cfg["sandbox_mode"], "workspace-write")
+        self.assertEqual(cfg["approval_policy"], "on-request")
+        self.assertFalse(cfg["sandbox_workspace_write"]["network_access"])
+        self.assertEqual(cfg["shell_environment_policy"]["inherit"], "core")
 
     def test_js_scan_catches_high_confidence_issues(self):
         for source in ("eval(userText)", "new Function(source)",
