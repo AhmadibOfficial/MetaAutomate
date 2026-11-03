@@ -1,0 +1,33 @@
+name: MetaAutomate AI Development Security
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  secure-diff:
+    name: AI-assisted changes secret scanning and Python SAST
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Scan committed changes (no secrets echoed)
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: python3 scripts/ai_security_preflight.py --base "$BASE_SHA"
+      - name: Test security-negative cases
+        run: |
+          python3 -m pip install 'pytest>=8,<10'
+          python3 -m pytest -q -p no:cacheprovider tests/test_ai_security_preflight.py
+      - name: Python SAST - Bandit medium and high findings fail
+        run: |
+          python3 -m pip install 'bandit==1.8.6'
+          python3 -m bandit -q -r apps/api -ll -ii -x '*/tests/*'
