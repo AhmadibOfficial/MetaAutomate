@@ -20,6 +20,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
+from psycopg import sql
 from psycopg.types.json import Jsonb
 
 from app.authn import TenantSession, get_tenant_session, require_role
@@ -169,19 +170,20 @@ def submit_period(
     org=session.principal.organization_id
     user=session.principal.user_id
     fields=list(OutcomePeriodInput.model_fields)
-    field_sql=",".join(fields)
-    placeholder=",".join(["%s"]*(len(fields)+4))
     params=[org,user,idempotency_key,checksum]+[getattr(payload,f) for f in fields]
-    # String-form SQL columns are a fixed, code-owned model definition, never
-    # derived from client-supplied keys.
+    # Fixed model-owned column identifiers are safely quoted via psycopg.sql;
+    # all values remain parameterized, including idempotency and tenant IDs.
+    statement=sql.SQL(
+        "INSERT INTO pilot_outcome_periods "
+        "(organization_id,submitted_by_user_id,request_key,input_sha256,{}) "
+        "VALUES ({}) "
+        "ON CONFLICT (organization_id,request_key) DO NOTHING RETURNING id"
+    ).format(
+        sql.SQL(",").join(sql.Identifier(name) for name in fields),
+        sql.SQL(",").join(sql.Placeholder() for _ in range(len(fields)+4)),
+    )
     with session.conn.cursor() as cur:
-        cur.execute(
-            "INSERT INTO pilot_outcome_periods "
-            "(organization_id,submitted_by_user_id,request_key,input_sha256,"+
-            field_sql+") VALUES ("+placeholder+") "
-            "ON CONFLICT (organization_id,request_key) DO NOTHING RETURNING id",
-            params,
-        )
+        cur.execute(statement,params)
         inserted=cur.fetchone()
         if inserted:
             cur.execute(
