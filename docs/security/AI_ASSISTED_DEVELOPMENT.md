@@ -44,3 +44,5 @@ Review this PR, validate the security tests, ensure Gitleaks and changed-code Ba
 Documentation references: https://code.claude.com/docs/en/settings ; https://learn.chatgpt.com/docs/agent-approvals-security ; https://github.com/gitleaks/gitleaks-action ; https://pypi.org/project/bandit/1.9.4/
 
 Dependency change control: docs/security/approved-api-python-packages.json records current direct API dependency identities, including the verified httpx2 package. scripts/security/dependency_review.py blocks unreviewed additions, direct URLs, alternate indexes, VCS links, and renames. This is NOT a version lock and NOT a transitive vulnerability audit; independent artifact integrity and advisory checks are still required before any new installation.
+
+Codex project settings: .codex/config.toml now requests workspace-write with on-request approvals, network off and a minimal inherited shell environment. Codex loads project settings only in trusted roots; treat these settings as agent controls, not filesystem secrecy. Verify the effective configuration and use a container without host secrets to prevent unintended reads.
