@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "scope": "ACTIVE_API_REQUIREMENTS_ONLY",
+  "status": "PACKAGE_IDENTITIES_REVIEWED_NOT_FULLY_VERSION_LOCKED",
+  "requirements": "apps/api/requirements.txt",
+  "packages": [
+    "fastapi",
+    "uvicorn",
+    "psycopg",
+    "redis",
+    "pytest",
+    "httpx2",
+    "authlib",
+    "itsdangerous",
+    "cryptography"
+  ],
+  "note": "Identity allowlist for the existing direct requirements; does not certify artifact versions, transitive dependencies, vulnerability status or package integrity."
+}
