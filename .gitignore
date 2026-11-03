@@ -178,6 +178,7 @@ credentials/
 **/google-services.json
 **/GoogleService-Info.plist
 .claude/settings.local.json
-.codex/
+.codex/*
+!.codex/config.toml
 artifacts/security/
 .gitleaks-report.*
