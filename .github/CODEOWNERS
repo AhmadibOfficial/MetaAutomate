@@ -1,0 +1,6 @@
+# Human ownership, not independently enforced until main branch rules are configured.
+* @AhmadibOfficial
+/.claude/ @AhmadibOfficial
+/.github/workflows/ @AhmadibOfficial
+/scripts/security/ @AhmadibOfficial
+/docs/security/ @AhmadibOfficial
