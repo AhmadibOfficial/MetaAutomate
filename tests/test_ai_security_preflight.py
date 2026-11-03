@@ -18,7 +18,7 @@ def test_restrict_sensitive_files():
 
 def test_recognize_secret_signatures():
     examples=[
-        ("-----BEGIN PRIVATE KEY-----","private_key"),
+        ("-----BEGIN " + "PRIVATE KEY-----","private_key"),
         ("ghp_"+"A"*30,"github_token"),
         ("AKIA"+"A"*16,"aws_access_key"),
         ("AIza"+"A"*35,"google_api_key"),
