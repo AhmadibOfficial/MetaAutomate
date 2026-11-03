@@ -30,7 +30,8 @@ def git(*args: str)->bytes:
     return process.stdout
 def inspect(path:str,raw:bytes)->list[tuple[str,int]]:
     problems=[]
-    if any(rule.search(path) for rule in DENY_PATHS):problems.append(("restricted_path",0))
+    if not path.endswith("/.env.example") and path != ".env.example" and any(rule.search(path) for rule in DENY_PATHS):
+        problems.append(("restricted_path",0))
     if len(raw)>MAX_BYTES:return problems+[("oversize_uninspected",0)]
     if b"\0" in raw[:4096]:return problems
     try: body=raw.decode("utf-8")
@@ -51,10 +52,9 @@ def main()->int:
     try:
         if args.base and not re.fullmatch(r"[0-9a-fA-F]{40}",args.base):
             raise ValueError("Not a full base SHA")
-        raw=git("diff","--cached" if args.staged else "--name-only") if False else (
-            git("diff","--cached","--name-only","--diff-filter=ACMR","-z") if args.staged
-            else git("diff","--name-only","--diff-filter=ACMR","-z",args.base+"..HEAD")
-        )
+        raw=(git("diff","--cached","--name-only","--diff-filter=ACMR","-z")
+             if args.staged else
+             git("diff","--name-only","--diff-filter=ACMR","-z",args.base+"..HEAD"))
         names=sorted(set(x.decode("utf-8") for x in raw.split(b"\0") if x))
         findings=[]
         for path in names:
