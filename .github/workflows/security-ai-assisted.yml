@@ -46,7 +46,7 @@ jobs:
       - name: Reject tracked sensitive paths
         run: python3 scripts/security/guard.py --tracked
       - name: Check repository security policy
-        run: python3 -m unittest tests.test_ai_assisted_security_controls
+        run: python3 -m unittest discover -s tests -p test_ai_assisted_security_controls.py
       - name: Static analysis of changed Python and application JavaScript
         env:
           BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
