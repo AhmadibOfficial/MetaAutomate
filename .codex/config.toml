@@ -1,0 +1,10 @@
+# Codex reads project-level configuration for trusted project roots.
+# Strong host-level isolation still requires a container with no secrets mounted.
+sandbox_mode = 'workspace-write'
+approval_policy = 'on-request'
+
+[sandbox_workspace_write]
+network_access = false
+
+[shell_environment_policy]
+inherit = 'core'
