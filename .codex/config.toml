@@ -1,0 +1,5 @@
+# Local conservative preference. Verify CLI version and trusted-project settings.
+sandbox_mode = "read-only"
+approval_policy = "on-request"
+[sandbox_workspace_write]
+network_access = false

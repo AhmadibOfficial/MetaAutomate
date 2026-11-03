@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/secrets/**)",
+      "Read(**/credentials/**)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/*.p12)",
+      "Read(**/*.pfx)",
+      "Read(**/.npmrc)",
+      "Read(**/.pypirc)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Edit(**/.env*)",
+      "Edit(**/secrets/**)",
+      "Edit(**/credentials/**)",
+      "Bash(git push *)",
+      "Bash(git merge *)",
+      "Bash(gh pr merge *)",
+      "Bash(git reset --hard *)"
+    ],
+    "ask": [
+      "Bash(git commit *)",
+      "Bash(npm install *)",
+      "Bash(pip install *)",
+      "Bash(docker *)"
+    ]
+  }
+}
