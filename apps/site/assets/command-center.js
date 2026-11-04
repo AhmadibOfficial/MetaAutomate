@@ -117,6 +117,7 @@
     prompt.focus();
   }
   $("remove-tool").addEventListener("click",()=>{selectedTool=null;updateToolSelection();prompt.focus();});
+  $("view-all-tools").addEventListener("click",()=>setPanel("agents"));
   for(const button of document.querySelectorAll("[data-choose]"))
     button.addEventListener("click",()=>chooseTool(button.dataset.choose));
 
