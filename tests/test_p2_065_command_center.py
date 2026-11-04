@@ -56,10 +56,10 @@ def test_existing_product_routes_and_real_media_tools_remain():
                   "/intelligence-lab/","/automation/","/company/"):
         assert route in p.hrefs
         assert (SITE/route.lstrip("/")).is_dir() if route != "/" else SITE.is_dir()
-    for item in ("image","video","project","intelligence","workflow","growth"):
+    for item in ("image","video","project","intelligence"):
         assert f'data-choose="{item}"' in HTML
-        assert item in HTML
-    assert len(re.findall(r'class="tool-card"',HTML))==6
+    assert len(re.findall(r'class="tool-card"',HTML))==4
+    assert 'id="view-all-tools"' in HTML
     assert 'id="tool-data"' in HTML
     tool_json=re.search(r'<script type="application/json" id="tool-data">(.*?)</script>',HTML,re.S)
     assert tool_json
