@@ -53,7 +53,7 @@
   <button type="button" class="new-chat" id="new-chat"><svg><use href="#i-plus"/></svg> New chat</button>
   <label class="search-box" for="chat-search"><svg><use href="#i-search"/></svg><input id="chat-search" type="search" autocomplete="off" placeholder="Search this session" aria-label="Search chats"></label>
   <div class="sidebar-section-heading"><span>Recent chats</span><span class="count" id="chat-count">0</span></div>
-  <div id="chat-history" class="chat-history" role="list" aria-label="Chats from this browser session"></div>
+  <div id="chat-history" class="chat-history" role="group" aria-label="Chats from this browser session"></div>
   <p class="chat-empty" id="chat-empty">No chats yet. Start with a goal or choose a tool.</p>
   <div class="sidebar-projects">
    <span class="sidebar-section-heading">Your connected tools</span>
@@ -76,14 +76,14 @@
       <div class="eyebrow">INTELLIGENCE · CREATION · AUTOMATION</div>
       <h1>What can we <em>create together?</em></h1>
       <p class="welcome-subtitle">One place to move from an idea to a plan, a graphic, a video, or a better business decision.</p>
-      <div class="tools-heading"><h2>Your tools</h2><span>Choose a starting point</span></div>
+      <div class="tools-heading"><h2>Your featured tools</h2><button id="view-all-tools" type="button" class="view-all-tools">View all 6 <svg><use href="#i-arrow"/></svg></button></div>
       <div class="tool-grid" id="featured-tools">
        <article class="tool-card"><div class="tool-badge badge-image"><svg><use href="#i-image"/></svg></div><div><h3>Image Studio</h3><p>Create original graphics and export high-resolution PNG files.</p><div class="tool-actions"><button type="button" data-choose="image">Plan with guide</button><a href="/creative/">Open tool <span aria-hidden="true">↗</span></a></div></div></article>
        <article class="tool-card"><div class="tool-badge badge-video"><svg><use href="#i-video"/></svg></div><div><h3>Video Studio</h3><p>Make narrated WebM motion graphics from your own audio.</p><div class="tool-actions"><button type="button" data-choose="video">Plan with guide</button><a href="/creative/">Open tool <span aria-hidden="true">↗</span></a></div></div></article>
        <article class="tool-card"><div class="tool-badge badge-chat"><svg><use href="#i-spark"/></svg></div><div><h3>AI Project Guide</h3><p>Shape your idea, build a brief and try optional on-device text AI.</p><div class="tool-actions"><button type="button" data-choose="project">Plan with guide</button><a href="/engage/">Open tool <span aria-hidden="true">↗</span></a></div></div></article>
        <article class="tool-card"><div class="tool-badge badge-data"><svg><use href="#i-chart"/></svg></div><div><h3>Business Intelligence</h3><p>Explore goals, cost scenarios and evidence-aware insights.</p><div class="tool-actions"><button type="button" data-choose="intelligence">Plan with guide</button><a href="/intelligence-lab/">Open tool <span aria-hidden="true">↗</span></a></div></div></article>
-       <article class="tool-card"><div class="tool-badge badge-work"><svg><use href="#i-folder"/></svg></div><div><h3>Workflow Planner</h3><p>Organize work across industries with reviewable steps.</p><div class="tool-actions"><button type="button" data-choose="workflow">Plan with guide</button><a href="/workspace/">Open tool <span aria-hidden="true">↗</span></a></div></div></article>
-       <article class="tool-card"><div class="tool-badge badge-growth"><svg><use href="#i-grid"/></svg></div><div><h3>Growth Autopilot</h3><p>Review customer, sales and marketing recommendations.</p><div class="tool-actions"><button type="button" data-choose="growth">Plan with guide</button><a href="/automation/">Open tool <span aria-hidden="true">↗</span></a></div></div></article>
+       
+       
       </div>
      </div>
      <section id="conversation" class="conversation" aria-label="Chat messages" hidden><div class="conversation-head"><div><span class="eyebrow">GUIDED PLANNING</span><h2 id="conversation-title">New conversation</h2></div><button type="button" id="export-chat" class="subtle-action"><svg><use href="#i-download"/></svg> Export TXT</button></div><ol id="message-list" class="message-list" aria-live="polite" aria-relevant="additions text"></ol></section>
