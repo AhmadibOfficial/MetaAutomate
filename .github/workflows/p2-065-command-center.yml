@@ -1,0 +1,41 @@
+name: P2-065 MetaAutomate Responsive Command Center
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [feature/p2-065-responsive-command-center]
+permissions:
+  contents: read
+jobs:
+  command-center:
+    name: Source, security and real responsive Chromium acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify JavaScript syntax and no external source imports
+        run: |
+          node --check apps/site/assets/command-center.js
+          test -f apps/site/command/index.html
+          test -f apps/site/assets/command-center.css
+      - name: Source privacy and navigation contracts
+        run: |
+          python -m pip install 'pytest>=8,<10'
+          python -m pytest -q -p no:cacheprovider tests/test_p2_065_command_center.py
+      - name: Install Chromium for real browser QA
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Verify desktop, tablet, mobile and browser-only actions
+        run: python scripts/verify_command_center_browser.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: command-center-desktop-mobile-evidence
+          path: artifacts/command-center/
+          if-no-files-found: warn

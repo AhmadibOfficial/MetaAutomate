@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07172c">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="MetaAutomate Command Center — a unified, responsive workspace connecting creative tools, business planning and guided project workflows.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'; frame-src 'none'">
+<title>MetaAutomate — Command Center</title>
+<link rel="icon" type="image/webp" href="/assets/metaautomate-mark.webp">
+<link rel="stylesheet" href="/assets/command-center.css">
+<script defer src="/assets/command-center.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to workspace</a>
+<svg xmlns="http://www.w3.org/2000/svg" class="svg-defs" aria-hidden="true">
+ <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 11.5a8 8 0 0 1-8 8 9 9 0 0 1-4-.8L3 20l1.4-4A8 8 0 1 1 20 11.5Z"/></symbol>
+ <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+ <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10H3V7Z"/></symbol>
+ <symbol id="i-tool" viewBox="0 0 24 24"><path d="M14 6a5 5 0 0 0-6.2 6.2L3 17v4h4l4.8-4.8A5 5 0 0 0 18 10l-3 3-4-4 3-3Z"/></symbol>
+ <symbol id="i-settings" viewBox="0 0 24 24"><path d="M9.6 3h4.8l.7 2.3 2 1.1 2.3-.5 2.4 4.2-1.7 1.8v2.2l1.7 1.8-2.4 4.2-2.3-.5-2 1.1-.7 2.3H9.6l-.7-2.3-2-1.1-2.3.5-2.4-4.2 1.7-1.8v-2.2l-1.7-1.8 2.4-4.2 2.3.5 2-1.1.7-2.3Z"/><circle cx="12" cy="12" r="3.1"/></symbol>
+ <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></symbol>
+ <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+ <symbol id="i-send" viewBox="0 0 24 24"><path d="m4 12 16-8-5 16-3-7-8-1Z"/><path d="m12 13 8-9"/></symbol>
+ <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+ <symbol id="i-close" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
+ <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m4 18 5-5 4 4 3-3 4 4"/></symbol>
+ <symbol id="i-video" viewBox="0 0 24 24"><rect x="2.5" y="5" width="14" height="14" rx="3"/><path d="m16.5 10 5-3v10l-5-3Z"/></symbol>
+ <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 2 2.8 7.2L22 12l-7.2 2.8L12 22l-2.8-7.2L2 12l7.2-2.8L12 2Z"/></symbol>
+ <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 20h18M6 17v-5M12 17V7M18 17v-9"/></symbol>
+ <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+ <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 18v3h16v-3"/></symbol>
+ <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+ <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 20 6v6c0 5-3 8-8 10-5-2-8-5-8-10V6l8-4Z"/><path d="m8 12 3 3 5-6"/></symbol>
+ <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/></symbol>
+</svg>
+<div class="shell" id="shell">
+ <nav class="icon-rail" aria-label="Primary workspace">
+  <a class="rail-brand" href="/" aria-label="MetaAutomate website"><img src="/assets/metaautomate-mark.webp" alt="" width="38" height="38"></a>
+  <div class="rail-nav">
+   <button type="button" data-panel="chat" class="rail-action active" aria-label="Chat workspace" aria-pressed="true" title="Chat workspace"><svg><use href="#i-chat"/></svg><span>Chat</span></button>
+   <button type="button" data-panel="agents" class="rail-action" aria-label="Explore tools" aria-pressed="false" title="Explore tools"><svg><use href="#i-grid"/></svg><span>Explore</span></button>
+   <button type="button" data-panel="projects" class="rail-action" aria-label="Projects and planning" aria-pressed="false" title="Projects and planning"><svg><use href="#i-folder"/></svg><span>Projects</span></button>
+   <button type="button" data-panel="tools" class="rail-action" aria-label="Available tools" aria-pressed="false" title="Available tools"><svg><use href="#i-tool"/></svg><span>Tools</span></button>
+   <button type="button" data-panel="settings" class="rail-action" aria-label="Privacy and settings" aria-pressed="false" title="Privacy and settings"><svg><use href="#i-settings"/></svg><span>Settings</span></button>
+  </div>
+  <a class="rail-bottom" href="/company/" aria-label="About MetaAutomate" title="About MetaAutomate"><svg><use href="#i-shield"/></svg><span>About</span></a>
+ </nav>
+ <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+ <aside class="chat-sidebar" id="chat-sidebar" aria-label="Chats and recent work">
+  <div class="side-head"><strong>Workspace</strong><button class="side-close icon-button" id="side-close" type="button" aria-label="Close chat menu"><svg><use href="#i-close"/></svg></button></div>
+  <button type="button" class="new-chat" id="new-chat"><svg><use href="#i-plus"/></svg> New chat</button>
+  <label class="search-box" for="chat-search"><svg><use href="#i-search"/></svg><input id="chat-search" type="search" autocomplete="off" placeholder="Search this session" aria-label="Search chats"></label>
+  <div class="sidebar-section-heading"><span>Recent chats</span><span class="count" id="chat-count">0</span></div>
+  <div id="chat-history" class="chat-history" role="group" aria-label="Chats from this browser session"></div>
+  <p class="chat-empty" id="chat-empty">No chats yet. Start with a goal or choose a tool.</p>
+  <div class="sidebar-projects">
+   <span class="sidebar-section-heading">Your connected tools</span>
+   <a href="/creative/"><svg><use href="#i-image"/></svg> Image &amp; video studio <svg class="link-arrow"><use href="#i-arrow"/></svg></a>
+   <a href="/engage/"><svg><use href="#i-spark"/></svg> On-device AI &amp; brief <svg class="link-arrow"><use href="#i-arrow"/></svg></a>
+   <a href="/workspace/"><svg><use href="#i-chart"/></svg> Business workflows <svg class="link-arrow"><use href="#i-arrow"/></svg></a>
+  </div>
+  <div class="sidebar-note"><span class="status-dot"></span><div><strong>Browser-local workspace</strong><small>No account. No data uploaded.</small></div></div>
+ </aside>
+ <div class="main-column">
+  <header class="topbar">
+   <div class="top-left"><button type="button" class="mobile-toggle icon-button" id="mobile-toggle" aria-label="Open chat menu" aria-expanded="false" aria-controls="chat-sidebar"><svg><use href="#i-menu"/></svg></button><div class="top-brand"><span class="top-label">MetaAutomate</span><span class="top-version">Command Center / Preview</span></div></div>
+   <a class="top-action" href="/engage/" title="Optional on-device text AI (experimental)"><svg><use href="#i-spark"/></svg> Local AI <span>Experimental</span></a>
+  </header>
+  <main id="main" tabindex="-1">
+   <div class="content-scroller">
+    <section class="page" id="panel-chat" data-page="chat" aria-label="Chat workspace">
+     <div id="welcome" class="welcome">
+      <div class="orb" aria-hidden="true"><div class="orb-core"></div></div>
+      <div class="eyebrow">INTELLIGENCE · CREATION · AUTOMATION</div>
+      <h1>What can we <em>create together?</em></h1>
+      <p class="welcome-subtitle">One place to move from an idea to a plan, a graphic, a video, or a better business decision.</p>
+      <div class="tools-heading"><h2>Your featured tools</h2><button id="view-all-tools" type="button" class="view-all-tools">View all 6 <svg><use href="#i-arrow"/></svg></button></div>
+      <div class="tool-grid" id="featured-tools">
+       <article class="tool-card"><div class="tool-badge badge-image"><svg><use href="#i-image"/></svg></div><div><h3>Image Studio</h3><p>Create original graphics and export high-resolution PNG files.</p><div class="tool-actions"><button type="button" data-choose="image">Plan with guide</button><a href="/creative/">Open tool <span aria-hidden="true">↗</span></a></div></div></article>
+       <article class="tool-card"><div class="tool-badge badge-video"><svg><use href="#i-video"/></svg></div><div><h3>Video Studio</h3><p>Make narrated WebM motion graphics from your own audio.</p><div class="tool-actions"><button type="button" data-choose="video">Plan with guide</button><a href="/creative/">Open tool <span aria-hidden="true">↗</span></a></div></div></article>
+       <article class="tool-card"><div class="tool-badge badge-chat"><svg><use href="#i-spark"/></svg></div><div><h3>AI Project Guide</h3><p>Shape your idea, build a brief and try optional on-device text AI.</p><div class="tool-actions"><button type="button" data-choose="project">Plan with guide</button><a href="/engage/">Open tool <span aria-hidden="true">↗</span></a></div></div></article>
+       <article class="tool-card"><div class="tool-badge badge-data"><svg><use href="#i-chart"/></svg></div><div><h3>Business Intelligence</h3><p>Explore goals, cost scenarios and evidence-aware insights.</p><div class="tool-actions"><button type="button" data-choose="intelligence">Plan with guide</button><a href="/intelligence-lab/">Open tool <span aria-hidden="true">↗</span></a></div></div></article>
+       
+       
+      </div>
+     </div>
+     <section id="conversation" class="conversation" aria-label="Chat messages" hidden><div class="conversation-head"><div><span class="eyebrow">GUIDED PLANNING</span><h2 id="conversation-title">New conversation</h2></div><button type="button" id="export-chat" class="subtle-action"><svg><use href="#i-download"/></svg> Export TXT</button></div><ol id="message-list" class="message-list" aria-live="polite" aria-relevant="additions text"></ol></section>
+    </section>
+    <section class="page panel-directory" id="panel-agents" data-page="agents" hidden aria-labelledby="agents-heading"><span class="eyebrow">CAPABILITY LIBRARY</span><h1 id="agents-heading">Your creative and business tools</h1><p>Select a real browser tool or begin a guided plan. These are not autonomous AI agents.</p><div id="agent-directory" class="directory-grid"></div></section>
+    <section class="page panel-directory" id="panel-projects" data-page="projects" hidden aria-labelledby="projects-heading"><span class="eyebrow">WORK IN ONE PLACE</span><h1 id="projects-heading">Projects &amp; workflows</h1><p>Continue into an existing MetaAutomate tool without losing the clarity of one starting workspace.</p><div class="directory-grid"><a class="directory-item" href="/workspace/"><svg><use href="#i-folder"/></svg><strong>Business workspace</strong><span>22 sector starting profiles and human-reviewed local plans.</span></a><a class="directory-item" href="/engage/"><svg><use href="#i-chat"/></svg><strong>Start a project</strong><span>Five-step guided intake, copy and download your brief.</span></a><a class="directory-item" href="/intelligence/"><svg><use href="#i-spark"/></svg><strong>Project architect</strong><span>Review structured project architectures using synthetic cases.</span></a><a class="directory-item" href="/automation/"><svg><use href="#i-grid"/></svg><strong>Growth explorer</strong><span>Explore consent-aware recommendations with sample data.</span></a></div></section>
+    <section class="page panel-directory" id="panel-tools" data-page="tools" hidden aria-labelledby="tools-heading"><span class="eyebrow">CREATION &amp; INTELLIGENCE</span><h1 id="tools-heading">Available tools</h1><p>Working browser capabilities and controlled previews from the existing MetaAutomate system.</p><div class="directory-grid"><a class="directory-item" href="/creative/"><svg><use href="#i-image"/></svg><strong>Create graphics and narrated videos</strong><span>PNG image export and WebM motion graphics with user-owned narration.</span></a><a class="directory-item" href="/intelligence-lab/"><svg><use href="#i-chart"/></svg><strong>Business intelligence lab</strong><span>Source-labeled synthetic indicators and planning scenarios.</span></a><a class="directory-item" href="/workspace/#work"><svg><use href="#i-folder"/></svg><strong>Inventory CSV review</strong><span>Inspect non-sensitive stock files locally with rules-based analysis.</span></a><a class="directory-item" href="/engage/"><svg><use href="#i-spark"/></svg><strong>Optional on-device AI</strong><span>Experimental model download after consent; requires compatible WebGPU.</span></a></div></section>
+    <section class="page panel-directory" id="panel-settings" data-page="settings" hidden aria-labelledby="settings-heading"><span class="eyebrow">YOUR CONTROL</span><h1 id="settings-heading">Privacy &amp; workspace</h1><div class="settings-grid"><article><svg><use href="#i-shield"/></svg><div><h2>Local session only</h2><p>Chats live only in this browser tab's memory. Refreshing clears them. Nothing is sent to MetaAutomate servers by this interface.</p></div></article><article><svg><use href="#i-spark"/></svg><div><h2>AI is not running here</h2><p>Chat guidance is rule-based. Optional text model inference is a separate experimental feature in Start a Project.</p></div></article><article><svg><use href="#i-check"/></svg><div><h2>Human approval</h2><p>No automated posting, messaging, billing, booking or infrastructure changes are available in this interface.</p></div></article></div><button type="button" class="outline-button" id="clear-all">Clear chats in this tab</button><p class="settings-warning">Use sample or non-sensitive information. Do not enter credentials, customer records, patient information or confidential business data.</p></section>
+   </div>
+   <section class="composer-shell" aria-label="Workspace command input">
+    <div class="selected-tool" id="selected-tool" hidden><span class="selected-dot"></span><span id="selected-tool-name"></span><button id="remove-tool" type="button" aria-label="Remove selected tool">×</button></div>
+    <form class="composer" id="command-form"><label for="command-input" class="sr-only">Describe your goal</label><textarea id="command-input" rows="2" maxlength="700" placeholder="Describe what you want to create or improve..." enterkeyhint="send" required></textarea><div class="composer-footer"><div class="composer-chips"><span class="mode-chip"><svg><use href="#i-shield"/></svg> Guided planning · Local</span><span class="privacy-chip">No external actions</span></div><button class="send-button" type="submit" aria-label="Create guided plan"><svg><use href="#i-arrow"/></svg></button></div></form>
+    <div class="quick-prompts" aria-label="Quick start suggestions"><button data-prompt="Create a product graphic for a business promotion" type="button">Product graphic</button><button data-prompt="Plan a narrated educational video with my own audio" type="button">Narrated video</button><button data-prompt="Organize customer inquiries and follow-ups" type="button">Customer follow-up</button><button data-prompt="Review stock levels and restocking priorities" type="button">Inventory review</button></div>
+    <p class="footnote">MetaAutomate can make mistakes. This screen offers rule-based planning, not autonomous AI. <a href="/company/">About our approach</a></p>
+   </section>
+  </main>
+ </div>
+</div>
+<script type="application/json" id="tool-data">{"image":{"name":"Image Studio","url":"/creative/","intro":"Create a high-resolution original graphic with the existing browser creator.","steps":["Choose an output format and clarify the visual message.","Prepare concise headline and supporting copy.","Open Image Studio, preview the design and download your PNG.","Review brand accuracy and permissions before sharing."]},"video":{"name":"Video Studio","url":"/creative/","intro":"Create a narrated motion graphic using your own authorized audio.","steps":["Prepare the message and a 30–120 second narration.","Confirm that you own or have permission to use the recording.","Open Video Studio and export a compatible WebM recording.","Preview audio and video before publication."]},"project":{"name":"AI Project Guide","url":"/engage/","intro":"Turn your idea into a clear project brief, with optional device-side text AI.","steps":["State the project objective and intended audience.","List the required functions, constraints and success criteria.","Use the five-step project guide to prepare a review brief.","Only enable optional on-device AI after checking the privacy notice."]},"intelligence":{"name":"Business Intelligence","url":"/intelligence-lab/","intro":"Explore data questions and evidence needed for better business decisions.","steps":["Define a business question and measurable baseline.","Inspect illustrative indicators in the Business Intelligence Lab.","Distinguish measured values from assumptions or forecasts.","Confirm source quality and accountable review before acting."]},"workflow":{"name":"Workflow Planner","url":"/workspace/","intro":"Structure a business task into clear, reviewable steps.","steps":["Describe the business problem without personal or confidential records.","Select a relevant industry or custom workflow.","Review the local plan, its dependencies and human checkpoints.","Record next actions only after responsible approval."]},"growth":{"name":"Growth Autopilot","url":"/automation/","intro":"Review consent-aware customer and growth opportunities without external execution.","steps":["Define the sales, retention or contribution objective.","Review the illustrative opportunity and cost assumptions.","Identify required opt-ins, handovers and human reviews.","Measure outcomes from real sources before any future activation."]}}</script>
+</body>
+</html>
