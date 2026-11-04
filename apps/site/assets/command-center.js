@@ -74,7 +74,6 @@
     for (const item of filtered) {
       const button=elt("button","history-item");
       button.type="button";
-      button.setAttribute("role","listitem");
       button.setAttribute("aria-current",String(item.id===activeId));
       button.setAttribute("aria-label","Open chat: "+item.title);
       const glyph=document.createElementNS("http://www.w3.org/2000/svg","svg");
@@ -95,6 +94,7 @@
       "No chat titles match your search.";
   }
 
+  search.addEventListener("input",renderHistory);
   function iconNode(name) {
     const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
     const use=document.createElementNS("http://www.w3.org/2000/svg","use");
