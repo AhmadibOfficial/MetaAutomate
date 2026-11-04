@@ -5,7 +5,7 @@
 
 ## User experience
 
-- Desktop: narrow icon navigation rail, searchable recent-chat sidebar, central intelligent-workspace screen with abstract CSS sphere, real tool cards, bottom command composer.
+- Desktop: narrow icon navigation rail, searchable recent-chat sidebar, central intelligent-workspace screen with abstract CSS sphere, four featured tool cards, a View all six directory and bottom command composer.
 - Tablet: collapsed sidebar with menu/drawer, intact main controls.
 - Mobile (320/360/390px): bottom 5-item navigation, off-canvas chat list, safe-area support, one-column cards and accessible responsive composer.
 - Tools: Image Studio, Video Studio, AI Project Guide, Business Intelligence, Workflow Planner, Growth Autopilot.
