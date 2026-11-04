@@ -43,12 +43,15 @@ def test_desktop(browser,base,errors,external):
     assert r is not None and r.status==200
     expect(page).to_have_title("MetaAutomate — Command Center")
     expect(page.locator(".rail-action")).to_have_count(5)
-    expect(page.locator(".tool-card")).to_have_count(6)
+    expect(page.locator(".tool-card")).to_have_count(4)
     expect(page.locator("#welcome")).to_be_visible()
     expect(page.locator("#mobile-toggle")).to_be_hidden()
     expect(page.locator("#command-input")).to_be_visible()
     assert no_horizontal_overflow(page,"desktop")
     page.screenshot(path=str(OUT/"command-desktop.png"),full_page=True)
+    page.locator("#view-all-tools").click()
+    expect(page.locator("#agent-directory .directory-item")).to_have_count(6)
+    page.locator('[data-panel="chat"]').click()
 
     # A tool selection is an action, not merely a card animation.
     page.locator('[data-choose="image"]').click()
@@ -130,6 +133,7 @@ def test_responsive(browser,base,width,height,errors,external):
         expect(page.locator("#panel-tools")).to_be_visible()
         page.locator('[data-panel="chat"]').click()
         expect(page.locator("#welcome")).to_be_visible()
+    page.screenshot(path=str(OUT/f"command-welcome-{width}px.png"),full_page=True)
     # Quick prompt action then actual rule-based response.
     page.locator('[data-prompt="Create a product graphic for a business promotion"]').click()
     expect(page.locator("#command-input")).to_have_value("Create a product graphic for a business promotion")
